@@ -15,3 +15,6 @@ theorem empty_is_upward_closed {α : Type*} (S : Set α) : IsUpwardClosed S ∅ 
   exact x
 
 -- something here....
+
+
+-- Daniel's comment #1
