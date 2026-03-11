@@ -16,3 +16,6 @@ theorem dual_is_upclosed (F : Set (Set α)) : upclosed (dual F) := by
   have A_cap_C_nonempty : (A ∩ C).Nonempty := A_in_dual C C_in_F
   have A_cap_C_in_B_cap_C : A ∩ C ⊆ B ∩ C := Set.inter_subset_inter_left C A_in_B
   exact Set.Nonempty.mono A_cap_C_in_B_cap_C A_cap_C_nonempty
+
+
+--- new thing here too
