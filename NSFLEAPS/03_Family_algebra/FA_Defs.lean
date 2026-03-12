@@ -37,22 +37,32 @@ def properFam (S : Set α) (F : Set (Set α)) : Prop :=
 structure Family (α : Type) where
   F : Set (Set α)
   upward_closed : UpwardClosed F
+def isfilterFamily (Fam : Family α) : Prop :=
+  (∀ {A B : Set α}, A ∈ Fam.F → B ∈ Fam.F → A ∩ B ∈ Fam.F) -- closed under ∩
+def isPRTwoSets (F : Family α) : Prop :=
+  ∀ A ∈ F.F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.F
 
 structure PRFamily (α : Type) extends Family α where
   partition_regular : isPRTwoSets {F, upward_closed}
-def isfilterFamily (Fam : Family α) : Prop :=
-  (∀ {A B : Set α}, A ∈ Fam.F → B ∈ Fam.F → A ∩ B ∈ Fam.F) -- closed under ∩
 
 structure FilterFamily (α : Type) extends Family α where
   filter : isfilterFamily {F, upward_closed}
-def isPRTwoSets (F : Family α) : Prop :=
-  ∀ A ∈ F.F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.F
 
 def capFam (F G : Set (Set α)) : Set (Set α) :=
   { H | ∃ A ∈ F, ∃ B ∈ G, H = A ∩ B }
 
-def fullFam (α : Type _) : Family α := sorry
-def emptyFam (α : Type _) : Family α := sorry
+def fullFam (α : Type _) : Family α := {
+  F := Set.powerset (Set.univ : Set α),
+  upward_closed := by
+    intro A B hA hAB
+    simp [Set.powerset] at hA ⊢
+}
+def emptyFam (α : Type _) : Family α := {
+  F := ∅,
+  upward_closed := by
+    intro A B hA hAB
+    simp at hA
+}
 
 --dual definitions
 def Family.dual (fam : Family α) : Family α :=
@@ -92,10 +102,8 @@ noncomputable def Family.classCap (famA famB : Family α) : Family α :=
     · exact famB.upward_closed A B hA hAB
     · exact famA.upward_closed A B hA hAB
     · rcases hA with ⟨C, hC, D, hD, hAeq⟩
+      sorry
       --B = ((B ∪ C) ∈ fam A) ∩ ((B ∪ D) ∈ fam B)
-      exact ⟨C, hC, D, hD, by rw [← hAeq];
-        exact Set.inter_subset_inter
-        (Set.subset_union_left B C) (Set.subset_union_left B D)⟩
 }
 
 instance : HasClassCap (Set (Set α))  where
@@ -111,7 +119,7 @@ noncomputable def classCapDual (F G : Set (Set α)) : Set (Set α) :=
   else { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
 
 open Classical in
-noncomputable def Family.classCapDual (famA famB : Family α) : Family α :=
+noncomputable def Family.classCapDual (famA famB : Family α) : Family α := {
   F := _root_.classCapDual famA.F famB.F,
   upward_closed := by
     intro A B hA hAB
@@ -122,9 +130,11 @@ noncomputable def Family.classCapDual (famA famB : Family α) : Family α :=
     · exact famA.upward_closed A B hA hAB
     · intro C hCF
       have hBCmem : B ∩ C ∈ famB.F :=
-        famB.upward_closed (A ∩ C) (B ∩ C) (hA C hCF) (Set.inter_subset_inter_left B hAB)
+        famB.upward_closed (A ∩ C) (B ∩ C) (hA C hCF)
+        (Set.inter_subset_inter hAB (Set.Subset.refl C))
       unfold _root_.dual at hBCmem
-      exact hBCmem C hCF
+      exact hBCmem
+}
 
 instance : HasClassCapDual (Set (Set α))  where
   classCapDual := _root_.classCapDual
