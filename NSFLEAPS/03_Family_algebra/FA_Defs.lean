@@ -101,9 +101,12 @@ noncomputable def Family.classCap (famA famB : Family α) : Family α :=
     split_ifs at hA ⊢ with hF hG
     · exact famB.upward_closed A B hA hAB
     · exact famA.upward_closed A B hA hAB
-    · rcases hA with ⟨C, hC, D, hD, hAeq⟩
+    · rcases hA with ⟨C, hCF, D, hDG, hAeq⟩
+      -- C ∩ D = A ⊆ B, so B ⊆ (C ∪ B) and B ⊆ (D ∪ B).
+      have hC' : (B ∪ C) ∈ famA.F := famA.upward_closed C (B ∪ C) hCF Set.subset_union_right
+      have hD' : (B ∪ D) ∈ famB.F := famB.upward_closed D (B ∪ D) hDG Set.subset_union_right
+      -- Now, (B ∪ C) ∩ (B ∪ D) = B ∪ (C ∩ D) = B ∪ A = B, so B ∈ classCap famA famB. 
       sorry
-      --B = ((B ∪ C) ∈ fam A) ∩ ((B ∪ D) ∈ fam B)
 }
 
 instance : HasClassCap (Set (Set α))  where
