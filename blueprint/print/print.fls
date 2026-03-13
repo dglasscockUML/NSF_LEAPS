@@ -121,6 +121,10 @@ INPUT macros/common.tex
 INPUT macros/common.tex
 INPUT macros/print.tex
 INPUT macros/print.tex
+INPUT LEAPS_preamble.tex
+INPUT LEAPS_preamble.tex
+INPUT /usr/local/texlive/2019/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/local/texlive/2019/texmf-dist/tex/latex/cleveref/cleveref.sty
 INPUT ../print/print.aux
 INPUT ../print/print.aux
 OUTPUT ../print/print.aux
@@ -163,5 +167,11 @@ INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm1
 INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT content.tex
 INPUT content.tex
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
+INPUT /usr/local/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
 INPUT ../print/print.aux
 INPUT ../print/print.out

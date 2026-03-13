@@ -5,3 +5,119 @@
 % If you want to split the blueprint content into several files then
 % the current file can be a simple sequence of \input. Otherwise It
 % can start with a \section or \chapter for instance.
+
+\begin{theorem}
+    \label{thm_dual_of_fam_is_fam}
+    \lean{thm_dual_of_fam_is_fam}
+    If $\family$ is a family, then $\family^*$ is a family.  That is, $\cdot^*: \families(S) \to \families(S)$.
+\end{theorem}
+
+\begin{proof}
+    By the definition of family, we need only check that $\family^*$ is an upward closed collection of subsets of $S$.  It is, by definition, a collection of subsets of $S$.  If $A \in \family^*$ and $A \subseteq A' \subseteq S$, to show that $A' \in \family^*$, we need only to show that for all $B \in \family$, $A' \cap B \neq \emptyset$.  Since $A \in \family^*$, we have that $\emptyset \neq A \cap B \subseteq A' \cap B$, as desired.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_equiv_dual_formulation}
+    \lean{thm_equiv_dual_formulation}
+    For all families $\family$, $\family^* = \{A \subseteq S \mid S \setminus A \not\in \family\}$
+\end{theorem}
+
+\begin{proof}
+In the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $A \in \family^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item for all $B \in \family$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] set theory: for $X, Y \subseteq Z$, $X \cap Y = \emptyset$ iff $Y \subseteq Z \setminus X$
+        \end{itemize}
+        \item for all $B \in \family$, $B \not\subseteq S \setminus A$
+        \begin{itemize}
+            \item[--] logic: negation of a universal quantifier
+        \end{itemize}
+        \item not ( there exists $B \in \family$, $B \subseteq S \setminus A$ )
+        \begin{itemize}
+            \item[--] $\family$ is upward closed
+        \end{itemize}
+        \item not ( $S \setminus A \in \family$ )
+    \end{enumerate}
+\end{proof}
+
+
+
+\begin{theorem}
+    \label{thm_dual_is_involution}
+    \lean{thm_dual_is_involution}
+    \uses{thm_equiv_dual_formulation}
+    $*$ is an involution on the set families: $(\family^*)^* = \family$
+\end{theorem}
+
+\begin{proof}
+    In the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $A \in (\family^*)^*$
+        \begin{itemize}
+            \item[--] \cref{thm_equiv_dual_formulation}
+        \end{itemize}
+        \item $S \setminus A \not\in \family^*$
+        \begin{itemize}
+            \item[--] \cref{thm_equiv_dual_formulation}
+        \end{itemize}
+        \item $S \setminus (S \setminus A) \in \family$
+        \begin{itemize}
+            \item[--] set theory: for $X \subseteq Z$, $Z \setminus (Z \setminus X) = X$
+        \end{itemize}
+        \item $A \in \family$
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+    \label{thm_pr_iff_dual_is_filter}
+    \lean{thm_pr_iff_dual_is_filter}
+    $\family$ is a partition regular family if and only if $\family^*$ is a filter
+\end{theorem}
+
+\begin{proof}
+    \uses{thm_dual_of_fam_is_fam, thm_dual_is_involution, thm_equiv_dual_formulation}
+    By \cref{thm_dual_of_fam_is_fam} and \cref{thm_dual_is_involution}, $\family$ is family if and only if $\family^*$ is a family.  Then, in the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $\family$ is a partition regular family
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $A \cup B \in \family$, then $A \in \family$ or $B \in \family$
+        \begin{itemize}
+            \item[--] \cref{thm_dual_is_involution}
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $A \cup B \in (\family^*)^*$, then $A \in (\family^*)^*$ or $B \in (\family^*)^*$
+        \begin{itemize}
+            \item[--] \cref{thm_equiv_dual_formulation}
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $S \setminus (A \cup B) \not\in \family^*$, then $S \setminus A \not\in \family^*$ or $S \setminus B \not\in \family^*$
+        \begin{itemize}
+            \item[--] set theory: for $X, Y \subseteq Z$, $Z \setminus (X \cup Y) = (Z \setminus X) \cap (Z \setminus Y)$
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $(S \setminus A) \cap (S \setminus B) \not\in \family^*$, then $S \setminus A \not\in \family^*$ or $S \setminus B \not\in \family^*$
+        \begin{itemize}
+            \item[--] logic: ``if not $p$, then not $q$ OR not $r$'' is equivalent to ``if $q$ and $r$, then $p$''
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $S \setminus A \in \family^*$ and $S \setminus B \in \family^*$, then $(S \setminus A) \cap (S \setminus B) \in \family^*$
+        \begin{itemize}
+            \item[--] write $C = S \setminus A$ and $D = S \setminus B$ and use set theory: for $X \subseteq Z$, $Z \setminus (Z \setminus X) = X$
+        \end{itemize}
+
+        \item for all $C, D \subseteq S$, if $C \in \family^*$ and $D \in \family^*$, then $C \cap D \in \family^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+
+        \item $\family^*$ is a filter
+    \end{enumerate}
+\end{proof}

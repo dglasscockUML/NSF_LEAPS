@@ -29,12 +29,354 @@
 
 
 <div class="main-text">
- <div class="titlepage">
+<div class="titlepage">
 <h1>NSF LEAPS</h1>
 <p class="authors">
 <span class="author">ALAAD</span>
 </p>
-</div> 
+</div>
+<p>Dependency graph: <a href="http://0.0.0.0:8000/dep_graph_document.html">http://0.0.0.0:8000/dep_graph_document.html</a> </p>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_dual_of_fam_is_fam">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">1</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#thm_dual_of_fam_is_fam">#</a>
+    
+    <a class="icon proof" href="index.html#a0000000002"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://dglasscockUML.github.io/NSF_LEAPS/docs/find/#doc/thm_dual_of_fam_is_fam" class="lean_decl">thm_dual_of_fam_is_fam</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>  If \(\mathcal{F}\) is a family, then \(\mathcal{F}^*\) is a family. That is, \(\cdot ^*: \text{Fam}(S) \to \text{Fam}(S)\). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000002">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>By the definition of family, we need only check that \(\mathcal{F}^*\) is an upward closed collection of subsets of \(S\). It is, by definition, a collection of subsets of \(S\). If \(A \in \mathcal{F}^*\) and \(A \subseteq A' \subseteq S\), to show that \(A' \in \mathcal{F}^*\), we need only to show that for all \(B \in \mathcal{F}\), \(A' \cap B \neq \emptyset \). Since \(A \in \mathcal{F}^*\), we have that \(\emptyset \neq A \cap B \subseteq A' \cap B\), as desired. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_equiv_dual_formulation">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">2</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#thm_equiv_dual_formulation">#</a>
+    
+    <a class="icon proof" href="index.html#a0000000003"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://dglasscockUML.github.io/NSF_LEAPS/docs/find/#doc/thm_equiv_dual_formulation" class="lean_decl">thm_equiv_dual_formulation</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>  For all families \(\mathcal{F}\), \(\mathcal{F}^* = \{ A \subseteq S \mid S \setminus A \not\in \mathcal{F}\} \) </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000003">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>In the following list, each statement is equivalent to the one that follows it. </p>
+<ol class="enumerate">
+  <li><p>\(A \in \mathcal{F}^*\) </p>
+<ul class="itemize">
+  <li><p>definition </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(B \in \mathcal{F}\), \(A \cap B \neq \emptyset \) </p>
+<ul class="itemize">
+  <li><p>set theory: for \(X, Y \subseteq Z\), \(X \cap Y = \emptyset \) iff \(Y \subseteq Z \setminus X\) </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(B \in \mathcal{F}\), \(B \not\subseteq S \setminus A\) </p>
+<ul class="itemize">
+  <li><p>logic: negation of a universal quantifier </p>
+</li>
+</ul>
+</li>
+  <li><p>not ( there exists \(B \in \mathcal{F}\), \(B \subseteq S \setminus A\) ) </p>
+<ul class="itemize">
+  <li><p>\(\mathcal{F}\) is upward closed </p>
+</li>
+</ul>
+</li>
+  <li><p>not ( \(S \setminus A \in \mathcal{F}\) ) </p>
+</li>
+</ol>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_dual_is_involution">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">3</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#thm_dual_is_involution">#</a>
+    
+    <a class="icon proof" href="index.html#a0000000004"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="index.html#thm_equiv_dual_formulation">Theorem 2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://dglasscockUML.github.io/NSF_LEAPS/docs/find/#doc/thm_dual_is_involution" class="lean_decl">thm_dual_is_involution</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   \(*\) is an involution on the set families: \((\mathcal{F}^*)^* = \mathcal{F}\) </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000004">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>In the following list, each statement is equivalent to the one that follows it. </p>
+<ol class="enumerate">
+  <li><p>\(A \in (\mathcal{F}^*)^*\) </p>
+<ul class="itemize">
+  <li><p><a href="index.html#thm_equiv_dual_formulation">theorem 2</a> </p>
+</li>
+</ul>
+</li>
+  <li><p>\(S \setminus A \not\in \mathcal{F}^*\) </p>
+<ul class="itemize">
+  <li><p><a href="index.html#thm_equiv_dual_formulation">theorem 2</a> </p>
+</li>
+</ul>
+</li>
+  <li><p>\(S \setminus (S \setminus A) \in \mathcal{F}\) </p>
+<ul class="itemize">
+  <li><p>set theory: for \(X \subseteq Z\), \(Z \setminus (Z \setminus X) = X\) </p>
+</li>
+</ul>
+</li>
+  <li><p>\(A \in \mathcal{F}\) </p>
+</li>
+</ol>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_pr_iff_dual_is_filter">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">4</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#thm_pr_iff_dual_is_filter">#</a>
+    
+    <a class="icon proof" href="index.html#a0000000005"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://dglasscockUML.github.io/NSF_LEAPS/docs/find/#doc/thm_pr_iff_dual_is_filter" class="lean_decl">thm_pr_iff_dual_is_filter</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>  \(\mathcal{F}\) is a partition regular family if and only if \(\mathcal{F}^*\) is a filter </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000005">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> By <a href="index.html#thm_dual_of_fam_is_fam">theorem 1</a> and <a href="index.html#thm_dual_is_involution">theorem 3</a>, \(\mathcal{F}\) is family if and only if \(\mathcal{F}^*\) is a family. Then, in the following list, each statement is equivalent to the one that follows it. </p>
+<ol class="enumerate">
+  <li><p>\(\mathcal{F}\) is a partition regular family </p>
+<ul class="itemize">
+  <li><p>definition </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(A, B \subseteq S\), if \(A \cup B \in \mathcal{F}\), then \(A \in \mathcal{F}\) or \(B \in \mathcal{F}\) </p>
+<ul class="itemize">
+  <li><p><a href="index.html#thm_dual_is_involution">theorem 3</a> </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(A, B \subseteq S\), if \(A \cup B \in (\mathcal{F}^*)^*\), then \(A \in (\mathcal{F}^*)^*\) or \(B \in (\mathcal{F}^*)^*\) </p>
+<ul class="itemize">
+  <li><p><a href="index.html#thm_equiv_dual_formulation">theorem 2</a> </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(A, B \subseteq S\), if \(S \setminus (A \cup B) \not\in \mathcal{F}^*\), then \(S \setminus A \not\in \mathcal{F}^*\) or \(S \setminus B \not\in \mathcal{F}^*\) </p>
+<ul class="itemize">
+  <li><p>set theory: for \(X, Y \subseteq Z\), \(Z \setminus (X \cup Y) = (Z \setminus X) \cap (Z \setminus Y)\) </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(A, B \subseteq S\), if \((S \setminus A) \cap (S \setminus B) \not\in \mathcal{F}^*\), then \(S \setminus A \not\in \mathcal{F}^*\) or \(S \setminus B \not\in \mathcal{F}^*\) </p>
+<ul class="itemize">
+  <li><p>logic: “if not \(p\), then not \(q\) OR not \(r\)” is equivalent to “if \(q\) and \(r\), then \(p\)” </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(A, B \subseteq S\), if \(S \setminus A \in \mathcal{F}^*\) and \(S \setminus B \in \mathcal{F}^*\), then \((S \setminus A) \cap (S \setminus B) \in \mathcal{F}^*\) </p>
+<ul class="itemize">
+  <li><p>write \(C = S \setminus A\) and \(D = S \setminus B\) and use set theory: for \(X \subseteq Z\), \(Z \setminus (Z \setminus X) = X\) </p>
+</li>
+</ul>
+</li>
+  <li><p>for all \(C, D \subseteq S\), if \(C \in \mathcal{F}^*\) and \(D \in \mathcal{F}^*\), then \(C \cap D \in \mathcal{F}^*\) </p>
+<ul class="itemize">
+  <li><p>definition </p>
+</li>
+</ul>
+</li>
+  <li><p>\(\mathcal{F}^*\) is a filter </p>
+</li>
+</ol>
+
+  </div>
+</div>
+
 </div> <!--main-text -->
 </div> <!-- content-wrapper -->
 </div> <!-- content -->
