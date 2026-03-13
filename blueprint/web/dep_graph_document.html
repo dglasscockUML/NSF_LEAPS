@@ -199,7 +199,7 @@ graphContainer.graphviz({useWorker: true})
     .width(width)
     .height(height)
     .fit(true)
-    .renderDot(`strict digraph "" {	graph [bgcolor=transparent];	node [label="\N",		penwidth=1.8	];	edge [arrowhead=vee];	thm_dual_of_fam_is_fam	[color=blue,		fillcolor="#A3D6FF",		label=thm_dual_of_fam_is_fam,		shape=ellipse,		style=filled];	thm_pr_iff_dual_is_filter	[color=blue,		label=thm_pr_iff_dual_is_filter,		shape=ellipse];	thm_dual_of_fam_is_fam -> thm_pr_iff_dual_is_filter;	thm_dual_is_involution	[label=thm_dual_is_involution,		shape=ellipse];	thm_dual_is_involution -> thm_pr_iff_dual_is_filter;	thm_equiv_dual_formulation	[color=blue,		fillcolor="#A3D6FF",		label=thm_equiv_dual_formulation,		shape=ellipse,		style=filled];	thm_equiv_dual_formulation -> thm_dual_is_involution	[style=dashed];}`)
+    .renderDot(`strict digraph "" {	graph [bgcolor=transparent];	node [label="\N",		penwidth=1.8	];	edge [arrowhead=vee];	thm_dual_of_fam_is_fam	[color=blue,		fillcolor="#A3D6FF",		label=thm_dual_of_fam_is_fam,		shape=ellipse,		style=filled];	thm_pr_iff_dual_is_filter	[color=blue,		label=thm_pr_iff_dual_is_filter,		shape=ellipse];	thm_dual_of_fam_is_fam -> thm_pr_iff_dual_is_filter;	thm_equiv_dual_formulation	[color=blue,		fillcolor="#A3D6FF",		label=thm_equiv_dual_formulation,		shape=ellipse,		style=filled];	thm_dual_is_involution	[label=thm_dual_is_involution,		shape=ellipse];	thm_equiv_dual_formulation -> thm_dual_is_involution	[style=dashed];	thm_dual_is_involution -> thm_pr_iff_dual_is_filter;}`)
     .on("end", interactive);
 
 latexLabelEscaper = function(label) {
