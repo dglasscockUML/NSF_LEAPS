@@ -9,9 +9,9 @@ import Mathlib.Data.Finset.Empty
 --class defs
 class HasFamDual (T : Type _) where
   famDual : T → T
-class HasFamJoin (T : Type _) where --not sure if we want to rename to famJoin
+class HasFamJoin (T : Type _) where
   famJoin : T → T → T
-class HasFamMeet (T : Type _) where --not sure if we want to rename to famMeet
+class HasFamMeet (T : Type _) where
   famMeet : T → T → T
 
 --operators
