@@ -37,7 +37,7 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by sorry
 
 --thm_de_morgan_union_v2
---theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
+--theorem thm_de_morgan_union_v2 (F G : Family α) : (F   G)* = (F* ∩ G*) :=
  -- by sorry
 
 --thm_de_morgan_v1_dual
@@ -84,7 +84,8 @@ theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = (
   by sorry
 
 --thm_classcapdual_monotone
-
+--theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
+ -- by sorry
 --thm_family_classcapdual_dual_is_filter
 --theorem thm_family_classcapdual_dual_is_filter (F : Family α) : FilterFamily (F ⋏ F*) :=
  -- by sorry

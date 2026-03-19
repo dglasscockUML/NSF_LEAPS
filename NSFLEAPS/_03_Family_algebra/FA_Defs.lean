@@ -118,7 +118,11 @@ noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
       have hC' : (B ∪ C) ∈ famA.sets := famA.upward_closed C (B ∪ C) hCF Set.subset_union_right
       have hD' : (B ∪ D) ∈ famB.sets := famB.upward_closed D (B ∪ D) hDG Set.subset_union_right
       -- Now, (B ∪ C) ∩ (B ∪ D) = B ∪ (C ∩ D) = B ∪ A = B, so B ∈ famMeet famA famB.
-      sorry
+      have hsub : C ∩ D ⊆ B := by simpa [hAeq] using hAB
+      have hB : B = (B ∪ C) ∩ (B ∪ D) := by
+        calc B = B ∪ (C ∩ D) := by exact (Set.union_eq_left.mpr hsub).symm
+        _ = (B ∪ C) ∩ (B ∪ D) := by simpa [Set.union_inter_distrib_left]
+      exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
 
 noncomputable instance : HasFamJoin (Set (Set α))  where
