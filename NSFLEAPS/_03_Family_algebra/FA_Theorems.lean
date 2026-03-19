@@ -36,8 +36,12 @@ theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by sorry
 
---thm_de_morgan_union_v1_dual
-theorem thm_de_morgan_union_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
+--thm_de_morgan_union_v2
+--theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
+ -- by sorry
+
+--thm_de_morgan_v1_dual
+theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by sorry
 
 --thm_classcap_contains_union
@@ -57,7 +61,7 @@ theorem thm_classcap_associative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F �
 
 
 --thm_family_classcap_dual_is_partition_regular
-theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoSets F* :=
+theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
   by sorry
 
 --thm_classcap_idempotent_at_filters
