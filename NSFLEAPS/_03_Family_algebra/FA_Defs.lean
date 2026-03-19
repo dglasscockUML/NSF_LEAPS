@@ -71,12 +71,28 @@ def Family.famDual (fam : Family α) : Family α :=
     rcases hAint with ⟨x, hxA, hxC⟩
     exact ⟨x, hAB hxA, hxC⟩
 }
+def isPRTwoSets (F : Family α) : Prop :=
+  ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
+def PRFamily.famDual (fam : PRFamily α) : PRFamily α :=
+{
+  sets := _root_.famDual fam.sets,
+  upward_closed := by
+    intro A B hA hAB C hCF
+    -- prove B ∈ dual S fam.
+    have hAint : (A ∩ C).Nonempty :=
+      hA C hCF
+    rcases hAint with ⟨x, hxA, hxC⟩
+    exact ⟨x, hAB hxA, hxC⟩
+  partition_regular := by sorry -- need to get rid of this sorry
+    -- prove ∃ i : Fin 2, {x ∈ A| c x = i} ∈ dual S fam.
+}
 
 instance : HasFamDual (Family α) where
   famDual := @Family.famDual α
 instance : HasFamDual (Set (Set α)) where
   famDual := _root_.famDual
-
+instance : HasFamDual (PRFamily α) where
+  famDual := @PRFamily.famDual α
 -- ⋎ definitions
 open Classical in
 noncomputable def famJoin (F G : Set (Set α)) : Set (Set α) :=
