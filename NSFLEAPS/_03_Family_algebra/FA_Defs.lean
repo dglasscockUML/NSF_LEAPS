@@ -121,7 +121,7 @@ noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
       have hsub : C ∩ D ⊆ B := by simpa [hAeq] using hAB
       have hB : B = (B ∪ C) ∩ (B ∪ D) := by
         calc B = B ∪ (C ∩ D) := by exact (Set.union_eq_left.mpr hsub).symm
-        _ = (B ∪ C) ∩ (B ∪ D) := by simpa [Set.union_inter_distrib_left]
+        _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
       exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
 
