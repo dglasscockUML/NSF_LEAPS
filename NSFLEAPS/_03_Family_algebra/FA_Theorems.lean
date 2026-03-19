@@ -81,7 +81,8 @@ theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = (
 
 --thm_classcapdual_monotone
 
-
 --thm_family_classcapdual_dual_is_filter
+--theorem thm_family_classcapdual_dual_is_filter (F : Family α) : FilterFamily (F ⋏ F*) :=
+ -- by sorry
 
 --thm_classcapdual_idempotent_at_pr_families
