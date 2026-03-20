@@ -11,8 +11,40 @@ variable (α : Type _) (J K L : Set (Set α))
 #check K
 
 theorem thm_equiv_dual_formulation {α} (F : Family α) :
-(F*).sets = {A : Set α | ¬ (Aᶜ ∈ F.sets)} :=
-sorry --complement of A in S not in F}
+(F*).sets = {A : Set α | Aᶜ ∉ F.sets} :=
+  by
+  -- {A | ∀ B ∈ F.sets, (A ∩ B).Nonempty} = {A | Aᶜ ∉ F.sets}
+  -- set equality proof -> prove 2 directions
+  ext A
+  constructor
+  · -- dual -> complement not in F
+    intro AinDual
+    by_contra h
+    have AcinF : Aᶜ ∈ F.sets := by
+      change ¬ (Aᶜ ∉ F.sets) at h
+      push_neg at h
+      exact h
+    have AnAc := AinDual Aᶜ AcinF
+    rcases AnAc with ⟨x, xinA, xinAc⟩
+    rw [Set.mem_compl_iff] at xinAc
+    exact xinAc xinA
+  · -- complement not in F -> dual
+    intro AcninF B BinF
+    by_contra hEmpty
+    have hsubset : B ⊆ Aᶜ := by
+      intro x xinB
+      by_contra xninAc
+      have xinA : x ∈ A := by
+        rw [Set.mem_compl_iff] at xninAc
+        push_neg at xninAc
+        exact xninAc
+      have : x ∈ A ∩ B := ⟨xinA, xinB⟩
+      have : (A ∩ B).Nonempty := ⟨x, this⟩
+      contradiction
+    have : Aᶜ ∈ F.sets :=
+      F.upward_closed B Aᶜ BinF hsubset
+    exact AcninF this
+ --complement of A in S not in F}
 
 theorem thm_dual_is_involution (F : Family α) : F** = F :=
   by sorry
@@ -21,8 +53,8 @@ theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
   (h : ∀ F, dual (dual F) = F) : Function.Bijective dual :=
   by sorry
 
---theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
- -- by sorry
+theorem thm_dual_is_antitone (F G : Family α) : F.sets ⊆ G.sets → (F*).sets ⊆ (G*).sets :=
+ by sorry
 -- need to define what a subset of Fam is
 
 --theorem thm_pr_iff_dual_is_filter (P : PRFamily α) : FilterFamily (P.sets*) :=
