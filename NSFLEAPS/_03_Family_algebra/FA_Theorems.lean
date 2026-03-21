@@ -145,7 +145,8 @@ theorem thm_classcap_associative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F �
   by sorry
 
 --thm_classcap_monotone
-
+theorem thm_classcap_monotone (F G H : Family α) : F.sets ⊆ G.sets → (F ⋎ H).sets ⊆ (G ⋎ H).sets :=
+  by sorry
 
 --thm_family_classcap_dual_is_partition_regular
 theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
@@ -158,8 +159,8 @@ theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoS
  -- by sorry
 
 --thm_classcapdual_contained_in_intersection
---theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G) ⊆ F ∩ G :=
-  --by sorry
+theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G).sets ⊆ F.sets ∩ G.sets :=
+  by sorry
 -- need to define what a subset of Fam is
 
 
@@ -171,8 +172,8 @@ theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = (
   by sorry
 
 --thm_classcapdual_monotone
---theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
- -- by sorry
+theorem thm_classcapdual_monotone (F G H : Family α) : F.sets ⊆ G.sets → (F ⋏ H).sets ⊆ (G ⋏ H).sets :=
+  by sorry
 --thm_family_classcapdual_dual_is_filter
 --theorem thm_family_classcapdual_dual_is_filter (F : Family α) : FilterFamily (F ⋏ F*) :=
  -- by sorry
