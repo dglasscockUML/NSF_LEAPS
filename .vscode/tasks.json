@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+  "label": "Generate content.tex",
+  "type": "shell",
+  "command": "python3 blueprint/src/make_content.py blueprint/src/precontent.tex blueprint/src/content.tex",
+  "options": {
+    "cwd": "${workspaceFolder}"
+  },
+  "problemMatcher": []
+    },
+    {
+      "label": "Build blueprint web",
+      "type": "shell",
+      "command": "leanblueprint web",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Serve blueprint",
+      "type": "shell",
+      "command": "leanblueprint serve",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Generate, build, and serve blueprint",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Generate content.tex",
+        "Build blueprint web",
+        "Serve blueprint"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

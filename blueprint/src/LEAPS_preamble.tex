@@ -20,6 +20,7 @@
 %\newtheorem{remark}[theorem]{Remark}
 %\newtheorem{example}[theorem]{Example}
 %\newtheorem{examples}[theorem]{Examples}
+\newtheorem*{lean}{Lean Remarks}
 
 %STANDARD COMMANDS
 \newcommand{\supp}{{\normalfont\text{supp}}\,}
@@ -34,10 +35,17 @@
 \newcommand{\eqdef}{=\vcentcolon}
 \newcommand{\restr}[2]{{ \left.\kern-\nulldelimiterspace #1 \right|_{#2}}}
 
+\newcommand{\dbar}{\overline{d}}
+\newcommand{\dlowbar}{\underline{d}}
+\newcommand{\dstar}{d^*}
+\newcommand{\dlowstar}{d_*}
+
 \newcommand{\families}{\text{Fam}}
 \newcommand{\family}{\mathcal{F}}
 \newcommand{\familytwo}{\mathcal{G}}
 \newcommand{\familythree}{\mathcal{H}}
+\newcommand{\familymeet}{\wedge}
+\newcommand{\familyjoin}{\vee}
 
 \newcommand{\syndetic}{\mathcal{S}}
 \newcommand{\thick}{\mathcal{T}}
@@ -45,7 +53,9 @@
 \newcommand{\dsyndetic}{d\mathcal{S}}
 \newcommand{\dthick}{d\mathcal{T}}
 \newcommand{\dcsyndetic}{dc\mathcal{S}}
+\newcommand{\dcsyndeticbohr}{\dcsyndetic_{\text{Bohr}_0}}
 \newcommand{\dcthick}{dc\mathcal{T}}
+\newcommand{\dcthickbohr}{\dcthick_{\text{Bohr}_0}}
 \newcommand{\dPS}{d\mathcal{PS}}
 \newcommand{\dcPS}{dc\mathcal{PS}}
 \newcommand{\central}{\mathcal{C}}
@@ -55,3 +65,14 @@
 
 \newcommand{\classcap}{\curlyvee}
 \newcommand{\classcapdual}{\curlywedge}
+
+\newcommand{\orb}{\overline{o}}
+
+\newcommand{\cube}{\mathbf{Q}}
+\newcommand{\diag}{\mathbf{D}}
+
+\newcommand{\RP}{\mathbf{RP}}
+\newcommand{\seq}{S_\text{eq}}
+
+\newcommand{\dgg}[1]{Daniel says: #1}
+\newcommand{\anh}[1]{Anh says: #1}

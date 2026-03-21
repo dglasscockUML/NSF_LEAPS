@@ -124,7 +124,6 @@ We can make our definitions in the appropriate generality by making them for uni
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_entourage_regularity_at_a_point}
     Let $\alpha \subseteq X^2$ be an entourage.  For all $x \in X$, the set $\alpha[x]$ is an open neighborhood of $x$.  By \cref{lemma_entourage_regularity_at_a_point}, there exists a non-empty, open set $U_x \subseteq X$ containing $x$ such that $\overline{U_x} \times \overline{U_x} \subseteq \alpha$.
 
     By compactness, there exists a finite set $F \subseteq X$ such that $\cup_{x \in F} U_x = X$. Thus $\cup_{x \in F} \overline{U_x} = X$.  Since $\pi$ is surjective, $\cup_{x \in F} \pi \overline{U_x} = Y$.  Since $\pi$ is a closed map, the sets $\pi \overline{U_x}$ are closed.  Since $Y$ is compact, Hausdorff, it is a Baire space, so there exists $x \in F$ such that $\pi \overline{U_x}$ has non-empty interior.  Let $V \subseteq Y$ be non-empty, open such that $V \subseteq \pi \overline{U_x}$.  Then
@@ -234,7 +233,6 @@ Contains:
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_cancel_relation_is_mult_eq}
     1. The semigroup structure on $S/\sim_C$ is given by $[s][t] = [st]$.  This is well defined by the fact that $\sim_C$ is multiplicative (\cref{lemma_cancel_relation_is_mult_eq}).
 
     2. That the quotient map is surjective is immediate. That it is a semigroup homomorphism is immediate from the definition of the semigroup structure on $S / \sim_C$.
@@ -373,7 +371,6 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_image_closure_equals_closure_image}
     Let $s \in S$.  We must show that $s \overline{A} \subseteq \overline{A}$.  Since $s A \subseteq A$, we have by \cref{lemma_image_closure_equals_closure_image} that $s \overline{A} = \overline{sA} \subseteq \overline{A}$.
 \end{proof}
 
@@ -383,7 +380,6 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_closure_of_inv_is_inv}
     The set $\overline{Sx}$ is closed and hence compact by \verb|IsClosed.isCompact|.  Given the subspace topology, it is Hausdorff (note \verb|instT2SpaceSubtype|).
 
     To see that $\overline{Sx}$ is $S$-invariant, it suffices by \cref{lemma_closure_of_inv_is_inv} to show that $Sx$ is $S$-invariant.  But this is immediate: $sSx = (sS)x \subseteq Sx$.
@@ -586,7 +582,6 @@ Here are some more set algebra statements in case we might need them:
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_intersection_of_invariant}
     The subsystems of $X$ are ordered by containment.  Given any collection $Z_i$, $i \in I$, of $S$-subsystems of $X$, $\cap_i Z_i$ is closed, non-empty (by compactness), and $S$-invariant (by \cref{lemma_intersection_of_invariant}). Thus, $\cap_i Z_i$ is an $S$-subsystem of $X$.  This shows that every totally ordered subset of the set of subsystems of $X$ has a lower bound in $X$.  By Zorn's lemma, the set of subsystems has a minimal element.  This minimal element is a subsystem of $X$ that is minimal.
 \end{proof}
 
@@ -596,7 +591,6 @@ Here are some more set algebra statements in case we might need them:
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_orb_closure_is_invariant}
     By \cref{lemma_orb_closure_is_invariant}, $\overline{Sx}$ is an $S$-system.  If $X$ is minimal, then $\overline{Sx} = X$, so $x$ has a dense orbit.
 
     On the other hand, if $Z$ is a closed, non-empty, $S$-invariant set, then choosing $x \in Z$, we see by the dense-orbit assumption that
@@ -634,7 +628,6 @@ Here are some more set algebra statements in case we might need them:
 \end{lemma}
 
 \begin{proof}
-\uses{thm_minimal_iff_dense_orbits,lemma_return_to_union,lemma_return_time_algebra_one}
     Let $x \in U \subseteq X$. By \cref{thm_minimal_iff_dense_orbits}, all orbits are dense, so for $y \in X$, there exists $s_y \in S$ such that $sy \in U$.  Therefore, $X = \cup_{y \in X} s_y^{-1}U$.  By compactness, there exists a finite set $F \subseteq X$ such that $X = \cup_{y \in F} s_y^{-1} U$.  By \cref{lemma_return_to_union} and \cref{lemma_return_time_algebra_one},
     \[S = R(x,X) = R(x, \bigcup_{y \in F} s_y^{-1} U ) = \bigcup_{y \in F} R(x, s_y^{-1} U) = \bigcup_{y \in F} s_y^{-1} R(x, U).\]
     By definition, the set $R(x,U)$ is syndetic.
@@ -646,7 +639,6 @@ Here are some more set algebra statements in case we might need them:
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_orb_closure_is_invariant}
     Note that $\overline{Sx}$ is an $S$-system by \cref{lemma_orb_closure_is_invariant}. Let $y \in \overline{Sx}$ and $U \subseteq \overline{Sx}$ be open and non-empty.  We must show that there exists $s \in S$ such that $sy \in U$.
 
     Let $V \subseteq U$ be non-empty, open, and $\gamma \subseteq X^2$ be an entourage such that if $(a,b) \in \gamma$ and $a \in V$, then $b \in U$.
@@ -664,7 +656,6 @@ Here are some more set algebra statements in case we might need them:
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_orb_closure_of_ur_is_minimal,lemma_pts_in_minimal_are_ur}
     By \cref{lemma_orb_closure_of_ur_is_minimal}, $\overline{Sx}$ is a minimal $S$-system.  By \cref{lemma_pts_in_minimal_are_ur}, all points of $\overline{Sx}$ are $S$-uniformly recurrent. \dgg{Something subtle here that may cause issues in Lean: $y$ being $S$-uniformly recurrent is independent of the system.  That is: if $Z$ is a subsystem of $X$ and $y$ is $S$-uniform recurrent in $Z$, then it is uniformly recurrent in $X$...}
 \end{proof}
 
@@ -674,7 +665,6 @@ Here are some more set algebra statements in case we might need them:
 \end{lemma}
 
 \begin{proof}
-\uses{thm_every_system_has_minimal_subsystem,lemma_img_of_inv_is_inv,lemma_img_of_min_is_min,lemma_pts_in_minimal_are_ur}
     Let $U \times V \subseteq X^2$ be a non-empty, open set. We will show that $U \times V$ contains an $S$-uniformly recurrent point.
     
     By \cref{thm_every_system_has_minimal_subsystem}, there exists a closed, non-empty, $S$-invariant (under the diagonal action) set $Z \subseteq X^2$.  Note that $\pi_1: X^2 \to X$ is an $S$-system factor map.  By \cref{lemma_img_of_inv_is_inv}, $\pi_1 Z$ is a closed, non-empty, $S$-invariant subset of $X$.  Since $X$ is minimal, $\pi_1 Z = X$.  Therefore, there exists $(x,y) \in Z$ such that $x \in U$.
@@ -701,7 +691,6 @@ Here are some more set algebra statements in case we might need them:
 \end{theorem}
 
 \begin{proof}
-\uses{theorem_orbit_closure_transitivity}
     By the definition of proximal, for all entourages $\alpha \subseteq X^2$, there exists $s \in S$ such that $(sx,sy) \in \alpha$.  The net $\alpha \mapsto (s_\alpha x, s_\alpha y)$ has a cluster point.  Since the cluster point is in every entourage, it belongs to $\Delta(X)$.  Therefore, there exists $z \in X$ such that $(z,z)$ is in the $S$-orbit closure of $(x,y)$.  By minimality, every point $x$ is in the $S$-orbit closure of $z$, so $\Delta(X)$ is in the $S$-orbit closure of $(z,z)$.  By orbit closure transitivity (\cref{theorem_orbit_closure_transitivity}), we have that $\Delta(X)$ is contained in the $S$-orbit closure of $(x,y)$, as desired.
 \end{proof}
 
@@ -720,7 +709,6 @@ Here are some more set algebra statements in case we might need them:
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_intersection_of_invariant}
     \begin{itemize}
         \item Symmetric: Denote by $\Phi: X^2 \to X^2$ the map $\Phi(x,y) = (y,x)$. Let $(x,y) \in \RP$ and $\alpha \subseteq X^2$ be an entourage. By the definition of a uniform space, $\Phi \alpha$ is an entourage (sometimes called $\alpha^{-1}$). Since $(x,y) \in \RP$, $(x,y) \in \overline{G \Phi \alpha}$. But $\overline{G \Phi \alpha} = \Phi \overline{G \alpha}$. Therefore, $(y,x) \in \overline{G \alpha}$, as was to be shown.
 
@@ -820,7 +808,6 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_dense_S_minimal_points_in_X2,lemma_orb_closure_of_ur_is_minimal,lemma_minimal_comm_action_implies_surjective}
     Let $t \in S$.  Since $St \subseteq S$, we have by the definition of $\RP$ that
     \[\bigcap_{\alpha} \overline{S t \alpha} \subseteq \RP.\]
     Conversely, suppose $(x,y) \in \RP$.  Let $\alpha \subseteq X^2$ be an entourage, and let $W \ni (x,y)$ be open.  We must show that $W \cap St \alpha \neq \emptyset$.
@@ -841,7 +828,6 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_S_ideal_description_of_rp,lemma_diag_limit_pt_set,lemma_set_of_ws_is_closed}
     Let $(x,y) \in \RP$.  First we claim that for all $t \in S$, $\Omega_{St}(x,y) \neq \emptyset$.  Indeed, by \cref{lemma_S_ideal_description_of_rp},
     \[(x,y) \in \RP = \bigcap_{\alpha} \overline{St \alpha}.\]
     By \cref{lemma_diag_limit_pt_set}, we have that $\Omega_{St}(x,y) \neq \emptyset$.
@@ -866,7 +852,6 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_rp_implies_net_minimal}
     Let $(x,y) \in \RP$.  Let $U \subseteq X$ be non-empty, open, and let $V \subseteq X^2$ be open and contain $(x,y)$.  Let $w \in U$.  It follows from \cref{lemma_rp_implies_net_minimal} that there exists a net $(a_n, b_n, s_n)_n \subseteq X \times X \times S$ such that
     \begin{align*}
         \lim_{n \to \infty} (a_n, b_n, s_n a_n, s_n b_n) &= (w, w, x, y).
@@ -897,7 +882,6 @@ The following lemma is shown in \cite[V. 2.12 and 2.14, pg. 416]{devries_book_19
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_rp_functorial_property,lemma_image_of_entourage_somewhere_dense_along_diagonal,lemma_rp_implies_intersects_open_nbhd_diagonal}
     By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP_X \subseteq \RP_Y$, so we only need to prove the reverse inclusion.
 
     To see that $\RP_Y \subseteq (\pi \times \pi) \RP_X$, let $(x,y) \in \RP_Y$.  Let $D$ be the product of the set of entourages of $X^2$ and the set of open subsets of $Y^2$ containing $(x,y)$.  For $d = (\alpha, U)$, by \cref{lemma_image_of_entourage_somewhere_dense_along_diagonal}, there exists a non-empty, open set $V \subseteq Y$ such that $V \times V \subseteq (\pi \otimes \pi) \alpha$.  By \cref{lemma_rp_implies_intersects_open_nbhd_diagonal},
@@ -971,7 +955,6 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
     %\dgg{We might only get: if a factor $\pi: X \to Y$ is equicontinuous, then $\RP \subseteq R_\pi$.}
 
 \begin{proof}
-\uses{lemma_rp_functorial_property_minimal,lemma_rp_and_equicontinuity}
     Note that by the definition of $R_\pi$, $\RP \subseteq R_\pi$ if and only if $(\pi \times \pi) \RP \subseteq \Delta_Y$.  By \cref{lemma_rp_functorial_property_minimal}, this is if and only if $\RP_Y \subseteq \Delta_Y$.  By \cref{lemma_rp_and_equicontinuity}, this is if and only if $Y$ is equicontinuous.
 \end{proof}
     %\dgg{Alt: Suppose the factor $\pi$ is equicontinuous so that $\RP_Y \subseteq \Delta$. By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP \subseteq \RP_Y \subseteq \Delta$. By the definition of $R_\pi$, $(\pi \times \pi) \RP \subseteq \Delta_Y$ implies $\RP \subseteq R_\pi$, as desired.} 
@@ -983,7 +966,6 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 %\dgg{We might only get: if $Q$ is an equicontinuous ICER, then $\RP \subseteq Q$.}
 
 \begin{proof}
-\uses{lemma_rp_characterization_of_equicont}
     Suppose $Q$ is an ICER.  By definition, it is equicontinuous if and only if $\pi_Q: (X,T) \to (X/Q,T)$ is equicontinuous.  By \cref{lemma_rp_characterization_of_equicont}, this happens if and only if $\RP \subseteq R_{\pi_Q} = Q$.
 \end{proof}
     %\dgg{Alt: Suppose $Q$ is an equicontinuous ICER.  By definition, $\pi_Q: (X,T) \to (X/Q,T)$ is equicontinuous.  By \cref{lemma_rp_characterization_of_equicont}, this implies $\RP \subseteq R_{\pi_Q} = Q$.}
@@ -1003,7 +985,6 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_intersection_of_icers,lemma_rp_characterization_of_equicont_icer}
     The equicontinuous structure relation $\seq$ is an ICER by \cref{lemma_intersection_of_icers}.
 
     To show that it is an equicontinuous ICER, it suffices by \cref{lemma_rp_characterization_of_equicont_icer} to show that $\RP \subseteq \seq$.
@@ -1016,7 +997,6 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_factors_and_icers}
     Since $\sigma: X \to Z$ is equicontinuous, $R_\sigma$ is an equicontinuous ICER.  By the definition of $\seq$, $\seq \subseteq R_\sigma$.  It follows then by \cref{lemma_factors_and_icers} that there exists a continuous surjection $\xi: K \to Z$ such that $\sigma = \xi \circ \pi$.
 \end{proof}
 
@@ -1033,8 +1013,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 %     Let $X$ be a $G$-system.  There exists a unique Kronecker ICER of $X$.  Also, there exists a unique Kronecker factor of $X$ up to isomorphism. \dgg{Isomorphism has not been defined, but I'd prefer to avoid it if possible.}
 % \end{lemma}
 
-% \begin{proof}
-\uses{lemma_intersection_of_icers,lemma_rp_characterization_of_equicont_icer}   
+% \begin{proof}   
 %     We will show that
 %     \[S \defeq \bigcap_{\text{$R$ equicont. ICER}} R\]
 %     is a Kronecker ICER.  Note that since $X^2$ is an equicontinuous ICER, the intersection is non-empty.  $S$ is an ICER by \cref{lemma_intersection_of_icers}.  By its definition, then, it suffices to show that it is an equicontinuous ICER.
@@ -1106,7 +1085,6 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_principal_ideal_is_compact}
     Let $L$ be a minimal left ideal of $S$.  Let $t \in L$. Then $St$ is a left ideal of $S$ contained in $L$.  Since $L$ is minimal, $St = L$.  By \cref{lemma_principal_ideal_is_compact}, $St$ is compact.
 \end{proof}
 
@@ -1126,7 +1104,6 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_exists_minimal_left_ideal,lemma_minimal_left_ideal_compact}
     Every left ideal contains a minimal left ideal (\cref{lemma_exists_minimal_left_ideal}).  Minimal left ideals are compact (\cref{lemma_minimal_left_ideal_compact}) subsemigroups.  Apply \verb|exists_idempotent_in_compact_subsemigroup|.
 \end{proof}
 
@@ -1230,7 +1207,6 @@ Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \b
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_ultrafilter_mult_with_one_principal}
     Each line is equivalent to the one following it.
     \begin{enumerate}
         \item $p \in \overline{s^{-1} B}$
@@ -1277,7 +1253,6 @@ An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal lef
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_pull_out_inverse_mult_in_basis_set}
     Denote left multiplication by $s$ by $\lambda_s: \beta S \to \beta S$.  It follows from \cref{lemma_pull_out_inverse_mult_in_basis_set} that for all $A \subseteq S$,
     \[\lambda_s^{-1} \overline{A} = \overline{s^{-1} A}.\]
     This suffices to show that $\lambda_s$ is continuous by the definition of the topology on $S$.
@@ -1289,7 +1264,6 @@ An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal lef
 \end{theorem}
 
 \begin{proof}
-\uses{thm_ultra_right_mult_continuous}
     That $\beta S$ is compact, Hausdorff is established, already in Lean, too.  That right multiplication is continuous is also established: see \cref{thm_ultra_right_mult_continuous} above.
 \end{proof}
 
@@ -1304,7 +1278,6 @@ An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal lef
 \end{lemma}
 
 \begin{proof}
-\uses{thm_ultrafilters_are_compact_right_top,lemma_left_ideal_contains_idempotent}
     From \cref{thm_ultrafilters_are_compact_right_top}, $\beta S$ is a compact, Hausdorff right-topological semigroup.  By \cref{lemma_left_ideal_contains_idempotent}, every left ideal contains an idempotent.
 \end{proof}
 
@@ -1314,7 +1287,6 @@ An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal lef
 \end{lemma}
 
 \begin{proof}
-\uses{thm_ultrafilters_are_compact_right_top,lemma_exists_minimal_left_ideal,lemma_left_ideal_contains_idempotent}
     From \cref{thm_ultrafilters_are_compact_right_top}, $\beta S$ is a compact, Hausdorff right-topological semigroup.  By \cref{lemma_exists_minimal_left_ideal}, every left ideal contains a minimal left ideal.  By \cref{lemma_left_ideal_contains_idempotent}, every (minimal) left ideal contains an idempotent.
 \end{proof}
 
@@ -1341,7 +1313,6 @@ Dynamically:
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_left_multiplication_is_continuous}
     $\beta S$ is a compact Hausdorff space.  The semigroup $S$ acts on $\beta S$ by multiplication on the left, which, by \cref{lemma_left_multiplication_is_continuous}, is continuous.
 \end{proof}
 
@@ -1360,7 +1331,6 @@ Dynamically:
 \end{theorem}
 
 \begin{proof}
-\uses{thm_beta_S_subsystem_characterization,lemma_principal_ideal_is_compact}
     Let $Z$ be a minimal $S$-subsystem of $\beta S$.  By \cref{thm_beta_S_subsystem_characterization}, $Z$ is a left ideal of $\beta S$.  Let $L \subseteq Z$ be a left ideal of $S$ contained in $Z$.  By a short argument from \cref{lemma_principal_ideal_is_compact}, there exists a closed left ideal $L'$ of $S$ contained in $L$.  By \cref{thm_beta_S_subsystem_characterization}, $L'$ is an $S$-subsystem of $\beta S$.  Since $Z$ is a minimal $S$-subsystem, $L' = L = Z$.  Therefore, we have shown that $Z$ is a minimal left ideal of $\beta S$.
 
     Conversely, \dgg{sorry.}
@@ -1372,7 +1342,6 @@ Dynamically:
 % \end{theorem}
 
 % \begin{proof}
-\uses{lemma_orb_closure_is_invariant}
 %     Let $p \in \beta S$.  The set $\overline{Sp}$ is an $S$-subsystem of $\beta S$ (by \cref{lemma_orb_closure_is_invariant}).
 
 %     Suppose $p$ is minimal. It belongs to a minimal left ideal $L$.  Then $Sp \subseteq L$.  Since $L$ is closed (abcde), $\overline{Sp} \subseteq L$.
@@ -1388,7 +1357,6 @@ Dynamically:
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_orb_closure_of_ur_is_minimal,lemma_pts_in_minimal_are_ur,thm_minimal_beta_S_subsystem_characterization}
     By \cref{lemma_orb_closure_of_ur_is_minimal} and \cref{lemma_pts_in_minimal_are_ur}, it is equivalent to show that an ultrafilter $p$ is minimal iff $\overline{Sp}$ is a minimal $S$-subsystem of $\beta S$.
 
     By \cref{thm_minimal_beta_S_subsystem_characterization}, $\overline{Sp}$ is a minimal $S$-subsystem of $\beta S$ iff $\overline{Sp}$ is a minimal left ideal.  But this happens iff $p$ is minimal. \dgg{Details.}
@@ -1462,7 +1430,6 @@ Let $X$ be a $G$-system. Then we have:
 \end{theorem}
 
 \begin{proof}
-\uses{thm_continuity_and_plim}
     Let $p \in \beta S$ and $x \in X$.  By swapping $p-\lim$ and $\pi$ (\cref{thm_continuity_and_plim}), we see that
     \[p \pi x = p-\lim_{s \in S} s \pi x = p-\lim_{s \in S} \pi s x = \pi p-\lim_{s \in S} s x = \pi p x,\]
     as desired.
@@ -1501,7 +1468,6 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 \end{lemma}
 
 \begin{proof}
-\uses{thm_ultra_semigroup_action}
     Let $\alpha \subseteq X^2$ be an entourage.  By the semigroup action theorem (\cref{thm_ultra_semigroup_action}), 
     \[p(x,px) = (px,ppx) = (px,px) \in \Delta \subseteq \alpha.\]
     Therefore, by the definition of $p-\lim$, there exists (many) $s \in S$ such that $(sx,spx) \in \alpha$, as was to be shown.
@@ -1513,7 +1479,6 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 \end{lemma}
 
 \begin{proof}
-\uses{thm_ultrafilters_as_system,thm_ultra_semigroup_action,thm_minimal_ultrafilter_iff_unif_rec}
     Let $U \ni px$.  Choose an open set $V \ni px$ such that $\overline{V} \subseteq U$.  By the definition of $p-\lim$, $p \in \overline{R(x,V)}$.  By \cref{thm_ultrafilters_as_system}, we can treat $\beta S$ as an $S$-system. We claim that
     \[R(p,\overline{R(x,V)}) \subseteq R(px,U).\]
     Indeed, note first that $s \in R(p,\overline{R(x,V)})$ implies $sp \in \overline{R(x,V)}$ implies $R(x,V) \in sp$, which by the definition of $p-\lim$ implies $(sp)x \in \overline{V} \subseteq U$.  By the ultrafilter action theorem (\cref{thm_ultra_semigroup_action}), $(sp)x = s (px)$, so $s(px) \in U$, which implies that $s \in R(px,U)$.
@@ -1527,7 +1492,6 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_exists_idempotent_px_is_x,lemma_ultrafilter_surjective_action,thm_ultra_semigroup_action,lemma_ru_is_r_for_idempotent}
     By \cref{lemma_exists_idempotent_px_is_x}, there exists an idempotent $u \in L$ so that $up = p$.  By \cref{lemma_ultrafilter_surjective_action} (twice), there exist $q, r \in L$ such that $qp = u$ and $rq = u$. By the semigroup action of $\beta S$ on $X$ (\cref{thm_ultra_semigroup_action}),
     \[qx = q (p x) = (qp) x = ux = u (px) = (up) x = px = x.\]
     By \cref{lemma_ru_is_r_for_idempotent}, $ru = r$.  Therefore, we also have
@@ -1629,7 +1593,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \dgg{An older version of this lemma for groups is in the comments.}
 
 \begin{proof}
-\uses{lemma_thick_inverse_shift_intersections}
     Let $K \subseteq S$ be finite.  For $k \in K$, let $p_k$ be the product of all the elements of $K$ except $k$, and let $p$ be the product of all elements of $K$.  By \cref{lemma_thick_inverse_shift_intersections}, the set $\cap_{k \in K} p_k^{-1} H$ is thick.
     
     To see that $\cap_{k \in F} kH$ is thick, let $F \subseteq S$ finite.  Since $\cap_{k \in K} p_k^{-1} H$ is thick, there exists $s \in S$ such that $Fs \subseteq \cap_{k \in K} p_k^{-1} H$.  Therefore,
@@ -1643,7 +1606,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_thick_inverse_shift_intersections,thm_ultrafilters_are_compact_right_top,lemma_pull_out_inverse_mult_in_basis_set,thm_ultra_right_mult_continuous,thm_every_left_contains_minimal_left}
     By \cref{lemma_thick_inverse_shift_intersections}, the set
     \[\big\{ \bigcap_{f \in F} \overline{f^{-1} H} \mid F \subseteq G \text{ finite, non-empty}\big\}\]
     has the finite intersection property.  Since $\beta S$ is compact (\cref{thm_ultrafilters_are_compact_right_top}), the set
@@ -1667,7 +1629,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_thick_closure_contains_ideal,lemma_exists_idempotent_in_left_ideals}
     From the proof of \cref{lemma_thick_closure_contains_ideal}, there exists a minimal left ideal
     \[L' \subseteq \bigcap_{g \in S} \overline{g^{-1}H}.\]
 
@@ -1744,7 +1705,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_product_of_equi_is_equi}
     Let $A, B \in \dcsyndeticbohr$.  Then $A = R(x,U)$ and $B = R(y,V)$ in equicontinuous $S$-systems $X$ and $Y$.  By \cref{lemma_product_of_equi_is_equi}, the $S$-system $X \times Y$ is equicontinuous, and $A \cap B = R((x,y), U \times V)$, whereby $A \cap B \in \dcsyndeticbohr$.
 \end{proof}
 
@@ -1754,7 +1714,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_dcsyndeticbohr_dcthickbohr_dual,lemma_dcsyndeticbohr_is_filter,thm_family_pr_iff_dual_is_filter}
     That $\dcthickbohr$ is partition regular follows immediately from \cref{lemma_dcsyndeticbohr_dcthickbohr_dual}, \cref{lemma_dcsyndeticbohr_is_filter}, and \cref{thm_family_pr_iff_dual_is_filter}.
 \end{proof}
 
@@ -1764,7 +1723,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-\uses{def_hom_system}
     Suppose $B \supseteq R_T(x,U)$ for a minimal, equicontinuous $T$-system $X$.  The homomorphism system (\cref{def_hom_system}) gives $X$ as an $S$-system.  It is \dgg{easy to check} that it is a minimal, equicontinuous $S$-system, and that $R_S(x,U) = \pi^{-1}R_T(x,U)$.  Thus, $\pi^{-1} B \supseteq \pi^{-1} \pi^{-1} R_T(x,U) = R_S(x,U)$ is a $\dcsyndeticbohr$ subset of $S$, as desired.
 \end{proof}
 
@@ -1779,7 +1737,6 @@ The proof would be a straight-forward application of the pigeonhole principle if
 %\dgg{Yes, cancellativity can be removed!  We do this just following the proof of this theorem.}
 
 \begin{proof}
-\uses{lemma_minimal_comm_action_implies_surjective}
     Suppose $A \in \Delta_0$ and we want to show that $A \cap R(x,U) \neq \emptyset$, where $X$ is a minimal, equicontinuous $S$-system, $x \in U \subseteq X$.  Since $X$ is compact, Hausdorff, it has a unique uniform structure.  Thus, there exists an entourage $\beta \subseteq X^2$ such that $\beta[x] \subseteq U$.  By equicontinuity, there exists an entourage $\alpha \subseteq X^2$ such that for all $s \in S$, $(s \otimes s) \alpha \subseteq \beta$.
     
     Note that $\Delta(X) \subseteq \alpha$, whereby
@@ -1802,7 +1759,6 @@ The proof would be a straight-forward application of the pigeonhole principle if
 \end{proof}
 
 \begin{proof}
-\uses{lemma_minimal_comm_action_implies_surjective}
     Suppose $A \in \Delta_0$ and we want to show that $A \cap R(x,U) \neq \emptyset$, where $X$ is a minimal, equicontinuous $S$-system, $x \in U \subseteq X$.  Since $X$ is compact, Hausdorff, it has a unique uniform structure.  Thus, there exists an entourage $\beta \subseteq X^2$ such that $\beta[x] \subseteq U$.  By equicontinuity, there exists an entourage $\alpha \subseteq X^2$ such that for all $s \in S$, $(s \otimes s) \alpha \subseteq \beta$.
 
     Let $\gamma$ be an entourage such that $\gamma \circ \gamma \subseteq \alpha$. But replacing $\gamma$ with $\gamma \cap \gamma^{-1}$, we can assume $\gamma$ is symmetric (i.e. $(x, y) \in \gamma$ if and only if $(y, x) \in \gamma)$.
@@ -1864,7 +1820,6 @@ The following lemma says that the action of $S$ on $X$ factors through the large
 \end{lemma}
 
 \begin{proof}
-\uses{def_hom_system}
     For $s \in S$, denote by $f_s$ the element of $C(X,X)$ given by $s$.  By the definition of the cancellativity quotient, if $[s] = [t]$, then $s=t$ or there exists $r \in S$ such that $rs = rt$.  We wish to show that $f_s = f_t$.  If $s = t$, this is immediate, so suppose there exists $r \in S$ such that $rs = rt$.
 
     Let $x \in X$. Since $S$ acts by surjections, there exists $y \in X$ such that $ry = x$.  Then
@@ -1885,7 +1840,6 @@ The following lemma says that the action of $S$ on $X$ factors through the large
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_dcsyndeticbohr_dcthickbohr_dual,lemma_com_surj_action_factors_thru_cancel_quotient,lemma_hom_system_facts,lemma_preimage_of_dcsyndetic_bohr}
     Note that the second item follows from the first and \cref{lemma_dcsyndeticbohr_dcthickbohr_dual}.
 
     Suppose $A$ is $\dcsyndeticbohr$.  There exists a minimal equicontinuous $S$-system $X$, a point $x \in X$, and an open neighborhood $U \ni x$ such that $A \supseteq R(x,U)$.  By \cref{lemma_com_surj_action_factors_thru_cancel_quotient} and \cref{lemma_hom_system_facts}, $X$ is a minimal, equicontinuous $S/\sim_C$ system and
@@ -1901,7 +1855,6 @@ The following lemma says that the action of $S$ on $X$ factors through the large
 \end{theorem}
 
 \begin{proof}
-\uses{thm_large_cancel_quotient,lemma_hom_image_of_delta_zero,thm_delta_zero_set_of_bohr_rec,lemma_bohr_descriptions_via_cancel_quotient}
     Denote by $\pi: S \to S/\sim_C$ the quotient map to the largest cancellative quotient (\cref{thm_large_cancel_quotient}). Let $A \in \Delta_0$.  By \cref{lemma_hom_image_of_delta_zero}, $\pi A$ is $\Delta_0$ in $S/\sim_C$. By \cref{thm_delta_zero_set_of_bohr_rec}, $\pi A$ is a $\dcthickbohr$ subset of $S/\sim_C$.  By \cref{lemma_bohr_descriptions_via_cancel_quotient}, $A$ is a $\dcthickbohr$ subset of $S$, as desired.
 \end{proof}
 
@@ -1965,7 +1918,6 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_S2_action_on_X2}
     By \cref{lemma_S2_action_on_X2}, both $X^3$ and $X^2$ are $S^2$-systems.  We need only show that for all $(s,t) \in S^2$, $(s,t) \pi_{12} = \pi_{12} (s,t)$.  Let $(s,t) \in S^2$ and $(x,y,z) \in X^3$.  Then
     \[(s,t) \pi_{12} (x,y,z) = (s,t)(x,y) = (sx,sty) = \pi_{12} (s,t) (x,y,z).\]
 \end{proof}
@@ -2018,7 +1970,6 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 % \end{lemma}
 
 % \begin{proof}
-\uses{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}
 %     Since $X$ is $S$-minimal, $(y,y) \in \overline{S(z,z)}$. Apply \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}.
 % \end{proof}
 
@@ -2049,7 +2000,6 @@ We define an action of $S^2$ on $X$ via
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_S2_action_on_X}
     By \cref{lemma_S2_action_on_X}, both $X^3$ and $X$ are $S^2$-systems.  We need only show that for all $(s,t) \in S^2$, $(s,t) \pi_{3} = \pi_{3} (s,t)$. Let $(s,t) \in S^2$ and $(x,y,z) \in X^3$.  Then
     \[(s,t) \pi_{3} (x,y,z) = (s,t)z = tz) = \pi_{3} (s,t) (x,y,z).\]
 \end{proof}
@@ -2078,7 +2028,6 @@ We showed above that $X^3$, $X^2$, and $X$ are all $S^2$-systems.  By \cref{thm_
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_x3_to_x2_is_S2_factor_map,lemma_x3_to_x_is_S2_factor_map,thm_ultra_semigroup_action_thru_factor}
     Since $\pi_{12}: X^3 \to X^2$ and $\pi_3: X^3 \to X$ are factor maps of $S^2$-systems (\cref{lemma_x3_to_x2_is_S2_factor_map} and \cref{lemma_x3_to_x_is_S2_factor_map}), by \cref{thm_ultra_semigroup_action_thru_factor}, we get that $\pi_{12} p (x,y,z) = p \pi_{12} (x,y,z) = p(x,y)$ and $\pi_3 p (x,y,z) = p \pi_3 (x,y,z) = pz$.
 \end{proof}
 
@@ -2090,7 +2039,6 @@ We showed above that $X^3$, $X^2$, and $X$ are all $S^2$-systems.  By \cref{thm_
 \end{theorem}
 
 \begin{proof}
-\uses{lem_minimal_h_from_g,lemma_exists_idempotent_px_is_x,lemma_ultrafilter_action_on_X3,lemma_minimal_implies_uniformly_recurrent,lemma_idempotent_implies_proximal,lemma_prox_in_h_implies_in_g,theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,lemma_in_orb_clos_of_ur_implies_ur,lemma_S_orb_closure_contained_in_S2_orbit_closure_v2}
 Since $X$ is a minimal $S$-system, by \cref{lem_minimal_h_from_g}, $X^2$ is a minimal $S^2$-system.  By \cref{lemma_exists_idempotent_px_is_x}, there exists a minimal, idempotent $p \in \beta S^2$ such that $p(x,x) = (x,x)$.  We see by \cref{lemma_ultrafilter_action_on_X3} that $p(x,x,x) = (x,x,p x)$.
 
 Since $p$ is minimal, by \cref{lemma_minimal_implies_uniformly_recurrent}, the point $p(x,x,x) = (x,x,px)$ is $S^2$-uniformly recurrent.  Since $p$ is idempotent, by \cref{lemma_idempotent_implies_proximal}, the points $x$ and $px$ are $S^2$-proximal.
@@ -2108,7 +2056,6 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_implies_net_iff,lemma_ultrafilter_surjective_action,lemma_ultrafilter_action_on_X3,thm_ultrafilter_action_with_fixed_x_is_continuous,lemma_ultrafilter_idempotent_lift,thm_ultra_point_in_orb_closure,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v2,theorem_orbit_closure_transitivity,eqn_orb_closure_eqn_1,lemma_in_orb_clos_of_ur_implies_ur,lemma_prox_in_h_implies_in_g,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}
     Suppose $(x,y) \in \RP$. By \cref{lemma_rp_implies_net_iff}, there exists $w \in X$ and a net $(a_n, b_n, s_n)_n \subseteq X \times X \times S$ such that
     \[(a_n, b_n, s_n a_n, s_n b_n) \to (w, w, x, y).\]
 
@@ -2153,7 +2100,6 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \end{theorem}
 
 \begin{proof}
-\uses{thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,theorem_cube_space_orbit_implies_rp}
     Let $(x,y), (y,z) \in \RP$.  Since $(x,y) \in \RP$, by \cref{thm_rp_implies_same_minimal_component}, we have that $(x,y,y) \in \overline{S^2(y,y,y)}$.  By minimality, $(z,z) \in \overline{S(y,y)}$.  Since $(x,y,y)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(x,z,z) \in \overline{S^2(x,y,y)}$.  Since $(y,z) \in \RP$, by \cref{thm_rp_implies_same_minimal_component}, we have that $(y,z,z) \in \overline{S^2(z,z,z)}$.  By minimality, $(y,y) \in \overline{S(z,z)}$.  Since $(y,z,z)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,y,y) \in \overline{S^2(y,z,z)}$.
     
     Recapping the conclusions from the previous paragraph:
@@ -2174,7 +2120,6 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_basics,lemma_rp_reflexive,theorem_rp_is_transitive}
     Combine \cref{lemma_rp_basics}, \cref{lemma_rp_reflexive}, and \cref{theorem_rp_is_transitive}.
 \end{proof}
 
@@ -2184,7 +2129,6 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \end{theorem}
 
 \begin{proof}
-\uses{theorem_rp_is_ICER,lemma_rp_characterization_of_equicont_icer}
     By \cref{theorem_rp_is_ICER}, $\RP$ is an ICER.  It follows from \cref{lemma_rp_characterization_of_equicont_icer} that $\RP$ is an equicontinuous ICER so that by the definition of $\seq$, $\seq \subseteq \RP$.  Since $\seq$ is an equicontinuous ICER, it follows from \cref{lemma_rp_characterization_of_equicont_icer} that $\RP \subseteq \seq$.  Therefore, $\RP = \seq$.
 \end{proof}
 
@@ -2200,7 +2144,6 @@ Here is another application of the material in this section. The theorem below i
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_basics,thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,lemma_return_time_algebra_three,lemma_image_of_syndetic}
     Let $U, V \subseteq X$ be non-empty, open with $y \in V$.  Let $z \in U$.  By \cref{lemma_rp_basics}, $\RP$ is symmetric, so $(y,x) \in \RP$.  By \cref{thm_rp_implies_same_minimal_component}, $(y,x,x) \in \overline{S^2 (x,x,x)}$. By minimality, $(z,z) \in \overline{S(x,x)}$.  Since $(x,x,x)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,z,z) \in \overline{S^2(y,x,x)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), $(y,z,z) \in \overline{S^2 (x,x,x)}$.
     
     By \cref{thm_xxx_is_trtl_unif_rec_v3}, the point $(x,x,x)$ is $S^2$-uniformly recurrent.  Since $V \times U \times U$ is an open neighborhood of $(y,z,z)$ and $(y,z,z) \in \overline{S^2 (x,x,x)}$, we get that $R_{S^2}((x,x,x), V \times U \times U)$ is syndetic. This is the set of pairs $(g,r) \in S^2$ such that $T_{L,g} T_{R,r} (x,x,x) \in V \times U \times U$ -- that is, such that $r \in R(x,U)$, $g \in R(x,V)$, $rg \in R(x,U)$.  For each such pair $(g,r) \in S^2$, we see by \cref{lemma_return_time_algebra_three} that
@@ -2255,7 +2198,6 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 \end{lemma}
 
 \begin{proof}[Proof outline]
-\uses{def_symbolic_system,def_hom_system}
     If $S$ has an identity, this is easy: $A = R(1_A, [1]_{e_S})$. Indeed, note that $s \in R(1_A, [1]_{e_S})$ iff $s1_A \in [1]_{e_S}$ iff $(s 1_A)(e_S) = 1$ iff $1_A(s e_S) = 1$ iff $1_A (s) = 1$ iff $s \in A$.
 
     But we don't want to assume that $S$ has an identity.  Thus, here is the outline for the proof in that case.
@@ -2326,7 +2268,6 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_thick_closure_contains_strong_ultrafilter,lemma_minimal_implies_uniformly_recurrent,lemma_unif_rec_implies_CRTURP,lemma_plim_in_open_set_return_time}
     Since $H$ is thick, by \cref{lemma_thick_closure_contains_strong_ultrafilter}, there exists a minimal, idempotent ultrafilter $p \in \overline{H} \subseteq \beta S$ such that for all finite $F \subseteq S$, $\cap_{f \in F} f^{-1} H \in p$. Let $1_B = p 1_{A \cap H}$.  It follows from \cref{lemma_minimal_implies_uniformly_recurrent} that $1_B$ is $S$-uniformly recurrent.  By \cref{lemma_unif_rec_implies_CRTURP}, $B$ is a CRTURP set.  Define $T = \{g \in S \mid 1_B(g) = 1_{A \cap H}(g) \}$.
     
     We claim that the set $H \cap T$ is thick.  Indeed, let $F \subseteq S$ be finite. The set
@@ -2351,7 +2292,6 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 % \dgg{Note: I removed the assumption that $\family \neq \mathcal{P}(S)$, since by definition, if $\family = \mathcal{P}(S)$, then $S \classcapdual \family = S$.}
 
 \begin{proof}
-\uses{thm_classcapdual_contained_in_intersection,lem:auslander-ellis}
 \begin{enumerate}
     \item Let $A \in \syndetic \classcapdual \family$ and $H \subseteq S$ be a thick set. Our goal is to show that $A \cap H \in \familytwo$.
 
@@ -2377,7 +2317,6 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 \end{theorem}
 
 \begin{proof}
-\uses{thm_delta_set_builder_prestep,lemma_synd_thick_dual,lemma_minimal_comm_action_implies_surjective,lemma_return_time_algebra_one,lemma_return_to_intersection,lemma_preimage_intersection_of_thick_is_thick}
     Let $B \subseteq S$ be thick. Put $U_1 = V$ and $B_1 = B$.
 
     \begin{enumerate}
@@ -2473,7 +2412,6 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_pr_family_concentration,lemma_dcthickbohr_is_pr,lemma_dcsyndeticbohr_dcthickbohr_dual,thm_rp_equals_s,thm_delta_from_kronecker}
     Since $B$ is a CRTURP set, there exists $X$ be a minimal $G$-system, $x \in X$, and $U \subseteq X$ clopen so that $B = R(x,U)$.  Assume $B \in \dcthickbohr$.
 
     Since $R(x,U) \in \dcthickbohr$, by \cref{lemma_pr_family_concentration}, \cref{lemma_dcthickbohr_is_pr}, and the fact that $U$ is closed, there exists $y \in U$ such that for all non-empty, open $U' \ni y$, the set $R(x,U') \in \dcthickbohr$.
@@ -2488,7 +2426,6 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 \subsection{Proof of \cref{thm_bfw_dual_abelian} and some corollaries}
 
 \begin{proof}[Proof of \cref{thm_bfw_dual_abelian}]
-\uses{thm_delta_in_deltazero,{thm_delta_zero_set_of_bohr_rec_no_cancel,thm_classcapdual_is_monotonic,thm_lspwf_upgrade,thm_classcapdual_contained_in_intersection,thm_dcthickbohr_is_delta_for_rxu}
     That
     \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr.\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{{thm_delta_zero_set_of_bohr_rec_no_cancel}}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
