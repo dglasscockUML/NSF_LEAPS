@@ -46,8 +46,63 @@ theorem thm_equiv_dual_formulation {α} (F : Family α) :
     exact AcninF this
  --complement of A in S not in F}
 
+--added this to get ext A to work, not sure why mine wasn't working but angelina's was
+@[ext]
+lemma Family.ext {α} {F G : Family α}
+  (h : F.sets = G.sets) : F = G := by
+  cases F
+  cases G
+  cases h
+  rfl
+
 theorem thm_dual_is_involution (F : Family α) : F** = F :=
-  by sorry
+  by
+  ext A
+  constructor
+  · -- F** ⊆ F
+    intro AinDualDual --have some F**
+    by_contra h --assume F** not in F
+    have AinDual : A ∈ (F*).sets := by
+      intro B BinF
+      by_contra hEmpty
+      have hsubset : B ⊆ Aᶜ := by
+        intro x xinB
+        by_contra xninAc
+        have xinA : x ∈ A := by
+          rw [Set.mem_compl_iff] at xninAc
+          push_neg at xninAc
+          exact xninAc
+        have : x ∈ A ∩ B := ⟨xinA, xinB⟩
+        have : (A ∩ B).Nonempty := ⟨x, this⟩
+        contradiction
+      have : Aᶜ ∈ F.sets :=
+        F.upward_closed B Aᶜ BinF hsubset
+      sorry
+    sorry
+  · -- F ⊆ F**
+    intro AinF
+    by_contra h
+    have AinDual : A ∈ (F*).sets := by
+      intro B BinF
+      by_contra hEmpty
+      have hsubset : B ⊆ Aᶜ := by
+        intro x xinB
+        by_contra xninAc
+        have xinA : x ∈ A := by
+          rw [Set.mem_compl_iff] at xninAc
+          push_neg at xninAc
+          exact xninAc
+        have : x ∈ A ∩ B := ⟨xinA, xinB⟩
+        have : (A ∩ B).Nonempty := ⟨x, this⟩
+        contradiction
+      have : Aᶜ ∈ F.sets :=
+        F.upward_closed B Aᶜ BinF hsubset
+      sorry
+    sorry
+  --split into 2 cases,
+ -- F** ⊆ F
+ -- F ⊆ F**
+
 
 theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
   (h : ∀ F, dual (dual F) = F) : Function.Bijective dual :=
@@ -69,8 +124,8 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by sorry
 
 --thm_de_morgan_union_v2
---theorem thm_de_morgan_union_v2 (F G : Family α) : (F   G)* = (F* ∩ G*) :=
- -- by sorry
+theorem thm_de_morgan_union_v2 (F G : Family α) : (F.sets ∪ G.sets)* = ((F*).sets ∩ (G*).sets) :=
+ by sorry
 
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
