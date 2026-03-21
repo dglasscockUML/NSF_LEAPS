@@ -1,3 +1,6 @@
+import NSFLEAPS._00_Imports.IM_Base
+
+/- These imports have been moved to _00_Imports.IM_Base
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Fin.Basic
@@ -5,6 +8,8 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Set.Operations
 import Init.PropLemmas
 import Mathlib.Data.Finset.Empty
+When ready, delete me.
+-/
 
 --class defs
 class HasFamDual (T : Type _) where
