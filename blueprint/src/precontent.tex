@@ -1,15 +1,3 @@
-\setcounter{section}{-1} % Set the counter to -1
-
-\section{Imports}
-\label{sec_imports}
-
-Contains:
-\begin{itemize}
-    \item Contains the imports from mathlib we need for the project.
-
-    \item For the more specialized packages, let's keep comments as to why we need them.
-\end{itemize}
-
 \section{Topology}
 \label{sec_topology}
 
@@ -20,7 +8,7 @@ Contains:
     \item Contains the specialized lemmas that we need many times but that do not appear in a convenient way in mathlib
 \end{itemize}
 
-\begin{lean}
+\begin{leanrmk}
     Some basic topology theorems we use over and over:
     \begin{itemize}
         \item \verb|IsClosedMap.closure_image_eq_of_continuous| shows that $\overline{fA} = f\overline{A}$ as long as $f: X \to Y$ is a closed map
@@ -37,12 +25,13 @@ Contains:
 
         \item \verb|IsCompact.isClosed|: in a Hausdorff space, a compact set is closed
     \end{itemize}
-\end{lean}
+\end{leanrmk}
 
 Here's a result we use several times that we'll need ready access to in Lean.
 
 \begin{lemma}
 \label{lemma_image_closure_equals_closure_image}
+ \lean{imageClosureIsClosureImage}
     Let $f: X \to Y$ be a continuous map of compact Hausdorff spaces.  For all $A \subseteq X$, $\overline{fA} = f \overline{A}$.
 \end{lemma}
 
@@ -50,7 +39,7 @@ Here's a result we use several times that we'll need ready access to in Lean.
     By \verb|Continuous.isProperMap|, $f$ is proper. Therefore, by \verb|IsProperMap.isClosedMap|, $f$ is closed. Therefore, by \verb|IsClosedMap.closure_image_eq_of_continuous|, $\overline{fA} = f \overline{A}$.
 \end{proof}
 
-\begin{lean}
+\begin{leanrmk}
     Basic topology structures already in lean:
     \begin{itemize}
         \item Hausdorff (T2) spaces: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/Separation/Hausdorff.html}
@@ -63,9 +52,9 @@ Here's a result we use several times that we'll need ready access to in Lean.
 
         \item \verb|nhds| is the filter of neighborhoods of a point $x$ in a topological space $X$.  A ``neighborhood'' is a set which contains an open subset of $x$.
     \end{itemize}
-\end{lean}
+\end{leanrmk}
 
-\begin{lean}
+\begin{leanrmk}
     Here are some useful facts about entourages in lean:
     \begin{itemize}
         \item Entourages are elements of the filter in ``uniformity'' field in the uniform space class. But careful: in this file, we've been implicitly assuming an entourage is an open set. We would need to make this explicit when working in lean, since elements of the entourage filter are not necessarily open.  
@@ -76,7 +65,7 @@ Here's a result we use several times that we'll need ready access to in Lean.
 
         \item We frequently want to apply $\pi \otimes \pi$.  The structure for this in lean is \verb|Prod.map|.  See also \verb|Prod.map_apply| for a shortcut
     \end{itemize}
-\end{lean}
+\end{leanrmk}
 
 In what follows, we will need to consider systems whose phase spaces are non-metrizable.  All phase spaces will be compact Hausdorff spaces.  We may have luck finding results in mathlib concerning uniform spaces.  The two are connected as follows.
 
@@ -90,7 +79,7 @@ In what follows, we will need to consider systems whose phase spaces are non-met
 
 We can make our definitions in the appropriate generality by making them for uniform spaces.  The disadvantage then is if we want to specialize to compact Hausdorff spaces and the previous theorem is not in mathlib, we'd need to prove it.
 
-\begin{lean}
+\begin{leanrmk}
     Baire space in Mathlib:
     \begin{itemize}
         \item \verb|BaireSpace| is a class that says a topology has the Baire property
@@ -98,17 +87,18 @@ We can make our definitions in the appropriate generality by making them for uni
         \item \verb|BaireSpace.of_t2Space_locallyCompactSpace| is an instance from which we can get a BaireSpace type from a compact Hausdorff space.  To do this, in a proof, one can write
         \begin{center}\verb|have : BaireSpace X := by infer_instance|\end{center}
     \end{itemize}
-\end{lean}
+\end{leanrmk}
 
 \begin{lemma}
     \label{lemma_entourage_regularity_at_a_point}
+    \lean{openClosureProductInEntourage}
     Let $X$ be a uniform space, $x \in X$, and $\alpha \subseteq X^2$ be an entourage.  There exists an open set $U \ni x$ such that $\overline{U} \times \overline{U} \subseteq \alpha$.
 \end{lemma}
 
 \begin{proof}
     Put the following things in order:
     \begin{itemize}
-        \item \verb|UniformSpace.ball x \alpha| will give an element of \verb|nbhd x| that contains an open set
+        \item \verb|UniformSpace.ball x \alpha| will give the element of \verb|nbhd x| corresponding to $\alpha$
         
         \item Since $X$ is uniform, by \verb|UniformSpace.to_regularSpace|, it is regular
         
@@ -119,6 +109,7 @@ We can make our definitions in the appropriate generality by making them for uni
 
 \begin{lemma}[Substitute for semiopenness of a factor map]
 \label{lemma_image_of_entourage_somewhere_dense_along_diagonal}
+\lean{openProductInEntourageImage}
     Let $\pi: X \to Y$ be a surjection of compact Hausdorff spaces. For all entourages $\alpha \subseteq X^2$, there exists a non-empty, open set $V \subseteq Y$ such that
     \[V \times V \subseteq (\pi \otimes \pi) \alpha.\]
 \end{lemma}
@@ -141,7 +132,7 @@ Contains:
     \item Contains semigroup algebra: ideals, idempotency, etc...
 \end{itemize}
 
-\begin{lean}
+\begin{leanrmk}
     In mathlib:
     \begin{enumerate}
         \item Semigroup: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Group/Defs.html}
@@ -155,18 +146,21 @@ Contains:
 
         \item Idempotents: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Group/Idempotent.html}
     \end{enumerate}
-\end{lean}
+\end{leanrmk}
 
-\begin{lean}
+\begin{leanrmk}
     Missing from Mathlib are definitions around ideals in semigroups.
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[{Left ideal, \cite[Def. 1.26]{hindman_strauss_book_2012}}]
+\lean{SemigroupLeftIdeal}
+\leanok{}
     A left ideal of semigroup $S$ is a non-empty subset $L \subseteq S$ such that for all $s \in S$, $s L \subseteq L$.
 \end{definition}
 
 \begin{lemma}
     \label{lemma_intersection_of_ideals_is_ideal}
+    \lean{intersectionOfLeftIdealsIsLeftIdeal}
     Let $S$ be a semigroup, and let $L_i$ be a collection of left ideals of $S$.  The intersection $\bigcap_i L_i$, if non-empty, is a left ideal of $S$.
 \end{lemma}
 
@@ -184,65 +178,6 @@ Contains:
     An element $s$ of a semigroup $S$ is idempotent if $ss = s$.
 \end{definition}
 
-\begin{definition}[Cancellative]
-    A semigroup $S$ is cancellative if it is both left cancellative and right cancellative.  That is, if for all $s, t, r \in S$, $rs = rt$ or $sr = tr$ implies $s = t$.  Equivalently: if for all $r \in S$, left multiplication by $r$ and right multiplication by $r$ as maps from $S \to S$ are both injective.
-\end{definition}
-
-\dgg{I don't know how standard this is or whether this relation can be found in mathlib.}
-
-\begin{definition}[Cancellativity relation]
-    Let $S$ be a semigroup.  The cancellativity relation on $S$ is defined by: $s \sim_C t$ if and only if $s = t$ or there exists $r \in S$ such that $rs = rt$.
-\end{definition}
-
-\begin{definition}
-    Let $S$ be a semigroup.  A multiplicative semigroup relation on $S$ is a relation $\sim$ on $S$ that satisfies: for all $s, t, r \in S$, $s \sim t$ implies $rs \sim rt$ and $sr \sim tr$.
-\end{definition}
-
-\begin{lemma}
-    \label{lemma_cancel_relation_is_mult_eq}
-    Let $S$ be a commutative semigroup. The cancellativity relation is a multiplicative equivalence relation.
-\end{lemma}
-
-\begin{proof}
-    \begin{itemize}
-        \item Reflexive $s \sim_C s$ is immediate
-        \item Symmetric $s \sim_C t$ implies $t \sim_C s$ is clear from symmetry of equals
-        \item Transitive $s \sim_C t$ and $t \sim_C k$ implies $s \sim_C k$: $sr = tr$ and $tp = kp$ implies $spr = tpr = kpr$, so $s \sim_C k$. Note that in this argument, $r$ or $p$ may be the null element (or, if $S$ has an identity, the identity)
-        \item Multiplicative: if $s \sim_C t$, then $sk \sim_C tk$: indeed, $sr = tr$ implies $skr = tkr$, so $sk \sim_C tk$.
-    \end{itemize}
-\end{proof}
-
-\begin{lean}
-\begin{itemize}
-    \item \verb|Con M| is the type of multiplicative congruence relations on a type with Mul. It is defined in Mathlib.GroupTheory.Congruence.Defs, together with quotients by congruences.
-
-    \item \verb|Con.Quotient|, which is the quotient type by a congruence, and mathlib gives it the induced multiplication; in particular there is a Semigroup instance on the quotient when the original type is a semigroup.  That is: $[s][t] = [st]$.
-\end{itemize}
-\end{lean}
-
-\begin{theorem}[Largest cancellative quotient]
-\label{thm_large_cancel_quotient}
-    Let $S$ be a commutative semigroup.
-    \begin{enumerate}
-        \item $S/\sim_C$ has a canonical semigroup structure.
-
-        \item The factor map $S \to S/\sim_C$ is a surjective semigroup homomorphism
-
-        \item The semigroup $S/\sim_C$ is a commutative, cancellative semigroup.
-    \end{enumerate}
-\end{theorem}
-
-\begin{proof}
-    1. The semigroup structure on $S/\sim_C$ is given by $[s][t] = [st]$.  This is well defined by the fact that $\sim_C$ is multiplicative (\cref{lemma_cancel_relation_is_mult_eq}).
-
-    2. That the quotient map is surjective is immediate. That it is a semigroup homomorphism is immediate from the definition of the semigroup structure on $S / \sim_C$.
-
-    3. Commutativity follows from the fact that $S$ is commutative and that homomorphic images of commutative semigroups are commutative.
-    
-    To see cancellativity, suppose $[s][r] = [t][r]$. We will show that $[s] = [t]$. Then $[sr] = [tr]$.  Then $sr \sim_C tr$, so there exists $k \in S$ such that $srk = trk$.  Thus $s \sim_C t$.  Thus $[s] = [t]$.
-    
-\end{proof}
-
 
 \section{Family algebra}
 \label{sec_family_algebra}
@@ -254,22 +189,939 @@ Contains:
     \item Contains the abstract Furstenberg family algebra definitions and results
 \end{itemize}
 
-The main content is in \verb|03_family_algebra.tex| file.  Below are some things we have immediate need for.
+\subsection{Definitions}
+
+Let $S$ be a set.
+
+\begin{definition}[Collection]
+    A \emph{collection} of subsets of $S$ is an element of $\collections{S}$.
+\end{definition}
+
+\begin{definition}[Nonempty collection]
+    A collection $\family \in \families{S}$ is \emph{nonempty} if $\family \neq \emptyset$.
+\end{definition}
+
+\begin{definition}[Proper collection]
+    A collection $\family \in \families{S}$ is \emph{proper} if $\family \neq \powerset{S}$.
+\end{definition}
+
+\begin{definition}[Upward closed collection]
+    A collection of sets $\family \in \collections{S}$ is \emph{upward closed} if for all $A, B \subseteq S$, (($A \in \family$ and $A \subseteq B$) implies $B \in \family$).
+\end{definition}
+
+\begin{definition}[Family of subsets of $S$]
+    A collection of sets $\family \in \collections{S}$ is a \emph{family} if it is upward closed.  We denote the set of families on $S$ by $\families{S}$.
+\end{definition}
+
+\begin{definition}[Partition regular family]
+    A family $\family \in \families{S}$ is \emph{partition regular family} if for all $A, B \subseteq S$, $A \cup B \in \family$ implies $A \in \family$ or $B \in \family$.
+\end{definition}
+
+\begin{definition}[Filter family]
+    A family $\family \in \families{S}$ is a \emph{filter family} if for all $A, B \subseteq S$, $A \in \family$ and $B \in \family$ implies $A \cap B \in \family$.
+\end{definition}
+
+\begin{definition}[Ultrafilter family]
+    A family $\family \in \families{S}$ is an \emph{ultrafilter family} if it is both a partition regular family and a filter family.
+\end{definition}
+
+\subsection{Set lattice}
+
+\begin{enumerate}
+    \item $\cup: \families{S}^2 \to \families{S}$
+    \begin{enumerate}
+        \item The union of two families is a family
+        \item The union of two filters is not necessarily a filter
+        \item The union of two partition regular families is partition regular
+    \end{enumerate}
+    \item $\cap : \families{S}^2 \to \families{S}$
+        \begin{enumerate}
+        \item The intersection of two families is a family
+        \item The intersection of two filters is a filter
+        \item The intersection of two partition regular families is not necessarily partition regular
+    \end{enumerate}
+    \item $(\families{S}, \cup, \cap)$ is a sub-lattice of $(\mathcal{P}(\mathcal{P}(S)),\cup,\cap)$
+    \item By \cref{thm_de_morgan_union_v1} and \cref{thm_de_morgan_union_v2}, I believe that $(\mathcal{P}(\mathcal{P}(S)),\cup,\cap,*)$ is something like an involutive lattice
+\end{enumerate}
+
+\subsection{Dual families}
+
+\begin{definition}[Dual map]
+    The \emph{dual} map $*: \mathcal{P}(\mathcal{P}(S)) \to \mathcal{P}(\mathcal{P}(S))$ is defined by 
+    \[\family^* = \{A \subseteq S : \forall B \in \family, \ A \cap B \neq \emptyset\}.\]
+    For $\family \in \collections{S}$, its image $\family^*$ is the \emph{dual} of $\family$.
+\end{definition}
+
+\vskip0.5cm
+
+Facts on the level of collections:
+\begin{enumerate}
+    \item $*$ is antitone: for collections $\family$ and $\familytwo$, if $\family \subseteq \familytwo$, then $\familytwo^* \subseteq \family^*$
+    \begin{itemize}
+        \item Proof: \cref{thm_dual_is_antitone}
+    \end{itemize}
+
+    \item For all collections $\family$ and $\familytwo$, $(\family \cup \familytwo)^* = \family^* \cap \familytwo^*$ and $(\family \cap \familytwo)^* = \family^* \cup \familytwo^*$
+    \begin{itemize}
+        \item Proof: \cref{thm_de_morgan_union_v1} and \cref{thm_de_morgan_union_v2}
+    \end{itemize}
+\end{enumerate}
+
+\vskip0.5cm
+
+Facts on the level of families:
+\begin{enumerate}
+    \item $*$ maps families to families, that is, $*: \families{S} \to \families{S}$
+    \begin{itemize}
+        \item Proof: \cref{thm_dual_of_fam_is_fam}
+        \item Note that the edge cases $\emptyset^* = \mathcal{P}(S)$ and $\mathcal{P}(S)^* = \emptyset$ hold by strict interpretation of the definition.  Thus, in the theorems proving facts about the dual, there are no separate edge cases to consider.
+        \item There is a more general statement here we might favor: $*$ takes $\mathcal{P}(\mathcal{P}(S))$ to $\families{S}$.
+    \end{itemize}
+    
+    \item Useful equivalent formulation: for all families $\family$,
+    \[\family^* = \{A \subseteq S : S \setminus A \not\in \family\}\]
+    \begin{itemize}
+        \item Proof: \cref{thm_equiv_fam_dual_formulation}
+    \end{itemize}
+    
+    \item $*$ is an involution on families: for all families $\family$, $(\family^*)^* = \family$
+    \begin{itemize}
+        \item Proof: \cref{thm_dual_is_involution_on_fams}
+        \item There is a more general statement we might favor: $(\family^*)^*$ is the upward-closure of $\family$.
+    \end{itemize}
+
+    \item $*: \families{S} \to \families{S}$ is a bijection
+    \begin{itemize}
+        \item Proof: \cref{thm_dual_is_bijection_on_fams}
+    \end{itemize}
+
+    \item For all families $\family$, $\family$ is partition regular if and only if $\family^*$ is a filter
+    \begin{itemize}
+        \item Proof: \cref{thm_pr_iff_dual_is_filter}
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Family join}
+
+\begin{definition}[Family join]
+    The \emph{family join} map $\classcap: \mathcal{P}(\mathcal{P}(S))^2 \to \mathcal{P}(\mathcal{P}(S))$ is defined by
+    \[\family \classcap \familytwo = \begin{cases} \{A \cap B : A \in \family, \ B \in \familytwo\} & \text{if $\family \neq \emptyset$ and $\familytwo \neq \emptyset$} \\ \familytwo & \text{if $\family = \emptyset$} \\ \family & \text{if $\familytwo = \emptyset$} \end{cases}\]
+    The (family) join of collections $\family, \familytwo \in \collections{S}$ is $\family \classcap \familytwo$.
+\end{definition}
+
+\vskip0.5cm
+
+Facts on the level of collections:
+\begin{enumerate}
+    \item $\family \cup \familytwo \subseteq \family \classcap \familytwo$
+    \begin{itemize}
+        \item Proof: \cref{thm_classcap_contains_union}
+    \end{itemize}
+
+    \item $\classcap$ is commutative: $\family \classcap \familytwo = \familytwo \classcap \family$
+    \begin{itemize}
+        \item Proof: \cref{thm_classcap_commutative}
+    \end{itemize}
+    
+    \item $\classcap$ is associative: $\family \classcap (\familytwo \classcap \familythree) = (\family \classcap \familytwo) \classcap \familythree$
+    \begin{itemize}
+        \item Proof: \cref{thm_classcap_associative}
+    \end{itemize}
+    
+    \item $\classcap$ is monotone: if $\family_1 \subseteq \family_2$ and $\familytwo_1 \subseteq \familytwo_2$, then $\family_1 \classcap \familytwo_1 \subseteq \family_2 \classcap \familytwo_2$.
+    \begin{itemize}
+        \item Proof: \cref{thm_classcap_monotone}
+    \end{itemize}
+\end{enumerate}
+
+\vskip0.5cm
+
+Facts on the level of families:
+\begin{enumerate}
+    \item The map $\classcap$ takes pairs of families to families, that is, $\classcap: \families{S}^2 \to \families{S}$
+    \begin{itemize}
+        \item Proof: \cref{thm_family_classcap_is_family}
+    \end{itemize}
+
+    \item $\family \classcap \family^*$ is partition regular
+    \begin{itemize}
+        \item Proof: \cref{thm_family_classcap_dual_is_partition_regular}
+    \end{itemize}
+
+    \item $\family \classcap \family = \family$ if and only if $\family$ is a filter
+    \begin{itemize}
+        \item Proof: \cref{thm_classcap_idempotent_at_filters}
+    \end{itemize}
+
+\end{enumerate}
+
+\subsection{Family meet}
+
+\begin{definition}[Family meet]
+    The \emph{family meet} map $\classcapdual: \mathcal{P}(\mathcal{P}(S))^2 \to \mathcal{P}(\mathcal{P}(S))$ is defined by
+    \[\family \classcapdual \familytwo = \begin{cases} \big\{A \subseteq S : \forall B \in \family^*, \ A \cap B \in \familytwo \big\} & \text{if $\family \neq \mathcal{P}(S)$ and $\familytwo \neq \mathcal{P}(S)$} \\ \familytwo & \text{if $\family = \mathcal{P}(S)$} \\ \family & \text{if $\familytwo = \mathcal{P}(S)$} \end{cases}\]
+    The (family) meet of collections $\family, \familytwo \in \collections{S}$ is $\family \classcapdual \familytwo$.
+\end{definition}
+
+\vskip0.5cm
+
+Facts on the level of collections:
+\begin{enumerate}
+    \item $\family \classcapdual \familytwo \subseteq \family \cap \familytwo$
+    \begin{itemize}
+        \item Proof: \cref{thm_classcapdual_contained_in_intersection}
+    \end{itemize}
+    
+    \item $\classcapdual$ is commutative
+    \begin{itemize}
+        \item Proof: \cref{thm_classcapdual_commutative}
+    \end{itemize}
+    
+    \item $\classcapdual$ is associative
+    \begin{itemize}
+        \item Proof: \cref{thm_classcapdual_associative}
+    \end{itemize}
+    
+    \item $\classcapdual$ is monotone
+    \begin{itemize}
+        \item Proof: \cref{thm_classcapdual_monotone}
+    \end{itemize}
+\end{enumerate}
+
+\vskip0.5cm
+
+Facts on the level of families:
+\begin{enumerate}
+    \item The map $\classcapdual$ takes pairs of families to families, that is, $\classcapdual: \families{S}^2 \to \families{S}$.
+    \begin{itemize}
+        \item Proof: \cref{thm_family_classcapdual_is_family}
+    \end{itemize}
+
+    \item $\family \classcapdual \family^*$ is a filter
+    \begin{itemize}
+        \item Proof: \cref{thm_family_classcapdual_dual_is_filter}
+    \end{itemize}
+
+    \item $\family \classcapdual \family = \family$ if and only if $\family$ is partition regular
+    \begin{itemize}
+        \item Proof: \cref{thm_classcapdual_idempotent_at_pr_families}
+    \end{itemize}    
+\end{enumerate}
+
+\subsection{Algebra involving both meet and join}
+
+\begin{enumerate}
+    \item DeMorgan-type laws: for all collections $\family$, $\familytwo$, $(\family \classcap \familytwo)^* = \family^* \classcapdual \familytwo^*$ and $(\family \classcapdual \familytwo)^* = \family^* \classcap \familytwo^*$
+    \begin{itemize}
+        \item Proof: \cref{thm_de_morgan_v1} and \cref{thm_de_morgan_v1_dual}
+    \end{itemize}
+
+    \item $\family \classcap (\familytwo \classcapdual \familythree) \subseteq (\family \classcap \familytwo) \classcapdual \familythree$
+    \begin{itemize}
+        \item Proof:
+
+        \item Dual: $(\family \classcapdual \familytwo) \classcap \familythree \subseteq \family \classcapdual (\familytwo \classcap \familythree)$
+
+        \item Equality does not hold in dual statement, eg: $(\syndetic \classcapdual \thick) \classcap \dcsyndetic = \dcsyndetic$, whereas $\syndetic \classcapdual (\thick \classcap \dcsyndetic)$ is strong central.
+    \end{itemize}
+
+    \item (Partial distributivity) $(\family \classcapdual \familytwo) \classcap (\family \classcapdual \familythree) \subseteq \family \classcapdual (\familytwo \classcap \familythree)$
+    \begin{itemize}
+        \item Proof: $(\family \classcapdual \familytwo) \classcap (\family \classcapdual \familythree) \subseteq (\family \classcapdual \familytwo) \classcap \familythree \subseteq \family \classcapdual (\familytwo \classcap \familythree)$, where the second containment comes from the previous point.
+
+        \item Equality does not hold in general: set $\family = \syndetic$, $\familytwo = \thick$, and $\familythree = \syndetic$.
+
+        \item Dual: (write it)
+    \end{itemize}
+
+    \item $\family^* \classcap (\family \classcapdual \familytwo) \subseteq \familytwo$
+    \begin{itemize}
+        \item Proof: If $A \in \family \classcapdual \familytwo$ and $B \in \family^*$, then $B \cap A \in \familytwo$.
+
+        \item Dual: $\family \classcapdual (\family^* \classcap \familytwo) \supseteq \familytwo$
+
+        \item Corollary: $\family \classcapdual (\family^* \classcap (\family \classcapdual \familytwo)) = \family \classcapdual \familytwo$
+        \begin{itemize}
+            \item Proof: From previous point, $\family^* \classcap (\family \classcapdual \familytwo) \subseteq \familytwo$, so by monotonicity, $\family \classcapdual (\family^* \classcap (\family \classcapdual \familytwo)) \subseteq \family \classcapdual \familytwo$.  Conversely, from previous point dual,  $\family \classcapdual (\family^* \classcap (\family \classcapdual \familytwo)) \supseteq \family \classcapdual \familytwo$.  
+        \end{itemize}
+
+    \end{itemize}
+    
+    \item $\family^* \classcap (\family \classcapdual \familytwo) \subseteq \familythree$ if and only if $\family \classcapdual \familytwo \subseteq \family \classcapdual \familythree$
+    \begin{itemize}
+        \item Proof: (quick to check by defs)
+
+        \item Alternative proof: Use the previous point to apply $\family \classcapdual$ to go in one direction.  Apply $\family^* \classcap$ to go in the other.
+
+        \item Related: $\family^* \classcap (\family \classcapdual \familytwo) \supseteq \familythree$ if and only if $\family \classcapdual \familytwo \supseteq \family \classcapdual \familythree$
+
+        \item \dgg{To do: use the previous point to prove this via some sort of cancellativity?}
+    \end{itemize}
+
+    \item (Partial absorption) $\family \classcapdual (\family \classcap \familytwo) \subseteq \family$
+    \begin{itemize}
+        \item Proof: $\family \classcapdual (\family \classcap \familytwo) \subseteq \family \cap (\family \classcap \familytwo) \subseteq \family$
+
+        \item There is not equality in general.  Take, eg, $\family$ and $\familytwo$ to be two distinct, proper, non-ultrafilters filters.  Then $\family \classcapdual (\family \classcap \familytwo)$ is trivial.
+
+        \item Lack of absorption shows that $(\families{S}, \classcap, \classcapdual)$ is not a lattice.
+
+        \item Dual: $\family \classcap (\family \classcapdual \familytwo) \supseteq \family$
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Proofs}
+
+Throughout this section, $S$ is a fixed set, and all families are families of subsets of $S$.
+
+\subsubsection{Set lattice facts}
+
+\dgg{I'm waiting to include anything here because it may depend on what is available already in lean.  For example, will lean let us write that the union of two collections is a collection with no issue, or will we need to state and prove that?}
+
+\subsubsection{Dual facts}
 
 \begin{theorem}
-\label{thm_family_pr_iff_dual_is_filter}
-    $\family$ is partition regular iff $\family^*$ is a filter.
+    \label{thm_dual_of_fam_is_fam}
+    \lean{Family.famDual}
+    If $\family$ is a family, then $\family^*$ is a family.  That is, $\cdot^*: \families{S} \to \families{S}$.
 \end{theorem}
 
+\begin{proof}
+    By the definition of family, we need only check that $\family^*$ is an upward closed collection of subsets of $S$.  It is, by definition, a collection of subsets of $S$.  If $A \in \family^*$ and $A \subseteq A' \subseteq S$, to show that $A' \in \family^*$, we need only to show that for all $B \in \family$, $A' \cap B \neq \emptyset$.  Since $A \in \family^*$, we have that $\emptyset \neq A \cap B \subseteq A' \cap B$, as desired.
+\end{proof}
+
 \begin{theorem}
-    \label{thm_classcapdual_is_monotonic}
-    $\classcapdual$ is monotonic.
+    \label{thm_equiv_fam_dual_formulation}
+    \lean{famDualAlt}
+    For all families $\family$, $\family^* = \{A \subseteq S \mid S \setminus A \not\in \family\}$
 \end{theorem}
+
+\begin{proof}
+In the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $A \in \family^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item for all $B \in \family$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] set theory: for $X, Y \subseteq Z$, $X \cap Y = \emptyset$ iff $Y \subseteq Z \setminus X$
+        \end{itemize}
+        \item for all $B \in \family$, $B \not\subseteq S \setminus A$
+        \begin{itemize}
+            \item[--] logic: negation of a universal quantifier
+        \end{itemize}
+        \item not ( there exists $B \in \family$, $B \subseteq S \setminus A$ )
+        \begin{itemize}
+            \item[--] $\family$ is upward closed
+        \end{itemize}
+        \item not ( $S \setminus A \in \family$ )
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+    \label{thm_dual_is_involution_on_fams}
+    $*$ is an involution on the set families: $(\family^*)^* = \family$
+\end{theorem}
+
+\begin{lean}
+    In lean: \verb|Function.Involutive|
+\end{lean}
+
+\begin{proof}
+    By \cref{thm_dual_of_fam_is_fam}, it suffices to show that for all $\family \in \families{S}$, $(\family^*)^* = \family$.
+    In the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $A \in (\family^*)^*$
+        \begin{itemize}
+            \item[--] \cref{thm_equiv_fam_dual_formulation}
+        \end{itemize}
+        \item $S \setminus A \not\in \family^*$
+        \begin{itemize}
+            \item[--] \cref{thm_equiv_fam_dual_formulation}
+        \end{itemize}
+        \item $S \setminus (S \setminus A) \in \family$
+        \begin{itemize}
+            \item[--] set theory: for $X \subseteq Z$, $Z \setminus (Z \setminus X) = X$
+        \end{itemize}
+        \item $A \in \family$
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+    \label{thm_dual_is_bijection_on_fams}
+    $\cdot^*: \families{S} \to \families{S}$ is a bijection
+\end{theorem}
+
+\begin{lean}
+    In lean: \verb|Function.Bijective|
+\end{lean}
+
+\begin{proof}
+    This follows from \cref{thm_dual_is_involution_on_fams} and the general fact that involutions are always bijective.  \dgg{Can we find this general fact in the lean library?}
+\end{proof}
+% By \cref{thm_dual_of_fam_is_fam}, $\cdot^*: \families{S} \to \families{S}$, so we need only show that it is surjective and injective.
+% $*$ is surjective: Let $\family$ be a family.  By \cref{thm_dual_of_fam_is_fam}, $\family^*$ is a family and by \cref{thm_dual_is_involution_on_fams}, $(\family^*)^* = \family$, so $\family$ is in the range of $*$.
+% $*$ is injective: Suppose $\family^* = \family$
+
+\begin{theorem}[Dual is antitone]
+    \label{thm_dual_is_antitone}
+    For all collections $\family, \familytwo \in \collections{S}$, if $\family \subseteq \familytwo$, then $\familytwo^* \subseteq \family^*$.
+\end{theorem}
+
+\begin{lean}
+    In Mathlib.Order.Monotone, see \verb|Antitone (f : a → b)|
+\end{lean}
+
+\begin{proof}
+    Let $\family, \familytwo \in \collections{S}$. In the following list, each statement implies the following one.
+    \begin{enumerate}
+        \item $A \in \familytwo^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item for all $B \in \familytwo$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] $\family \subseteq \familytwo$
+        \end{itemize}
+        \item for all $B \in \family$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item $A \in \family^*$
+    \end{enumerate}
+\end{proof}
+% Suppose $\family \subseteq \familytwo$.  Let $A \in \familytwo^*$.  To see that $A \in \family^*$, we must show that for all $B \in \family$, $A \cap B \neq \emptyset$.  Let $B \in \family$.  Since $\family \subseteq \familytwo$, $B \in \familytwo$.  Since $A \in \familytwo^*$, $A \cap B \neq \emptyset$, as desired.
+
+\begin{theorem}
+    \label{thm_pr_iff_dual_is_filter}
+    \label{thm_family_pr_iff_dual_is_filter}
+    $\family$ is a partition regular family if and only if $\family^*$ is a filter
+\end{theorem}
+
+\begin{proof}
+    By \cref{thm_dual_of_fam_is_fam} and \cref{thm_dual_is_involution_on_fams}, $\family$ is family if and only if $\family^*$ is a family.  Then, in the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $\family$ is a partition regular family
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $A \cup B \in \family$, then $A \in \family$ or $B \in \family$
+        \begin{itemize}
+            \item[--] \cref{thm_dual_is_involution_on_fams}
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $A \cup B \in (\family^*)^*$, then $A \in (\family^*)^*$ or $B \in (\family^*)^*$
+        \begin{itemize}
+            \item[--] \cref{thm_equiv_fam_dual_formulation}
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $S \setminus (A \cup B) \not\in \family^*$, then $S \setminus A \not\in \family^*$ or $S \setminus B \not\in \family^*$
+        \begin{itemize}
+            \item[--] set theory: for $X, Y \subseteq Z$, $Z \setminus (X \cup Y) = (Z \setminus X) \cap (Z \setminus Y)$
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $(S \setminus A) \cap (S \setminus B) \not\in \family^*$, then $S \setminus A \not\in \family^*$ or $S \setminus B \not\in \family^*$
+        \begin{itemize}
+            \item[--] logic: ``if not $p$, then not $q$ OR not $r$'' is equivalent to ``if $q$ and $r$, then $p$''
+        \end{itemize}
+
+        \item for all $A, B \subseteq S$, if $S \setminus A \in \family^*$ and $S \setminus B \in \family^*$, then $(S \setminus A) \cap (S \setminus B) \in \family^*$
+        \begin{itemize}
+            \item[--] write $C = S \setminus A$ and $D = S \setminus B$ and use set theory: for $X \subseteq Z$, $Z \setminus (Z \setminus X) = X$
+        \end{itemize}
+
+        \item for all $C, D \subseteq S$, if $C \in \family^*$ and $D \in \family^*$, then $C \cap D \in \family^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+
+        \item $\family^*$ is a filter
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+\label{thm_family_equal_to_dual_iff_ultrafilter}
+    $\family = \family^*$ if and only if $\family$ is an ultrafilter family
+\end{theorem}
+
+\begin{proof}
+    \dgg{Wait on this.}
+\end{proof}
+
+\begin{theorem}[Set DeMorgan 1]
+    \label{thm_de_morgan_union_v1}
+    For all collections $\family$, $\familytwo$, $(\family \cup \familytwo)^* = \family^* \cap \familytwo^*$.
+\end{theorem}
+
+\begin{proof}
+Let $\family, \familytwo \in \collections{S}$. In the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $A \in (\family \cup \familytwo)^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+
+        \item for all $B \in \family \cup \familytwo$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] logic
+        \end{itemize}
+
+        \item for all $B \in \family$, $A \cap B \neq \emptyset$ and for all $B \in \familytwo$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+
+        \item $A \in \family^*$ and $A \in \familytwo^*$
+        \begin{itemize}
+            \item[--] logic
+        \end{itemize}
+
+        \item $A \in \family^* \cap \familytwo^*$
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}[Set DeMorgan 2]
+    \label{thm_de_morgan_union_v2}
+    For all collections $\family$, $\familytwo$, $(\family \cap \familytwo)^* = \family^* \cup \familytwo^*$.
+\end{theorem}
+
+\begin{proof}
+    Apply \cref{thm_de_morgan_union_v1} to $\family^*$ and $\familytwo^*$ to see that $(\family^* \cup \familytwo^*)^* = (\family^*)^* \cap (\familytwo^*)^*$.  By \cref{thm_dual_is_involution_on_fams}, we have that $(\family^* \cup \familytwo^*)^* = \family \cap \familytwo$.  Taking the dual and again and using \cref{thm_dual_is_involution_on_fams} again, we see $\family^* \cup \familytwo^* = (\family \cap \familytwo)^*$, as desired.
+\end{proof}
+
+\subsubsection{Family join}
+
+\begin{theorem}
+\label{thm_family_classcap_is_family}
+    If $\family$ and $\familytwo$ are families, then $\family \classcap \familytwo$ is a family.
+\end{theorem}
+
+\begin{proof}
+    By definition, $\family \classcap \familytwo$ is a collection of subsets of $S$.  We need to show that it is upward closed.
+
+    If $\family = \emptyset$ or $\familytwo = \emptyset$, then $\family \classcap \familytwo$ is a family, and hence is upward closed.  Assume $\family \neq \emptyset$ and $\familytwo \neq \emptyset$.  We will show that $\family \classcap \familytwo$ is upward closed.
+
+    Let $A \in \family \classcap \familytwo$ and $A \subseteq A' \subseteq S$.  We must show that $A' \in \family \classcap \familytwo$.  By definition, there exists $B \in \family$ and $C \in \familytwo$ such that $A = B \cap C$.  Define $B' = B \cup A'$ and $C' = C \cup A'$.
+
+    We claim that
+    \begin{enumerate}
+        \item $B' \in \family$,
+        \item $C' \in \familytwo$,
+        \item $B' \cap C' = A'$.
+    \end{enumerate}
+    If we show all three, then we are done, since it will follow that $A' \in \family \classcap \familytwo$.
+    
+    (1) Since $B \in \family$, $\family$ is upward closed, and $B \subseteq B' \subseteq S$, we have that $B' \in \family$.
+
+    (2) Since $C \in \familytwo$, $\familytwo$ is upward closed, and $C \subseteq C' \subseteq S$, we have that $C' \in \familytwo$.
+
+    (3) From set theory, union distributes over intersection ($X \cup (Y \cap Z) = (X \cup Y) \cap (X \cup Z)$).  We see
+    \[B' \cap C' = (B \cup A') \cap (C \cup A') = (B \cap C) \cup A' = A \cup A'.\]
+    Since $A \subseteq A'$, $A \cup A' = A'$, as desired.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_classcap_contains_union}
+    $\family \cup \familytwo \subseteq \family \classcap \familytwo$
+\end{theorem}
+
+\begin{proof}
+    If $\family = \emptyset$ or $\familytwo = \emptyset$, this is immediate by definition.
+    
+    Assume $\family \neq \emptyset$ and $\familytwo \neq \emptyset$. We will show $\family \subseteq \family \classcap \familytwo$ and $\familytwo \subseteq \family \classcap \familytwo$.
+
+    Let $A \in \family$.  Since $\familytwo \neq \emptyset$ and $\familytwo$ is upward closed, $S \in \familytwo$.  By definition $A = A \cap S \in \family \classcap \familytwo$.  Therefore, $\family \subseteq \family \classcap \familytwo$.
+
+    Let $B \in \familytwo$.  Since $\family \neq \emptyset$ and $\family$ is upward closed, $S \in \family$.  By definition $B = S \cap B \in \family \classcap \familytwo$. Therefore, $\familytwo \subseteq \family \classcap \familytwo$.
+\end{proof}
+
+\begin{theorem}[$\classcap$ is commutative]
+    \label{thm_classcap_commutative}
+    For all $\family, \familytwo \in \collections{S}$,
+    \[\family \classcap \familytwo = \familytwo \classcap \family.\]
+\end{theorem}
+
+\begin{proof}
+    Let $\family, \familytwo \in \collections{S}$.  We must show that
+    \[\family \classcap \familytwo = \familytwo \classcap \family.\]
+    
+    If $\family = \emptyset$ or $\familytwo = \emptyset$, this is immediate by definition.  Assume $\family \neq \emptyset$ and $\familytwo \neq \emptyset$ so that
+    \[\family \classcap \familytwo = \{A \cap B : A \in \family, \ B \in \familytwo\}.\]
+    Let $X \subseteq S$. Each line is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $X \in \family \classcap \familytwo$
+        \item there exists $A \in \family, \ B \in \familytwo$ such that $X = A \cap B$
+        \item there exists $A \in \family, \ B \in \familytwo$ such that $X = B \cap A$
+        \item $X \in \familytwo \classcap \family$
+    \end{enumerate}
+    Therefore, $\family \classcap \familytwo = \familytwo \classcap \family$, as desired.
+\end{proof}
+
+\begin{theorem}[$\classcap$ is associative]
+    \label{thm_classcap_associative}
+    For all $\family, \familytwo, \familythree \in \collections{S}$,
+    \[(\family \classcap \familytwo) \classcap \familythree = \family \classcap (\familytwo \classcap \familythree).\]
+\end{theorem}
+
+\begin{proof}
+    Let $\family, \familytwo, \familythree \in \collections{S}$.  We must show that
+    \[(\family \classcap \familytwo) \classcap \familythree = \family \classcap (\familytwo \classcap \familythree).\]
+    If $\family = \emptyset$ or $\familytwo = \emptyset$ or $\familythree = \emptyset$, it is quick to check that this equality holds.  Therefore, we will assume $\family, \familytwo, \familythree \neq \emptyset$.
+
+    Since $\family, \familytwo \neq \emptyset$,
+    \[\family \classcap \familytwo = \{A \cap B : A \in \family, \ B \in \familytwo\}.\]
+    Similarly, since $\familytwo, \familythree \neq \emptyset$,
+    \[\familytwo \classcap \familythree = \{A \cap B : A \in \familytwo, \ B \in \familythree\}.\]
+
+    Let $X \subseteq S$. Each line is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $X \in (\family \classcap \familytwo) \classcap \familythree$
+        \item there exists $A \in (\family \classcap \familytwo)$ and $B \in \familythree$ such that $X = A \cap B$
+        \item there exists $C \in \family, \ D \in \familytwo$, and $B \in \familythree$ such that $X = (C \cap D) \cap B$
+        \item there exists $C \in \family, \ D \in \familytwo$, and $B \in \familythree$ such that $X = C \cap (D \cap B)$
+        \item there exists $C \in \family$ and $E \in \familytwo \classcap \familythree$ such that $X = C \cap E$
+        \item $X \in \family \classcap (\familytwo \classcap \familythree)$
+    \end{enumerate}
+    Therefore, $(\family \classcap \familytwo) \classcap \familythree = \family \classcap (\familytwo \classcap \familythree)$, as desired.
+\end{proof}
+
+\begin{theorem}[$\classcap$ is monotone]
+    \label{thm_classcap_monotone}
+    For all $\family_1, \family_2, \familytwo_1, \familytwo_2 \in \collections{S}$, if $\family_1 \subseteq \family_2$ and $\familytwo_1 \subseteq \familytwo_2$, then $\family_1 \classcap \familytwo_1 \subseteq \family_2 \classcap \familytwo_2$.
+\end{theorem}
+
+\begin{proof}
+    If $\family_1 = \emptyset$, then by the definition of $\classcap$ and \cref{thm_classcap_contains_union},
+    \[\family_1 \classcap \familytwo_1 = \familytwo_1 \subseteq \family_2 \cup \familytwo_2 \subseteq \family_2 \classcap \familytwo_2.\]
+    By the analogous argument, we reach the same conclusion if $\familytwo_1 = \emptyset$.
+
+    If $\family_2 = \emptyset$ or $\familytwo_2 = \emptyset$, then $\family_1 = \emptyset$ or $\familytwo_1 = \emptyset$, and we reach the desired conclusion by the previous paragraph.
+
+    Therefore, we may assume that none of $\family_1, \family_2, \familytwo_1, \familytwo_2$ are empty.  Let $X \subseteq S$.  Each line follows from the previous one:
+    \begin{enumerate}
+        \item $X \in \family_1 \classcap \familytwo_1$
+        \item there exists $A \in \family_1$ and $B \in \familytwo_1$ such that $X = A \cap B$
+        \item there exists $A \in \family_2$ and $B \in \familytwo_2$ such that $X = A \cap B$
+        \item $X \in \family_2 \classcap \familytwo_2$
+    \end{enumerate}
+    Therefore, $\family_1 \classcap \familytwo_1 \subseteq \family_2 \classcap \familytwo_2$, as was to be shown.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_family_classcap_dual_is_partition_regular}
+    $\family \classcap \family^*$ is partition regular
+\end{theorem}
+
+\begin{proof}
+    Let $\family$ be a family. Applying \cref{thm_family_classcapdual_dual_is_filter}, we see that $\family \classcapdual \family^*$ is a filter.  Applying \cref{thm_pr_iff_dual_is_filter}, we see that $(\family \classcapdual \family^*)^*$ is partition regular.  By \cref{thm_de_morgan_v1_dual}, we get that $\family^* \classcap (\family^*)^*$ is partition regular.  Applying \cref{thm_dual_is_involution_on_fams}, we see that $\family^* \classcap \family$ is partition regular.  Applying \cref{thm_classcap_commutative}, we have that $\family \classcap \family^*$ is partition regular, as desired.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_classcap_idempotent_at_filters}
+    For all families $\family$, $\family \classcap \family = \family$ if and only if $\family$ is a filter.
+\end{theorem}
+
+\begin{proof}
+    If $\family = \emptyset$, then $\family \classcap \family = \family = \emptyset$ is a filter. Assume $\family \neq \emptyset$.
+    
+    In the following list, each statement is equivalent to the following one.
+    \begin{enumerate}
+        \item $\family \classcap \family = \family$
+        \begin{itemize}
+            \item[--] \cref{thm_classcap_contains_union}
+        \end{itemize}
+        \item $\family \classcap \family \subseteq \family$
+        \begin{itemize}
+            \item[--] definition, using that $\family \neq \emptyset$
+        \end{itemize}
+        \item for all $A, B \in \family$, $A \cap B \in \family$
+        \begin{itemize}
+            \item[--] families are upward closed, and definition of filter
+        \end{itemize}
+        \item $\family$ is a filter
+    \end{enumerate}
+\end{proof}
+
+\subsubsection{Family meet}
+
+\begin{theorem}
+\label{thm_family_classcapdual_is_family}
+    If $\family$ and $\familytwo$ are families, then $\family \classcapdual \familytwo$ is a family.
+\end{theorem}
+
+\begin{proof}
+    Let $\family$ and $\familytwo$ be families.  Applying \cref{thm_family_classcap_is_family} to the families $\family^*$ and $\familytwo^*$, we get that $\family^* \classcap \familytwo^*$ is a family.  By \cref{thm_dual_of_fam_is_fam}, $(\family^* \classcap \familytwo^*)^*$ is a family.  By \cref{thm_de_morgan_v1},
+    \[(\family^* \classcap \familytwo^*)^* = (\family^*)^* \classcapdual (\familytwo^*)^*.\]
+    By \cref{thm_dual_is_involution_on_fams}, we have
+    \[(\family^* \classcap \familytwo^*)^* = \family \classcapdual \familytwo.\]
+    It follows that $\family \classcapdual \familytwo$ is a family.
+\end{proof}
 
 \begin{theorem}
     \label{thm_classcapdual_contained_in_intersection}
     For all families $\family$ and $\familytwo$, $\family \classcapdual \familytwo \subseteq \family \cap \familytwo$.
 \end{theorem}
+
+\begin{proof}
+    Let $\family$ and $\familytwo$ be families.  Applying \cref{thm_classcap_contains_union} to $\family^*$ and $\familytwo^*$, we see that $\family^* \cup \familytwo^* \subseteq \family^* \classcap \familytwo^*$. Taking the dual and applying \cref{thm_dual_is_antitone}, we have that $(\family^* \cup \familytwo^*)^* \supseteq (\family^* \classcap \familytwo^*)^*$.  Applying \cref{thm_de_morgan_union_v1} and \cref{thm_de_morgan_v1}, we have that $(\family^*)^* \cap (\familytwo^*)^* \supseteq (\family^*)^* \classcapdual (\familytwo^*)^*$.  By \cref{thm_dual_is_involution_on_fams}, $\family \cap \familytwo \supseteq \family \classcapdual \familytwo$, as desired.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_classcapdual_commutative}
+    $\classcapdual$ is commutative
+\end{theorem}
+
+\dgg{Careful: the proof below works only for families -- not more generally for collections -- because it relies on \cref{thm_dual_is_involution_on_fams}.}
+
+\begin{proof}
+    Let $\family$ and $\familytwo$ be families.  Applying \cref{thm_classcap_commutative} to the families $\family^*$ and $\familytwo^*$, we get that
+    \[\family^* \classcap \familytwo^* = \familytwo^* \classcap \family^*.\]
+    Applying the dual and using \cref{thm_de_morgan_v1}, we see
+    \[(\family^*)^* \classcapdual (\familytwo^*)^* = (\familytwo^*)^* \classcapdual (\family^*)^*.\]
+    By \cref{thm_dual_is_involution_on_fams}, we have
+    \[\family \classcapdual \familytwo = \familytwo \classcapdual \family.\]
+\end{proof}
+
+\begin{theorem}
+    \label{thm_classcapdual_associative}
+    $\classcapdual$ is associative
+\end{theorem}
+
+\begin{proof}
+    (Don't prove from scratch.  If possible, refer to dual statement.)
+\end{proof}
+
+\begin{theorem}
+    \label{thm_classcapdual_monotone}
+    \label{thm_classcapdual_is_monotonic}
+    $\classcapdual$ is monotone
+\end{theorem}
+
+\begin{proof}
+    (Don't prove from scratch.  If possible, refer to dual statement.)
+\end{proof}
+
+\begin{theorem}
+    \label{thm_family_classcapdual_dual_is_filter}
+    $\family \classcapdual \family^*$ is a filter
+\end{theorem}
+
+\begin{proof}
+    Let $\family$ be a family.  If $\family = \mathcal{P}(S)$ or $\family^* = \mathcal{P}(S)$, then $\family \classcapdual \family^* = \emptyset$, which is a filter.
+    
+    Assume $\family \neq \mathcal{P}(S)$ and $\family^* \neq \mathcal{P}(S)$.  By \cref{thm_family_classcapdual_is_family}, $\family \classcapdual \family^*$ is a family.  We need only to show that if $A, B \in \family \classcapdual \family^*$, then $A \cap B \in \family \classcapdual \family^*$.
+
+    Let $A, B \in \family \classcapdual \family^*$.  To see that $A \cap B \in \family \classcapdual \family^*$, by definition, we must show that for every $C \in \family^*$, the set $A \cap B \cap C$ belongs to $\family^*$.
+
+    Let $C \in \family^*$.  Since $A \in \family \classcapdual \family^*$, $A \cap C \in \family^*$.  Since $B \in \family \classcapdual \family^*$, the set $A \cap B \cap C \in \family^*$, as desired.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_classcapdual_idempotent_at_pr_families}
+    For all families $\family$, $\family \classcapdual \family = \family$ if and only if $\family$ is partition regular.
+\end{theorem}
+
+\begin{proof}
+    Let $\family$ be a family.  By \cref{thm_classcap_idempotent_at_filters} applied to $\family^*$, we have that $\family^* \classcap \family^* = \family^*$ if and only if $\family^*$ is a filter.  By \cref{thm_pr_iff_dual_is_filter}, we have that $(\family^* \classcap \family^*)^* = (\family^*)^*$ if and only if $(\family^*)^*$ is partition regular.  By \cref{thm_de_morgan_v1}, we have that $(\family^*)^* \classcapdual (\family^*)^* = (\family^*)^*$ if and only if $(\family^*)^*$ is partition regular.  By \cref{thm_dual_is_involution_on_fams}, we have that $\family \classcapdual \family = \family$ if and only if $\family$ is partition regular, as desired.
+\end{proof}
+
+\subsubsection{Combo statements}
+
+\begin{theorem}
+    \label{thm_de_morgan_v1}
+    For all collections $\family$, $\familytwo$, $(\family \classcap \familytwo)^* = \family^* \classcapdual \familytwo^*$
+\end{theorem}
+
+\begin{proof}
+    We consider three cases.
+    
+    Case 1: $\family = \emptyset$. In this case,
+    \begin{itemize}
+        \item $\family \classcap \familytwo = \familytwo$, by definition
+        \item $\family^* = \mathcal{P}(S)$
+        \item $\family^* \classcapdual \familytwo^* = \mathcal{P}(S) \classcapdual \familytwo^* = \familytwo^*$, by definition
+    \end{itemize}
+    Therefore,
+    \[(\family \classcap \familytwo)^* = \familytwo^* = \family^* \classcapdual \familytwo^*,\]
+    as desired.
+
+    Case 2: $\familytwo = \emptyset$.  In this case, we follow the analogous argument.  (Alternatively, we could use the fact that $\classcap$ and $\classcapdual$ are commutative.)
+    
+    Case 3: $\family \neq \emptyset$ and $\familytwo \neq \emptyset$. In the following list, each statement is equivalent to the one that follows it.
+    \begin{enumerate}
+        \item $A \in (\family \classcap \familytwo)^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item for all $B \in \family \classcap \familytwo$, $A \cap B \neq \emptyset$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item for all $C \in \family$ and $D \in \familytwo$, $A \cap C \cap D \neq \emptyset$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item for all $C \in \family$, $A \cap C \in \familytwo^*$
+        \begin{itemize}
+            \item[--] definition
+        \end{itemize}
+        \item $A \in \family^* \classcapdual \familytwo^*$
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+    \label{thm_de_morgan_v1_dual}
+    For all families / collections (see note immediately following), $(\family \classcapdual \familytwo)^* = \family^* \classcap \familytwo^*$
+\end{theorem}
+
+\dgg{I believe this is true on the level of collections.  But to prove it by using \cref{thm_de_morgan_v1} and the dual, we'd only get the statement for families (since the dual is not an involution on the level of collections...}
+
+\begin{proof}[Families proof]
+    Let $\family$ and $\familytwo$ be families.  By \cref{thm_dual_of_fam_is_fam}, $\family^*$ and $\familytwo^*$ are families.  By \cref{thm_de_morgan_v1} with the families $\family^*$ and $\familytwo^*$, we have that
+    \[(\family^* \classcap \familytwo^*)^* = (\family^*)^* \classcapdual (\familytwo^*)^*.\]
+    By \cref{thm_dual_is_involution_on_fams}, this is
+    \[\family \classcapdual \familytwo = (\family^* \classcap \familytwo^*)^*.\]
+    Taking duals and using \cref{thm_dual_is_involution_on_fams} again, we see
+    \[(\family \classcapdual \familytwo)^* = \family^* \classcap \familytwo^*,\]
+    as desired.
+\end{proof}
+
+\subsection{Loading zone: still considering}
+
+\dgg{This is a pool of potential results.  These can be safely ignored for now.}
+
+Dual families
+\begin{enumerate}
+    \item For all families $\family$, $\family^* = \family$ if and only if $\family$ is an ultrafilter
+    \begin{itemize}
+        \item Proof: \cref{thm_family_equal_to_dual_iff_ultrafilter}
+    \end{itemize}
+\end{enumerate}
+
+Family join
+\begin{enumerate}
+    \item Subsets of $\families{S}$ invariant under $\classcap$:
+    \begin{itemize}
+        \item Filters
+        \item Partition regular families (grills)
+        \item non-empty families
+        \item (and, by extension, all intersections of combinations of these)
+    \end{itemize}
+    
+    \item Note that $\classcap$ is not idempotent.  Indeed, if $\family$ contains two sets that are disjoint, then $\family \classcap \family = \mathcal{P}(S)$.  This shows that $(\families{S},\subseteq,\classcap,\classcapdual)$ is not a lattice.
+    
+    \item $\family \classcap \familytwo \neq \mathcal{P}(S)$ iff $\family \subseteq \familytwo^*$  \dgg{seems to fail when $\family = \emptyset$ and $\familytwo = \mathcal{P}(S)$.  Perhaps this is the only exception to the statement.}
+        
+    \item On filters and partition regular families
+    \begin{enumerate}
+        \item If $\family$ and $\familytwo$ are filters, $\family \classcap \familytwo$ is the smallest filter containing both $\family$ and $\familytwo$.
+
+        \item $\classcap$ is not an interesting operation on partition regular families.  If either $\family$ or $\familytwo$ is equal to $\emptyset$, then $\family \classcap \familytwo \in \{\family, \familytwo\}$.  Otherwise, if $\family$ and $\familytwo$ are non-empty and partition regular and $\family \classcap \familytwo \neq \mathcal{P}(S)$, then $\family = \familytwo$ is an ultrafilter and $\family \classcap \familytwo = \family$.
+
+        \item The previous implies that if $\family$ and $\familytwo$ are partition regular, then $\family \classcap \familytwo$ is partition regular, but for a silly reason: it is equal to $\family$, $\familytwo$, $\emptyset$, or $\mathcal{P}(S)$.
+
+        \item (For a proof, see the family meet section where the dual statement is proven.)
+    \end{enumerate}
+\end{enumerate}
+
+Family meet
+\begin{enumerate}
+    \item Subsets of $\families{S}$ invariant under $\classcapdual$:
+    \begin{itemize}
+        \item Filters
+        \item Partition regular families (grills)
+        \item families not equal to $\mathcal{P}(S)$
+        \item (and, by extension, all intersections of combinations of these)
+    \end{itemize}
+    
+    \item $\family \classcapdual \familytwo \neq \emptyset$ iff $\family^* \subseteq \familytwo$ \dgg{seems to fail when $\family = \emptyset$ and $\familytwo = \mathcal{P}(S)$. Perhaps this is the only exception to the statement.}
+    \begin{itemize}
+        \item Proof:
+    \end{itemize}
+    
+    \item Edge cases
+    \begin{itemize}
+        % \item $\family \classcapdual \{S\}^* = \family$
+        \item $\family \classcapdual \mathcal{P}(S) = \family$ \dgg{this does not match the definition above, but it is dual to our choice of $\family \classcap \emptyset = \family$.}
+        \item $\family \classcapdual \family = \family$ if and only if $\family$ is a filter
+        % \item (?) More generally, characterize when $\family \classcapdual \familytwo = \family \cap \familytwo$
+    \end{itemize}
+    \item On filters and partition regular families
+    \begin{enumerate}
+        \item If $\family$ and $\familytwo$ are partition regular, $\family \classcapdual \familytwo$ is the largest partition regular family contained in both $\family$ and $\familytwo$.
+        
+        \item $\classcapdual$ is not an interesting operation on filters.  If either $\family$ or $\familytwo$ is equal to $\mathcal{P}(S)$, then $\family \classcapdual \familytwo \in \{\family, \familytwo\}$.  Otherwise, if $\family$ and $\familytwo$ are filters not equal to $\mathcal{P}(S)$ and $\family \classcapdual \familytwo \neq \emptyset$, then $\family = \familytwo$ is an ultrafilter and $\family \classcapdual \familytwo = \family$.
+        
+        \item The previous implies that if $\family$ and $\familytwo$ are filters, then $\family \classcapdual \familytwo$ is a filter, but for a silly reason: it is equal to $\family$, $\familytwo$, $\emptyset$, or $\mathcal{P}(S)$.
+        
+        \item Proof of this fact: If either $\family$ or $\familytwo$ is equal to $\mathcal{P}(S)$, then $\family \classcapdual \familytwo \in \{\family, \familytwo\}$.  This follows by the work above.  Suppose $\family$ and $\familytwo$ are filters not equal to $\mathcal{P}(S)$ and that $\family \classcapdual \familytwo \neq \emptyset$. Then $\family^* \subseteq \familytwo$ and $\familytwo^* \subseteq \family$.  But because they are filters not equal to $\mathcal{P}(S)$, we see
+        \[\family \subseteq \family^* \subseteq \familytwo \subseteq \familytwo^* \subseteq \family,\]
+        which shows that $\family = \familytwo$ and that they are self-dual, hence ultrafilters.
+    \end{enumerate}
+\end{enumerate}
+
+Algebra involving both
+\begin{enumerate}
+    \item \dgg{This is a consequence of other results, so we should only state it helpful.} The following are equivalent: \dgg{careful with the edge cases here.  consider defining $\emptyset$ to be a filter but $\mathcal{P}(S)$ not to be?  Otherwise, need clarification for edge cases.}
+    \begin{enumerate}
+        \item $\family$ is partition regular
+        \item $\family^*$ is a filter
+        \item $\family \classcap \family^* = \family$
+        \item $\family \classcapdual \family^* = \family^*$
+    \end{enumerate}
+    If any one, all, of these hold, then $\family^* \subseteq \family$.
+\end{enumerate}
+
+Semigroup algebra operations
+\begin{enumerate}
+    \item $\family + \familytwo$
+    \item $A - \family$
+\end{enumerate}
+\vskip0.5cm
+
+
+The following list of facts were useful for us in a previous paper.  It would be great to 1) extend the definitions and notation to arbitrary semigroups, 2) formally verify these facts.  I can't honestly say, however, that we would have a great application for any of these facts in this paper.
+
+\begin{lemma}
+    \label{lemma_filter_algebra}
+    \label{lemma_fam_dual_sums}
+    \label{lemma_filter_sums_containment}
+    Let $n \in \N$, $A, B \subseteq \N$, and $\family, \familytwo, \family_1, \family_2, \familytwo_1, \familytwo_2$ be families.
+    \begin{enumerate}
+        \item
+        \label{item_family_prop_zero}
+        If $\family$ and $\familytwo$ are proper, then $\family + \familytwo$ is proper.
+        
+        \item
+        \label{item_family_prop_one_new}
+        $(A - \family) \cap (B - \familytwo) \subseteq (A \cap B) - (\family \classcap \familytwo)$, with equality if $\family = \familytwo$ is a filter.
+
+        \item \label{item_family_prop_two}
+        If $\family$ and $\familytwo$ are filters, then $\family + \familytwo$ is a filter.
+
+        \item \label{item_family_prop_three}
+        $(A -n) - \family = (A - \family) - n$.
+
+        \item \label{item_family_prop_four}
+        $A - (\family + \familytwo) = (A - \familytwo) - \family$.
+
+        \item \label{item_family_diff_containment}
+        If $\family \subseteq \familytwo$, then $A - \family \subseteq A - \familytwo$.
+        
+        \item \label{item_filter_sums_containment}
+        If $\family_1 \subseteq \familytwo_1$ and $\family_2 \subseteq \familytwo_2$, then $\family_1 + \family_2 \subseteq \familytwo_1 + \familytwo_2$.
+
+        \item \label{item_sum_dual}
+        $(\family + \familytwo)^* = \family^* + \familytwo^*$.
+
+        \item \label{item_cap_sums}
+        $(\family_1 + \family_2) \classcap (\familytwo_1 + \familytwo_2) \subseteq (\family_1 \classcap \familytwo_1) + (\family_2 \classcap \familytwo_2)$.
+    \end{enumerate}
+\end{lemma}
+
+
 
 \section{Topological dynamical systems}
 \label{sec_topological_dynamical_systems}
@@ -283,11 +1135,11 @@ Contains:
 
 \subsection{Intro and defs}
 
-\begin{lean}
+\begin{leanrmk}
     The topological dynamical systems in Mathlib are called Flows.  See \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}.  A flow is an action of a topological monoid on a topological space by continuous maps.  Since we care only about discrete semigroups (monoids), we are likely better off defining our own class of topological dynamical systems.  We may still find it useful to use the notion of invariance, here: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}
-\end{lean}
+\end{leanrmk}
 
-\begin{lean}
+\begin{leanrmk}
     Question: Do we define topological dynamical systems as semigroup actions or monoid actions?  The only difference is that a monoid action requires that the identity element of the monoid acts by the identity map on the space.  This is a natural assumption, but may not be required for us.\\
     
     Answer: semigroup actions.  It seems we can do everything we need to do while avoiding monoids, and especially monoid actions.\\
@@ -299,14 +1151,16 @@ Contains:
     Question: A ``system'' for us is usually a bundle of a phase space $X$ together with an action of a semigroup $S$.  But in our applications, it may be more efficient to un-bundle these by focusing on the action as the object.  So, instead, we would say: $T$ is an action of $S$ on $X$.  Then $T$ is minimal; a subset of $X$ is $T$-invariant; if $R$ is an action of $S$ on $Y$, then a surjection $\pi: X \to Y$ is a factor map if $S \circ \pi = \pi \circ T$; etc...\\
     
     Answer: since the data provided is essentially the same, I don't right now see a meaningful difference here.  Let's go with the more recognizable ``system'' as a bundling of space and action.
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[Semigroup action]
+\lean{SemigroupAction}
 Let $S$ be a semigroup and $X$ be a set.  An action of $S$ on $X$ is a map $f: S \to X \to X$ such that for all $s, t \in S$,
 \[(f s) \circ (f t) = f (s*t).\]
 \end{definition}
 
 \begin{definition}[Topological dynamical system]
+\lean{DynamicalSystem}
     Let $S$ be a non-empty semigroup and $X$ be a non-empty, compact Hausdorff space. An \emph{$S$-system} is an action of $S$ on $X$ such that for all $s \in S$, $f s$ is continuous.
 \end{definition}
 
@@ -322,6 +1176,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \end{enumerate}
 
 \begin{definition}[Orbit and orbit closure]
+\lean{DS.orbit}
     Let $X$ be an $S$-system and $x \in X$.  The $S$-orbit of $x$ is $Sx$.  The $S$-orbit closure of $x$ is $\overline{Sx}$.
 \end{definition}
 
@@ -333,14 +1188,9 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
     Let $X$ be a $S$-system.  A set $Y \subseteq X$ is $S$-invariant if for all $g \in S$, $gY \subseteq Y$. \dgg{Get this from mathlib already? see \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}}
 \end{definition}
 
-\begin{theorem}[Orbit closure transitivity]
-\label{theorem_orbit_closure_transitivity}
-    Let $X$ be an $S$-system and $x,y,z \in X$. If $y \in \overline{Sx}$ and $z \in \overline{Sy}$, then $z \in \overline{Sx}$.
-\end{theorem}
-
-\begin{lean}
-    Pay attention to how subsystems are defined in lean.  The primary need for subsystem is \cref{thm_every_system_has_minimal_subsystem}.
-\end{lean}
+\begin{leanrmk}
+    Pay attention to how subsystems are defined in lean.  The primary need for subsystem is \cref{thm_every_system_has_minimal_subsystem}.  For precedent, see Submodule: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Module/Submodule/Defs.html#Submodule}
+\end{leanrmk}
 
 \begin{definition}[Subsystem]
     \label{def_subsystem}
@@ -357,9 +1207,14 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
     Let $S$ be a semigroup.  Let $X$ be an $S$-system.  Let $\varphi: T \to S$ be a semigroup homomorphism.  Then $X$ is a $T$-system via the homomorphism $\varphi$ as follows: $tx = (\varphi t)x$.
 \end{definition}
 
-\begin{lean}
+\begin{theorem}[Orbit closure transitivity]
+\label{theorem_orbit_closure_transitivity}
+    Let $X$ be an $S$-system and $x,y,z \in X$. If $y \in \overline{Sx}$ and $z \in \overline{Sy}$, then $z \in \overline{Sx}$.
+\end{theorem}
+
+\begin{leanrmk}
     Here we will use \verb|mem_closure_iff| repeatedly.
-\end{lean}
+\end{leanrmk}
 
 \begin{proof}
     Let $U \ni z$.  Since $z \in \overline{Sy}$, $U \cap Sy \neq \emptyset$, so there exists $s \in S$ such that $y \in s^{-1}U$.  Since $y \in \overline{Sx}$ and $s^{-1}U$ is open, $s^{-1} U \cap Sx \neq \emptyset$.  Thus, there exists $t \in S$ such that $tx \in s^{-1} U$.  Therefore, $stx \in U$, and so $U \cap Sx \neq \emptyset$.  Since $U$ was arbitrary, we get that $z \in \overline{Sx}$, as was to be shown.
@@ -400,9 +1255,9 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together with a continuous surjection $X \to Y$ that intertwines the action of $G$.
 \end{definition}
 
-\begin{lean}
+\begin{leanrmk}
     For precedent for ICERs in Lean, see \verb|AddCon| in \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/GroupTheory/Congruence/Defs.html}
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[ICER]
     Let $X$ be a $G$-system.  A set $R \subseteq X^2$ is an \emph{ICER (on $X$)} if it is an equivalence relation, closed as a subset of $X^2$, and invariant under $G$ by the diagonal action.
@@ -451,10 +1306,8 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}
     \label{lemma_img_of_inv_is_inv}
-    Let $S$ be a semigroup, and let $\pi: X \to Y$ be a continuous surjection of $S$-systems.  If $A \subseteq X$ is non-empty, closed, and $S$-invariant, then $\pi A$ is non-empty, closed, and $S$-invariant.
+    Let $S$ be a semigroup, and let $\pi: X \to Y$ be an $S$-equivariant continuous map (eg. a factor map satisfies this).  If $A \subseteq X$ is an $S$-subsystem of $X$, then $\pi A$ is an $S$-subsystem of $Y$.
 \end{lemma}
-
-\dgg{Belongs in the factor map section.}
 
 \begin{proof}
     Clearly, $\pi A$ is non-empty.  It is closed since $\pi$ is a closed map.  (By \verb|Continuous.isProperMap|, $f$ is proper. Therefore, by \verb|IsProperMap.isClosedMap|, $f$ is closed.)  To see $S$-invariance, let $s \in S$.  Then $s \pi A = \pi sA \subseteq \pi A$, as was to be shown.
@@ -464,12 +1317,16 @@ The following lemma describes the bijection between factors of a given system an
 \subsection{Return time sets}
 
 \begin{definition}[Return time sets]
-    Let $X$ be a $G$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{return time set of $x$ to $U$ and $V$ to $U$} are defined as
+    Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{return time set of $x$ to $U$ and $V$ to $U$} are defined as
     \begin{align*}
-        R(x,U) &\defeq \{g \in G \mid gx \in U \}\\
-        R(V,U) &\defeq \{g \in G \mid gV \cap U \neq \emptyset\}.
+        R(x,U) &\defeq \{s \in S \mid sx \in U \}\\
+        R(V,U) &\defeq \{s \in S \mid sV \cap U \neq \emptyset\}.
     \end{align*}
 \end{definition}
+
+\begin{leanrmk}
+    Note that $R(x,U)$ is the preimage of $U$ under the map $S \to X$ gotten by fixing $x$.  There is likely a slick way to write this in lean.  Then $R(V,U) = \cup_{x \in V} R(x,U)$.  Most if not all of the algebra involving return-time sets will come down to simple set algebra involving preimages.
+\end{leanrmk}
 
 \begin{lemma}[Return time algebra 1]
 \label{lemma_return_time_algebra_one}
@@ -537,7 +1394,7 @@ The following lemma describes the bijection between factors of a given system an
 \end{lemma}
 
 \begin{proof}
-    \dgg{Standard.}
+    Standard: re-write as the set theoretic statement, ``preimage splits over intersections''
 \end{proof}
 
 \begin{lemma}
@@ -547,7 +1404,7 @@ The following lemma describes the bijection between factors of a given system an
 \end{lemma}
 
 \begin{proof}
-    \dgg{Standard.}
+    Standard: re-write as the set theoretic statement, ``preimage splits over unions''
 \end{proof}
 
 \begin{lemma}[Monotonicty of return-time sets]
@@ -560,13 +1417,23 @@ Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
     Immediate from the definitions.
 \end{proof}
 
-Here are some more set algebra statements in case we might need them:
-\begin{enumerate}
-    \item If $s: X \to X$ is surjective, then $R(U,V)s \subseteq R(s^{-1}U,V)$.
-    \item $R(sx, U)s \subseteq R(x,U)$.
-    \item $sR(x,U) \subseteq R(x,sU)$.
-    \item $sR(U,V) \subseteq R(U,sV)$.
-\end{enumerate}
+\begin{lemma}[Return times for product actions]
+\label{lemma_return_time_sets_in_prod_system}
+Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, $y \in Y$, $U \subseteq X$, and $V \subseteq Y$, considering the product system,
+\[R((x,y), U \times V) = R(x, U) \cap R(y,V).\]
+\end{lemma}
+
+\begin{proof}
+    Immediate from the definitions.
+\end{proof}
+
+% Here are some more set algebra statements in case we might need them:
+% \begin{enumerate}
+%     \item If $s: X \to X$ is surjective, then $R(U,V)s \subseteq R(s^{-1}U,V)$.
+%     \item $R(sx, U)s \subseteq R(x,U)$.
+%     \item $sR(x,U) \subseteq R(x,sU)$.
+%     \item $sR(U,V) \subseteq R(U,sV)$.
+% \end{enumerate}
 
 
 \subsection{Minimality}
@@ -635,11 +1502,13 @@ Here are some more set algebra statements in case we might need them:
 
 \begin{lemma}
     \label{lemma_orb_closure_of_ur_is_minimal}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  If $x \in X$ is $S$-uniformly recurrent, then $\overline{Sx}$ is a minimal $S$-system.
+    Let $S$ be a semigroup and $X$ be an $S$-system.  If $x \in X$ is $S$-uniformly recurrent, then $\overline{Sx}$ is a minimal $S$-system containing $x$.
 \end{lemma}
 
 \begin{proof}
-    Note that $\overline{Sx}$ is an $S$-system by \cref{lemma_orb_closure_is_invariant}. Let $y \in \overline{Sx}$ and $U \subseteq \overline{Sx}$ be open and non-empty.  We must show that there exists $s \in S$ such that $sy \in U$.
+    Note that $\overline{Sx}$ is an $S$-system by \cref{lemma_orb_closure_is_invariant}. For all $U \ni x$, $R(x,U)$ is syndetic, hence non-empty.  Therefore, $x \in \overline{Sx}$.
+    
+    Let $y \in \overline{Sx}$ and $U \subseteq \overline{Sx}$ be open and non-empty.  We must show that there exists $s \in S$ such that $sy \in U$.
 
     Let $V \subseteq U$ be non-empty, open, and $\gamma \subseteq X^2$ be an entourage such that if $(a,b) \in \gamma$ and $a \in V$, then $b \in U$.
     
@@ -677,11 +1546,12 @@ Here are some more set algebra statements in case we might need them:
 
 \subsection{Proximality}
 
-\begin{lean}
-    It seems that the words ``proximal'' and ``distal'' do not appear in mathlib...
-\end{lean}
+\begin{leanrmk}
+    It seems that the words ``proximal'' and ``distal'' do not appear in mathlib...  We don't need distal, but we will need proximal.
+\end{leanrmk}
 
 \begin{definition}[{Proximal, cf. \cite[Ch. 4, (2.11)]{devries_book_1993}}]
+\label{def_proximal}
     Let $X$ be an $S$-system and $x, y \in X$.  The point $x$ is \emph{proximal to $y$} if for all $\alpha$ in the uniform structure on $X$, there exists $s \in S$ such that $(sx,sy) \in \alpha$.
 \end{definition}
 
@@ -903,11 +1773,11 @@ The following lemma is shown in \cite[V. 2.12 and 2.14, pg. 416]{devries_book_19
 
 \subsection{Equicontinuity and regional proximality}
 
-\begin{lean}
+\begin{leanrmk}
     Equicontinuity: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/UniformSpace/Equicontinuity.html}
 
     Let's look in Mathlib for ``Equicontinuous family'' as in the definition below.
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[Equicontinuous family]
      Let $X$ and $Y$ be uniform spaces.  A set $S$ of continuous maps from $X$ to $Y$ is \emph{uniformly equicontinuous} if for every $\beta \subseteq Y^2$ in the uniform structure of $Y$ there is an $\alpha \subseteq X^2$ in the uniform structure of $X$ such that for all $f \in S$, $(f \otimes f)\alpha \subseteq \beta$.
@@ -928,6 +1798,40 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \begin{proof}
     If $X$ and $Y$ are $S$-systems, then $X \times Y$ is an $S$-system via the diagonal action.  We need to show that the family of maps $\{(x,y) \mapsto (gx,gy) : g \in G\}$ from $X \times Y$ to $X \times Y$ is equicontinuous.  Let $\beta \subseteq (X \times Y)^2$ be an entourage.  By some general fact concerning the uniform structure on a Cartesian product of uniform spaces (in mathlib, see \verb|entourageProd_subset|), there exist entourages $\beta_X \subseteq X^2$ and $\beta_Y \subseteq Y^2$ such that $\beta_X \times \beta_Y \subseteq \beta$.  By equicontinuity of the systems $X$ and $Y$, there exist entourages $\alpha_X \subseteq X^2$ and $\alpha_Y \subseteq Y^2$ such that for all $g \in G$, $(g \otimes g) \alpha_X \subseteq \beta_X$ and $(g \otimes g) \alpha_Y \subseteq \beta_Y$.  Then $
     \alpha \defeq \alpha_X \times \alpha_Y$ is an entourage of $X \times Y$, and for all $g \in G$, $(g \otimes g \otimes g \otimes g)\alpha \subseteq \beta$, as desired.
+\end{proof}
+
+\begin{lemma}
+    \label{lemma_subsys_of_equi_is_equi}
+    Let $S$ be a semigroup, and let $X$ be an equicontinuous $S$-system.  All subsystems of $X$ are equicontinuous $S$-systems.
+\end{lemma}
+
+\begin{proof}
+    By assumption, the family of maps indexed by $S$ is equicontinuous.  Let $Z$ be a subsystem of $X$.  By definition, the system $Z$ is equicontinuous if the family of maps $\{\restr{s}{Z}: Z \to Z | s \in S\}$ is equicontinuous.  \dgg{This should be a general topological fact.}
+\end{proof}
+
+\begin{lemma}
+    \label{lemma_minimal_equi_implies_homogeneous}
+    Let $S$ be a commutative semigroup, and let $X$ be a minimal, equicontinuous $S$-system.  For all $x, y \in X$, there exists a factor map $\varphi: X \to X$ of $S$-systems such that $\varphi x = y$.
+\end{lemma}
+
+\dgg{If it would help here, we can prove first that a minimal action by a commutative semigroup acts by homeomorphisms.   Then perhaps in \cref{lemma_minimal_equi_implies_homogeneous} we could get that $\varphi$ is a homeomorphism, hence an automorphism of the $S$-system $X$.}
+
+\begin{proof}[Proof sketch.]
+    Let $x, y \in X$.  By minimality, exists a net $(s_n)_n \subseteq S$ such that $\lim_n s_n x = y$.  Then, by commutativity and the fact that $S$ acts by continuous maps, for all $t \in S$, $\lim_n s_n tx = ty$.  Thus, for all $z \in Sx$, $\lim_n s_n z$ exists.
+
+    We claim that the map $f: Sx \to X$ defined by $f(z) = \lim_n s_n z$ is uniformly continuous. Indeed, let $\alpha \subseteq X^2$ be an entourage.  We need to show that there exists an entourage $\beta \subseteq (Sx)^2$ such that $f \beta \subseteq \alpha$.  By equicontinuity of the action, there exists $\beta \subseteq X^2$ such that $\overline{S \beta} \subseteq \alpha$. For $(w,z) \in \beta$, we see that
+    \[f(w,z) = (f(w),f(z)) = (\lim_n s_n w, \lim_n s_n z) = \lim_n s_n (w,z) \in \overline{S\beta} \subseteq \alpha,\]
+    as was to be shown.
+
+    Since $f: Sx \to X$ is uniformly continuous and, by minimality, $Sx$ is dense in $X$, we have that $f$ extends uniquely to a continuous function $\varphi: X \to X$.
+
+    We claim that $\varphi$ is $S$-equivariant.  Indeed, let $t \in S$.  Note that for all $z \in Sx$, by the definition of $f$ and the fact that action by $t$ is continuous, $f(tz) = t f(z)$.  So, $\varphi \circ t = t \circ \varphi$ on a dense set, and hence on all of $X$ \dgg{this is fuzzy}.
+    
+    We claim $\varphi x = y$. Indeed, note that for all $m$, since $s_m x \in Sx$, $\varphi(s_m x) = f(s_m x) = \lim_{n} s_n s_m x = s_m \lim_n s_n x = s_m y$.  Then
+    \[\varphi(y) = \varphi(\lim_m s_m x) = \lim_m \varphi(s_m x) = \lim_m s_m \varphi (x) = \]
+    \dgg{This is not complete.}
+    
+    By \cref{lemma_img_of_inv_is_inv}, $\varphi X$ is a subsystem of $X$.  By minimality, $\varphi X = X$.  Therefore, $\varphi: X \to X$ is a factor map of $S$-systems.
 \end{proof}
 
 \begin{definition}[{Equicontinuous ICER, cf. \cite{ellis_ellis_book_2014}}]
@@ -1045,7 +1949,7 @@ Contains:
     A right-topological semigroup is a topological semigroup $S$ such that for all $s \in S$, $\rho_s: S \to S$ is continuous.
 \end{definition}
 
-\begin{lean}
+\begin{leanrmk}
     We likely do not need to define ``right topological semigroup.''  Any statements regarding these objects can be make the necessary assumptions, eg:
     \begin{center}
         \verb|{X}[Semigroup S][TopologicalSpace X][CompactSpace X]| \\ \verb|[r_cts : \forall (s : S), continuous fun (x : S) => x * s]|
@@ -1057,7 +1961,7 @@ Contains:
 
         \item \verb|exists_idempotent_in_compact_subsemigroup| proves the same thing but for a compact subsemigroup.
     \end{itemize}    
-\end{lean}
+\end{leanrmk}
 
 
 \begin{theorem}[{\cite[Thm 2.5]{hindman_strauss_book_2012}}]
@@ -1068,15 +1972,24 @@ Contains:
     This is \verb|exists_idempotent_of_compact_t2_of_continuous_mul_left|.
 \end{proof}
 
-For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_strauss_book_2012}.
+For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_strauss_book_2012}. \dgg{There is some going back and forth between compact and closed in these results.  These are equivalent for Hausdorff spaces.  Probably just choose the formulation that makes applying the lemma easiest.}
 
-\begin{lemma}[Principal ideals are compact]
+\begin{lemma}[Principal ideals are closed]
 \label{lemma_principal_ideal_is_compact}
-    Let $S$ be a compact, right-topological semigroup, and let $t \in S$.  The set $St$ is compact.
+    Let $S$ be a compact, Hausdorff right-topological semigroup, and let $t \in S$.  The set $St$ is closed.
 \end{lemma}
 
 \begin{proof}
-    Since $S$ is compact and $\rho_t$ is continuous, $\rho_t(S) = St$ is compact.
+    Since $S$ is compact and $\rho_t$ is continuous, $\rho_t(S) = St$ is compact.  Since $S$ is Hausdorff, $St$ is closed.
+\end{proof}
+
+\begin{lemma}[Left ideal contains a closed left ideal]
+\label{lemma_left_ideal_contains_closed_left_ideal}
+    Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal contains a closed left ideal.
+\end{lemma}
+
+\begin{proof}
+    Let $L$ be a left ideal.  Let $t \in L$.  Since $L$ is  a left ideal, $St$ is a left ideal contained in $L$.  By \cref{lemma_principal_ideal_is_compact}, $St$ is closed.
 \end{proof}
 
 \begin{lemma}[Minimal left ideals are compact]
@@ -1098,30 +2011,39 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
     Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is compact since $S$ is Hausdorff.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
 \end{proof}
 
+\begin{theorem}
+    \label{exists_idempotent_in_compact_subsemigroup}
+    Let $S$ be a compact, Hausdorff right-topological semigroup.  Every compact subsemigroup of $S$ contains an idempotent.
+\end{theorem}
+
+\begin{proof}
+    This is precisely  \verb|exists_idempotent_in_compact_subsemigroup| in mathlib.
+\end{proof}
+
 \begin{lemma}
 \label{lemma_left_ideal_contains_idempotent}
     Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal of $S$ contains an idempotent element.
 \end{lemma}
 
 \begin{proof}
-    Every left ideal contains a minimal left ideal (\cref{lemma_exists_minimal_left_ideal}).  Minimal left ideals are compact (\cref{lemma_minimal_left_ideal_compact}) subsemigroups.  Apply \verb|exists_idempotent_in_compact_subsemigroup|.
+    Every left ideal contains a minimal left ideal (\cref{lemma_exists_minimal_left_ideal}).  Minimal left ideals are compact (\cref{lemma_minimal_left_ideal_compact}) subsemigroups.  Apply \cref{exists_idempotent_in_compact_subsemigroup}.
 \end{proof}
 
 \subsection{Ultrafilters}
 
 \subsection{Ultrafilters as a set}
 
-\begin{lean}
+\begin{leanrmk}
     \begin{enumerate}
         \item Ultrafilters: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Order/Filter/Ultrafilter/Defs.html}
     
         \item \verb|Ultrafilter.instPure| is the principal ultrafilter associated to a point.  This allows us to see $S$ as a subset of \verb|Ultrafilter S|.  \verb|pure s| is the principal ultrafilter at $s$
     \end{enumerate}
-\end{lean}
+\end{leanrmk}
 
-\begin{lean}
+\begin{leanrmk}
     The type for ultrafilters on $S$ is the structure \verb|Ultrafilter S|.
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[Ultrafilter]
     Let $S$ be a set.  An ultrafilter on $S$ is a maximal filter on $S$ by containment. 
@@ -1139,25 +2061,25 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \subsection{Ultrafilters as a topological space}
 
-\begin{lean}
+\begin{leanrmk}
     A realization of the Stone-\Cech{} compactification as the space of ultrafilters: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/Compactification/StoneCech.html}
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[Topology on $\beta S$]
     There is a compact, Hausdorff topology on $\beta S$ in which $S$ (realized as the set of principal ultrafilters on $S$) is a dense subset.  
 \end{definition}
 
-\begin{lean}
+\begin{leanrmk}
     The topology is accessible in Lean as \verb|[TopologicalSpace (Ultrafilter S)]|.  This topology makes $\beta S$ the Stone-Cech compactification of $S$, though we don't need to know that.  This is in mathlib as \verb|ultrafilter_compact| and \verb|Ultrafilter.t2Space|
-\end{lean}
+\end{leanrmk}
 
 \begin{theorem}
     Let $S$ be a semigroup, $X$ be a compact, Hausdorff space, and $f: S \to X$.  There is a unique continuous function $\tilde f: \beta S \to X$ that extends $f$, in the sense that $\tilde f (\delta_s) = f(s)$ for all $s \in S$.
 \end{theorem}
 
-\begin{lean}
+\begin{leanrmk}
     The extension of $f: S \to X$ to $f: \beta S \to X$ is accomplished in Lean via \verb|Ultrafilter.extend|.
-\end{lean}
+\end{leanrmk}
 
 % \begin{definition}[Stone-\Cech{} compactification]
 %     The Stone-\Cech{} compactification of a discrete semigroup $S$, denoted $\beta S$, is a compact Hausdorff space with the universal property: for all maps $S \to X$ into a compact Hausdorff space, there exists a unique continuous map $\beta S \to X$ so that the diagram (with the canonical injection $S \to \beta G$) commutes.  It is also a compact right topological semigroup.
@@ -1165,9 +2087,9 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \subsection{Ultrafilters as a semigroup}
 
-\begin{lean}
+\begin{leanrmk}
     A proof of Hindman's theorem via idempotent ultrafilters: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Combinatorics/Hindman.html}
-\end{lean}
+\end{leanrmk}
 
 \begin{definition}[Semigroup structure on $\beta S$]
 \label{def_ultrafilter_multiplication}
@@ -1179,11 +2101,11 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \beta S$ to be left and right multiplication by $s$.
 \end{definition}
 
-\begin{lean}
+\begin{leanrmk}
     This product makes $\beta S$ into a semigroup.  In Mathlib, the semigroup structure is provided in \verb|Ultrafilter.semigroup| in the Hindman's theorem file (link above).  Once we fix an instance of it, the typeclass search will recognize \verb|[Semigroup (Ultrafilter S)]|.
 
     Of note: the multiplication is defined in a very short and quite confusing way.  But it is not hard to prove \cref{def_ultrafilter_multiplication}.
-\end{lean}
+\end{leanrmk}
 
 \begin{lemma}
 \label{lemma_ultrafilter_mult_with_one_principal}
@@ -1222,18 +2144,34 @@ Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \b
 
 \begin{lemma}
     \label{lemma_ru_is_r_for_idempotent}
-    Let $L \subseteq \beta \Z$ be a minimal left ideal, and let $u \in L$  be idempotent.  For all $p \in L$, $pu = p$.
+    Let $L \subseteq \beta S$ be a minimal left ideal, and let $u \in L$  be idempotent.  For all $p \in L$, $pu = p$.
 \end{lemma}
 
 \begin{proof}
     Let $p \in L$.  Note that $Lu$ is a left ideal contained in $L$.  By minimality, $Lu = L$.  Therefore, there exists $q \in L$ such that $p = qu$.  Then $pu = quu = qu = p$, as was to be shown.
 \end{proof}
 
-\begin{definition}
-An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal left ideal.
+\begin{definition}[Minimal ultrafilter]
+\label{def_minimal_ultrafilter}
+An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta S$.
 \end{definition}
 
 \dgg{Hindman-Strauss Def. 1.37 define ``minimal idempotent'' as an idempotent minimal with respect to an ordering.  Then, they prove immediately that this is the same (at least in $\beta S$, in which every minimal left ideal has an idempotent) as belonging to a minimal left ideal.}
+
+% \begin{lemma}
+%     \label{lemma_min_ultra_iff_principal_ideal_is_minimal}
+%     Let $S$ be a semigroup.  An ultrafilter $p \in \beta S$ is minimal if and only if $(\beta S)p$ is a minimal left ideal.
+% \end{lemma}
+
+%\dgg{I have my doubts here: why does $(\beta S)p$ contain $p$?  Maybe it doesn't in general.}
+
+% \begin{proof}
+%     Suppose $p \in \beta S$ is minimal.  It belongs to a minimal left ideal $L$.  Since $(\beta S)p$ is a left ideal contained in $L$, $L = (\beta S)p$.
+
+%     Conversely, suppose that $(\beta S)p$ is a minimal left ideal.  
+    
+%     Since $p \in (\beta S)p$ \dgg{why is this true?}, $p$ belongs to a minimal left ideal.
+% \end{proof}
 
 \subsection{Ultrafilters as a topological semigroup}
 
@@ -1272,6 +2210,10 @@ An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal lef
     Let $S$ be a (compact?) right topological semigroup.  Every left ideal of $S$ contains a minimal left ideal.
 \end{theorem}
 
+\begin{proof}
+    \dgg{Sorry.}
+\end{proof}
+
 \begin{lemma}
 \label{lemma_exists_idempotent_in_left_ideals}
     Let $S$ be a semigroup.  Every left ideal in $\beta S$ contains a idempotent.
@@ -1292,21 +2234,6 @@ An ultrafilter $p \in \beta \Z$ is \emph{minimal} if it belongs to a minimal lef
 
 \subsection{Ultrafilters as the phase space of an $S$-system}
 
-Dynamically:
-\begin{enumerate}
-    \item  the space $\beta G$ is the phase space for a $G$-system, that is, $G$ acts on $\beta G$ by continuous maps (actually, homeomorphisms, since $G$ is a group, but this is not so important).
-
-    \item the subsystems of the $G$-system $\beta G$ are precisely the left ideals of $\beta G$, and the minimal subsystems of $\beta G$ are the minimal left ideals (this possibly could be taken as a definition of minimal left ideal, but it is not the ``correct'' definition)
-
-    \item the $G$-uniformly recurrent points of $\beta G$ are precisely the minimal ultrafilters (those that belong to a minimal left ideal)
-
-    \item Fix $x \in X$ and define $\pi_x: \beta S \to X$ by $p \mapsto px$.  We would prove that this is a factor map of systems.
-
-    \item In lean, that \verb|Ultrafilter S| has a compact Hausdorff topology and a semigroup structure, we can turn it into an $S$-system
-    
-    \item Define $S \to$ \verb|Ultrafilter S| $\to$ \verb|Ultrafilter S| by $(s,p) \mapsto \delta_s * p$, where $\delta_s$ is the principal ultrafilter at $s$.  Fixing $s$, the map $p \mapsto \delta_s * p$ is continuous (though we would need to prove that, as in Hindman-Strauss theorem 4.1)
-\end{enumerate}
-
 \begin{theorem}
     \label{thm_ultrafilters_as_system}
     Let $S$ be a semigroup.  With left multiplication by elements of $S$ (via principal ultrafilters) and the topology described above, $\beta S$ is an $S$-system.
@@ -1322,7 +2249,11 @@ Dynamically:
 \end{theorem}
 
 \begin{proof}
-    \dgg{Sorry.}
+    Let $Z$ be an $S$-subsystem of $\beta S$.  Then $SZ \subseteq Z$.  Let $z \in Z$.  By \cref{thm_ultra_right_mult_continuous}, $\rho_z: \beta S \to \beta S$ is continuous and $\rho_z S \subseteq Z$.  By \cref{lemma_image_closure_equals_closure_image},
+    \[\rho_z(\beta S) = \rho_z(\overline{S}) = \overline{\rho_z S} \subseteq \overline{Z} = Z,\]
+    whereby $(\beta S)z \subseteq Z$.  Since $z$ was arbitrary, we have that $(\beta S)Z \subseteq Z$, meaning that $Z$ is a left ideal.  Since $Z$ is closed, we see that $Z$ is a closed left ideal, as desired.
+
+    Conversely, suppose that $L$ is a closed left ideal.  Since $(\beta S)L \subseteq L$, we have in particular that $SL \subseteq L$.  So, $L$ is non-empty, closed, and $S$-invariant.  Therefore, it is an $S$-subsystem of $\beta S$.
 \end{proof}
 
 \begin{theorem}[Minimal subsystems in $\beta S$]
@@ -1331,25 +2262,10 @@ Dynamically:
 \end{theorem}
 
 \begin{proof}
-    Let $Z$ be a minimal $S$-subsystem of $\beta S$.  By \cref{thm_beta_S_subsystem_characterization}, $Z$ is a left ideal of $\beta S$.  Let $L \subseteq Z$ be a left ideal of $S$ contained in $Z$.  By a short argument from \cref{lemma_principal_ideal_is_compact}, there exists a closed left ideal $L'$ of $S$ contained in $L$.  By \cref{thm_beta_S_subsystem_characterization}, $L'$ is an $S$-subsystem of $\beta S$.  Since $Z$ is a minimal $S$-subsystem, $L' = L = Z$.  Therefore, we have shown that $Z$ is a minimal left ideal of $\beta S$.
+    Let $Z$ be a minimal $S$-subsystem of $\beta S$.  By \cref{thm_beta_S_subsystem_characterization}, $Z$ is a left ideal of $\beta S$.  Let $L \subseteq Z$ be a left ideal of $S$ contained in $Z$.  By \cref{lemma_left_ideal_contains_closed_left_ideal}, there exists a closed left ideal $L'$ of $S$ contained in $L$.  By \cref{thm_beta_S_subsystem_characterization}, $L'$ is an $S$-subsystem of $\beta S$.  Since $Z$ is a minimal $S$-subsystem, $L' = L = Z$.  Therefore, we have shown that $Z$ is a minimal left ideal of $\beta S$.
 
-    Conversely, \dgg{sorry.}
+    Conversely, suppose $L$ is a minimal left ideal of $S$. By \cref{thm_beta_S_subsystem_characterization}, $L$ is an $S$-subsystem of $\beta S$.  To see that it is minimal, suppose $Z \subseteq L$ is an $S$-subsystem of $L$. By \cref{thm_beta_S_subsystem_characterization}, $Z$ is a left ideal of $S$ contained in $L$.  Since $L$ is minimal, $Z = L$, showing that $L$ is a minimal $S$-subsystem of $\beta S$.
 \end{proof}
-
-% \begin{theorem}[{cf. \cite[Lemma 19.6]{hindman_strauss_book_2012}}]
-% \label{thm_minimal_ultrafilter_iff_orbit_closure_is_minimal_ideal}
-%     Let $S$ be a semigroup.  An ultrafilter $p \in \beta S$ is minimal if and only if $\overline{Sp}$ is a minimal $S$-subsystem of $\beta S$.
-% \end{theorem}
-
-% \begin{proof}
-%     Let $p \in \beta S$.  The set $\overline{Sp}$ is an $S$-subsystem of $\beta S$ (by \cref{lemma_orb_closure_is_invariant}).
-
-%     Suppose $p$ is minimal. It belongs to a minimal left ideal $L$.  Then $Sp \subseteq L$.  Since $L$ is closed (abcde), $\overline{Sp} \subseteq L$.
-    
-%     Let $Z \subseteq \overline{Sp}$ be an $S$-subsystem of $\overline{Sp}$.  Then $Z \subseteq \overline{Sp}$.  Since $Z$ is $S$-invariant, it is a left ideal
-    
-%         Since $\overline{Sp}$ is $S$-invariant (\cref{lemma_orb_closure_is_invariant}), it is a left ideal.  Since $L$ is minimal, $\overline{Sp} = L$ 
-% \end{proof}
 
 \begin{theorem}[{cf. \cite[Lemma 19.6]{hindman_strauss_book_2012}}]
 \label{thm_minimal_ultrafilter_iff_unif_rec}
@@ -1357,32 +2273,53 @@ Dynamically:
 \end{theorem}
 
 \begin{proof}
-    By \cref{lemma_orb_closure_of_ur_is_minimal} and \cref{lemma_pts_in_minimal_are_ur}, it is equivalent to show that an ultrafilter $p$ is minimal iff $\overline{Sp}$ is a minimal $S$-subsystem of $\beta S$.
+    Suppose $p \in \beta S$ is minimal.  By definition, it is contained in a minimal left ideal $L$.  By \cref{thm_minimal_beta_S_subsystem_characterization}, $L$ is a minimal $S$-subsystem of $\beta S$. By \cref{lemma_pts_in_minimal_are_ur}, $p$ is $S$-uniformly recurrent.
 
-    By \cref{thm_minimal_beta_S_subsystem_characterization}, $\overline{Sp}$ is a minimal $S$-subsystem of $\beta S$ iff $\overline{Sp}$ is a minimal left ideal.  But this happens iff $p$ is minimal. \dgg{Details.}
+    Conversely, suppose that $p$ is $S$-uniformly recurrent.  By \cref{lemma_orb_closure_of_ur_is_minimal}, $\overline{Sp}$ is a minimal $S$-subsystem of $\beta S$ containing $p$. By \cref{thm_minimal_beta_S_subsystem_characterization}, $\overline{Sp}$ is a minimal left ideal.  Therefore, $p$ is contained in a minimal left ideal, implying (\cref{def_minimal_ultrafilter}) it is minimal.
 \end{proof}
+
+% Dynamically:
+% \begin{enumerate}
+%     \item  the space $\beta G$ is the phase space for a $G$-system, that is, $G$ acts on $\beta G$ by continuous maps (actually, homeomorphisms, since $G$ is a group, but this is not so important).
+
+%     \item the subsystems of the $G$-system $\beta G$ are precisely the left ideals of $\beta G$, and the minimal subsystems of $\beta G$ are the minimal left ideals (this possibly could be taken as a definition of minimal left ideal, but it is not the ``correct'' definition)
+
+%     \item the $G$-uniformly recurrent points of $\beta G$ are precisely the minimal ultrafilters (those that belong to a minimal left ideal)
+
+%     \item Fix $x \in X$ and define $\pi_x: \beta S \to X$ by $p \mapsto px$.  We would prove that this is a factor map of systems.
+
+%     \item In lean, that \verb|Ultrafilter S| has a compact Hausdorff topology and a semigroup structure, we can turn it into an $S$-system
+    
+%     \item Define $S \to$ \verb|Ultrafilter S| $\to$ \verb|Ultrafilter S| by $(s,p) \mapsto \delta_s * p$, where $\delta_s$ is the principal ultrafilter at $s$.  Fixing $s$, the map $p \mapsto \delta_s * p$ is continuous (though we would need to prove that, as in Hindman-Strauss theorem 4.1)
+% \end{enumerate}
 
 \subsection{Ultrafilters as a semigroup acting on $X$}
 
 
-Let $X$ be a $G$-system. Then we have:
-\begin{enumerate}
-    \item an action of $\beta G$ on $X$ by maps, in the sense that $(pq)x = p(qx)$ (note that this does NOT make $X$ a $\beta G$-system since $\beta G$ is not acting by continuous maps);
 
-    \item for a fixed $x \in X$, a continuous map $\beta G \to X$ given by $p \mapsto px$ (that is, the action map $\beta G \times X \to X$ given by $(p,x) \mapsto px$ is continuous in the left coordinate).  When $x$ is a transitive point of $X$, this map is a surjection, and hence is a factor map of $G$-systems;
-
-    \item for all minimal $p \in \beta G$ and $x \in X$, the point $px$ is uniformly recurrent;
-
-    \item for all idempotent $p \in \beta G$ and $x \in X$, the points $x$ and $px$ are proximal; and, conversely, if the points $x$ and $y$ are proximal and if $y$ is in the orbit-closure of $x$, then there exists an idempotent $p \in \beta G$ such that $px = y$.
-
-    \item In lean, the ultrafilter pushforward at a point.  Given an action $S \to X \to X$, we get $\beta S \to X \to X$ as follows.  Fix first $x \in X$.  We get a map $S \to X$.  For $p \in \beta S$, we push $p$ forward using \verb|Ultrafilter.map| through this map to get an ultrafilter on $X$.  Then, we take the ultrafilter limit on $X$.  Ultrafilter limits exist by compactness and \verb|IsCompact.ultrafilter_le_nhds|
-        
-    \item Suppose $X$ is an $S$ system.  For us, that might look like \verb|sys : tds X S|. The claim is that we get an action of \verb|Ultrafilter S| on $X$.  By the above, we have a map $\beta S \to X \to X$.  The claim is that this is an action: $(q,(p,x)) = (qp,x)$.
-\end{enumerate}
+In this section, for $f: S \to X$, recall that $\tilde f: \beta S \to X$ is the unique continuous extension of $f$ to $\beta S$.
 
 \begin{definition}[$p-\lim$]
-    Let $S$ be a semigroup, $X$ a compact Hausdorff space, and $f: S \to X$.  We write $p-\lim_{s \in S} f(s)$ to mean $\tilde f (p)$, where $\tilde f: \beta S \to X$ is the unique continuous lift of $f$ to $\beta S$.  (Alternative: equivalently, $p-\lim_{s \in S} f(s)$ is the point $x \in X$ with the property that for all non-empty, open $U \ni x$, $\{s \in S : f(s) \in U\} \in p$.)
+    Let $S$ be a set, $X$ a compact Hausdorff space, and $f: S \to X$.  We write $p-\lim_{s \in S} f(s)$ to mean $\tilde f (p)$.  (Alternative: equivalently, $p-\lim_{s \in S} f(s)$ is the point $x \in X$ with the property that for all non-empty, open $U \ni x$, $\{s \in S : f(s) \in U\} \in p$.)
 \end{definition}
+
+\begin{theorem}[$(pq)-\lim$ description]
+\label{thm_pq_lim_is_plim_qlim}
+    Let $S$ be a semigroup, $X$ a compact Hausdorff space, and $f: S \to X$.  For all $p, q \in \beta S$,
+    \[(pq)-\lim_s f(s) = p-\lim_s (q-\lim_t f(st)).\]
+\end{theorem}
+
+\begin{proof}
+    \dgg{These steps are broken into separate results in the lean miniproject on this topic.}
+    
+    Step 1: for $s \in S$ and $f: S \to X$,
+    \[\widetilde{f \circ \lambda_s} = \tilde f \circ \lambda_{\delta_s}.\]
+    This needs that multiplication on the left by principal ultrafilters is continuous (\cref{lemma_left_multiplication_is_continuous}).
+
+    Step 2: for $q \in \beta S$ and $f: S \to X$, the extension of the map $s \mapsto \widetilde{f \circ \lambda_s}(q)$ to $\beta S$ is $\tilde f \circ \rho_q$. This requires that multiplication on the right is continuous (\cref{thm_ultra_right_mult_continuous}).
+
+    Step 3: For $p, q \in \beta S$ and $f: S \to X$, the extension of the map $s \mapsto \widetilde{f \circ \lambda_s}(q)$ evaluated at $p$ is equal to $\tilde f(pq)$.  That is to say, $(pq)-\lim_s f(s) = p-\lim_s (q-\lim_t f(st))$.
+\end{proof}
 
 \begin{theorem}[Continuous function and $p-\lim$]
 \label{thm_continuity_and_plim}
@@ -1390,29 +2327,46 @@ Let $X$ be a $G$-system. Then we have:
 \end{theorem}
 
 \begin{proof}
-    \dgg{I proved this in a mini-project by showing that $\widetilde {\pi \circ f} = \pi \circ \tilde f$.}
+    The statement here is that $\widetilde {\pi \circ f} = \pi \circ \tilde f$.  This is easy to see by checking the equality on the dense set of principal ultrafilters.  Indeed, for $s \in S$, $(\pi \circ f)(s) = \pi(f(s))$.
 \end{proof}
+
+Notation: For $p \in \beta S$ and $x \in X$, write $px$ for $p-\lim_{s \in S} sx$.
 
 \begin{theorem}[Ultrafilter semigroup action theorem]
 \label{thm_ultra_semigroup_action}
-    Let $X$ be an $S$-system.  The map $\beta S \times X \to X$ given by $(p,x) \mapsto p-\lim_{s \in S} sx$ yields an action of $\beta S$ on $X$.
+    Let $S$ be a semigroup. Let $X$ be an $S$-system.  The map $\beta S \times X \to X$ given by $(p,x) \mapsto p-\lim_{s \in S} sx$ yields an action of $\beta S$ on $X$.
 \end{theorem}
 
 \begin{proof}
-    \dgg{I proved this in lean in a mini-project.}
+    For $p, q \in \beta S$ and $x \in X$, we want to show that 
+    \[(pq) x = p(qx).\]
+    To see this, we get by \cref{thm_pq_lim_is_plim_qlim} and using that acting on the left by $s$ is a continuous map $X \to X$(\cref{thm_continuity_and_plim}), we see
+    \begin{align*}
+        (pq) x &= (pq)-\lim_s sx\\
+        &= p-\lim_s (q-\lim_t (st)x ) \\
+        &= p-\lim_s (q-\lim_t s(tx)) \\
+        &= p-\lim_s s(q-\lim_t tx) \\
+        &= p-\lim_s s (qx) \\
+        &= p(qx).
+    \end{align*}
 \end{proof}
 
 \begin{theorem}
-\label{lemma_plim_in_open_set_return_time}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  Let $x \in X$, $U \subseteq X$ be open, and $p \in \beta S$.
-    \begin{enumerate}
-        \item If $px \in U$, then $R(x,U) \in p$.
-        \item If $R(x,U) \in p$, then $px \in \overline{U}$.
-    \end{enumerate}
+    \label{thm_ultrafilter_action_with_fixed_x_is_continuous}
+    Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The map $\beta S \to X$ defined by $p \mapsto px$ is continuous.
 \end{theorem}
 
 \begin{proof}
-    \dgg{This follows immediately from the definition of $p$-limit.}
+    By definition, the map $\beta S \to X$ defined by $p \mapsto px$ is the lift of the map $S \to X$ defined by $s \mapsto sx$.  Therefore, it is continuous.
+\end{proof}
+
+\begin{theorem}
+    \label{thm_ultra_factor_map}
+    Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  If $\overline{Sx} = X$, then the map $\beta S \to X$ defined by $p \mapsto px$ is a factor map of $S$-systems.
+\end{theorem}
+
+\begin{proof}
+    By \cref{thm_ultrafilter_action_with_fixed_x_is_continuous}, the map is continuous.  Since $\overline{Sx} = X$, we have that $p \mapsto px$, the lift of $s \mapsto sx$, is surjective.
 \end{proof}
 
 \begin{theorem}
@@ -1421,7 +2375,7 @@ Let $X$ be a $G$-system. Then we have:
 \end{theorem}
 
 \begin{proof}
-    \dgg{sorry.}
+    Recall that the map $\beta S \to X$ defined by $p \mapsto px$ is the lift of the map $S \to X$ defined by $s \mapsto sx$.  Fix $x \in X$.  For all $s \in S$, $sx \in \overline{Sx}$.  Therefore, for all $p \in \beta S$, $px \in \overline{Sx}$.
 \end{proof}
 
 \begin{theorem}[Ultrafilter action through factors]
@@ -1436,12 +2390,16 @@ Let $X$ be a $G$-system. Then we have:
 \end{proof}
 
 \begin{theorem}
-    \label{thm_ultrafilter_action_with_fixed_x_is_continuous}
-    Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The map $\beta S \to X$ defined by $p \mapsto px$ is continuous.
+\label{lemma_plim_in_open_set_return_time}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  Let $x \in X$, $U \subseteq X$ be open, and $p \in \beta S$.
+    \begin{enumerate}
+        \item If $px \in U$, then $R(x,U) \in p$.
+        \item If $R(x,U) \in p$, then $px \in \overline{U}$.
+    \end{enumerate}
 \end{theorem}
 
 \begin{proof}
-    \dgg{Sorry}
+    Both of these statements follow immediately from the definition of the filter limit.
 \end{proof}
 
 \begin{lemma}[Surjectivity lemma]
@@ -1449,8 +2407,8 @@ Let $X$ be a $G$-system. Then we have:
 Let $X$ be a minimal $S$-system and $L \subseteq \beta S$ be a minimal left ideal.  For all $x, y \in X$, there exists $p \in L$ such that $px = y$.
 \end{lemma}
 
-\begin{proof}[Proof idea]
-    Fix $x \in X$. The map $\pi: \beta S \to X$ given by $p \mapsto px$ is a factor map.  Since $L$ is an $S$-minimal subsystem, $\pi L$ an $S$-minimal subsystem of $X$.  But $X$ is minimal, so $\pi L = X$.
+\begin{proof}
+    Fix $x \in X$. By the minimality of the $S$-action, $\overline{Sx} = X$.  By \cref{thm_ultra_factor_map}, the map $\pi: \beta S \to X$ given by $p \mapsto px$ is a factor map.  By \cref{thm_minimal_beta_S_subsystem_characterization}, $L$ is an $S$-minimal subsystem of $\beta S$.  By \cref{lemma_img_of_inv_is_inv}, $\pi L$ is an $S$-subsystem of $X$.  But $X$ is minimal, so $\pi L = X$.  Therefore, there exists $p \in L$ such that $px = y$.
 \end{proof}
 
 \begin{lemma}[Idempotent ultrafilter lemma]
@@ -1459,7 +2417,7 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 \end{lemma}
 
 \begin{proof}
-    \dgg{Sorry.}  Show that $\{p \in \beta S : px = x\}$ is a closed subsemigroup. Then, show it has non-empty intersection with $L$.  Then, use Numakura.
+    Fix $x \in X$. Let $A = \{p \in \beta S : px = x\}$.  By \cref{lemma_ultrafilter_surjective_action}, $A \cap L$ is non-empty. Since $\{x\}$ is closed and $p \mapsto px$ is continuous (\cref{thm_ultrafilter_action_with_fixed_x_is_continuous}), the set $A$ is closed.  Since $L$ is closed (\cref{lemma_minimal_left_ideal_compact} and \cref{thm_ultrafilters_are_compact_right_top}), $A \cap L$ is closed. By \cref{thm_ultra_semigroup_action}, if $p, q \in A$, then $pq \in A$.  Since $L$ is a left ideal, if $p, q \in L$, then $pq \in L$.  Therefore, $A \cap L$ is a closed, hence compact, subsemigroup of $\beta S$. Apply \cref{exists_idempotent_in_compact_subsemigroup}.
 \end{proof}
 
 \begin{lemma}[Points $x$ and $px$ are proximal]
@@ -1470,10 +2428,10 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 \begin{proof}
     Let $\alpha \subseteq X^2$ be an entourage.  By the semigroup action theorem (\cref{thm_ultra_semigroup_action}), 
     \[p(x,px) = (px,ppx) = (px,px) \in \Delta \subseteq \alpha.\]
-    Therefore, by the definition of $p-\lim$, there exists (many) $s \in S$ such that $(sx,spx) \in \alpha$, as was to be shown.
+    Therefore, by the definition of proximal (\cref{def_proximal}) $p-\lim$, there exists (many) $s \in S$ such that $(sx,spx) \in \alpha$, as was to be shown.
 \end{proof}
 
-\begin{lemma}[Point $px$ is uniformly recurrent]
+\begin{lemma}[$px$ is uniformly recurrent]
     \label{lemma_minimal_implies_uniformly_recurrent}
     Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $p \in \beta S$ be a minimal ultrafilter.  The point $px$ is $S$-uniformly recurrent.
 \end{lemma}
@@ -1488,16 +2446,31 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 
 \begin{lemma}[Technical idempotent lifting lemma]
 \label{lemma_ultrafilter_idempotent_lift}
-    Let $X$ be a minimal $S$-system and $x \in X$.  Let $L \subseteq \beta S$ be a minimal left ideal and $p \in L$.  If $p x = x$, there exists $q \in L$ such that $q x = x$ and $pq \in L$ is idempotent.
+    Let $X$ be a minimal $S$-system and $x \in X$.  Let $L \subseteq \beta S$ be a minimal left ideal and $p \in L$.  If $p x = x$, there exists $q \in L$ such that $q x = x$ and $pq$ is idempotent.
 \end{lemma}
 
 \begin{proof}
-    By \cref{lemma_exists_idempotent_px_is_x}, there exists an idempotent $u \in L$ so that $up = p$.  By \cref{lemma_ultrafilter_surjective_action} (twice), there exist $q, r \in L$ such that $qp = u$ and $rq = u$. By the semigroup action of $\beta S$ on $X$ (\cref{thm_ultra_semigroup_action}),
+    By \cref{thm_ultrafilters_as_system}, we can treat $\beta S$ as an $S$-system. By \cref{thm_minimal_beta_S_subsystem_characterization}, $L$ is a minimal $S$-system. By \cref{lemma_exists_idempotent_px_is_x}, there exists an idempotent $u \in L$ so that $up = p$.  By \cref{lemma_ultrafilter_surjective_action} (twice), there exist $q, r \in L$ such that $qp = u$ and $rq = u$. By the semigroup action of $\beta S$ on $X$ (\cref{thm_ultra_semigroup_action}),
     \[qx = q (p x) = (qp) x = ux = u (px) = (up) x = px = x.\]
     By \cref{lemma_ru_is_r_for_idempotent}, $ru = r$.  Therefore, we also have
     \[pq = (up)q = u (pq) = (rq) (pq) = r (qp) q = ruq = (ru) q = rq = u,\]
     as desired.
 \end{proof}
+
+% Let $X$ be a $G$-system. Then we have:
+% \begin{enumerate}
+%     \item an action of $\beta G$ on $X$ by maps, in the sense that $(pq)x = p(qx)$ (note that this does NOT make $X$ a $\beta G$-system since $\beta G$ is not acting by continuous maps);
+
+%     \item for a fixed $x \in X$, a continuous map $\beta G \to X$ given by $p \mapsto px$ (that is, the action map $\beta G \times X \to X$ given by $(p,x) \mapsto px$ is continuous in the left coordinate).  When $x$ is a transitive point of $X$, this map is a surjection, and hence is a factor map of $G$-systems;
+
+%     \item for all minimal $p \in \beta G$ and $x \in X$, the point $px$ is uniformly recurrent;
+
+%     \item for all idempotent $p \in \beta G$ and $x \in X$, the points $x$ and $px$ are proximal; and, conversely, if the points $x$ and $y$ are proximal and if $y$ is in the orbit-closure of $x$, then there exists an idempotent $p \in \beta G$ such that $px = y$.
+
+%     \item In lean, the ultrafilter pushforward at a point.  Given an action $S \to X \to X$, we get $\beta S \to X \to X$ as follows.  Fix first $x \in X$.  We get a map $S \to X$.  For $p \in \beta S$, we push $p$ forward using \verb|Ultrafilter.map| through this map to get an ultrafilter on $X$.  Then, we take the ultrafilter limit on $X$.  Ultrafilter limits exist by compactness and \verb|IsCompact.ultrafilter_le_nhds|
+        
+%     \item Suppose $X$ is an $S$ system.  For us, that might look like \verb|sys : tds X S|. The claim is that we get an action of \verb|Ultrafilter S| on $X$.  By the above, we have a map $\beta S \to X \to X$.  The claim is that this is an action: $(q,(p,x)) = (qp,x)$.
+% \end{enumerate}
 
 \section{Furstenberg families}
 \label{sec_furstenberg_families}
@@ -1616,7 +2589,7 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     \[\delta_sp \in \delta_s \overline{(gs)^{-1} H} = \delta_s \overline{s^{-1}g^{-1} H} = \delta_s \delta_s^{-1} \overline{g^{-1} H} \subseteq \overline{g^{-1} H},\]
     as desired.  Denoting right multiplication by $p$ by $\rho_p: \beta S \to \beta S$, we have shown that $\rho_p(\{\delta_s : s \in S\}) \subseteq L$.
 
-    By \cref{thm_ultra_right_mult_continuous}, $\rho_p$ is continuous.  Since $L$ is closed, by THEOREM (\dgg{find this in mathlib: image of the closure of a set under a continuous function is the closure of its image}), we see
+    By \cref{thm_ultra_right_mult_continuous}, $\rho_p$ is continuous.  Since $L$ is closed, by \cref{lemma_image_closure_equals_closure_image}, we see
     \[\rho_p(\beta S) = \rho_p(\overline{S}) = \overline{\rho_p(\{\delta_s : s \in S\})} \subseteq \overline{L} = L.\]
     In other words: for all $q \in \beta S$, $qL \subseteq L$, as was to be shown.
     
@@ -1674,12 +2647,12 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-    \dgg{Idea: $s_n \in s_m A$ implies $\varphi s_n \in \varphi s_m \varphi A$.}
+    Let $N \in \N$. Since $A$ is a $\Delta_0$ set, there exists $s_1, \ldots, s_N \in S$ such that $s_n \in s_m A$ for $n > m$.  Applying $\varphi$, we see that $\varphi s_1, \varphi s_2, \ldots, \varphi s_N$ are such that $\varphi s_n \in \varphi s_m \varphi A$ for $n > m$, as desired.
 \end{proof}
 
 \subsection{Bohr sets}
 
-\dgg{In the definition below, we require the system to be minimal.  We can drop that assumption if all points are uniformly recurrent for an equicontinuous action.  This is true for group actions, but may not be true any longer for semigroup actions.}
+\dgg{In the definition below, we require the system to be minimal.  We can drop that assumption if all points are uniformly recurrent for an equicontinuous semigroup action.  This is true for group actions, but may not be true any longer for semigroup actions.}
 
 \begin{definition}
 Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
@@ -1696,16 +2669,18 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \end{lemma}
 
 \begin{proof}
-    Easy from definitions.
+    Immediate from definitions.
 \end{proof}
 
 \begin{lemma}
     \label{lemma_dcsyndeticbohr_is_filter}
-    $\dcsyndeticbohr$ is a filter.
+    Suppose $S$ is commutative. $\dcsyndeticbohr$ is a filter.
 \end{lemma}
 
 \begin{proof}
-    Let $A, B \in \dcsyndeticbohr$.  Then $A = R(x,U)$ and $B = R(y,V)$ in equicontinuous $S$-systems $X$ and $Y$.  By \cref{lemma_product_of_equi_is_equi}, the $S$-system $X \times Y$ is equicontinuous, and $A \cap B = R((x,y), U \times V)$, whereby $A \cap B \in \dcsyndeticbohr$.
+    Let $A, B \in \dcsyndeticbohr$.  Then $A = R(x,U)$ and $B = R(y,V)$ in minimal equicontinuous $S$-systems $X$ and $Y$.  By \cref{lemma_product_of_equi_is_equi}, the $S$-system $X \times Y$ is equicontinuous.  By \cref{lemma_subsys_of_equi_is_equi}, subsystems of equicontinuous systems are equicontinuous.  So, it suffices to show that the point $(x,y)$ belongs to a minimal subsystem of $X \times Y$.
+
+    By \cref{thm_every_system_has_minimal_subsystem}, there exists an $S$-minimal subsystem $Z \subseteq X \times Y$.  Since $\pi_2 Z = Y$, there exists $(w,y) \in Z$.  By \cref{lemma_minimal_equi_implies_homogeneous}, there exists a factor map $\varphi: X \to X$ such that $\varphi(x) = w$.  Apply $\varphi \otimes \text{Id}$ to $Z$ to get a minimal subsystem of $X \times Y$ containing $(x,y)$. By product system return time algebra (\cref{lemma_return_time_sets_in_prod_system}), $A \cap B = R((x,y), U \times V)$, whereby $A \cap B \in \dcsyndeticbohr$.
 \end{proof}
 
 \begin{lemma}
@@ -1717,46 +2692,13 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     That $\dcthickbohr$ is partition regular follows immediately from \cref{lemma_dcsyndeticbohr_dcthickbohr_dual}, \cref{lemma_dcsyndeticbohr_is_filter}, and \cref{thm_family_pr_iff_dual_is_filter}.
 \end{proof}
 
-\begin{lemma}
-    \label{lemma_preimage_of_dcsyndetic_bohr}
-    Let $\varphi: S \to T$ be a surjective semigroup homomorphism. If $B \subseteq T$ is a $\dcsyndeticbohr$ subset of $T$, then $\varphi^{-1} B$ is a $\dcsyndeticbohr$ subset of $S$.
-\end{lemma}
-
-\begin{proof}
-    Suppose $B \supseteq R_T(x,U)$ for a minimal, equicontinuous $T$-system $X$.  The homomorphism system (\cref{def_hom_system}) gives $X$ as an $S$-system.  It is \dgg{easy to check} that it is a minimal, equicontinuous $S$-system, and that $R_S(x,U) = \pi^{-1}R_T(x,U)$.  Thus, $\pi^{-1} B \supseteq \pi^{-1} \pi^{-1} R_T(x,U) = R_S(x,U)$ is a $\dcsyndeticbohr$ subset of $S$, as desired.
-\end{proof}
-
 \begin{theorem}
     \label{thm_delta_zero_set_of_bohr_rec}
-    For $S$ a \sout{cancellative}, commutative semigroup, $\Delta_0 \subseteq \dcthickbohr$.
+    For $S$ a commutative semigroup, $\Delta_0 \subseteq \dcthickbohr$.
 \end{theorem}
 \begin{remark}
 The proof would be a straight-forward application of the pigeonhole principle if $S$ were a group and the phase spaces of the systems we consider were metrizable. In the general setting we are in, without access to inverses in $S$ and even not assuming cancellativity of $S$, more work is required before the pigeonhole principle is applied.
 \end{remark}
-
-%\dgg{Yes, cancellativity can be removed!  We do this just following the proof of this theorem.}
-
-\begin{proof}
-    Suppose $A \in \Delta_0$ and we want to show that $A \cap R(x,U) \neq \emptyset$, where $X$ is a minimal, equicontinuous $S$-system, $x \in U \subseteq X$.  Since $X$ is compact, Hausdorff, it has a unique uniform structure.  Thus, there exists an entourage $\beta \subseteq X^2$ such that $\beta[x] \subseteq U$.  By equicontinuity, there exists an entourage $\alpha \subseteq X^2$ such that for all $s \in S$, $(s \otimes s) \alpha \subseteq \beta$.
-    
-    Note that $\Delta(X) \subseteq \alpha$, whereby
-    \[X = \bigcup_{x \in X} \alpha[x].\]
-    By compactness, there exists a finite set $Z \subseteq X$ such that
-    \[
-        X = \bigcup_{z \in Z} \alpha[z].
-    \]
-    Put $N = |Z|+1$.  By the assumption that $A$ is a $\Delta_0$ set, there exists $s_1, \ldots, s_N \in S$ such that for all $1 \leq m < n \leq N$, $s_n \in s_m A$.
-    
-    By \cref{lemma_minimal_comm_action_implies_surjective}, the elements $s_1, \ldots, s_N$ act surjectively on $X$.  Therefore, there exists $y_1, \ldots, y_N \in X$ such that $s_i y_i = x$.
-    
-    Consider the points $y_1, \ldots, y_N$.  Since $N > |Z|$, by pigeonhole principle, there is $1 \leq m < n \leq N$ and $z \in Z$ such that $(y_n, y_m) \in \alpha[z] \times \alpha[z]$.  Since $s_n \in s_m A$, there exist $a \in A$ such that $s_n = s_m a$.
-    
-    Act on the product by $s_n$ to see that
-    \[
-        (x,a x) = (x, a s_m y_m) = (x, s_n y_m) = (s_n \otimes s_n) (y_n, y_m) \in \beta,
-    \]
-    whereby $a x \in \beta[x]$. \anh{There is a small issue here. What we have is $(y_n, z), (y_m, z) \in \alpha$. So it is not necessary that $(y_n, y_m) \in \alpha$. Without this, we cannot apply $(s \otimes s) \alpha \subseteq \beta$ for all $s$. There's an easy fix though. There exists an entourage $\gamma \subseteq X^2$ such that $\gamma \circ \gamma \subseteq \alpha$. Then build $Z$ based on $\gamma$ instead of $\alpha$. The fixed proof is below.} Since $\beta[x] \subseteq U$, we have $a \in R(x,U)$.  Note that $a \in A$ and so $A \cap R(x,U) \neq \emptyset$, as was to be shown.
-\end{proof}
 
 \begin{proof}
     Suppose $A \in \Delta_0$ and we want to show that $A \cap R(x,U) \neq \emptyset$, where $X$ is a minimal, equicontinuous $S$-system, $x \in U \subseteq X$.  Since $X$ is compact, Hausdorff, it has a unique uniform structure.  Thus, there exists an entourage $\beta \subseteq X^2$ such that $\beta[x] \subseteq U$.  By equicontinuity, there exists an entourage $\alpha \subseteq X^2$ such that for all $s \in S$, $(s \otimes s) \alpha \subseteq \beta$.
@@ -1786,78 +2728,6 @@ The proof would be a straight-forward application of the pigeonhole principle if
 \end{proof}
 
 
-For the rest of the section, we develop the math necessary to remove the ``cancellativity'' assumption in the previous result. \dgg{I've re-written the proof of \cref{thm_delta_zero_set_of_bohr_rec} to avoid the use of cancellativity.  Does it check out?  If so, we don't need what follows.}
-
-\begin{lemma}
-    \label{lemma_hom_system_facts}
-    Let $\varphi: S \to T$ be a surjective semigroup homomorphism.  Let $X$ be a $T$-system.
-    \begin{enumerate}
-        \item The action of $S$ on $X$ via $\varphi$ (\cref{def_hom_system}) is minimal if and only if the action by $T$ is minimal.
-
-        \item The action of $S$ on $X$ via $\varphi$ (\cref{def_hom_system}) is equicontinuous if and only if the action by $T$ is equicontinuous.
-
-        \item For all $x \in X$ and $U \subseteq X$,
-        \[R_S(x,U) = \varphi^{-1}R_{T}(x, U).\]
-    \end{enumerate}
-\end{lemma}
-
-\dgg{This result has nothing to do with the largest cancellative quotient or Bohr sets.  Could move up.}
-
-\begin{proof}
-    \dgg{Work it out}
-\end{proof}
-
-The following lemma says that the action of $S$ on $X$ factors through the largest cancellative quotient (\cref{thm_large_cancel_quotient}) $S/\sim_C$.
-
-\begin{lemma}
-\label{lemma_com_surj_action_factors_thru_cancel_quotient}
-    Let $S$ be a commutative semigroup, and let $X$ be an $S$-system.  If $S$ acts by surjections, then
-    \begin{enumerate}
-        \item $X$ into a $S/\sim_C$-system by the map $S/\sim_C \times X \to X$ defined by $[s]x = sx$;
-
-        \item the action of $S$ on $X$ is precisely the homomorphism action of $S$ on $X$ via the quotient map $S \to S/\sim_C$ (cf. \cref{def_hom_system}).
-    \end{enumerate}
-\end{lemma}
-
-\begin{proof}
-    For $s \in S$, denote by $f_s$ the element of $C(X,X)$ given by $s$.  By the definition of the cancellativity quotient, if $[s] = [t]$, then $s=t$ or there exists $r \in S$ such that $rs = rt$.  We wish to show that $f_s = f_t$.  If $s = t$, this is immediate, so suppose there exists $r \in S$ such that $rs = rt$.
-
-    Let $x \in X$. Since $S$ acts by surjections, there exists $y \in X$ such that $ry = x$.  Then
-    \[tx = try = sry = sx.\]
-    Since $x \in X$ was arbitrary, we see $f_s = f_t$.
-
-    Thus, the map $S/\sim_C \times X \to X$ defined by $[s]x = sx$ makes $X$ into a $S/\sim_C$-system.  The equality $sx = [s]x$ also gives that the original $S$-action is then the homomorphism action (\cref{def_hom_system}) via the quotient homomorphism.
-\end{proof}
-
-\begin{lemma}
-    \label{lemma_bohr_descriptions_via_cancel_quotient}
-    Let $S$ be a commutative semigroup, and denote by $\pi: S \to S/\sim_C$ the quotient map to the largest cancellative quotient of $S$ (\cref{thm_large_cancel_quotient}). Let $A \subseteq S$.
-    \begin{enumerate}
-        \item $A$ is $\dcsyndeticbohr$ set if and only if there exists a $\dcsyndeticbohr$ set $B \subseteq S/\sim_C$ such that $A \supseteq \pi^{-1} B$.
-
-        \item $A$ is $\dcthickbohr$ set if and only if $\pi A$ is a $\dcthickbohr$ set in $S/\sim_C$.
-    \end{enumerate}
-\end{lemma}
-
-\begin{proof}
-    Note that the second item follows from the first and \cref{lemma_dcsyndeticbohr_dcthickbohr_dual}.
-
-    Suppose $A$ is $\dcsyndeticbohr$.  There exists a minimal equicontinuous $S$-system $X$, a point $x \in X$, and an open neighborhood $U \ni x$ such that $A \supseteq R(x,U)$.  By \cref{lemma_com_surj_action_factors_thru_cancel_quotient} and \cref{lemma_hom_system_facts}, $X$ is a minimal, equicontinuous $S/\sim_C$ system and
-    \[A \supseteq R_S(x,U) = \pi^{-1} R_{S/\sim_C}(x,U).\]
-    Therefore, $R_{S/\sim_C}(x,U)$ is a $\dcsyndeticbohr$ set in $S/\sim_C$, and $A \supseteq \pi^{-1} R_{S/\sim_C}(x,U)$, as desired.
-
-    That the converse holds is covered in \cref{lemma_preimage_of_dcsyndetic_bohr}.
-\end{proof}
-
-\begin{theorem}
-    \label{thm_delta_zero_set_of_bohr_rec_no_cancel}
-    For $S$ a commutative semigroup, $\Delta_0 \subseteq \dcthickbohr$.
-\end{theorem}
-
-\begin{proof}
-    Denote by $\pi: S \to S/\sim_C$ the quotient map to the largest cancellative quotient (\cref{thm_large_cancel_quotient}). Let $A \in \Delta_0$.  By \cref{lemma_hom_image_of_delta_zero}, $\pi A$ is $\Delta_0$ in $S/\sim_C$. By \cref{thm_delta_zero_set_of_bohr_rec}, $\pi A$ is a $\dcthickbohr$ subset of $S/\sim_C$.  By \cref{lemma_bohr_descriptions_via_cancel_quotient}, $A$ is a $\dcthickbohr$ subset of $S$, as desired.
-\end{proof}
-
 \section{RP is an EQ relation}
 \label{sec_RP}
 
@@ -1885,7 +2755,7 @@ Let $S$ be a commutative semigroup and $X$ be an $S$-system.  For $s, t \in S$, 
 \begin{lemma}[Action of $S^2$ on $X^3$]
     The map $S^2 \times X^3 \to X^3$ given by
     \[(s,t)(x,y,z) = T_{L,s}T_{R,t}(x,y,z) = (sx,sty,tz)\]
-    makes $X^3$ an $S^2$ system.
+    makes $X^3$ an $S^2$-system.
 \end{lemma}
 
 \begin{proof}
@@ -2165,7 +3035,7 @@ Contains:
 
 \begin{theorem}
 \label{thm_bfw_dual_abelian}
-    In a commutative, cancellative semigroup $S$,
+    In a commutative semigroup $S$,
     \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0 = \syndetic \classcapdual \dcthickbohr.\]
 \end{theorem}
 
@@ -2408,7 +3278,7 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 
 \begin{theorem}
 \label{thm_dcthickbohr_is_delta_for_rxu}
-    Let $G$ be a commutative, cancellative semigroup, and let $B \subseteq G$ be CRTURP.  If $B \in \dcthickbohr$, then for all thick $H \subseteq G$, the set $R(x,U) \cap H \in \Delta$.
+    Let $G$ be a commutative semigroup, and let $B \subseteq G$ be CRTURP.  If $B \in \dcthickbohr$, then for all thick $H \subseteq G$, the set $R(x,U) \cap H \in \Delta$.
 \end{theorem}
 
 \begin{proof}
@@ -2428,7 +3298,7 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 \begin{proof}[Proof of \cref{thm_bfw_dual_abelian}]
     That
     \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr.\]
-    follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{{thm_delta_zero_set_of_bohr_rec_no_cancel}}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
+    follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \syndetic \classcapdual \Delta.\]
     According to \cref{thm_lspwf_upgrade}, it suffices to show this inclusion for CRTURP sets.  Let $B \in \syndetic \classcapdual \dcthickbohr$ be a CRTURP set.  From \cref{thm_classcapdual_contained_in_intersection}, we have that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \dcthickbohr,\]
@@ -2442,4 +3312,27 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 
 \begin{proof}
     \dgg{Apply the algebra.}
+\end{proof}
+
+
+\section{End notes}
+
+\subsection{Other potentially interesting applications}
+
+\begin{corollary}
+    \[\thick \classcap (\syndetic \classcapdual \IP) = \central\]
+    and
+    \[\syndetic \classcapdual \IP = \syndetic \classcapdual \central\]
+\end{corollary}
+
+\begin{proof}
+    Note that
+    \[\thick \classcap (\syndetic \classcapdual \IP) \supseteq \central\]
+    follows from $\central = \thick \classcap \dcsyndetic$.  To see the reverse containment, we need only to check the conditions in \cref{thm_lspwf_upgrade}.  Suppose $R(x,U) \cap H$ is an IP set.  Let $p$ be an idempotent filter containing $R(x,U) \cap H$.  The point $T^p x$ is in $U$ (remember: $U$ is clopen), uniformly recurrent, and is proximal to $x$ along $H$.  Therefore, the set $R(x,U) \cap H$ is central.
+
+    Note that it is a general fact that $\family^* \classcap (\family \classcapdual \familytwo) \subseteq \familythree$ if and only if $\family \classcapdual \familytwo \subseteq \family \classcapdual \familythree$.  Therefore,
+    \[\syndetic \classcapdual \IP \subseteq \syndetic \classcapdual \central,\]
+    is equivalent to 
+    \[\thick \classcap (\syndetic \classcapdual \IP) \subseteq \central,\]
+    which was shown above.  The reverse containment is immediate.
 \end{proof}

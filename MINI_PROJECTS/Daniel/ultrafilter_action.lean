@@ -173,7 +173,7 @@ by
   exact Continuous.ext_on denseRange_pure lhs_continuous rhs_continuous equal_on_dense
 
 -- This is a technical lemma needed in the proof of ultra_technical_equality_cor
-theorem ultra_technical_equality {S} [Semigroup S] {X} [TopologicalSpace X]
+lemma ultra_technical_equality {S} [Semigroup S] {X} [TopologicalSpace X]
 [CompactSpace X] [T2Space X] (f : S → X) (q : Ultrafilter S) :
 Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (S_left_mult s)) q) =
 (Ultrafilter.extend f) ∘ (ultra_right_mult q) := by
