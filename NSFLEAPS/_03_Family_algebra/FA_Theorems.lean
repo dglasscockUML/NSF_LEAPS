@@ -108,7 +108,9 @@ theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
   (h : ∀ F, dual (dual F) = F) : Function.Bijective dual :=
   by sorry
 
-theorem thm_dual_is_antitone (F G : Family α) : F.sets ⊆ G.sets → (F*).sets ⊆ (G*).sets :=
+-- theorem thm_dual_is_antitone (F G : Family α) : F.sets ⊆ G.sets → (F*).sets ⊆ (G*).sets :=
+--  by sorry
+theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
  by sorry
 -- need to define what a subset of Fam is
 

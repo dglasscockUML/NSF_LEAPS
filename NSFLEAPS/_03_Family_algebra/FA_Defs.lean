@@ -35,6 +35,17 @@ structure Family (α : Type) where
   sets : Set (Set α)
   upward_closed : upwardClosed sets
 
+-- instance {α} : Coe (Family α) (Set (Set α)) where
+--   coe F := F.sets
+instance {α} : SetLike (Family α) (Set α) where
+  coe F := F.sets
+  coe_injective' := by
+    intro F G h
+    cases F; cases G; cases h; rfl
+
+instance {α} : HasSubset (Family α) where
+  Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
+
 def isIntersectionClosed (F : Set (Set α)) : Prop :=
   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
 
