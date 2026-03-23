@@ -32,6 +32,7 @@ Here's a result we use several times that we'll need ready access to in Lean.
 \begin{lemma}
 \label{lemma_image_closure_equals_closure_image}
  \lean{imageClosureIsClosureImage}
+ \leanok{}
     Let $f: X \to Y$ be a continuous map of compact Hausdorff spaces.  For all $A \subseteq X$, $\overline{fA} = f \overline{A}$.
 \end{lemma}
 
@@ -92,6 +93,7 @@ We can make our definitions in the appropriate generality by making them for uni
 \begin{lemma}
     \label{lemma_entourage_regularity_at_a_point}
     \lean{openClosureProductInEntourage}
+    \leanok{}
     Let $X$ be a uniform space, $x \in X$, and $\alpha \subseteq X^2$ be an entourage.  There exists an open set $U \ni x$ such that $\overline{U} \times \overline{U} \subseteq \alpha$.
 \end{lemma}
 
@@ -108,8 +110,9 @@ We can make our definitions in the appropriate generality by making them for uni
 
 
 \begin{lemma}[Substitute for semiopenness of a factor map]
-\label{lemma_image_of_entourage_somewhere_dense_along_diagonal}
-\lean{openProductInEntourageImage}
+    \label{lemma_image_of_entourage_somewhere_dense_along_diagonal}
+    \lean{openProductInEntourageImage}
+    \leanok{}
     Let $\pi: X \to Y$ be a surjection of compact Hausdorff spaces. For all entourages $\alpha \subseteq X^2$, there exists a non-empty, open set $V \subseteq Y$ such that
     \[V \times V \subseteq (\pi \otimes \pi) \alpha.\]
 \end{lemma}
@@ -160,7 +163,8 @@ Contains:
 
 \begin{lemma}
     \label{lemma_intersection_of_ideals_is_ideal}
-    \lean{intersectionOfLeftIdealsIsLeftIdeal}
+    \lean{nonemptyInterOfLeftIdealsIsLeftIdeal}
+    \leanok{}
     Let $S$ be a semigroup, and let $L_i$ be a collection of left ideals of $S$.  The intersection $\bigcap_i L_i$, if non-empty, is a left ideal of $S$.
 \end{lemma}
 
@@ -171,10 +175,14 @@ Contains:
 \end{proof}
 
 \begin{definition}[{Minimal left ideal, \cite[Def. 1.27]{hindman_strauss_book_2012}}]
+    \lean{isMinLeftIdeal}
+    \leanok{}
     A minimal left ideal of semigroup $S$ is a left ideal $L$ with the property that for all left ideals $J \subseteq S$ with $J \subseteq L$, $J = L$.  (That is, $L$ is a minimal element by containment amongst left ideals.)
 \end{definition}
 
 \begin{definition}[Idempotent]
+    \lean{IsIdempotentElem}
+    \mathlibok{}
     An element $s$ of a semigroup $S$ is idempotent if $ss = s$.
 \end{definition}
 
@@ -519,14 +527,14 @@ In the following list, each statement is equivalent to the one that follows it.
     \end{enumerate}
 \end{proof}
 
+\begin{leanrmk}
+    In lean: \verb|Function.Involutive|
+\end{leanrmk}
+
 \begin{theorem}
     \label{thm_dual_is_involution_on_fams}
     $*$ is an involution on the set families: $(\family^*)^* = \family$
 \end{theorem}
-
-\begin{lean}
-    In lean: \verb|Function.Involutive|
-\end{lean}
 
 \begin{proof}
     By \cref{thm_dual_of_fam_is_fam}, it suffices to show that for all $\family \in \families{S}$, $(\family^*)^* = \family$.
@@ -548,14 +556,14 @@ In the following list, each statement is equivalent to the one that follows it.
     \end{enumerate}
 \end{proof}
 
+\begin{leanrmk}
+    In lean: \verb|Function.Bijective|
+\end{leanrmk}
+
 \begin{theorem}
     \label{thm_dual_is_bijection_on_fams}
     $\cdot^*: \families{S} \to \families{S}$ is a bijection
 \end{theorem}
-
-\begin{lean}
-    In lean: \verb|Function.Bijective|
-\end{lean}
 
 \begin{proof}
     This follows from \cref{thm_dual_is_involution_on_fams} and the general fact that involutions are always bijective.  \dgg{Can we find this general fact in the lean library?}
@@ -569,9 +577,9 @@ In the following list, each statement is equivalent to the one that follows it.
     For all collections $\family, \familytwo \in \collections{S}$, if $\family \subseteq \familytwo$, then $\familytwo^* \subseteq \family^*$.
 \end{theorem}
 
-\begin{lean}
+\begin{leanrmk}
     In Mathlib.Order.Monotone, see \verb|Antitone (f : a → b)|
-\end{lean}
+\end{leanrmk}
 
 \begin{proof}
     Let $\family, \familytwo \in \collections{S}$. In the following list, each statement implies the following one.
@@ -641,14 +649,14 @@ In the following list, each statement is equivalent to the one that follows it.
     \end{enumerate}
 \end{proof}
 
-\begin{theorem}
-\label{thm_family_equal_to_dual_iff_ultrafilter}
-    $\family = \family^*$ if and only if $\family$ is an ultrafilter family
-\end{theorem}
+% \begin{theorem}
+% \label{thm_family_equal_to_dual_iff_ultrafilter}
+%     $\family = \family^*$ if and only if $\family$ is an ultrafilter family
+% \end{theorem}
 
-\begin{proof}
-    \dgg{Wait on this.}
-\end{proof}
+% \begin{proof}
+%     \dgg{Wait on this.}
+% \end{proof}
 
 \begin{theorem}[Set DeMorgan 1]
     \label{thm_de_morgan_union_v1}
@@ -988,6 +996,16 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
     as desired.
 \end{proof}
 
+\begin{theorem}
+\label{thm_combo_algebra_statement_one}
+    For all families (collections?) $\family, \familytwo, \familythree$,
+    \[\familythree^* \subseteq \family \classcapdual (\family^* \classcap \familytwo^*) \text{ if and only if } \family \classcapdual \familytwo \subseteq \family \classcapdual \familythree.\]
+\end{theorem}
+
+\begin{proof}
+    TBD
+\end{proof}
+
 \subsection{Loading zone: still considering}
 
 \dgg{This is a pool of potential results.  These can be safely ignored for now.}
@@ -1084,42 +1102,37 @@ Semigroup algebra operations
 
 The following list of facts were useful for us in a previous paper.  It would be great to 1) extend the definitions and notation to arbitrary semigroups, 2) formally verify these facts.  I can't honestly say, however, that we would have a great application for any of these facts in this paper.
 
-\begin{lemma}
-    \label{lemma_filter_algebra}
-    \label{lemma_fam_dual_sums}
-    \label{lemma_filter_sums_containment}
-    Let $n \in \N$, $A, B \subseteq \N$, and $\family, \familytwo, \family_1, \family_2, \familytwo_1, \familytwo_2$ be families.
-    \begin{enumerate}
-        \item
-        \label{item_family_prop_zero}
-        If $\family$ and $\familytwo$ are proper, then $\family + \familytwo$ is proper.
-        
-        \item
-        \label{item_family_prop_one_new}
-        $(A - \family) \cap (B - \familytwo) \subseteq (A \cap B) - (\family \classcap \familytwo)$, with equality if $\family = \familytwo$ is a filter.
+Let $n \in \N$, $A, B \subseteq \N$, and $\family, \familytwo, \family_1, \family_2, \familytwo_1, \familytwo_2$ be families.
+\begin{enumerate}
+    \item
+    \label{item_family_prop_zero}
+    If $\family$ and $\familytwo$ are proper, then $\family + \familytwo$ is proper.
+    
+    \item
+    \label{item_family_prop_one_new}
+    $(A - \family) \cap (B - \familytwo) \subseteq (A \cap B) - (\family \classcap \familytwo)$, with equality if $\family = \familytwo$ is a filter.
 
-        \item \label{item_family_prop_two}
-        If $\family$ and $\familytwo$ are filters, then $\family + \familytwo$ is a filter.
+    \item \label{item_family_prop_two}
+    If $\family$ and $\familytwo$ are filters, then $\family + \familytwo$ is a filter.
 
-        \item \label{item_family_prop_three}
-        $(A -n) - \family = (A - \family) - n$.
+    \item \label{item_family_prop_three}
+    $(A -n) - \family = (A - \family) - n$.
 
-        \item \label{item_family_prop_four}
-        $A - (\family + \familytwo) = (A - \familytwo) - \family$.
+    \item \label{item_family_prop_four}
+    $A - (\family + \familytwo) = (A - \familytwo) - \family$.
 
-        \item \label{item_family_diff_containment}
-        If $\family \subseteq \familytwo$, then $A - \family \subseteq A - \familytwo$.
-        
-        \item \label{item_filter_sums_containment}
-        If $\family_1 \subseteq \familytwo_1$ and $\family_2 \subseteq \familytwo_2$, then $\family_1 + \family_2 \subseteq \familytwo_1 + \familytwo_2$.
+    \item \label{item_family_diff_containment}
+    If $\family \subseteq \familytwo$, then $A - \family \subseteq A - \familytwo$.
+    
+    \item \label{item_filter_sums_containment}
+    If $\family_1 \subseteq \familytwo_1$ and $\family_2 \subseteq \familytwo_2$, then $\family_1 + \family_2 \subseteq \familytwo_1 + \familytwo_2$.
 
-        \item \label{item_sum_dual}
-        $(\family + \familytwo)^* = \family^* + \familytwo^*$.
+    \item \label{item_sum_dual}
+    $(\family + \familytwo)^* = \family^* + \familytwo^*$.
 
-        \item \label{item_cap_sums}
-        $(\family_1 + \family_2) \classcap (\familytwo_1 + \familytwo_2) \subseteq (\family_1 \classcap \familytwo_1) + (\family_2 \classcap \familytwo_2)$.
-    \end{enumerate}
-\end{lemma}
+    \item \label{item_cap_sums}
+    $(\family_1 + \family_2) \classcap (\familytwo_1 + \familytwo_2) \subseteq (\family_1 \classcap \familytwo_1) + (\family_2 \classcap \familytwo_2)$.
+\end{enumerate}
 
 
 
@@ -1155,12 +1168,14 @@ Contains:
 
 \begin{definition}[Semigroup action]
 \lean{SemigroupAction}
+\leanok{}
 Let $S$ be a semigroup and $X$ be a set.  An action of $S$ on $X$ is a map $f: S \to X \to X$ such that for all $s, t \in S$,
 \[(f s) \circ (f t) = f (s*t).\]
 \end{definition}
 
 \begin{definition}[Topological dynamical system]
 \lean{DynamicalSystem}
+\leanok{}
     Let $S$ be a non-empty semigroup and $X$ be a non-empty, compact Hausdorff space. An \emph{$S$-system} is an action of $S$ on $X$ such that for all $s \in S$, $f s$ is continuous.
 \end{definition}
 
@@ -1175,13 +1190,28 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
     \item $GU$ to denote the set $\{gx \mid g \in G, \ x \in U\}$.
 \end{enumerate}
 
-\begin{definition}[Orbit and orbit closure]
+\begin{definition}[Orbit]
 \lean{DS.orbit}
+\leanok{}
     Let $X$ be an $S$-system and $x \in X$.  The $S$-orbit of $x$ is $Sx$.  The $S$-orbit closure of $x$ is $\overline{Sx}$.
 \end{definition}
 
+\begin{definition}[Orbit closure]
+\lean{orbitClosure}
+\leanok{}
+    Let $X$ be an $S$-system and $x \in X$.  The $S$-orbit closure of $x$ is $\overline{Sx}$.
+\end{definition}
+
 \begin{definition}[Diagonal action]
+\lean{diagSemigroupAction}
+\leanok{}
     Let $X$ be a $S$-system.  The \emph{diagonal action} of $S$ on $X^2$ is $s(x,x) = (sx,sx)$.  This makes $X^2$ into a $S$-system.
+\end{definition}
+
+\begin{definition}[Diagonal system]
+\lean{diagDynamicalSystem}
+\leanok{}
+    Let $X$ be a $S$-system.  The \emph{diagonal action} of $S$ on $X^2$ is $s(x,x) = (sx,sx)$ makes $X^2$ into a $S$-system.
 \end{definition}
 
 \begin{definition}[Invariant set]
@@ -1209,6 +1239,8 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{theorem}[Orbit closure transitivity]
 \label{theorem_orbit_closure_transitivity}
+\lean{orbitTransitivity}
+\leanok{}
     Let $X$ be an $S$-system and $x,y,z \in X$. If $y \in \overline{Sx}$ and $z \in \overline{Sy}$, then $z \in \overline{Sx}$.
 \end{theorem}
 
@@ -1217,6 +1249,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \end{leanrmk}
 
 \begin{proof}
+\leanok{}
     Let $U \ni z$.  Since $z \in \overline{Sy}$, $U \cap Sy \neq \emptyset$, so there exists $s \in S$ such that $y \in s^{-1}U$.  Since $y \in \overline{Sx}$ and $s^{-1}U$ is open, $s^{-1} U \cap Sx \neq \emptyset$.  Thus, there exists $t \in S$ such that $tx \in s^{-1} U$.  Therefore, $stx \in U$, and so $U \cap Sx \neq \emptyset$.  Since $U$ was arbitrary, we get that $z \in \overline{Sx}$, as was to be shown.
 \end{proof}
 
@@ -1345,21 +1378,21 @@ The following lemma describes the bijection between factors of a given system an
     \end{enumerate}
 \end{proof}
 
-\begin{lemma}[Return time algebra 2]
-\label{lemma_return_time_algebra_two}
-    Suppose $G$ is a semigroup.  Let $X$ be a $G$-system, $x \in X$, $U \subseteq X$, and $g \in G$.
-    \[R(gx,U) = R(x,U)g^{-1}.\]
-\end{lemma}
+% \begin{lemma}[Return time algebra 2]
+% \label{lemma_return_time_algebra_two}
+%     Suppose $G$ is a semigroup.  Let $X$ be a $G$-system, $x \in X$, $U \subseteq X$, and $g \in G$.
+%     \[R(gx,U) = R(x,U)g^{-1}.\]
+% \end{lemma}
 
-\begin{proof}
-    Each line is equivalent to the one that follows it.
-    \begin{enumerate}
-        \item $h \in R(gx, U)$
-        \item $hgx \in U$
-        \item $hg\in R(x,U)$
-        \item $h \in R(x,U)g^{-1}$
-    \end{enumerate}
-\end{proof}
+% \begin{proof}
+%     Each line is equivalent to the one that follows it.
+%     \begin{enumerate}
+%         \item $h \in R(gx, U)$
+%         \item $hgx \in U$
+%         \item $hg\in R(x,U)$
+%         \item $h \in R(x,U)g^{-1}$
+%     \end{enumerate}
+% \end{proof}
 
 \begin{lemma}[Return time algebra 3]
 \label{lemma_return_time_algebra_three}
@@ -2008,7 +2041,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \end{lemma}
 
 \begin{proof}
-    Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is compact since $S$ is Hausdorff.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
+    Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is non-empty and compact since $S$ is Hausdorff, and which is an ideal by \cref{lemma_intersection_of_ideals_is_ideal}.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
 \end{proof}
 
 \begin{theorem}
@@ -2518,16 +2551,16 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     Easy from definitions.
 \end{proof}
 
-\begin{lemma}
-    \label{lemma_preimage_of_syndetic}
-    If $\varphi: G \to H$ is a surjective semigroup homomorphism and $A \subseteq H$ is syndetic in $H$, then $\varphi^{-1} A$ is syndetic in $G$.
-\end{lemma}
+% \begin{lemma}
+%     \label{lemma_preimage_of_syndetic}
+%     If $\varphi: G \to H$ is a surjective semigroup homomorphism and $A \subseteq H$ is syndetic in $H$, then $\varphi^{-1} A$ is syndetic in $G$.
+% \end{lemma}
 
-\begin{proof}[Proof sketch]
-    Write $H = \cup_{f \in F} f^{-1} A$.  Then
-    \[G = \varphi^{-1} H = \cup_{f \in F} \varphi^{-1} f^{-1} A = \cup_{b \in B} b^{-1} \varphi^{-1} A,\]
-    where $B \subseteq G$ is finite and $\varphi B = F$.  Thus, $\varphi^{-1} A$ is syndetic.
-\end{proof}
+% \begin{proof}[Proof sketch]
+%     Write $H = \cup_{f \in F} f^{-1} A$.  Then
+%     \[G = \varphi^{-1} H = \cup_{f \in F} \varphi^{-1} f^{-1} A = \cup_{b \in B} b^{-1} \varphi^{-1} A,\]
+%     where $B \subseteq G$ is finite and $\varphi B = F$.  Thus, $\varphi^{-1} A$ is syndetic.
+% \end{proof}
 
 \begin{lemma}
     \label{lemma_image_of_syndetic}
@@ -2641,15 +2674,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     This is immediate from the definitions.
 \end{proof}
 
-\begin{lemma}
-    \label{lemma_hom_image_of_delta_zero}
-    Let $\varphi: S \to T$ be a homomorphism of semigroups.  If $A \subseteq S$ is a $\Delta_0$ set, then $\varphi A$ is a $\Delta_0$ set.
-\end{lemma}
-
-\begin{proof}
-    Let $N \in \N$. Since $A$ is a $\Delta_0$ set, there exists $s_1, \ldots, s_N \in S$ such that $s_n \in s_m A$ for $n > m$.  Applying $\varphi$, we see that $\varphi s_1, \varphi s_2, \ldots, \varphi s_N$ are such that $\varphi s_n \in \varphi s_m \varphi A$ for $n > m$, as desired.
-\end{proof}
-
 \subsection{Bohr sets}
 
 \dgg{In the definition below, we require the system to be minimal.  We can drop that assumption if all points are uniformly recurrent for an equicontinuous semigroup action.  This is true for group actions, but may not be true any longer for semigroup actions.}
@@ -2696,9 +2720,6 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     \label{thm_delta_zero_set_of_bohr_rec}
     For $S$ a commutative semigroup, $\Delta_0 \subseteq \dcthickbohr$.
 \end{theorem}
-\begin{remark}
-The proof would be a straight-forward application of the pigeonhole principle if $S$ were a group and the phase spaces of the systems we consider were metrizable. In the general setting we are in, without access to inverses in $S$ and even not assuming cancellativity of $S$, more work is required before the pigeonhole principle is applied.
-\end{remark}
 
 \begin{proof}
     Suppose $A \in \Delta_0$ and we want to show that $A \cap R(x,U) \neq \emptyset$, where $X$ is a minimal, equicontinuous $S$-system, $x \in U \subseteq X$.  Since $X$ is compact, Hausdorff, it has a unique uniform structure.  Thus, there exists an entourage $\beta \subseteq X^2$ such that $\beta[x] \subseteq U$.  By equicontinuity, there exists an entourage $\alpha \subseteq X^2$ such that for all $s \in S$, $(s \otimes s) \alpha \subseteq \beta$.
@@ -2726,6 +2747,10 @@ The proof would be a straight-forward application of the pigeonhole principle if
     \]
     whereby $a x \in \beta[x]$. Since $\beta[x] \subseteq U$, we have $a \in R(x,U)$.  Note that $a \in A$ and so $A \cap R(x,U) \neq \emptyset$, as was to be shown.
 \end{proof}
+
+\begin{remark}
+The proof would be a straight-forward application of the pigeonhole principle if $S$ were a group and the phase spaces of the systems we consider were metrizable. In the general setting we are in, without access to inverses in $S$ and even not assuming cancellativity of $S$, more work is required before the pigeonhole principle is applied.
+\end{remark}
 
 
 \section{RP is an EQ relation}
@@ -3033,15 +3058,6 @@ Contains:
     \item This is the main application: $\syndetic \classcapdual \dcthickbohr = \syndetic \classcapdual \Delta$
 \end{itemize}
 
-\begin{theorem}
-\label{thm_bfw_dual_abelian}
-    In a commutative semigroup $S$,
-    \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0 = \syndetic \classcapdual \dcthickbohr.\]
-\end{theorem}
-
-If you only care about the combinatorics, the following is a weaker, but purely combinatorial and still highly-nontrivial-looking consequence:
-\[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0.\]
-
 
 \subsection{Reduction to dynamically syndetic sets}
 
@@ -3295,7 +3311,16 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 
 \subsection{Proof of \cref{thm_bfw_dual_abelian} and some corollaries}
 
-\begin{proof}[Proof of \cref{thm_bfw_dual_abelian}]
+If you only care about the combinatorics, the following is a weaker, but purely combinatorial and still highly-nontrivial-looking consequence:
+\[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0.\]
+
+\begin{theorem}
+\label{thm_bfw_dual_abelian}
+    In a commutative semigroup $S$,
+    \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0 = \syndetic \classcapdual \dcthickbohr.\]
+\end{theorem}
+
+\begin{proof}
     That
     \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr.\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
@@ -3306,33 +3331,13 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 \end{proof}
 
 \begin{theorem}
+\label{thm_delta_star_locally_bohr}
     Let $S$ be a commutative semigroup. Delta star sets are locally Bohr.  Actually:
     \[\Delta^* \subseteq \syndetic \classcapdual (\thick \classcap \dcsyndeticbohr).\]
 \end{theorem}
 
 \begin{proof}
-    \dgg{Apply the algebra.}
-\end{proof}
-
-
-\section{End notes}
-
-\subsection{Other potentially interesting applications}
-
-\begin{corollary}
-    \[\thick \classcap (\syndetic \classcapdual \IP) = \central\]
-    and
-    \[\syndetic \classcapdual \IP = \syndetic \classcapdual \central\]
-\end{corollary}
-
-\begin{proof}
-    Note that
-    \[\thick \classcap (\syndetic \classcapdual \IP) \supseteq \central\]
-    follows from $\central = \thick \classcap \dcsyndetic$.  To see the reverse containment, we need only to check the conditions in \cref{thm_lspwf_upgrade}.  Suppose $R(x,U) \cap H$ is an IP set.  Let $p$ be an idempotent filter containing $R(x,U) \cap H$.  The point $T^p x$ is in $U$ (remember: $U$ is clopen), uniformly recurrent, and is proximal to $x$ along $H$.  Therefore, the set $R(x,U) \cap H$ is central.
-
-    Note that it is a general fact that $\family^* \classcap (\family \classcapdual \familytwo) \subseteq \familythree$ if and only if $\family \classcapdual \familytwo \subseteq \family \classcapdual \familythree$.  Therefore,
-    \[\syndetic \classcapdual \IP \subseteq \syndetic \classcapdual \central,\]
-    is equivalent to 
-    \[\thick \classcap (\syndetic \classcapdual \IP) \subseteq \central,\]
-    which was shown above.  The reverse containment is immediate.
+    From \cref{thm_bfw_dual_abelian}, we have that
+    \[\syndetic \classcapdual \dcthickbohr \subseteq \syndetic \classcapdual \Delta.\]
+    Since $\syndetic^* = \thick$ (\cref{lemma_synd_thick_dual}) and $\dcthickbohr^* = \dcsyndeticbohr$ (\cref{lemma_dcsyndeticbohr_dcthickbohr_dual}), we have the conclusion from \cref{thm_combo_algebra_statement_one}.
 \end{proof}
