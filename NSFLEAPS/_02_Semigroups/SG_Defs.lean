@@ -1,5 +1,7 @@
 import NSFLEAPS._00_Imports.IM_Base
 
+-- We may want to assume [Nonempty S] throughout, but I've not implemented that yet.
+
 structure SemigroupLeftIdeal (S) [Semigroup S] where
   carrier : Set S
   nonempty' : carrier.Nonempty
