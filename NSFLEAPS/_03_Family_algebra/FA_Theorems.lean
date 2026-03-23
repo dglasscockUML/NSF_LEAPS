@@ -126,7 +126,7 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by sorry
 
 --thm_de_morgan_union_v2
-theorem thm_de_morgan_union_v2 (F G : Family α) : (F.sets ∪ G.sets)* = ((F*).sets ∩ (G*).sets) :=
+theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
  by sorry
 
 --thm_de_morgan_v1_dual
@@ -147,7 +147,7 @@ theorem thm_classcap_associative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F �
   by sorry
 
 --thm_classcap_monotone
-theorem thm_classcap_monotone (F G H : Family α) : F.sets ⊆ G.sets → (F ⋎ H).sets ⊆ (G ⋎ H).sets :=
+theorem thm_classcap_monotone (F G H : Family α) : F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   by sorry
 
 --thm_family_classcap_dual_is_partition_regular
@@ -161,7 +161,7 @@ theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoS
  -- by sorry
 
 --thm_classcapdual_contained_in_intersection
-theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G).sets ⊆ F.sets ∩ G.sets :=
+theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G) ⊆ (F ∩ G) :=
   by sorry
 -- need to define what a subset of Fam is
 
@@ -174,7 +174,7 @@ theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = (
   by sorry
 
 --thm_classcapdual_monotone
-theorem thm_classcapdual_monotone (F G H : Family α) : F.sets ⊆ G.sets → (F ⋏ H).sets ⊆ (G ⋏ H).sets :=
+theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by sorry
 --thm_family_classcapdual_dual_is_filter
 --theorem thm_family_classcapdual_dual_is_filter (F : Family α) : FilterFamily (F ⋏ F*) :=

@@ -46,6 +46,15 @@ instance {α} : SetLike (Family α) (Set α) where
 instance {α} : HasSubset (Family α) where
   Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
 
+instance {α} : Inter (Family α) where
+  inter F G := ⟨(F : Set (Set α)) ∩ (G : Set (Set α)), by --subset is all F also in G
+    sorry
+  ⟩
+
+instance {α} : Union (Family α) where
+  union F G := ⟨(F : Set (Set α)) ∪ (G : Set (Set α)), by sorry⟩
+
+
 def isIntersectionClosed (F : Set (Set α)) : Prop :=
   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
 
