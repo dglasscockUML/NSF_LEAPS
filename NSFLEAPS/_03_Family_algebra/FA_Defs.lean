@@ -47,12 +47,17 @@ instance {α} : HasSubset (Family α) where
   Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
 
 instance {α} : Inter (Family α) where
-  inter F G := ⟨(F : Set (Set α)) ∩ (G : Set (Set α)), by --subset is all F also in G
-    sorry
-  ⟩
+  inter F G := ⟨(F : Set (Set α)) ∩ (G : Set (Set α)), by
+    intro A B hA hAB
+    obtain ⟨hAF, hAG⟩ := hA
+    exact ⟨F.upward_closed A B hAF hAB, G.upward_closed A B hAG hAB⟩⟩
 
 instance {α} : Union (Family α) where
-  union F G := ⟨(F : Set (Set α)) ∪ (G : Set (Set α)), by sorry⟩
+  union F G := ⟨(F : Set (Set α)) ∪ (G : Set (Set α)), by
+    intro A B hA hAB
+    obtain hAF | hAG := hA
+    · exact Or.inl (F.upward_closed A B hAF hAB)
+    · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
 
 def isIntersectionClosed (F : Set (Set α)) : Prop :=
