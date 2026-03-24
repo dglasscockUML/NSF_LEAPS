@@ -41,3 +41,17 @@ theorem nonemptyInterOfLeftIdealsIsLeftIdeal {S} [Semigroup S]
 /-- isMinLeftIdeal is the predicate that `L` is a minimal left ideal of a semigroup `S` -/
 def isMinLeftIdeal {S} [Semigroup S] (L : Set S) : Prop :=
 isLeftIdeal L ∧ (∀ (M : Set S), isLeftIdeal M → M ⊆ L → M = L)
+
+
+
+/- Definition of syndetic from Hindman-Strauss, Def. 4.38
+Why I used finite sets instead of finsets:
+Building a finset requires a proof of dupliates, which is annoying
+We don't care about possible duplicates, so finite sets are enough -/
+
+/-- A subset A of a semigroup S is syndetic if there is a finite subset F of S such that
+every element of S can be multiplied on the left by F to land in A -/
+def isSyndetic
+{S : Type*} [Semigroup S] (A : Set S) :
+Prop :=
+∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
