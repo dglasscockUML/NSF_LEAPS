@@ -203,11 +203,46 @@ def DS.setReturnTimeSet (S) [Semigroup S] [Nonempty S]
 {X} [Nonempty X] {sAction : SemigroupAction S X}
 (U V : Set X) : Set S := {s : S | (((sAction.toFun s) '' U) ∩ V).Nonempty}
 
+/-- The set of times `s ∈ S` for which the point `x ∈ X` visits the set
+`s^{-1} U` is `s^{-1} R(x,U)` -/
 theorem DS.visitsToPreimages {S} [Semigroup S] [Nonempty S]
 {X} [Nonempty X] {sAction : SemigroupAction S X}
 (x : X) (U : Set X) (s : S) :
 (s * ·) ⁻¹' (DS.returnTimeSet S x U (sAction := sAction)) =
 DS.returnTimeSet S x ((sAction.toFun s) ⁻¹' U) (sAction := sAction) :=
+by sorry
+
+/-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal to `R(x,V) R(x,U)^{-1}` -/
+theorem DS.setVisitsAsQuotientSet {S} [Semigroup S] [Nonempty S]
+{X} [Nonempty X] {sAction : SemigroupAction S X}
+(x : X) (U V : Set X) :
+DS.setReturnTimeSet S U V (sAction := sAction) =
+⋃ s ∈ DS.returnTimeSet S x U (sAction := sAction),
+((· * s) ⁻¹' (DS.returnTimeSet S x V (sAction := sAction))) :=
+by sorry
+
+/-- The set `R(x,∩_i U_i)` is equal to `∩_i R(x,U_i)` -/
+theorem DS.visitToInter {S} [Semigroup S] [Nonempty S]
+{X} [Nonempty X] {sAction : SemigroupAction S X}
+(x : X) {I} (f : I → Set X) :
+DS.returnTimeSet S x (⋂ i : I, f i) (sAction := sAction) =
+⋂ i : I, (DS.returnTimeSet S x (f i) (sAction := sAction)) :=
+by sorry
+
+/-- The set `R(x,∪_i U_i)` is equal to `∪_i R(x,U_i)` -/
+theorem DS.visitToUnion {S} [Semigroup S] [Nonempty S]
+{X} [Nonempty X] {sAction : SemigroupAction S X}
+(x : X) {I} (f : I → Set X) :
+DS.returnTimeSet S x (⋃ i : I, f i) (sAction := sAction) =
+⋃ i : I, (DS.returnTimeSet S x (f i) (sAction := sAction)) :=
+by sorry
+
+/-- Given `U1 ⊆ U2`, `R(x,U1) ⊆ R(x,U2)` -/
+theorem DS.visitTimesMono {S} [Semigroup S] [Nonempty S]
+{X} [Nonempty X] {sAction : SemigroupAction S X}
+{x : X} {U1 U2 : Set X} (hMono : U1 ⊆ U2) :
+DS.returnTimeSet S x U1 (sAction := sAction) ⊆
+DS.returnTimeSet S x U2 (sAction := sAction) :=
 by sorry
 
 end Return_time_sets

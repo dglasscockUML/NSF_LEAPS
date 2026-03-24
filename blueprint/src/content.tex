@@ -24,6 +24,8 @@ Contains:
         \item \verb|IsClosed.isCompact|: a closed subset of a compact space is compact
 
         \item \verb|IsCompact.isClosed|: in a Hausdorff space, a compact set is closed
+
+        \item \verb|isClosed_closure|: the closure of a set is closed
     \end{itemize}
 \end{leanrmk}
 
@@ -170,7 +172,7 @@ Contains:
 \end{lemma}
 
 \begin{proof}
-    \leanok{}
+\leanok{}
     Suppose $\bigcap_i L_i$ is non-empty.  We need only show that for all $s \in S$, $s\bigcap_i L_i \subseteq \bigcap_i L_i$.  Let $i \in I$.  Since $L_i$ is a left ideal,
     \[s \bigcap_i L_i \subseteq s L_i \subseteq L_i,\]
     as desired.
@@ -1161,7 +1163,7 @@ Contains:
     \item Definitions and results concerning topological dynamical systems, the regionally proximal relation, equicontinuity, etc...
 \end{itemize}
 
-\subsection{Intro and defs}
+\subsection{Definitions}
 
 \begin{leanrmk}
     The topological dynamical systems in Mathlib are called Flows.  See \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}.  A flow is an action of a topological monoid on a topological space by continuous maps.  Since we care only about discrete semigroups (monoids), we are likely better off defining our own class of topological dynamical systems.  We may still find it useful to use the notion of invariance, here: \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}
@@ -1229,8 +1231,10 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
     Let $X$ be a $S$-system.  The \emph{diagonal action} of $S$ on $X^2$ is $s(x,x) = (sx,sx)$ makes $X^2$ into a $S$-system.
 \end{definition}
 
+%\dgg{Get this from mathlib already? see \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}}
 \begin{definition}[Invariant set]
-    Let $X$ be a $S$-system.  A set $Y \subseteq X$ is $S$-invariant if for all $g \in S$, $gY \subseteq Y$. \dgg{Get this from mathlib already? see \url{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Dynamics/Flow.html}}
+\leanok{}
+    Let $X$ be a $S$-system.  A set $Y \subseteq X$ is $S$-invariant if for all $g \in S$, $gY \subseteq Y$.
 \end{definition}
 
 \begin{leanrmk}
@@ -1239,6 +1243,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{definition}[Subsystem]
     \label{def_subsystem}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  Let $Z \subseteq X$ be a non-empty, closed, $S$-invariant set.  Then $Z$ is an $S$-system called an \emph{$S$-subsystem} of $X$.
 \end{definition}
 
@@ -1270,6 +1275,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
 \label{lemma_closure_of_inv_is_inv}
+\leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $A \subseteq X$.  If $A$ is $S$-invariant, then $\overline{A}$ is $S$-invariant.
 \end{lemma}
 
@@ -1280,22 +1286,38 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
     \label{lemma_orb_closure_is_invariant}
-    Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The $S$-orbit closure of $x$, $\overline{Sx}$, is an $S$-invariant subset of $X$ and $\overline{Sx}$ is an $S$-system. \dgg{Better?  $\overline{Sx}$ is a subsystem of $X$}
+    \lean{DS.orbClosIsInv}
+    \leanok{}
+    Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The $S$-orbit closure of $x$, $\overline{Sx}$, is an $S$-invariant subset of $X$.
 \end{lemma}
 
 \begin{proof}
 \uses{lemma_closure_of_inv_is_inv}
-    The set $\overline{Sx}$ is closed and hence compact by \verb|IsClosed.isCompact|.  Given the subspace topology, it is Hausdorff (note \verb|instT2SpaceSubtype|).
-
     To see that $\overline{Sx}$ is $S$-invariant, it suffices by \cref{lemma_closure_of_inv_is_inv} to show that $Sx$ is $S$-invariant.  But this is immediate: $sSx = (sS)x \subseteq Sx$.
 \end{proof}
 
 \begin{lemma}
+    \label{lemma_orb_closure_is_subsystem}
+    \lean{DS.orbitClosureIsSubDynamicalSystem}
+    \leanok{}
+    Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The $S$-orbit closure of $x$, $\overline{Sx}$, is an $S$-subsystem of $X$.
+\end{lemma}
+
+\begin{proof}
+\uses{lemma_orb_closure_is_invariant}
+    \leanok{}
+    The set $\overline{Sx}$ is closed and hence compact by \verb|IsClosed.isCompact|.  Given the subspace topology, it is Hausdorff (note \verb|instT2SpaceSubtype|). By \cref{lemma_orb_closure_is_invariant}, the set $\overline{Sx}$ is $S$-invariant.
+\end{proof}
+
+\begin{lemma}
     \label{lemma_intersection_of_invariant}
+    \lean{DS.InterOfInvIsInv}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be a $S$-system.  If $Y_i$, $i \in I$, is a collection of $S$-invariant subsets of $X$, then $\cap_i Y_i$ is $S$-invariant.
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Let $x \in \cap_i Y_i$, $g \in S$, and $j \in I$.  Since $x \in Y_j$ and $Y_j$ is invariant, $gx \in Y_j$, as was to be shown.
 \end{proof}
 
@@ -1364,12 +1386,24 @@ The following lemma describes the bijection between factors of a given system an
 \end{proof}
 
 
-\subsection{Return time sets}
+\subsection{Visit time sets}
 
-\begin{definition}[Return time sets]
-    Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{return time set of $x$ to $U$ and $V$ to $U$} are defined as
+\begin{definition}[Point visit time sets]
+\label{def_point_visit_time_set}
+\lean{DS.returnTimeSet}
+\leanok{}
+    Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{visit time set of $x$ to $U$} is defined as
     \begin{align*}
-        R(x,U) &\defeq \{s \in S \mid sx \in U \}\\
+        R(x,U) &\defeq \{s \in S \mid sx \in U \}.
+    \end{align*}
+\end{definition}
+
+\begin{definition}[Set visit time sets]
+\label{def_set_visit_time_set}
+\lean{DS.setReturnTimeSet}
+\leanok{}
+    Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{visit time set of $V$ to $U$} is defined as
+    \begin{align*}
         R(V,U) &\defeq \{s \in S \mid sV \cap U \neq \emptyset\}.
     \end{align*}
 \end{definition}
@@ -1378,8 +1412,10 @@ The following lemma describes the bijection between factors of a given system an
     Note that $R(x,U)$ is the preimage of $U$ under the map $S \to X$ gotten by fixing $x$.  There is likely a slick way to write this in lean.  Then $R(V,U) = \cup_{x \in V} R(x,U)$.  Most if not all of the algebra involving return-time sets will come down to simple set algebra involving preimages.
 \end{leanrmk}
 
-\begin{lemma}[Return time algebra 1]
+\begin{lemma}[Visits to preimages]
 \label{lemma_return_time_algebra_one}
+\lean{DS.visitsToPreimages}
+\leanok{}
     Suppose $G$ is a semigroup.  Let $X$ be a $G$-system, $x \in X$, $U \subseteq X$, and $g \in G$.
     \[g^{-1}R(x,U) = R(x,g^{-1}U).\]
 \end{lemma}
@@ -1395,7 +1431,7 @@ The following lemma describes the bijection between factors of a given system an
     \end{enumerate}
 \end{proof}
 
-% \begin{lemma}[Return time algebra 2]
+% \begin{lemma}[Visit time algebra 2]
 % \label{lemma_return_time_algebra_two}
 %     Suppose $G$ is a semigroup.  Let $X$ be a $G$-system, $x \in X$, $U \subseteq X$, and $g \in G$.
 %     \[R(gx,U) = R(x,U)g^{-1}.\]
@@ -1411,8 +1447,10 @@ The following lemma describes the bijection between factors of a given system an
 %     \end{enumerate}
 % \end{proof}
 
-\begin{lemma}[Return time algebra 3]
+\begin{lemma}[Set visits as quotient of point visits]
 \label{lemma_return_time_algebra_three}
+\lean{DS.setVisitsAsQuotientSet}
+\leanok{}
     Suppose $S$ is a semigroup, $X$ be a minimal $S$-system, $U, V \subseteq X$, and $x \in X$.
     \[R(x,V)R(x,U)^{-1} = R(U,V).\]
 \end{lemma}
@@ -1439,6 +1477,8 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}
     \label{lemma_return_to_intersection}
+    \lean{DS.visitToInter}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  For all $x \in X$ and $U_1, \ldots, U_k \subseteq X$,
     \[R\left(x, \bigcap_{i=1}^k U_i \right) = \bigcap_{i=1}^k R(x,U_i).\]
 \end{lemma}
@@ -1449,6 +1489,8 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}
     \label{lemma_return_to_union}
+    \lean{DS.visitToUnion}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  For all $x \in X$ and $U_1, \ldots, U_k \subseteq X$,
     \[R\left(x, \bigcup_{i=1}^k U_i \right) = \bigcup_{i=1}^k R(x,U_i).\]
 \end{lemma}
@@ -1459,6 +1501,8 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}[Monotonicty of return-time sets]
 \label{lemma_monotonicity_of_rts}
+\lean{DS.visitTimesMono}
+\leanok{}
 Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
 \[R(x,U_1) \subseteq R(x,U_2).\]
 \end{lemma}
@@ -1467,7 +1511,7 @@ Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
     Immediate from the definitions.
 \end{proof}
 
-\begin{lemma}[Return times for product actions]
+\begin{lemma}[Visit times for product actions]
 \label{lemma_return_time_sets_in_prod_system}
 Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, $y \in Y$, $U \subseteq X$, and $V \subseteq Y$, considering the product system,
 \[R((x,y), U \times V) = R(x, U) \cap R(y,V).\]
@@ -1939,7 +1983,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \end{proof}
     %\dgg{Alt: Suppose $Q$ is an equicontinuous ICER.  By definition, $\pi_Q: (X,T) \to (X/Q,T)$ is equicontinuous.  By \cref{lemma_rp_characterization_of_equicont}, this implies $\RP \subseteq R_{\pi_Q} = Q$.}
 
-\subsection{The equicontinuous structure relation and the Kronecker factor}
+\subsection{The equicontinuous structure relation}
 
 \begin{definition}[{cf. \cite[Ch. V, (1.3)]{devries_book_1993}}]
     Let $S$ be a semigroup and $X$ be an $S$-system.  The \emph{equicontinuous structure relation} on $X$, denoted $\seq(X)$ (or just $\seq$ if $X$ is understood), is the intersection of all equicontinuous ICERS on $X$.  (Note that $X^2$ is always one such ICER, so the intersection is non-empty.)
@@ -2765,7 +2809,7 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \uses{lemma_product_of_equi_is_equi,lemma_subsys_of_equi_is_equi,thm_every_system_has_minimal_subsystem,lemma_minimal_equi_implies_homogeneous,lemma_return_time_sets_in_prod_system}
     Let $A, B \in \dcsyndeticbohr$.  Then $A = R(x,U)$ and $B = R(y,V)$ in minimal equicontinuous $S$-systems $X$ and $Y$.  By \cref{lemma_product_of_equi_is_equi}, the $S$-system $X \times Y$ is equicontinuous.  By \cref{lemma_subsys_of_equi_is_equi}, subsystems of equicontinuous systems are equicontinuous.  So, it suffices to show that the point $(x,y)$ belongs to a minimal subsystem of $X \times Y$.
 
-    By \cref{thm_every_system_has_minimal_subsystem}, there exists an $S$-minimal subsystem $Z \subseteq X \times Y$.  Since $\pi_2 Z = Y$, there exists $(w,y) \in Z$.  By \cref{lemma_minimal_equi_implies_homogeneous}, there exists a factor map $\varphi: X \to X$ such that $\varphi(x) = w$.  Apply $\varphi \otimes \text{Id}$ to $Z$ to get a minimal subsystem of $X \times Y$ containing $(x,y)$. By product system return time algebra (\cref{lemma_return_time_sets_in_prod_system}), $A \cap B = R((x,y), U \times V)$, whereby $A \cap B \in \dcsyndeticbohr$.
+    By \cref{thm_every_system_has_minimal_subsystem}, there exists an $S$-minimal subsystem $Z \subseteq X \times Y$.  Since $\pi_2 Z = Y$, there exists $(w,y) \in Z$.  By \cref{lemma_minimal_equi_implies_homogeneous}, there exists a factor map $\varphi: X \to X$ such that $\varphi(x) = w$.  Apply $\varphi \otimes \text{Id}$ to $Z$ to get a minimal subsystem of $X \times Y$ containing $(x,y)$. By product system visit time algebra (\cref{lemma_return_time_sets_in_prod_system}), $A \cap B = R((x,y), U \times V)$, whereby $A \cap B \in \dcsyndeticbohr$.
 \end{proof}
 
 \begin{lemma}
