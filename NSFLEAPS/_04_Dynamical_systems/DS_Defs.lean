@@ -40,8 +40,10 @@ closure (orbit sAction x)
 /-- Given semigroup actions of `S` on `X` and `Y`, the diagonal semigroup
 action of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
 def diagSemigroupAction
-{S} [Semigroup S] [Nonempty S] {X Y} [Nonempty X] [Nonempty Y]
-(sActionX : SemigroupAction S X) (sActionY : SemigroupAction S Y) :
+{S} [Semigroup S] [Nonempty S]
+{X Y} [Nonempty X] [Nonempty Y]
+(sActionX : SemigroupAction S X)
+(sActionY : SemigroupAction S Y) :
 SemigroupAction S (X × Y) :=
 {
   toFun := fun s ↦ Prod.map (sActionX.toFun s) (sActionY.toFun s)
@@ -52,19 +54,26 @@ SemigroupAction S (X × Y) :=
     simp only [sActionY.map_mult']
 }
 
-/- Superceded by diagSemigroupAction for different systems
-/-- Given a semigroup action of `S` on `X`, the diagonal semigroup action
-of `S` on `X × X` is given by `s (x,y) = (sx,sy)` -/
-def diagSemigroupAction {S} [Semigroup S] [Nonempty S]
-{X} [Nonempty X] (sAction : SemigroupAction S X) :
-SemigroupAction S (X × X) := {
-  toFun := fun s ↦ Prod.map (sAction.toFun s) (sAction.toFun s)
+/-- Given dynamical systems of `S` on `X` and `Y`, the diagonal system
+of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
+def diagDynamicalSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemX : DynamicalSystem S X)
+(dSystemY : DynamicalSystem S Y) :
+DynamicalSystem S (X × Y) :=
+{
+  toFun := fun s ↦ Prod.map (dSystemX.toFun s) (dSystemY.toFun s)
   map_mult' := by
     intro s t (x,y)
     simp only [Prod.map]
-    simp only [sAction.map_mult']
+    simp only [dSystemX.map_mult']
+    simp only [dSystemY.map_mult']
+  cont' := by
+    intro s
+    exact Continuous.prodMap (dSystemX.cont' s) (dSystemY.cont' s)
 }
--/
 
 -- Do we need: diagDynamicalSystem?  Wait.
 
@@ -140,6 +149,7 @@ theorem orbClosIsInv
 {dSystem : DynamicalSystem S X} {x : X} :
 isInvariantSet dSystem.toSemigroupAction (orbitClosure dSystem.toSemigroupAction x) :=
 by sorry
+-- Use closureOfInvIsInv
 
 /-- A sub (topological) dynamical system of a topological dynmical system given by
 a semigroup `S` acting on `X` is a nonempty, compact, invariant subset of `X`
@@ -171,9 +181,9 @@ def fromSubSystemToSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
-{Z : Set X} [CompactSpace Z] [Nonempty Z]
+{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
 (isSubsys : isSubDynamicalSystem dSystem Z) :
-DynamicalSystem S Z :=
+DynamicalSystem S ↑Z :=
 {
   toFun := by
     intro s ⟨z,hz⟩
@@ -306,8 +316,8 @@ by sorry
 /-- Given `U1 ⊆ U2`, `R(x,U1) ⊆ R(x,U2)` -/
 theorem visitTimesMono
 {S} [Semigroup S] [Nonempty S]
-{X} [Nonempty X] {sAction : SemigroupAction S X}
-{x : X} {U V : Set X} (hMono : U ⊆ V) :
+{X} [Nonempty X] (sAction : SemigroupAction S X)
+(x : X) {U V : Set X} (hMono : U ⊆ V) :
 visitTimeSet sAction x U ⊆ visitTimeSet sAction x V :=
 by sorry
 
@@ -455,11 +465,13 @@ def isUniformlyRecurrent
 Prop :=
 ∀ U ∈ nhds x, isSyndetic (visitTimeSet dSystem.toSemigroupAction x U)
 
+/-- In a minimal system, for all `x ∈ X` and all non-empty, open `U ⊆ X`
+the set of visit times `R(x,U)` is syndetic -/
 theorem minimalImpliesSyndeticVisits
 {S} [Semigroup S] [Nonempty S]
-{X} [τ : TopologicalSpace X] [cs : CompactSpace X] [T2Space X] [Nonempty X]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
-∀ x : X, ∀ U : Set X, U.Nonempty → τ.IsOpen U →
+∀ x : X, ∀ U : Set X, U.Nonempty → IsOpen U →
 isSyndetic (visitTimeSet dSystem.toSemigroupAction x U) :=
 by
   intro x U U_nonempty U_open
@@ -486,7 +498,7 @@ by
     intro x
     unfold V_chooser
     exact s_chooser_property x
-  have V_choice_open : ∀ x : X, τ.IsOpen (V_chooser x) := by
+  have V_choice_open : ∀ x : X, IsOpen (V_chooser x) := by
     intro x
     have cts_s_chooser : Continuous (dSystem.toFun (s_chooser x)) := dSystem.cont' (s_chooser x)
     unfold V_chooser
@@ -498,7 +510,7 @@ by
     use x
     exact s_chooser_property x
   have finite_cover : ∃ (Y : Finset X), Set.univ ⊆ ⋃ y ∈ Y, V_chooser y :=
-    IsCompact.elim_finite_subcover cs.isCompact_univ V_chooser V_choice_open V_choice_covers
+    IsCompact.elim_finite_subcover isCompact_univ V_chooser V_choice_open V_choice_covers
   rcases finite_cover with ⟨Y, cover_prop⟩
   have Yset_finite : (Y : Set X).Finite := Y.finite_toSet
   unfold isSyndetic
@@ -525,15 +537,38 @@ by
   use s_chooser y
 
 
--- Easy consequence of former
-theorem DS.minimalImpliesUniformlyRecurrent
+/-- In a minimal system, every point is uniformly recurrent -/
+theorem minimalImpliesUniformlyRecurrent
 {S} [Semigroup S] [Nonempty S]
-{X} [τ : TopologicalSpace X] [cs : CompactSpace X] [T2Space X] [Nonempty X]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
 ∀ x : X, isUniformlyRecurrent dSystem x :=
+by
+  intro x U Unbhd
+  simp only [mem_nhds_iff] at Unbhd
+  rcases Unbhd with ⟨V, VinU, Vopen, Vhasx⟩
+  have Vnonempty : V.Nonempty := Set.nonempty_of_mem Vhasx
+  have goalforV : isSyndetic (visitTimeSet dSystem.toSemigroupAction x V) :=
+    minimalImpliesSyndeticVisits (hMin := hMin) dSystem x V Vnonempty Vopen
+  exact syndeticIsMonotone goalforV (visitTimesMono dSystem.toSemigroupAction x VinU)
+
+/- The orbit closure of a uniformly recurrent point is a minimal system -/
+/- theorem orbitClosureOfURPointIsMinimal
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+{x : X} (xisUR : isUniformlyRecurrent dSystem x) :
+isMinimalSystem (fromSubSystemToSystem dSystem (orbitClosureIsSubDynamicalSystem dSystem x)) -/
+
+--orbitClosureIsSubDynamicalSystem
+--fromSubSystemToSystem
+
+theorem inMinCommSystemURPairsDense
+{S} [commSemi : CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [csX : CompactSpace X] [T2Space X] [nonX : Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} :=
 by sorry
-
-
 
 end Uniform_recurrence
 

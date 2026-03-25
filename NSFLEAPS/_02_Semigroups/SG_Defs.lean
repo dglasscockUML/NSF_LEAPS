@@ -55,3 +55,21 @@ def isSyndetic
 {S : Type*} [Semigroup S] (A : Set S) :
 Prop :=
 ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
+
+
+theorem syndeticIsMonotone
+{S : Type*} [Semigroup S]
+{A B : Set S} (hSA : isSyndetic A) (hAB : A ⊆ B):
+isSyndetic B :=
+by
+  unfold isSyndetic at hSA
+  rcases hSA with ⟨F, Ffinite, hF⟩
+  use F
+  constructor
+  · exact Ffinite
+  · intro s
+    rcases (hF s) with ⟨f, finF, fsinA⟩
+    use f
+    constructor
+    · exact finF
+    · exact hAB fsinA

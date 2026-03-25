@@ -1170,14 +1170,14 @@ Contains:
 \end{leanrmk}
 
 \begin{definition}[Semigroup action]
-\lean{SemigroupAction}
+\lean{DS.SemigroupAction}
 \leanok{}
 Let $S$ be a semigroup and $X$ be a set.  An action of $S$ on $X$ is a map $f: S \to X \to X$ such that for all $s, t \in S$,
 \[(f s) \circ (f t) = f (s*t).\]
 \end{definition}
 
 \begin{definition}[Topological dynamical system]
-\lean{DynamicalSystem}
+\lean{DS.DynamicalSystem}
 \leanok{}
     Let $S$ be a non-empty semigroup and $X$ be a non-empty, compact Hausdorff space. An \emph{$S$-system} is an action of $S$ on $X$ such that for all $s \in S$, $f s$ is continuous.
 \end{definition}
@@ -1496,6 +1496,7 @@ Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
 
 \begin{lemma}[Visit times for product actions]
 \label{lemma_return_time_sets_in_prod_system}
+\lean{DS.visitsToProd}
 Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, $y \in Y$, $U \subseteq X$, and $V \subseteq Y$, considering the product system,
 \[R((x,y), U \times V) = R(x, U) \cap R(y,V).\]
 \end{lemma}
@@ -1516,12 +1517,16 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \subsection{Minimality}
 
 \begin{definition}[Minimal system]
-    % A $S$-system $X$ is \emph{minimal} if for all $x \in X$, the set $Sx$ is dense in $X$.
+    \label{def_minimal_system}
+    \lean{DS.isMinimal}
+    \leanok{}
     An $S$-system $X$ is \emph{minimal} if the only non-empty, closed, $S$-invariant subset of $X$ is $X$.
 \end{definition}
 
 \begin{theorem}[Every system has a minimal subsystem]
 \label{thm_every_system_has_minimal_subsystem}
+\lean{DS.existsMinimalSubsystem}
+\leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  There exists a non-empty, closed, $S$-invariant subset $Z \subseteq X$ (that is, an $S$-subsystem $Z$ of $X$) such that the $S$-system $Z$ is minimal.
 \end{theorem}
 
@@ -1531,10 +1536,13 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{theorem}[Minimal iff dense orbits]
 \label{thm_minimal_iff_dense_orbits}
+\lean{minimalIffDenseOrbits}
+\leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  The system $X$ is minimal if and only if for all $x \in X$, $\overline{Sx} = X$.
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     By \cref{lemma_orb_closure_is_invariant}, $\overline{Sx}$ is an $S$-system.  If $X$ is minimal, then $\overline{Sx} = X$, so $x$ has a dense orbit.
 
     On the other hand, if $Z$ is a closed, non-empty, $S$-invariant set, then choosing $x \in Z$, we see by the dense-orbit assumption that
@@ -1553,25 +1561,34 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{lemma}[Minimal actions act surjectively]
 \label{lemma_minimal_comm_action_implies_surjective}
+\lean{minimalCommActionIsSurjective}
+\leanok{}
     Let $S$ be a commutative semigroup.  Let $X$ be a minimal $S$-system.  For all $s \in S$, the map $s: X \to X$ is surjective.
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Let $s \in S$.  Since $S$ is commutative, the set $sX$ is a closed, $S$-invariant subset of $X$.  By minimality, $sX = X$, showing that $s$ is surjective, as desired.
 \end{proof}
 
 \subsection{Uniform recurrence}
 
 \begin{definition}[Uniformly recurrent point]
+\label{def_uniformly_recurrent}
+\lean{DS.isUniformlyRecurrent}
+\leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The point $x$ is $S$-uniformly recurrent if for all non-empty, open $U \ni x$, the set $R(x,U)$ is syndetic.
 \end{definition}
 
-\begin{lemma}
+\begin{lemma}[All points in a minimal system are uniformly recurrent]
     \label{lemma_pts_in_minimal_are_ur}
+    \lean{DS.minimalImpliesUniformlyRecurrent}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be a minimal $S$-system. For all $x \in X$, $x$ is $S$-uniformly recurrent.
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Let $x \in U \subseteq X$. By \cref{thm_minimal_iff_dense_orbits}, all orbits are dense, so for $y \in X$, there exists $s_y \in S$ such that $sy \in U$.  Therefore, $X = \cup_{y \in X} s_y^{-1}U$.  By compactness, there exists a finite set $F \subseteq X$ such that $X = \cup_{y \in F} s_y^{-1} U$.  By \cref{lemma_return_to_union} and \cref{lemma_return_time_algebra_one},
     \[S = R(x,X) = R(x, \bigcup_{y \in F} s_y^{-1} U ) = \bigcup_{y \in F} R(x, s_y^{-1} U) = \bigcup_{y \in F} s_y^{-1} R(x, U).\]
     By definition, the set $R(x,U)$ is syndetic.

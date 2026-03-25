@@ -2610,7 +2610,7 @@
         </div>
   </div>
   <div class="lean_thmcontent">
-  <p>SemigroupAction  Let \(S\) be a semigroup and \(X\) be a set. An action of \(S\) on \(X\) is a map \(f: S \to X \to X\) such that for all \(s, t \in S\), </p>
+  <p>DS.SemigroupAction  Let \(S\) be a semigroup and \(X\) be a set. An action of \(S\) on \(X\) is a map \(f: S \to X \to X\) such that for all \(s, t \in S\), </p>
 <div class="displaymath" id="a0000000099">
   \[ (f s) \circ (f t) = f (s*t). \]
 </div>
@@ -2658,7 +2658,7 @@
         </div>
   </div>
   <div class="lean_thmcontent">
-  <p>DynamicalSystem  Let \(S\) be a non-empty semigroup and \(X\) be a non-empty, compact Hausdorff space. An <em>\(S\)-system</em> is an action of \(S\) on \(X\) such that for all \(s \in S\), \(f s\) is continuous. </p>
+  <p>DS.DynamicalSystem  Let \(S\) be a non-empty semigroup and \(X\) be a non-empty, compact Hausdorff space. An <em>\(S\)-system</em> is an action of \(S\) on \(X\) such that for all \(s \in S\), \(f s\) is continuous. </p>
 
   </div>
 </div>
@@ -3935,9 +3935,30 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>  Let \(S\) be a semigroup, and let \(X\) and \(Y\) be \(S\)-systems. For all \(x \in X\), \(y \in Y\), \(U \subseteq X\), and \(V \subseteq Y\), considering the product system, </p>
-<div class="displaymath" id="a0000000147">
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000147">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000147">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>DS.visitsToProd Let \(S\) be a semigroup, and let \(X\) and \(Y\) be \(S\)-systems. For all \(x \in X\), \(y \in Y\), \(U \subseteq X\), and \(V \subseteq Y\), considering the product system, </p>
+<div class="displaymath" id="a0000000148">
   \[ R((x,y), U \times V) = R(x, U) \cap R(y,V). \]
+</div>
+
+  </div>
 </div>
 
   </div>
@@ -3954,8 +3975,8 @@
 
   </div>
 </div>
-<h2 id="a0000000148">0.4.4 Minimality</h2>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000149">
+<h2 id="a0000000149">0.4.4 Minimality</h2>
+<div class="definition_thmwrapper theorem-style-definition" id="def_minimal_system">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -3967,14 +3988,37 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000149">#</a>
+    <a class="icon proof" href="index.html#def_minimal_system">#</a>
     
     
     
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p> An \(S\)-system \(X\) is <em>minimal</em> if the only non-empty, closed, \(S\)-invariant subset of \(X\) is \(X\). </p>
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000150">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000150">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>DS.isMinimal  An \(S\)-system \(X\) is <em>minimal</em> if the only non-empty, closed, \(S\)-invariant subset of \(X\) is \(X\). </p>
+
+  </div>
+</div>
 
   </div>
 </div>
@@ -3992,7 +4036,7 @@
 
     <a class="icon proof" href="index.html#thm_every_system_has_minimal_subsystem">#</a>
     
-    <a class="icon proof" href="index.html#a0000000150"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000151"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4000,11 +4044,34 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>  Let \(S\) be a semigroup and \(X\) be an \(S\)-system. There exists a non-empty, closed, \(S\)-invariant subset \(Z \subseteq X\) (that is, an \(S\)-subsystem \(Z\) of \(X\)) such that the \(S\)-system \(Z\) is minimal. </p>
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000152">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000152">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>DS.existsMinimalSubsystem  Let \(S\) be a semigroup and \(X\) be an \(S\)-system. There exists a non-empty, closed, \(S\)-invariant subset \(Z \subseteq X\) (that is, an \(S\)-subsystem \(Z\) of \(X\)) such that the \(S\)-system \(Z\) is minimal. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000150">
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000151">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4030,7 +4097,7 @@
 
     <a class="icon proof" href="index.html#thm_minimal_iff_dense_orbits">#</a>
     
-    <a class="icon proof" href="index.html#a0000000151"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000153"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4038,11 +4105,34 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>  Let \(S\) be a semigroup and \(X\) be an \(S\)-system. The system \(X\) is minimal if and only if for all \(x \in X\), \(\overline{Sx} = X\). </p>
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000154">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000154">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>minimalIffDenseOrbits  Let \(S\) be a semigroup and \(X\) be an \(S\)-system. The system \(X\) is minimal if and only if for all \(x \in X\), \(\overline{Sx} = X\). </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000151">
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000153">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4050,9 +4140,9 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> By <a href="index.html#lemma_orb_closure_is_invariant">lemma 57</a>, \(\overline{Sx}\) is an \(S\)-system. If \(X\) is minimal, then \(\overline{Sx} = X\), so \(x\) has a dense orbit. </p>
+  <p>  By <a href="index.html#lemma_orb_closure_is_invariant">lemma 57</a>, \(\overline{Sx}\) is an \(S\)-system. If \(X\) is minimal, then \(\overline{Sx} = X\), so \(x\) has a dense orbit. </p>
 <p>On the other hand, if \(Z\) is a closed, non-empty, \(S\)-invariant set, then choosing \(x \in Z\), we see by the dense-orbit assumption that </p>
-<div class="displaymath" id="a0000000152">
+<div class="displaymath" id="a0000000155">
   \[ X = \overline{Sx} \subseteq \overline{SZ} \subseteq Z \subseteq X. \]
 </div>
 <p> It follows that \(Z = X\), and hence that \(X\) is a minimal \(S\)-system. </p>
@@ -4073,7 +4163,7 @@
 
     <a class="icon proof" href="index.html#lemma_img_of_min_is_min">#</a>
     
-    <a class="icon proof" href="index.html#a0000000153"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000156"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4085,7 +4175,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000153">
+<div class="proof_wrapper" id="a0000000156">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4111,67 +4201,6 @@
 
     <a class="icon proof" href="index.html#lemma_minimal_comm_action_implies_surjective">#</a>
     
-    <a class="icon proof" href="index.html#a0000000154"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
-</a>
-    
-    
-    
-        </div>
-  </div>
-  <div class="lemma_thmcontent">
-  <p>  Let \(S\) be a commutative semigroup. Let \(X\) be a minimal \(S\)-system. For all \(s \in S\), the map \(s: X \to X\) is surjective. </p>
-
-  </div>
-</div>
-<div class="proof_wrapper" id="a0000000154">
-  <div class="proof_heading">
-    <span class="proof_caption">
-    Proof
-    </span>
-    <span class="expand-proof">▶</span>
-  </div>
-  <div class="proof_content">
-  <p>Let \(s \in S\). Since \(S\) is commutative, the set \(sX\) is a closed, \(S\)-invariant subset of \(X\). By minimality, \(sX = X\), showing that \(s\) is surjective, as desired. </p>
-
-  </div>
-</div>
-<h2 id="a0000000155">0.4.5 Uniform recurrence</h2>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000156">
-  <div class="definition_thmheading">
-    <span class="definition_thmcaption">
-    Definition
-    </span>
-    <span class="definition_thmlabel">80</span>
-    <span class="definition_thmtitle">Uniformly recurrent point</span>
-    <div class="thm_header_extras">
-
-        </div>
-    <div class="thm_header_hidden_extras">
-
-    <a class="icon proof" href="index.html#a0000000156">#</a>
-    
-    
-    
-        </div>
-  </div>
-  <div class="definition_thmcontent">
-  <p> Let \(S\) be a semigroup, \(X\) be an \(S\)-system, and \(x \in X\). The point \(x\) is \(S\)-uniformly recurrent if for all non-empty, open \(U \ni x\), the set \(R(x,U)\) is syndetic. </p>
-
-  </div>
-</div>
-<div class="lemma_thmwrapper theorem-style-plain" id="lemma_pts_in_minimal_are_ur">
-  <div class="lemma_thmheading">
-    <span class="lemma_thmcaption">
-    Lemma
-    </span>
-    <span class="lemma_thmlabel">81</span>
-    <div class="thm_header_extras">
-
-        </div>
-    <div class="thm_header_hidden_extras">
-
-    <a class="icon proof" href="index.html#lemma_pts_in_minimal_are_ur">#</a>
-    
     <a class="icon proof" href="index.html#a0000000157"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
@@ -4180,7 +4209,30 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p> Let \(S\) be a semigroup and \(X\) be a minimal \(S\)-system. For all \(x \in X\), \(x\) is \(S\)-uniformly recurrent. </p>
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000158">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000158">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>minimalCommActionIsSurjective  Let \(S\) be a commutative semigroup. Let \(X\) be a minimal \(S\)-system. For all \(s \in S\), the map \(s: X \to X\) is surjective. </p>
+
+  </div>
+</div>
 
   </div>
 </div>
@@ -4192,8 +4244,116 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Let \(x \in U \subseteq X\). By <a href="index.html#thm_minimal_iff_dense_orbits">theorem 77</a>, all orbits are dense, so for \(y \in X\), there exists \(s_y \in S\) such that \(sy \in U\). Therefore, \(X = \cup _{y \in X} s_y^{-1}U\). By compactness, there exists a finite set \(F \subseteq X\) such that \(X = \cup _{y \in F} s_y^{-1} U\). By <a href="index.html#lemma_return_to_union">lemma 72</a> and <a href="index.html#lemma_return_time_algebra_one">lemma 69</a>, </p>
-<div class="displaymath" id="a0000000158">
+  <p> Let \(s \in S\). Since \(S\) is commutative, the set \(sX\) is a closed, \(S\)-invariant subset of \(X\). By minimality, \(sX = X\), showing that \(s\) is surjective, as desired. </p>
+
+  </div>
+</div>
+<h2 id="a0000000159">0.4.5 Uniform recurrence</h2>
+<div class="definition_thmwrapper theorem-style-definition" id="def_uniformly_recurrent">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">80</span>
+    <span class="definition_thmtitle">Uniformly recurrent point</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#def_uniformly_recurrent">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000160">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000160">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>DS.isUniformlyRecurrent  Let \(S\) be a semigroup, \(X\) be an \(S\)-system, and \(x \in X\). The point \(x\) is \(S\)-uniformly recurrent if for all non-empty, open \(U \ni x\), the set \(R(x,U)\) is syndetic. </p>
+
+  </div>
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lemma_pts_in_minimal_are_ur">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">81</span>
+    <span class="lemma_thmtitle">All points in a minimal system are uniformly recurrent</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#lemma_pts_in_minimal_are_ur">#</a>
+    
+    <a class="icon proof" href="index.html#a0000000161"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="lean_thmwrapper theorem-style-definition" id="a0000000162">
+  <div class="lean_thmheading">
+    <span class="lean_thmcaption">
+    Lean Remarks
+    </span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="index.html#a0000000162">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="lean_thmcontent">
+  <p>DS.minimalImpliesUniformlyRecurrent  Let \(S\) be a semigroup and \(X\) be a minimal \(S\)-system. For all \(x \in X\), \(x\) is \(S\)-uniformly recurrent. </p>
+
+  </div>
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000161">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>  Let \(x \in U \subseteq X\). By <a href="index.html#thm_minimal_iff_dense_orbits">theorem 77</a>, all orbits are dense, so for \(y \in X\), there exists \(s_y \in S\) such that \(sy \in U\). Therefore, \(X = \cup _{y \in X} s_y^{-1}U\). By compactness, there exists a finite set \(F \subseteq X\) such that \(X = \cup _{y \in F} s_y^{-1} U\). By <a href="index.html#lemma_return_to_union">lemma 72</a> and <a href="index.html#lemma_return_time_algebra_one">lemma 69</a>, </p>
+<div class="displaymath" id="a0000000163">
   \[ S = R(x,X) = R(x, \bigcup _{y \in F} s_y^{-1} U ) = \bigcup _{y \in F} R(x, s_y^{-1} U) = \bigcup _{y \in F} s_y^{-1} R(x, U). \]
 </div>
 <p> By definition, the set \(R(x,U)\) is syndetic. </p>
@@ -4213,7 +4373,7 @@
 
     <a class="icon proof" href="index.html#lemma_orb_closure_of_ur_is_minimal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000159"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000164"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4225,7 +4385,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000159">
+<div class="proof_wrapper" id="a0000000164">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4255,7 +4415,7 @@
 
     <a class="icon proof" href="index.html#lemma_in_orb_clos_of_ur_implies_ur">#</a>
     
-    <a class="icon proof" href="index.html#a0000000160"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000165"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4267,7 +4427,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000160">
+<div class="proof_wrapper" id="a0000000165">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4292,7 +4452,7 @@
 
     <a class="icon proof" href="index.html#lemma_dense_S_minimal_points_in_X2">#</a>
     
-    <a class="icon proof" href="index.html#a0000000161"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000166"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4304,7 +4464,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000161">
+<div class="proof_wrapper" id="a0000000166">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4319,7 +4479,7 @@
 
   </div>
 </div>
-<h2 id="a0000000162">0.4.6 Proximality</h2>
+<h2 id="a0000000167">0.4.6 Proximality</h2>
 <p> It seems that the words “proximal” and “distal” do not appear in mathlib... We don’t need distal, but we will need proximal.  </p>
 <div class="definition_thmwrapper theorem-style-definition" id="def_proximal">
   <div class="definition_thmheading">
@@ -4359,7 +4519,7 @@
 
     <a class="icon proof" href="index.html#theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000163"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000168"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4371,7 +4531,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000163">
+<div class="proof_wrapper" id="a0000000168">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4383,7 +4543,7 @@
 
   </div>
 </div>
-<h2 id="a0000000164">0.4.7 Regional proximality</h2>
+<h2 id="a0000000169">0.4.7 Regional proximality</h2>
 <div class="definition_thmwrapper theorem-style-definition" id="def_rp_relation">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
@@ -4406,7 +4566,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(S\) be a semigroup and \(X\) be an \(S\)-system. The <em>regionally proximal relation</em> is defined as </p>
-<div class="displaymath" id="a0000000165">
+<div class="displaymath" id="a0000000170">
   \[ \mathbf{RP}= \bigcap _{\alpha } \overline{S \alpha }, \]
 </div>
 <p> where the intersection is over all \(\alpha \) in the uniformity on \(X\), and \(S\) acts diagonally. We say that point \(x \in X\) is <em>regionally proximal to</em> point \(y \in X\) if \((x,y) \in \mathbf{RP}\). </p>
@@ -4426,7 +4586,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_basics">#</a>
     
-    <a class="icon proof" href="index.html#a0000000166"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000171"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4438,7 +4598,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000166">
+<div class="proof_wrapper" id="a0000000171">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4451,7 +4611,7 @@
   <li><p>Symmetric: Denote by \(\Phi : X^2 \to X^2\) the map \(\Phi (x,y) = (y,x)\). Let \((x,y) \in \mathbf{RP}\) and \(\alpha \subseteq X^2\) be an entourage. By the definition of a uniform space, \(\Phi \alpha \) is an entourage (sometimes called \(\alpha ^{-1}\)). Since \((x,y) \in \mathbf{RP}\), \((x,y) \in \overline{G \Phi \alpha }\). But \(\overline{G \Phi \alpha } = \Phi \overline{G \alpha }\). Therefore, \((y,x) \in \overline{G \alpha }\), as was to be shown. </p>
 </li>
   <li><p>Invariant: The set \(G\alpha \) is clearly \(G\)-invariant. Since \(G\) acts by continuous maps, </p>
-<div class="displaymath" id="a0000000167">
+<div class="displaymath" id="a0000000172">
   \[ g \overline{G\alpha } \subseteq \overline{gG \alpha } \subseteq \overline{G \alpha }, \]
 </div>
 <p> whereby \(\overline{G\alpha }\) is \(G\)-invariant. Finally, by <a href="index.html#lemma_intersection_of_invariant">lemma 59</a>, an arbitrary intersection of \(G\)-invariant sets is \(G\)-invariant, so \(\mathbf{RP}\) is \(G\)-invariant. </p>
@@ -4475,7 +4635,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_reflexive">#</a>
     
-    <a class="icon proof" href="index.html#a0000000168"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000173"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4487,7 +4647,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000168">
+<div class="proof_wrapper" id="a0000000173">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4519,7 +4679,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(S\) be a semigroup and \(X\) be an \(S\)-system. For \((x, y) \in X^2\) and \(A \subseteq S\), define </p>
-<div class="displaymath" id="a0000000169">
+<div class="displaymath" id="a0000000174">
   \[ \Omega _A(x,y) = \{ w \in X : \exists \  \text{net } (a_n, b_n, s_n) \in X^2 \times A, \  \lim _{n \to \infty } (a_n, b_n, s_n a_n, s_n b_n) = (w, w, x, y) \} . \]
 </div>
 
@@ -4538,7 +4698,7 @@
 
     <a class="icon proof" href="index.html#lemma_diag_limit_pt_set">#</a>
     
-    <a class="icon proof" href="index.html#a0000000170"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000175"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4550,7 +4710,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000170">
+<div class="proof_wrapper" id="a0000000175">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4575,7 +4735,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_implies_net_iff">#</a>
     
-    <a class="icon proof" href="index.html#a0000000171"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000176"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4584,17 +4744,17 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(S\) be a semigroup, \(X\) be an \(S\)-system, and \(x, y \in X\). For all \(A \subseteq S\), </p>
-<div class="displaymath" id="a0000000172">
+<div class="displaymath" id="a0000000177">
   \[ \bigcap _{\alpha } \overline{A \alpha } = \{ (x,y) \in X^2 : \Omega _A(x,y) \neq \emptyset \} . \]
 </div>
 <p> In particular, setting \(A = S\), we see that \((x,y) \in \mathbf{RP}\) if and only if there exists \(w \in X\) and a net \((a_n, b_n, g_n)_n \subseteq X \times X \times S\) such that </p>
-<div class="displaymath" id="a0000000173">
+<div class="displaymath" id="a0000000178">
   \begin{align*}  \lim _{n \to \infty } (a_n, b_n, g_n a_n, g_n b_n) & = (w, w, x, y). \end{align*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000171">
+<div class="proof_wrapper" id="a0000000176">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4603,16 +4763,16 @@
   </div>
   <div class="proof_content">
   <p>Let \(A \subseteq S\). Suppose \((x,y) \in \cap _{\alpha } \overline{A \alpha }\). Let \(D\) be the directed set consisting of Cartesian products of open neighborhoods of \(x\), open neighborhoods of \(y\), and entourages of \(X\). For \(n = (U,V,\alpha ) \in D\), we see from </p>
-<div class="displaymath" id="a0000000174">
+<div class="displaymath" id="a0000000179">
   \[ (x,y) \in \bigcap _{\alpha } \overline{A \alpha } \]
 </div>
 <p> that </p>
-<div class="displaymath" id="a0000000175">
+<div class="displaymath" id="a0000000180">
   \[ (U \times V) \cap A \alpha \neq \emptyset . \]
 </div>
 <p> Thus, there exists \((a_n,b_n) \in \alpha \) and \(s_n \in A\) such that \((s_n w_n, s_n x_n) \in U \times V\). By compactness, the net \(n \mapsto (a_n, b_n, s_n a_n, s_n b_n)\) has a cluster point. Thus, there exists \(w \in X\) such that \((a_n,b_n)\) converges to \((w,w)\) and \((s_n a_n, s_n b_n)\) converges to \((x,y)\). </p>
 <p>Conversely, suppose that \((x,y) \in X^2\) is such that \(\Omega _A(x,y) \neq \emptyset \): there exists \(w \in X\) and a net \((a_n, b_n, s_n)_n \subseteq X \times X \times A\) such that </p>
-<div class="displaymath" id="a0000000176">
+<div class="displaymath" id="a0000000181">
   \begin{align*}  \lim _{n \to \infty } (a_n, b_n, s_n a_n, s_n b_n) & = (w, w, x, y). \end{align*}
 </div>
 <p> We will show that \((x,y) \in \cap _{\alpha } \overline{A \alpha }\). Let \(\alpha \subseteq X^2\) be an entourage and \(W \ni (x,y)\) be open. Then \(\alpha \times W\) is an open neighborhood of \((w,w,x,y)\), so there exists \(n\) such that \((a_n,b_n,s_na_n,s_n,b_n) \in \alpha \times W\). In particular, \(W \cap A \alpha \neq \emptyset \). Since \(W\) and \(\alpha \) were arbitrary, we see that \((x,y) \in \overline{A \alpha }\), as was to be shown. </p>
@@ -4633,7 +4793,7 @@
 
     <a class="icon proof" href="index.html#lemma_set_of_ws_is_closed">#</a>
     
-    <a class="icon proof" href="index.html#a0000000177"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000182"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4642,13 +4802,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(S\) be a semigroup and \(X\) be an \(S\)-system. For all \(A \subseteq S\), </p>
-<div class="displaymath" id="a0000000178">
+<div class="displaymath" id="a0000000183">
   \[ \Delta (\Omega _A(x,y)) = \Delta (X) \cap \bigcap _{\text{open } U \ni (x,y)} \overline{A^{-1} U}. \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000177">
+<div class="proof_wrapper" id="a0000000182">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4657,11 +4817,11 @@
   </div>
   <div class="proof_content">
   <p>Suppose \(w \in \Omega _A(x,y)\). Clearly \((w,w) \in \Delta (X)\), so we need only show that \((w,w) \in \cap _{U} \overline{A^{-1}U}\). Let \(U \subseteq X^2\) be open and contain \((x,y)\). There is a net \((a_n, b_n, s_n) \in X^2 \times A\) such that </p>
-<div class="displaymath" id="a0000000179">
+<div class="displaymath" id="a0000000184">
   \[ \lim _{n \to \infty } (a_n, b_n, s_n a_n, s_n b_n) = (w, w, x, y). \]
 </div>
 <p> Let \(W \ni (w,w)\) be an open subset of \(X^2\). Since \(W \times U\) is an open neighborhood of \((w, w, x, y)\), there is \(n\) such that \((a_n,b_n) \in W\) and \(s_n(a_n,b_n) \in U\). Therefore, </p>
-<div class="displaymath" id="a0000000180">
+<div class="displaymath" id="a0000000185">
   \[ (a_n, b_n) \in s_n^{-1} U \cap W, \]
 </div>
 <p> and so \(A^{-1} U \cap W \neq \emptyset \). Since \(W \ni (w,w)\) was arbitrary, we see that \((w,w) \in \overline{A^{-1}U}\), as was to be shown. </p>
@@ -4682,7 +4842,7 @@
 
     <a class="icon proof" href="index.html#lemma_S_ideal_description_of_rp">#</a>
     
-    <a class="icon proof" href="index.html#a0000000181"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000186"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4691,13 +4851,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(S\) be a commutative semigroup, \(X\) be a minimal \(S\)-system, and \(x, y \in X\). For all \(t \in S\), </p>
-<div class="displaymath" id="a0000000182">
+<div class="displaymath" id="a0000000187">
   \[ \mathbf{RP}= \bigcap _{\alpha } \overline{St \alpha }. \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000181">
+<div class="proof_wrapper" id="a0000000186">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4706,16 +4866,16 @@
   </div>
   <div class="proof_content">
   <p> Let \(t \in S\). Since \(St \subseteq S\), we have by the definition of \(\mathbf{RP}\) that </p>
-<div class="displaymath" id="a0000000183">
+<div class="displaymath" id="a0000000188">
   \[ \bigcap _{\alpha } \overline{S t \alpha } \subseteq \mathbf{RP}. \]
 </div>
 <p> Conversely, suppose \((x,y) \in \mathbf{RP}\). Let \(\alpha \subseteq X^2\) be an entourage, and let \(W \ni (x,y)\) be open. We must show that \(W \cap St \alpha \neq \emptyset \). </p>
 <p>Since \((x,y) \in \mathbf{RP}\), we have that \(W \cap S \alpha \neq \emptyset \). Thus, there exists \(s \in S\) such that \(W \cap s \alpha \neq \emptyset \). Therefore, \(s^{-1} W \cap \alpha \neq \emptyset \). Since this is an open set, by <a href="index.html#lemma_dense_S_minimal_points_in_X2">lemma 84</a>, there exists \((a,b) \in s^{-1} W \cap \alpha \) that is \(S\)-uniformly recurrent (under the diagonal action). It follows that </p>
-<div class="displaymath" id="a0000000184">
+<div class="displaymath" id="a0000000189">
   \[ (a,b) \in \overline{S(a,b)}. \]
 </div>
 <p> Since \((a,b)\) is \(S\)-uniformly recurrent, it follows by <a href="index.html#lemma_orb_closure_of_ur_is_minimal">lemma 82</a> that \(\overline{S(a,b)}\) is a minimal \(S\)-system. By <a href="index.html#lemma_minimal_comm_action_implies_surjective">lemma 79</a> and the fact that \(S\) is commutative, we have that </p>
-<div class="displaymath" id="a0000000185">
+<div class="displaymath" id="a0000000190">
   \[ \overline{St(a,b)} = \overline{tS(a,b)} = t\overline{S(a,b)} = \overline{S(a,b)}. \]
 </div>
 <p> Therefore, \((a,b) \in s^{-1}W \cap \alpha \cap \overline{St(a,b)}\) and so this set is non-empty. Since \(s^{-1}W \cap \alpha \) is open, \(s^{-1}W \cap \alpha \cap St(a,b) \neq \emptyset \). Therefore, there exists \(\ell \in S\) such that \(\ell t (a,b) \in s^{-1}W \cap \alpha \). That is: \(s \ell t (a,b) \in W\), whereby \(S t (a,b) \cap W \neq \emptyset \). Since \((a,b) \in \alpha \), we have shown that \(S t \alpha \cap W \neq \emptyset \), as was to be shown. </p>
@@ -4735,7 +4895,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_implies_net_minimal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000186"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000191"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4744,13 +4904,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(S\) be a commutative semigroup, \(X\) be a minimal \(S\)-system, and \((x, y) \in X^2\). If \((x,y) \in \mathbf{RP}\), then \(\Omega _S(x,y) = X\), that is, for all \(w \in X\), there exists a net \((a_n, b_n, s_n)_n \subseteq X \times X \times S\) such that </p>
-<div class="displaymath" id="a0000000187">
+<div class="displaymath" id="a0000000192">
   \begin{align*}  \lim _{n \to \infty } (a_n, b_n, s_n a_n, s_n b_n) & = (w, w, x, y). \end{align*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000186">
+<div class="proof_wrapper" id="a0000000191">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4759,16 +4919,16 @@
   </div>
   <div class="proof_content">
   <p> Let \((x,y) \in \mathbf{RP}\). First we claim that for all \(t \in S\), \(\Omega _{St}(x,y) \neq \emptyset \). Indeed, by <a href="index.html#lemma_S_ideal_description_of_rp">lemma 94</a>, </p>
-<div class="displaymath" id="a0000000188">
+<div class="displaymath" id="a0000000193">
   \[ (x,y) \in \mathbf{RP}= \bigcap _{\alpha } \overline{St \alpha }. \]
 </div>
 <p> By <a href="index.html#lemma_diag_limit_pt_set">lemma 91</a>, we have that \(\Omega _{St}(x,y) \neq \emptyset \). </p>
 <p>Next we claim that for all \(t \in S\), \(t \Omega _{St}(x,y) \subseteq S\). Let \(t \in S\) and \(w \in \Omega _{St}(x,y)\). Thus, there exists a net \((a_n, b_n, s_n t)_n \subseteq X^2 \times S\) such that </p>
-<div class="displaymath" id="a0000000189">
+<div class="displaymath" id="a0000000194">
   \begin{align*}  \lim _{n \to \infty } (a_n, b_n, s_n t a_n, s_n t b_n) & = (w, w, x, y). \end{align*}
 </div>
 <p> It follows that \(t(a_n,b_n) \to t(w,w)\). So, the net \((ta_n, tb_n, s_n)_n \subseteq X^2 \times S\) is such that </p>
-<div class="displaymath" id="a0000000190">
+<div class="displaymath" id="a0000000195">
   \[ \lim _{n \to \infty } (t a_n, t b_n, s_n t a_n, s_n t b_n) = (t w, t w, x, y). \]
 </div>
 <p> Therefore, \(tw \in \Omega _S(x,y)\), as desired. </p>
@@ -4790,7 +4950,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_implies_intersects_open_nbhd_diagonal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000191"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000196"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4799,13 +4959,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(S\) be a commutative semigroup, \(X\) be a minimal \(S\)-system, and \(x, y \in X\). If \((x,y) \in \mathbf{RP}\), then for all non-empty, open \(U \subseteq X\), and all non-empty, open \(V \subseteq X^2\) containing \((x,y)\), </p>
-<div class="displaymath" id="a0000000192">
+<div class="displaymath" id="a0000000197">
   \[ S^{-1} V \cap (U \times U) \neq \emptyset . \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000191">
+<div class="proof_wrapper" id="a0000000196">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4814,11 +4974,11 @@
   </div>
   <div class="proof_content">
   <p> Let \((x,y) \in \mathbf{RP}\). Let \(U \subseteq X\) be non-empty, open, and let \(V \subseteq X^2\) be open and contain \((x,y)\). Let \(w \in U\). It follows from <a href="index.html#lemma_rp_implies_net_minimal">lemma 95</a> that there exists a net \((a_n, b_n, s_n)_n \subseteq X \times X \times S\) such that </p>
-<div class="displaymath" id="a0000000193">
+<div class="displaymath" id="a0000000198">
   \begin{align*}  \lim _{n \to \infty } (a_n, b_n, s_n a_n, s_n b_n) & = (w, w, x, y). \end{align*}
 </div>
 <p> Since \(U \times U \times V\) is an open neighborhood of \((w,w,x,y)\), there exists \(n\) such that \((a_n,b_n) \in U \times U\) and \(s_n (a_n, b_n) \in V\). Therefore, </p>
-<div class="displaymath" id="a0000000194">
+<div class="displaymath" id="a0000000199">
   \[ (a_n, b_n) \in s^{-1} V \cap (U \times U), \]
 </div>
 <p> and hence this set is non-empty, as was to be shown. </p>
@@ -4841,7 +5001,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_functorial_property">#</a>
     
-    <a class="icon proof" href="index.html#a0000000195"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000200"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4853,7 +5013,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000195">
+<div class="proof_wrapper" id="a0000000200">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4862,7 +5022,7 @@
   </div>
   <div class="proof_content">
   <p>Let \(\beta \subseteq Y^2\) be an entourage. Since \(\pi : X \to Y\) is continuous and \(X\) is compact, it is uniformly continuous. In particular, there exists \(\alpha \subseteq X^2\) an entourage such that \((\pi \otimes \pi ) \alpha \subseteq \beta \). We see then that </p>
-<div class="displaymath" id="a0000000196">
+<div class="displaymath" id="a0000000201">
   \[ (\pi \times \pi ) \mathbf{RP}_X \subseteq (\pi \otimes \pi ) \overline{G \alpha } = \overline{(\pi \otimes \pi ) G \alpha } = \overline{G(\pi \otimes \pi ) \alpha } \subseteq \overline{G \beta }, \]
 </div>
 <p> as was to be shown. </p>
@@ -4885,7 +5045,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_functorial_property_minimal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000197"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000202"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -4897,7 +5057,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000197">
+<div class="proof_wrapper" id="a0000000202">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -4907,31 +5067,31 @@
   <div class="proof_content">
   <p> By <a href="index.html#lemma_rp_functorial_property">lemma 97</a>, \((\pi \times \pi ) \mathbf{RP}_X \subseteq \mathbf{RP}_Y\), so we only need to prove the reverse inclusion. </p>
 <p>To see that \(\mathbf{RP}_Y \subseteq (\pi \times \pi ) \mathbf{RP}_X\), let \((x,y) \in \mathbf{RP}_Y\). Let \(D\) be the product of the set of entourages of \(X^2\) and the set of open subsets of \(Y^2\) containing \((x,y)\). For \(d = (\alpha , U)\), by <a href="index.html#lemma_image_of_entourage_somewhere_dense_along_diagonal">lemma 4</a>, there exists a non-empty, open set \(V \subseteq Y\) such that \(V \times V \subseteq (\pi \otimes \pi ) \alpha \). By <a href="index.html#lemma_rp_implies_intersects_open_nbhd_diagonal">lemma 96</a>, </p>
-<div class="displaymath" id="a0000000198">
+<div class="displaymath" id="a0000000203">
   \[ S^{-1} U \cap (V \times V) \neq \emptyset . \]
 </div>
 <p> Therefore, </p>
-<div class="displaymath" id="a0000000199">
+<div class="displaymath" id="a0000000204">
   \[ S^{-1} U \cap (\pi \otimes \pi ) \alpha \neq \emptyset . \]
 </div>
 <p> Therefore, there exists \((a_d,b_d) \in \alpha \) and \(s_d \in S\) such that \(s_d(\pi a_d, \pi b_d) \in U\). </p>
 <p>By compactness of \(X^4\), the net \(d \mapsto (a_d,b_d,s_d a_d, s_d b_d)\) has a convergent subnet \(n \mapsto (a_n,b_n,s_n a_n, s_n b_n)\). Thus, there exists \((a,b,w,z) \in X^4\) such that </p>
-<div class="displaymath" id="a0000000200">
+<div class="displaymath" id="a0000000205">
   \[ \lim _n (a_n,b_n,s_n a_n, s_n b_n) = (a,b,w,z). \]
 </div>
 <p> By the construction of the net, we see that \(a=b\). Therefore, \((w,z) \in \mathbf{RP}_X\). </p>
 <p>Also by the construction of the net, we see that \(s_n (\pi a_n, \pi b_n) \to (x,y)\). But \(s_n (\pi a_n, \pi b_n) = (\pi \otimes \pi ) (s_n a_n, s_n b_n)\), and so by continuity of \(\pi \otimes \pi \), we have that </p>
-<div class="displaymath" id="a0000000201">
+<div class="displaymath" id="a0000000206">
   \[ (x,y) \leftarrow s_n (\pi a_n, \pi b_n) = (\pi \otimes \pi ) (s_n a_n, s_n b_n) \to (\pi \otimes \pi ) (w,z). \]
 </div>
 <p> Therefore, \((\pi \otimes \pi ) (w,z) = (x,y)\), and so \((x,y) \in (\pi \otimes \pi ) \mathbf{RP}_X\), as was to be shown. </p>
 
   </div>
 </div>
-<h2 id="a0000000202">0.4.8 Equicontinuity and regional proximality</h2>
+<h2 id="a0000000207">0.4.8 Equicontinuity and regional proximality</h2>
 <p> Equicontinuity: <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/UniformSpace/Equicontinuity.html">https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/UniformSpace/Equicontinuity.html</a> </p>
 <p>Let’s look in Mathlib for “Equicontinuous family” as in the definition below.  </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000203">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000208">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -4943,7 +5103,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000203">#</a>
+    <a class="icon proof" href="index.html#a0000000208">#</a>
     
     
     
@@ -4955,7 +5115,7 @@
   </div>
 </div>
 <p>Note for the definition of equicontinuous system: A \(G\)-system \(X\) for us is a compact Hausdorff space. Compact Hausdorff spaces are uniform spaces with a unique uniformity given by the filter of all neighborhoods of the diagonal. </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000204">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000209">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -4969,7 +5129,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000204">#</a>
+    <a class="icon proof" href="index.html#a0000000209">#</a>
     
     
     
@@ -4993,7 +5153,7 @@
 
     <a class="icon proof" href="index.html#lemma_product_of_equi_is_equi">#</a>
     
-    <a class="icon proof" href="index.html#a0000000205"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000210"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5005,7 +5165,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000205">
+<div class="proof_wrapper" id="a0000000210">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5030,7 +5190,7 @@
 
     <a class="icon proof" href="index.html#lemma_subsys_of_equi_is_equi">#</a>
     
-    <a class="icon proof" href="index.html#a0000000206"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000211"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5042,7 +5202,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000206">
+<div class="proof_wrapper" id="a0000000211">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5067,7 +5227,7 @@
 
     <a class="icon proof" href="index.html#lemma_minimal_equi_implies_homogeneous">#</a>
     
-    <a class="icon proof" href="index.html#a0000000207"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000212"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5080,7 +5240,7 @@
   </div>
 </div>
 <p>Daniel says: If it would help here, we can prove first that a minimal action by a commutative semigroup acts by homeomorphisms. Then perhaps in <a href="index.html#lemma_minimal_equi_implies_homogeneous">lemma 103</a> we could get that \(\varphi \) is a homeomorphism, hence an automorphism of the \(S\)-system \(X\). </p>
-<div class="proof_wrapper" id="a0000000207">
+<div class="proof_wrapper" id="a0000000212">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof sketch.
@@ -5090,14 +5250,14 @@
   <div class="proof_content">
   <p>  Let \(x, y \in X\). By minimality, exists a net \((s_n)_n \subseteq S\) such that \(\lim _n s_n x = y\). Then, by commutativity and the fact that \(S\) acts by continuous maps, for all \(t \in S\), \(\lim _n s_n tx = ty\). Thus, for all \(z \in Sx\), \(\lim _n s_n z\) exists. </p>
 <p>We claim that the map \(f: Sx \to X\) defined by \(f(z) = \lim _n s_n z\) is uniformly continuous. Indeed, let \(\alpha \subseteq X^2\) be an entourage. We need to show that there exists an entourage \(\beta \subseteq (Sx)^2\) such that \(f \beta \subseteq \alpha \). By equicontinuity of the action, there exists \(\beta \subseteq X^2\) such that \(\overline{S \beta } \subseteq \alpha \). For \((w,z) \in \beta \), we see that </p>
-<div class="displaymath" id="a0000000208">
+<div class="displaymath" id="a0000000213">
   \[ f(w,z) = (f(w),f(z)) = (\lim _n s_n w, \lim _n s_n z) = \lim _n s_n (w,z) \in \overline{S\beta } \subseteq \alpha , \]
 </div>
 <p> as was to be shown. </p>
 <p>Since \(f: Sx \to X\) is uniformly continuous and, by minimality, \(Sx\) is dense in \(X\), we have that \(f\) extends uniquely to a continuous function \(\varphi : X \to X\). </p>
 <p>We claim that \(\varphi \) is \(S\)-equivariant. Indeed, let \(t \in S\). Note that for all \(z \in Sx\), by the definition of \(f\) and the fact that action by \(t\) is continuous, \(f(tz) = t f(z)\). So, \(\varphi \circ t = t \circ \varphi \) on a dense set, and hence on all of \(X\) Daniel says: this is fuzzy. </p>
 <p>We claim \(\varphi x = y\). Indeed, note that for all \(m\), since \(s_m x \in Sx\), \(\varphi (s_m x) = f(s_m x) = \lim _{n} s_n s_m x = s_m \lim _n s_n x = s_m y\). Then </p>
-<div class="displaymath" id="a0000000209">
+<div class="displaymath" id="a0000000214">
   \[ \varphi (y) = \varphi (\lim _m s_m x) = \lim _m \varphi (s_m x) = \lim _m s_m \varphi (x) =  \]
 </div>
 <p> Daniel says: This is not complete. </p>
@@ -5105,7 +5265,7 @@
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000210">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000215">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5119,7 +5279,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000210">#</a>
+    <a class="icon proof" href="index.html#a0000000215">#</a>
     
     
     
@@ -5146,7 +5306,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_and_equicontinuity">#</a>
     
-    <a class="icon proof" href="index.html#a0000000211"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000216"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5158,7 +5318,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000211">
+<div class="proof_wrapper" id="a0000000216">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5167,7 +5327,7 @@
   </div>
   <div class="proof_content">
   <p>Suppose \(\mathbf{RP}\subseteq \Delta \). To see that \(X\) is equicontinuous, let \(\alpha \subseteq X^2\) be an entourage. Since </p>
-<div class="displaymath" id="a0000000212">
+<div class="displaymath" id="a0000000217">
   \[ \bigcap _{\gamma } \overline{G \gamma } = \mathbf{RP}\subseteq \Delta \subseteq \alpha , \]
 </div>
 <p> by a general topological fact (<em>if \(\mathcal{K}\) is a collection of closed sets, \(U\) is open, and \(\cap _{Z \in \mathcal{K}} Z \subseteq U\), then there exists a finite subcollection \(\mathcal{K}' \subseteq \mathcal{K}\) such that \(\cap _{Z \in \mathcal{K}'} Z \subseteq U\)</em>; to get this in mathlib, use <code class="verbatim">IsCompact.elim_finite_subfamily_closed</code>) there exists an entourage \(\beta \subseteq X^2\) such that \(\overline{G \beta } \subseteq \alpha \). Thus, \(G \beta \subseteq \alpha \), as was to be shown. </p>
@@ -5188,7 +5348,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_characterization_of_equicont">#</a>
     
-    <a class="icon proof" href="index.html#a0000000213"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000218"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5200,7 +5360,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000213">
+<div class="proof_wrapper" id="a0000000218">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5225,7 +5385,7 @@
 
     <a class="icon proof" href="index.html#lemma_rp_characterization_of_equicont_icer">#</a>
     
-    <a class="icon proof" href="index.html#a0000000214"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000219"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5237,7 +5397,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000214">
+<div class="proof_wrapper" id="a0000000219">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5249,8 +5409,8 @@
 
   </div>
 </div>
-<h2 id="a0000000215">0.4.9 The equicontinuous structure relation</h2>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000216">
+<h2 id="a0000000220">0.4.9 The equicontinuous structure relation</h2>
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000221">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5264,7 +5424,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000216">#</a>
+    <a class="icon proof" href="index.html#a0000000221">#</a>
     
     
     
@@ -5275,7 +5435,7 @@
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000217">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000222">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5286,7 +5446,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000217">#</a>
+    <a class="icon proof" href="index.html#a0000000222">#</a>
     
     
     
@@ -5297,7 +5457,7 @@
 
   </div>
 </div>
-<div class="theorem_thmwrapper theorem-style-plain" id="a0000000218">
+<div class="theorem_thmwrapper theorem-style-plain" id="a0000000223">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
@@ -5308,9 +5468,9 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000218">#</a>
+    <a class="icon proof" href="index.html#a0000000223">#</a>
     
-    <a class="icon proof" href="index.html#a0000000219"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000224"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5322,7 +5482,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000219">
+<div class="proof_wrapper" id="a0000000224">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5336,7 +5496,7 @@
 
   </div>
 </div>
-<div class="theorem_thmwrapper theorem-style-plain" id="a0000000220">
+<div class="theorem_thmwrapper theorem-style-plain" id="a0000000225">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
@@ -5347,9 +5507,9 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000220">#</a>
+    <a class="icon proof" href="index.html#a0000000225">#</a>
     
-    <a class="icon proof" href="index.html#a0000000221"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000226"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5361,7 +5521,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000221">
+<div class="proof_wrapper" id="a0000000226">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5384,9 +5544,9 @@
   <li><p>Ultrafilters as dynamical objects </p>
 </li>
 </ul>
-<h2 id="a0000000222">0.5.1 Topological semigroups</h2>
+<h2 id="a0000000227">0.5.1 Topological semigroups</h2>
 <p>Daniel says: Worth noting that in the Hindman-Strauss book, they assume Hausdorff implicitly. So, really they treat compact, Hausdorff right-topological semigroups. </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000223">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000228">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5400,7 +5560,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000223">#</a>
+    <a class="icon proof" href="index.html#a0000000228">#</a>
     
     
     
@@ -5421,7 +5581,7 @@
 </li>
 </ul>
 
-<div class="theorem_thmwrapper theorem-style-plain" id="a0000000224">
+<div class="theorem_thmwrapper theorem-style-plain" id="a0000000229">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
@@ -5435,9 +5595,9 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000224">#</a>
+    <a class="icon proof" href="index.html#a0000000229">#</a>
     
-    <a class="icon proof" href="index.html#a0000000225"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000230"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5449,7 +5609,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000225">
+<div class="proof_wrapper" id="a0000000230">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5478,7 +5638,7 @@
 
     <a class="icon proof" href="index.html#lemma_principal_ideal_is_compact">#</a>
     
-    <a class="icon proof" href="index.html#a0000000226"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000231"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5490,7 +5650,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000226">
+<div class="proof_wrapper" id="a0000000231">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5516,7 +5676,7 @@
 
     <a class="icon proof" href="index.html#lemma_left_ideal_contains_closed_left_ideal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000227"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000232"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5528,7 +5688,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000227">
+<div class="proof_wrapper" id="a0000000232">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5554,7 +5714,7 @@
 
     <a class="icon proof" href="index.html#lemma_minimal_left_ideal_compact">#</a>
     
-    <a class="icon proof" href="index.html#a0000000228"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000233"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5566,7 +5726,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000228">
+<div class="proof_wrapper" id="a0000000233">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5591,7 +5751,7 @@
 
     <a class="icon proof" href="index.html#lemma_exists_minimal_left_ideal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000229"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000234"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5603,7 +5763,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000229">
+<div class="proof_wrapper" id="a0000000234">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5628,7 +5788,7 @@
 
     <a class="icon proof" href="index.html#exists_idempotent_in_compact_subsemigroup">#</a>
     
-    <a class="icon proof" href="index.html#a0000000230"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000235"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5640,7 +5800,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000230">
+<div class="proof_wrapper" id="a0000000235">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5665,7 +5825,7 @@
 
     <a class="icon proof" href="index.html#lemma_left_ideal_contains_idempotent">#</a>
     
-    <a class="icon proof" href="index.html#a0000000231"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000236"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5677,7 +5837,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000231">
+<div class="proof_wrapper" id="a0000000236">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5689,8 +5849,8 @@
 
   </div>
 </div>
-<h2 id="a0000000232">0.5.2 Ultrafilters</h2>
-<h2 id="a0000000233">0.5.3 Ultrafilters as a set</h2>
+<h2 id="a0000000237">0.5.2 Ultrafilters</h2>
+<h2 id="a0000000238">0.5.3 Ultrafilters as a set</h2>
 
 <ol class="enumerate">
   <li><p>Ultrafilters: <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Order/Filter/Ultrafilter/Defs.html">https://leanprover-community.github.io/mathlib4_docs/Mathlib/Order/Filter/Ultrafilter/Defs.html</a> </p>
@@ -5700,7 +5860,7 @@
 </ol>
 
 <p> The type for ultrafilters on \(S\) is the structure <code class="verbatim">Ultrafilter S</code>.  </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000234">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000239">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5712,7 +5872,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000234">#</a>
+    <a class="icon proof" href="index.html#a0000000239">#</a>
     
     
     
@@ -5723,7 +5883,7 @@
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000235">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000240">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5735,7 +5895,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000235">#</a>
+    <a class="icon proof" href="index.html#a0000000240">#</a>
     
     
     
@@ -5746,7 +5906,7 @@
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000236">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000241">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5758,7 +5918,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000236">#</a>
+    <a class="icon proof" href="index.html#a0000000241">#</a>
     
     
     
@@ -5769,9 +5929,9 @@
 
   </div>
 </div>
-<h2 id="a0000000237">0.5.4 Ultrafilters as a topological space</h2>
+<h2 id="a0000000242">0.5.4 Ultrafilters as a topological space</h2>
 <p> A realization of the Stone- compactification as the space of ultrafilters: <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/Compactification/StoneCech.html">https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/Compactification/StoneCech.html</a>  </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000238">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000243">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5783,7 +5943,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000238">#</a>
+    <a class="icon proof" href="index.html#a0000000243">#</a>
     
     
     
@@ -5795,7 +5955,7 @@
   </div>
 </div>
 <p> The topology is accessible in Lean as <code class="verbatim">[TopologicalSpace (Ultrafilter S)]</code>. This topology makes \(\beta S\) the Stone-Cech compactification of \(S\), though we don’t need to know that. This is in mathlib as <code class="verbatim">ultrafilter_compact</code> and <code class="verbatim">Ultrafilter.t2Space</code>  </p>
-<div class="theorem_thmwrapper theorem-style-plain" id="a0000000239">
+<div class="theorem_thmwrapper theorem-style-plain" id="a0000000244">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
@@ -5806,7 +5966,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000239">#</a>
+    <a class="icon proof" href="index.html#a0000000244">#</a>
     
     
     
@@ -5818,7 +5978,7 @@
   </div>
 </div>
 <p> The extension of \(f: S \to X\) to \(f: \beta S \to X\) is accomplished in Lean via <code class="verbatim">Ultrafilter.extend</code>.  </p>
-<h2 id="a0000000240">0.5.5 Ultrafilters as a semigroup</h2>
+<h2 id="a0000000245">0.5.5 Ultrafilters as a semigroup</h2>
 <p> A proof of Hindman’s theorem via idempotent ultrafilters: <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Combinatorics/Hindman.html">https://leanprover-community.github.io/mathlib4_docs/Mathlib/Combinatorics/Hindman.html</a>  </p>
 <div class="definition_thmwrapper theorem-style-definition" id="def_ultrafilter_multiplication">
   <div class="definition_thmheading">
@@ -5840,13 +6000,13 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(S\) be a semigroup. For \(p, q \in \beta S\), define </p>
-<div class="displaymath" id="a0000000241">
+<div class="displaymath" id="a0000000246">
   \[ pq = \{ A \subseteq S : \{ s \in S : \{ t \in S : st \in A\}  \in q \}  \in p \} . \]
 </div>
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000242">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000247">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -5858,7 +6018,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000242">#</a>
+    <a class="icon proof" href="index.html#a0000000247">#</a>
     
     
     
@@ -5884,7 +6044,7 @@
 
     <a class="icon proof" href="index.html#lemma_ultrafilter_mult_with_one_principal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000243"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000248"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5896,7 +6056,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000243">
+<div class="proof_wrapper" id="a0000000248">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5933,7 +6093,7 @@
 
     <a class="icon proof" href="index.html#lemma_pull_out_inverse_mult_in_basis_set">#</a>
     
-    <a class="icon proof" href="index.html#a0000000244"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000249"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5945,7 +6105,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000244">
+<div class="proof_wrapper" id="a0000000249">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -5986,7 +6146,7 @@
 
     <a class="icon proof" href="index.html#lemma_ru_is_r_for_idempotent">#</a>
     
-    <a class="icon proof" href="index.html#a0000000245"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000250"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -5998,7 +6158,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000245">
+<div class="proof_wrapper" id="a0000000250">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6034,7 +6194,7 @@
   </div>
 </div>
 <p>Daniel says: Hindman-Strauss Def. 1.37 define “minimal idempotent” as an idempotent minimal with respect to an ordering. Then, they prove immediately that this is the same (at least in \(\beta S\), in which every minimal left ideal has an idempotent) as belonging to a minimal left ideal. </p>
-<h2 id="a0000000246">0.5.6 Ultrafilters as a topological semigroup</h2>
+<h2 id="a0000000251">0.5.6 Ultrafilters as a topological semigroup</h2>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm_ultra_right_mult_continuous">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
@@ -6051,7 +6211,7 @@
 
     <a class="icon proof" href="index.html#thm_ultra_right_mult_continuous">#</a>
     
-    <a class="icon proof" href="index.html#a0000000247"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000252"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6063,7 +6223,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000247">
+<div class="proof_wrapper" id="a0000000252">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6091,7 +6251,7 @@
 
     <a class="icon proof" href="index.html#lemma_left_multiplication_is_continuous">#</a>
     
-    <a class="icon proof" href="index.html#a0000000248"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000253"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6103,7 +6263,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000248">
+<div class="proof_wrapper" id="a0000000253">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6112,7 +6272,7 @@
   </div>
   <div class="proof_content">
   <p> Denote left multiplication by \(s\) by \(\lambda _s: \beta S \to \beta S\). It follows from <a href="index.html#lemma_pull_out_inverse_mult_in_basis_set">lemma 128</a> that for all \(A \subseteq S\), </p>
-<div class="displaymath" id="a0000000249">
+<div class="displaymath" id="a0000000254">
   \[ \lambda _s^{-1} \overline{A} = \overline{s^{-1} A}. \]
 </div>
 <p> This suffices to show that \(\lambda _s\) is continuous by the definition of the topology on \(S\). </p>
@@ -6132,7 +6292,7 @@
 
     <a class="icon proof" href="index.html#thm_ultrafilters_are_compact_right_top">#</a>
     
-    <a class="icon proof" href="index.html#a0000000250"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000255"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6144,7 +6304,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000250">
+<div class="proof_wrapper" id="a0000000255">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6169,7 +6329,7 @@
 
     <a class="icon proof" href="index.html#thm_every_left_contains_minimal_left">#</a>
     
-    <a class="icon proof" href="index.html#a0000000251"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000256"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6181,7 +6341,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000251">
+<div class="proof_wrapper" id="a0000000256">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6206,7 +6366,7 @@
 
     <a class="icon proof" href="index.html#lemma_exists_idempotent_in_left_ideals">#</a>
     
-    <a class="icon proof" href="index.html#a0000000252"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000257"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6218,7 +6378,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000252">
+<div class="proof_wrapper" id="a0000000257">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6243,7 +6403,7 @@
 
     <a class="icon proof" href="index.html#lemma_exists_minimal_idempotent_in_left_ideals">#</a>
     
-    <a class="icon proof" href="index.html#a0000000253"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000258"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6255,7 +6415,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000253">
+<div class="proof_wrapper" id="a0000000258">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6267,7 +6427,7 @@
 
   </div>
 </div>
-<h2 id="a0000000254">0.5.7 Ultrafilters as the phase space of an \(S\)-system</h2>
+<h2 id="a0000000259">0.5.7 Ultrafilters as the phase space of an \(S\)-system</h2>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm_ultrafilters_as_system">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
@@ -6281,7 +6441,7 @@
 
     <a class="icon proof" href="index.html#thm_ultrafilters_as_system">#</a>
     
-    <a class="icon proof" href="index.html#a0000000255"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000260"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6293,7 +6453,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000255">
+<div class="proof_wrapper" id="a0000000260">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6319,7 +6479,7 @@
 
     <a class="icon proof" href="index.html#thm_beta_S_subsystem_characterization">#</a>
     
-    <a class="icon proof" href="index.html#a0000000256"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000261"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6331,7 +6491,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000256">
+<div class="proof_wrapper" id="a0000000261">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6340,7 +6500,7 @@
   </div>
   <div class="proof_content">
   <p> Let \(Z\) be an \(S\)-subsystem of \(\beta S\). Then \(SZ \subseteq Z\). Let \(z \in Z\). By <a href="index.html#thm_ultra_right_mult_continuous">theorem 131</a>, \(\rho _z: \beta S \to \beta S\) is continuous and \(\rho _z S \subseteq Z\). By <a href="index.html#lemma_image_closure_equals_closure_image">lemma 1</a>, </p>
-<div class="displaymath" id="a0000000257">
+<div class="displaymath" id="a0000000262">
   \[ \rho _z(\beta S) = \rho _z(\overline{S}) = \overline{\rho _z S} \subseteq \overline{Z} = Z, \]
 </div>
 <p> whereby \((\beta S)z \subseteq Z\). Since \(z\) was arbitrary, we have that \((\beta S)Z \subseteq Z\), meaning that \(Z\) is a left ideal. Since \(Z\) is closed, we see that \(Z\) is a closed left ideal, as desired. </p>
@@ -6362,7 +6522,7 @@
 
     <a class="icon proof" href="index.html#thm_minimal_beta_S_subsystem_characterization">#</a>
     
-    <a class="icon proof" href="index.html#a0000000258"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000263"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6374,7 +6534,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000258">
+<div class="proof_wrapper" id="a0000000263">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6403,7 +6563,7 @@
 
     <a class="icon proof" href="index.html#thm_minimal_ultrafilter_iff_unif_rec">#</a>
     
-    <a class="icon proof" href="index.html#a0000000259"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000264"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6415,7 +6575,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000259">
+<div class="proof_wrapper" id="a0000000264">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6428,9 +6588,9 @@
 
   </div>
 </div>
-<h2 id="a0000000260">0.5.8 Ultrafilters as a semigroup acting on \(X\)</h2>
+<h2 id="a0000000265">0.5.8 Ultrafilters as a semigroup acting on \(X\)</h2>
 <p>In this section, for \(f: S \to X\), recall that \(\tilde f: \beta S \to X\) is the unique continuous extension of \(f\) to \(\beta S\). </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000261">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000266">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -6442,7 +6602,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000261">#</a>
+    <a class="icon proof" href="index.html#a0000000266">#</a>
     
     
     
@@ -6467,7 +6627,7 @@
 
     <a class="icon proof" href="index.html#thm_pq_lim_is_plim_qlim">#</a>
     
-    <a class="icon proof" href="index.html#a0000000262"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000267"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6476,13 +6636,13 @@
   </div>
   <div class="theorem_thmcontent">
   <p>  Let \(S\) be a semigroup, \(X\) a compact Hausdorff space, and \(f: S \to X\). For all \(p, q \in \beta S\), </p>
-<div class="displaymath" id="a0000000263">
+<div class="displaymath" id="a0000000268">
   \[ (pq)-\lim _s f(s) = p-\lim _s (q-\lim _t f(st)). \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000262">
+<div class="proof_wrapper" id="a0000000267">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6492,7 +6652,7 @@
   <div class="proof_content">
   <p> Daniel says: These steps are broken into separate results in the lean miniproject on this topic. </p>
 <p>Step 1: for \(s \in S\) and \(f: S \to X\), </p>
-<div class="displaymath" id="a0000000264">
+<div class="displaymath" id="a0000000269">
   \[ \widetilde{f \circ \lambda _s} = \tilde f \circ \lambda _{\delta _s}. \]
 </div>
 <p> This needs that multiplication on the left by principal ultrafilters is continuous (<a href="index.html#lemma_left_multiplication_is_continuous">theorem 132</a>). </p>
@@ -6515,7 +6675,7 @@
 
     <a class="icon proof" href="index.html#thm_continuity_and_plim">#</a>
     
-    <a class="icon proof" href="index.html#a0000000265"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000270"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6527,7 +6687,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000265">
+<div class="proof_wrapper" id="a0000000270">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6554,7 +6714,7 @@
 
     <a class="icon proof" href="index.html#thm_ultra_semigroup_action">#</a>
     
-    <a class="icon proof" href="index.html#a0000000266"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000271"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6566,7 +6726,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000266">
+<div class="proof_wrapper" id="a0000000271">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6575,11 +6735,11 @@
   </div>
   <div class="proof_content">
   <p> For \(p, q \in \beta S\) and \(x \in X\), we want to show that </p>
-<div class="displaymath" id="a0000000267">
+<div class="displaymath" id="a0000000272">
   \[ (pq) x = p(qx). \]
 </div>
 <p> To see this, we get by <a href="index.html#thm_pq_lim_is_plim_qlim">theorem 142</a> and using that acting on the left by \(s\) is a continuous map \(X \to X\)(<a href="index.html#thm_continuity_and_plim">theorem 143</a>), we see </p>
-<div class="displaymath" id="a0000000268">
+<div class="displaymath" id="a0000000273">
   \begin{align*}  (pq) x & = (pq)-\lim _s sx\\ & = p-\lim _s (q-\lim _t (st)x ) \\ & = p-\lim _s (q-\lim _t s(tx)) \\ & = p-\lim _s s(q-\lim _t tx) \\ & = p-\lim _s s (qx) \\ & = p(qx). \end{align*}
 </div>
 
@@ -6598,7 +6758,7 @@
 
     <a class="icon proof" href="index.html#thm_ultrafilter_action_with_fixed_x_is_continuous">#</a>
     
-    <a class="icon proof" href="index.html#a0000000269"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000274"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6610,7 +6770,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000269">
+<div class="proof_wrapper" id="a0000000274">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6635,7 +6795,7 @@
 
     <a class="icon proof" href="index.html#thm_ultra_factor_map">#</a>
     
-    <a class="icon proof" href="index.html#a0000000270"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000275"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6647,7 +6807,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000270">
+<div class="proof_wrapper" id="a0000000275">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6672,7 +6832,7 @@
 
     <a class="icon proof" href="index.html#thm_ultra_point_in_orb_closure">#</a>
     
-    <a class="icon proof" href="index.html#a0000000271"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000276"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6684,7 +6844,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000271">
+<div class="proof_wrapper" id="a0000000276">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6710,7 +6870,7 @@
 
     <a class="icon proof" href="index.html#thm_ultra_semigroup_action_thru_factor">#</a>
     
-    <a class="icon proof" href="index.html#a0000000272"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000277"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6722,7 +6882,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000272">
+<div class="proof_wrapper" id="a0000000277">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6731,7 +6891,7 @@
   </div>
   <div class="proof_content">
   <p> Let \(p \in \beta S\) and \(x \in X\). By swapping \(p-\lim \) and \(\pi \) (<a href="index.html#thm_continuity_and_plim">theorem 143</a>), we see that </p>
-<div class="displaymath" id="a0000000273">
+<div class="displaymath" id="a0000000278">
   \[ p \pi x = p-\lim _{s \in S} s \pi x = p-\lim _{s \in S} \pi s x = \pi p-\lim _{s \in S} s x = \pi p x, \]
 </div>
 <p> as desired. </p>
@@ -6751,7 +6911,7 @@
 
     <a class="icon proof" href="index.html#lemma_plim_in_open_set_return_time">#</a>
     
-    <a class="icon proof" href="index.html#a0000000274"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000279"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6769,7 +6929,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000274">
+<div class="proof_wrapper" id="a0000000279">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6795,7 +6955,7 @@
 
     <a class="icon proof" href="index.html#lemma_ultrafilter_surjective_action">#</a>
     
-    <a class="icon proof" href="index.html#a0000000275"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000280"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6807,7 +6967,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000275">
+<div class="proof_wrapper" id="a0000000280">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6833,7 +6993,7 @@
 
     <a class="icon proof" href="index.html#lemma_exists_idempotent_px_is_x">#</a>
     
-    <a class="icon proof" href="index.html#a0000000276"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000281"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6845,7 +7005,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000276">
+<div class="proof_wrapper" id="a0000000281">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6871,7 +7031,7 @@
 
     <a class="icon proof" href="index.html#lemma_idempotent_implies_proximal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000277"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000282"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6883,7 +7043,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000277">
+<div class="proof_wrapper" id="a0000000282">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6892,7 +7052,7 @@
   </div>
   <div class="proof_content">
   <p> Let \(\alpha \subseteq X^2\) be an entourage. By the semigroup action theorem (<a href="index.html#thm_ultra_semigroup_action">theorem 144</a>), </p>
-<div class="displaymath" id="a0000000278">
+<div class="displaymath" id="a0000000283">
   \[ p(x,px) = (px,ppx) = (px,px) \in \Delta \subseteq \alpha . \]
 </div>
 <p> Therefore, by the definition of proximal (<a href="index.html#def_proximal">definition 85</a>) \(p-\lim \), there exists (many) \(s \in S\) such that \((sx,spx) \in \alpha \), as was to be shown. </p>
@@ -6913,7 +7073,7 @@
 
     <a class="icon proof" href="index.html#lemma_minimal_implies_uniformly_recurrent">#</a>
     
-    <a class="icon proof" href="index.html#a0000000279"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000284"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6925,7 +7085,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000279">
+<div class="proof_wrapper" id="a0000000284">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6934,7 +7094,7 @@
   </div>
   <div class="proof_content">
   <p> Let \(U \ni px\). Choose an open set \(V \ni px\) such that \(\overline{V} \subseteq U\). By the definition of \(p-\lim \), \(p \in \overline{R(x,V)}\). By <a href="index.html#thm_ultrafilters_as_system">theorem 137</a>, we can treat \(\beta S\) as an \(S\)-system. We claim that </p>
-<div class="displaymath" id="a0000000280">
+<div class="displaymath" id="a0000000285">
   \[ R(p,\overline{R(x,V)}) \subseteq R(px,U). \]
 </div>
 <p> Indeed, note first that \(s \in R(p,\overline{R(x,V)})\) implies \(sp \in \overline{R(x,V)}\) implies \(R(x,V) \in sp\), which by the definition of \(p-\lim \) implies \((sp)x \in \overline{V} \subseteq U\). By the ultrafilter action theorem (<a href="index.html#thm_ultra_semigroup_action">theorem 144</a>), \((sp)x = s (px)\), so \(s(px) \in U\), which implies that \(s \in R(px,U)\). </p>
@@ -6956,7 +7116,7 @@
 
     <a class="icon proof" href="index.html#lemma_ultrafilter_idempotent_lift">#</a>
     
-    <a class="icon proof" href="index.html#a0000000281"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000286"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -6968,7 +7128,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000281">
+<div class="proof_wrapper" id="a0000000286">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -6977,11 +7137,11 @@
   </div>
   <div class="proof_content">
   <p> By <a href="index.html#thm_ultrafilters_as_system">theorem 137</a>, we can treat \(\beta S\) as an \(S\)-system. By <a href="index.html#thm_minimal_beta_S_subsystem_characterization">theorem 139</a>, \(L\) is a minimal \(S\)-system. By <a href="index.html#lemma_exists_idempotent_px_is_x">lemma 151</a>, there exists an idempotent \(u \in L\) so that \(up = p\). By <a href="index.html#lemma_ultrafilter_surjective_action">lemma 150</a> (twice), there exist \(q, r \in L\) such that \(qp = u\) and \(rq = u\). By the semigroup action of \(\beta S\) on \(X\) (<a href="index.html#thm_ultra_semigroup_action">theorem 144</a>), </p>
-<div class="displaymath" id="a0000000282">
+<div class="displaymath" id="a0000000287">
   \[ qx = q (p x) = (qp) x = ux = u (px) = (up) x = px = x. \]
 </div>
 <p> By <a href="index.html#lemma_ru_is_r_for_idempotent">lemma 129</a>, \(ru = r\). Therefore, we also have </p>
-<div class="displaymath" id="a0000000283">
+<div class="displaymath" id="a0000000288">
   \[ pq = (up)q = u (pq) = (rq) (pq) = r (qp) q = ruq = (ru) q = rq = u, \]
 </div>
 <p> as desired. </p>
@@ -6996,7 +7156,7 @@
   <li><p>A few abstract results, and specific families: syndetic, thick, dcsyndetic, Bohr sets, sets of Bohr recurrence, etc... </p>
 </li>
 </ul>
-<h2 id="a0000000284">0.6.1 Abstract results</h2>
+<h2 id="a0000000289">0.6.1 Abstract results</h2>
 <div class="lemma_thmwrapper theorem-style-plain" id="lemma_pr_family_concentration">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
@@ -7010,7 +7170,7 @@
 
     <a class="icon proof" href="index.html#lemma_pr_family_concentration">#</a>
     
-    <a class="icon proof" href="index.html#a0000000285"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000290"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7022,7 +7182,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000285">
+<div class="proof_wrapper" id="a0000000290">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7031,15 +7191,15 @@
   </div>
   <div class="proof_content">
   <p>Daniel says: This argument can be shortened considerably using filter limits, which are already part of mathlib. The family \(\mathcal{F}^*\) is a filter and \(U\) is a closed set belonging to the pushforward of \(\mathcal{F}^*\) under the action map through the point \(x\). By compactness, there is a cluster point \(y\) of the pushforward of \(\mathcal{F}^*\). This says exactly that for all non-empty, open \(V \ni y\), \(R(x,V) \in \mathcal{F}\). We prove the contrapositive. Suppose for all \(y \in U\), there exists non-empty, open \(V_y \ni y\) such that \(R(x,V_y) \not\in \mathcal{F}\). By compactness of \(U\), there exists a finite set \(F \subseteq X\) such that \(U \subseteq \cup _{y \in F} V_y\). Then </p>
-<div class="displaymath" id="a0000000286">
+<div class="displaymath" id="a0000000291">
   \[ R(x,U) \subseteq R(x,\cup _{y \in F} V_y) = \cup _{y \in F} R(x,V_y). \]
 </div>
 <p> Since no \(R(x,V_y)\) is in \(\mathcal{F}\), we have that \(\cup _{y \in F} R(x,V_y) \not\in \mathcal{F}\), and hence that \(R(x,U) \not\in \mathcal{F}\), as desired. </p>
 
   </div>
 </div>
-<h2 id="a0000000287">0.6.2 Syndetic and thick sets</h2>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000288">
+<h2 id="a0000000292">0.6.2 Syndetic and thick sets</h2>
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000293">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -7050,7 +7210,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000288">#</a>
+    <a class="icon proof" href="index.html#a0000000293">#</a>
     
     
     
@@ -7080,7 +7240,7 @@
 
     <a class="icon proof" href="index.html#lemma_synd_thick_dual">#</a>
     
-    <a class="icon proof" href="index.html#a0000000289"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000294"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7092,7 +7252,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000289">
+<div class="proof_wrapper" id="a0000000294">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7117,7 +7277,7 @@
 
     <a class="icon proof" href="index.html#lemma_image_of_syndetic">#</a>
     
-    <a class="icon proof" href="index.html#a0000000290"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000295"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7129,7 +7289,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000290">
+<div class="proof_wrapper" id="a0000000295">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof sketch
@@ -7155,7 +7315,7 @@
 
     <a class="icon proof" href="index.html#lemma_thick_inverse_shift_intersections">#</a>
     
-    <a class="icon proof" href="index.html#a0000000291"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000296"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7167,7 +7327,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000291">
+<div class="proof_wrapper" id="a0000000296">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7192,7 +7352,7 @@
 
     <a class="icon proof" href="index.html#lemma_thick_shift_intersections">#</a>
     
-    <a class="icon proof" href="index.html#a0000000292"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000297"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7205,7 +7365,7 @@
   </div>
 </div>
 <p>Daniel says: An older version of this lemma for groups is in the comments. </p>
-<div class="proof_wrapper" id="a0000000292">
+<div class="proof_wrapper" id="a0000000297">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7215,7 +7375,7 @@
   <div class="proof_content">
   <p> Let \(K \subseteq S\) be finite. For \(k \in K\), let \(p_k\) be the product of all the elements of \(K\) except \(k\), and let \(p\) be the product of all elements of \(K\). By <a href="index.html#lemma_thick_inverse_shift_intersections">lemma 159</a>, the set \(\cap _{k \in K} p_k^{-1} H\) is thick. </p>
 <p>To see that \(\cap _{k \in F} kH\) is thick, let \(F \subseteq S\) finite. Since \(\cap _{k \in K} p_k^{-1} H\) is thick, there exists \(s \in S\) such that \(Fs \subseteq \cap _{k \in K} p_k^{-1} H\). Therefore, </p>
-<div class="displaymath" id="a0000000293">
+<div class="displaymath" id="a0000000298">
   \[ Fps = p F s \subseteq p \cap _{k \in K} p_k^{-1} H \subseteq \cap _{k \in K} p p_k^{-1} H \subseteq \cap _{k \in K} k H, \]
 </div>
 <p> as was to be shown. </p>
@@ -7235,7 +7395,7 @@
 
     <a class="icon proof" href="index.html#lemma_thick_closure_contains_ideal">#</a>
     
-    <a class="icon proof" href="index.html#a0000000294"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000299"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7247,7 +7407,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000294">
+<div class="proof_wrapper" id="a0000000299">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7256,21 +7416,21 @@
   </div>
   <div class="proof_content">
   <p> By <a href="index.html#lemma_thick_inverse_shift_intersections">lemma 159</a>, the set </p>
-<div class="displaymath" id="a0000000295">
+<div class="displaymath" id="a0000000300">
   \[ \big\{  \bigcap _{f \in F} \overline{f^{-1} H} \mid F \subseteq G \text{ finite, non-empty}\big\}  \]
 </div>
 <p> has the finite intersection property. Since \(\beta S\) is compact (<a href="index.html#thm_ultrafilters_are_compact_right_top">theorem 133</a>), the set </p>
-<div class="displaymath" id="a0000000296">
+<div class="displaymath" id="a0000000301">
   \[ L \vcentcolon =\bigcap _{g \in S} \overline{g^{-1}H} \]
 </div>
 <p> is non-empty. </p>
 <p>We will show that \(L\) is a left ideal. Let \(p \in L\). We will show first that for all \(s \in S\), \(\delta _s p \in L\). Let \(s \in S\), \(g \in S\). We must show that \(\delta _s p \in \overline{g^{-1} H}\). By the definition of \(L\) and <a href="index.html#lemma_pull_out_inverse_mult_in_basis_set">lemma 128</a>, we see </p>
-<div class="displaymath" id="a0000000297">
+<div class="displaymath" id="a0000000302">
   \[ \delta _sp \in \delta _s \overline{(gs)^{-1} H} = \delta _s \overline{s^{-1}g^{-1} H} = \delta _s \delta _s^{-1} \overline{g^{-1} H} \subseteq \overline{g^{-1} H}, \]
 </div>
 <p> as desired. Denoting right multiplication by \(p\) by \(\rho _p: \beta S \to \beta S\), we have shown that \(\rho _p(\{ \delta _s : s \in S\} ) \subseteq L\). </p>
 <p>By <a href="index.html#thm_ultra_right_mult_continuous">theorem 131</a>, \(\rho _p\) is continuous. Since \(L\) is closed, by <a href="index.html#lemma_image_closure_equals_closure_image">lemma 1</a>, we see </p>
-<div class="displaymath" id="a0000000298">
+<div class="displaymath" id="a0000000303">
   \[ \rho _p(\beta S) = \rho _p(\overline{S}) = \overline{\rho _p(\{ \delta _s : s \in S\} )} \subseteq \overline{L} = L. \]
 </div>
 <p> In other words: for all \(q \in \beta S\), \(qL \subseteq L\), as was to be shown. </p>
@@ -7291,7 +7451,7 @@
 
     <a class="icon proof" href="index.html#lemma_thick_closure_contains_strong_ultrafilter">#</a>
     
-    <a class="icon proof" href="index.html#a0000000299"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000304"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7303,7 +7463,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000299">
+<div class="proof_wrapper" id="a0000000304">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7312,11 +7472,11 @@
   </div>
   <div class="proof_content">
   <p> From the proof of <a href="index.html#lemma_thick_closure_contains_ideal">lemma 161</a>, there exists a minimal left ideal </p>
-<div class="displaymath" id="a0000000300">
+<div class="displaymath" id="a0000000305">
   \[ L' \subseteq \bigcap _{g \in S} \overline{g^{-1}H}. \]
 </div>
 <p>By <a href="index.html#lemma_exists_idempotent_in_left_ideals">lemma 135</a>, \(L'\) contains an idempotent \(p\). Then \(p\) is a minimal, idempotent ultrafilter. To see that it has the stated property, let \(F \subseteq S\) be finite. Then </p>
-<div class="displaymath" id="a0000000301">
+<div class="displaymath" id="a0000000306">
   \[ p \in L' \subseteq \bigcap _{f \in F} \overline{f^{-1} H}, \]
 </div>
 <p> which means that \(\cap _{f \in F} f^{-1} H \in p\), as desired. </p>
@@ -7336,7 +7496,7 @@
 
     <a class="icon proof" href="index.html#lemma_preimage_intersection_of_thick_is_thick">#</a>
     
-    <a class="icon proof" href="index.html#a0000000302"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000307"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7345,14 +7505,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(S\) be a commutative semigroup and \(B \subseteq S\) be thick. For all finite \(K \subseteq S\), the set </p>
-<div class="displaymath" id="a0000000303">
+<div class="displaymath" id="a0000000308">
   \[ \bigcap _{k \in K} k^{-1} B \]
 </div>
 <p> is thick. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000302">
+<div class="proof_wrapper" id="a0000000307">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7364,8 +7524,8 @@
 
   </div>
 </div>
-<h2 id="a0000000304">0.6.3 Delta sets</h2>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000305">
+<h2 id="a0000000309">0.6.3 Delta sets</h2>
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000310">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -7376,7 +7536,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000305">#</a>
+    <a class="icon proof" href="index.html#a0000000310">#</a>
     
     
     
@@ -7406,7 +7566,7 @@
 
     <a class="icon proof" href="index.html#thm_delta_in_deltazero">#</a>
     
-    <a class="icon proof" href="index.html#a0000000306"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000311"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7418,7 +7578,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000306">
+<div class="proof_wrapper" id="a0000000311">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7430,9 +7590,9 @@
 
   </div>
 </div>
-<h2 id="a0000000307">0.6.4 Bohr sets</h2>
+<h2 id="a0000000312">0.6.4 Bohr sets</h2>
 <p>Daniel says: In the definition below, we require the system to be minimal. We can drop that assumption if all points are uniformly recurrent for an equicontinuous semigroup action. This is true for group actions, but may not be true any longer for semigroup actions. </p>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000308">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000313">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -7443,7 +7603,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000308">#</a>
+    <a class="icon proof" href="index.html#a0000000313">#</a>
     
     
     
@@ -7473,7 +7633,7 @@
 
     <a class="icon proof" href="index.html#lemma_dcsyndeticbohr_dcthickbohr_dual">#</a>
     
-    <a class="icon proof" href="index.html#a0000000309"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000314"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7485,7 +7645,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000309">
+<div class="proof_wrapper" id="a0000000314">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7510,7 +7670,7 @@
 
     <a class="icon proof" href="index.html#lemma_dcsyndeticbohr_is_filter">#</a>
     
-    <a class="icon proof" href="index.html#a0000000310"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000315"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7522,7 +7682,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000310">
+<div class="proof_wrapper" id="a0000000315">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7548,7 +7708,7 @@
 
     <a class="icon proof" href="index.html#lemma_dcthickbohr_is_pr">#</a>
     
-    <a class="icon proof" href="index.html#a0000000311"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000316"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7560,7 +7720,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000311">
+<div class="proof_wrapper" id="a0000000316">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7585,7 +7745,7 @@
 
     <a class="icon proof" href="index.html#thm_delta_zero_set_of_bohr_rec">#</a>
     
-    <a class="icon proof" href="index.html#a0000000312"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000317"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7597,7 +7757,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000312">
+<div class="proof_wrapper" id="a0000000317">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7608,18 +7768,18 @@
   <p> Suppose \(A \in \Delta _0\) and we want to show that \(A \cap R(x,U) \neq \emptyset \), where \(X\) is a minimal, equicontinuous \(S\)-system, \(x \in U \subseteq X\). Since \(X\) is compact, Hausdorff, it has a unique uniform structure. Thus, there exists an entourage \(\beta \subseteq X^2\) such that \(\beta [x] \subseteq U\). By equicontinuity, there exists an entourage \(\alpha \subseteq X^2\) such that for all \(s \in S\), \((s \otimes s) \alpha \subseteq \beta \). </p>
 <p>Let \(\gamma \) be an entourage such that \(\gamma \circ \gamma \subseteq \alpha \). But replacing \(\gamma \) with \(\gamma \cap \gamma ^{-1}\), we can assume \(\gamma \) is symmetric (i.e. \((x, y) \in \gamma \) if and only if \((y, x) \in \gamma )\). </p>
 <p>Note that \(\Delta (X) \subseteq \gamma \), whereby </p>
-<div class="displaymath" id="a0000000313">
+<div class="displaymath" id="a0000000318">
   \[  X = \bigcup _{x \in X} \gamma [x].  \]
 </div>
 <p> By compactness, there exists a finite set \(Z \subseteq X\) such that </p>
-<div class="displaymath" id="a0000000314">
+<div class="displaymath" id="a0000000319">
   \[  X = \bigcup _{z \in Z} \gamma [z].  \]
 </div>
 <p> Put \(N = |Z|+1\). By the assumption that \(A\) is a \(\Delta _0\) set, there exists \(s_1, \ldots , s_N \in S\) such that for all \(1 \leq m {\lt} n \leq N\), \(s_n \in s_m A\). </p>
 <p>By <a href="index.html#lemma_minimal_comm_action_implies_surjective">lemma 79</a>, the elements \(s_1, \ldots , s_N\) act surjectively on \(X\). Therefore, there exists \(y_1, \ldots , y_N \in X\) such that \(s_i y_i = x\). </p>
 <p>Consider the points \(y_1, \ldots , y_N\). Since \(N {\gt} |Z|\), by pigeonhole principle, there are \(1 \leq m {\lt} n \leq N\) and \(z \in Z\) such that \((y_n, y_m) \in \gamma [z] \times \gamma [z]\). It follows that \((z, y_n), (z, y_m) \in \gamma \). Since \(\gamma \) is symmetric, \((y_n, z) \in \gamma \). Since \(\gamma \circ \gamma \subseteq \alpha \), we have \((y_n, y_m) \in \alpha \). </p>
 <p>Since \(s_n \in s_m A\), there exist \(a \in A\) such that \(s_n = s_m a\). Act on the product by \(s_n\) to see that </p>
-<div class="displaymath" id="a0000000315">
+<div class="displaymath" id="a0000000320">
   \[  (x,a x) = (x, a s_m y_m) = (x, s_n y_m) = (s_n \otimes s_n) (y_n, y_m) \in (s_n \otimes s_n) \alpha \subseteq \beta ,  \]
 </div>
 <p> whereby \(a x \in \beta [x]\). Since \(\beta [x] \subseteq U\), we have \(a \in R(x,U)\). Note that \(a \in A\) and so \(A \cap R(x,U) \neq \emptyset \), as was to be shown. </p>
@@ -7641,10 +7801,10 @@
 <h2 id="sec_corner_space">0.7.1 Corner space</h2>
 
 <p>Let \(S\) be a commutative semigroup and \(X\) be an \(S\)-system. For \(s, t \in S\), define maps \(T_{L,s}, T_{R,t}: X^3 \to X^3\) by </p>
-<div class="displaymath" id="a0000000316">
+<div class="displaymath" id="a0000000321">
   \begin{align*}  T_{L,s}(x,y,z) & = (sx, sy, z)\\ T_{R,t}(x,y,z) & = (x, ty, tz). \end{align*}
 </div>
-<div class="lemma_thmwrapper theorem-style-plain" id="a0000000317">
+<div class="lemma_thmwrapper theorem-style-plain" id="a0000000322">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
@@ -7656,9 +7816,9 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000317">#</a>
+    <a class="icon proof" href="index.html#a0000000322">#</a>
     
-    <a class="icon proof" href="index.html#a0000000318"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000323"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7667,14 +7827,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p> The map \(S^2 \times X^3 \to X^3\) given by </p>
-<div class="displaymath" id="a0000000319">
+<div class="displaymath" id="a0000000324">
   \[ (s,t)(x,y,z) = T_{L,s}T_{R,t}(x,y,z) = (sx,sty,tz) \]
 </div>
 <p> makes \(X^3\) an \(S^2\)-system. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000318">
+<div class="proof_wrapper" id="a0000000323">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7686,9 +7846,9 @@
 
   </div>
 </div>
-<h3 id="a0000000320">Action of \(S^2\) on \(X^2\)</h3>
+<h3 id="a0000000325">Action of \(S^2\) on \(X^2\)</h3>
 <p>Overloading notation, for \(s, t \in S\), we define maps \(T_{L,s}, T_{R,s}: X^2 \to X^2\) by </p>
-<div class="displaymath" id="a0000000321">
+<div class="displaymath" id="a0000000326">
   \begin{align*}  T_{L,s}(x,y) & = (sx, sy)\\ T_{R,t}(x,y) & = (x, ty). \end{align*}
 </div>
 <div class="lemma_thmwrapper theorem-style-plain" id="lemma_S2_action_on_X2">
@@ -7705,7 +7865,7 @@
 
     <a class="icon proof" href="index.html#lemma_S2_action_on_X2">#</a>
     
-    <a class="icon proof" href="index.html#a0000000322"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000327"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7714,14 +7874,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  The map \(S^2 \times X^2 \to X^2\) given by </p>
-<div class="displaymath" id="a0000000323">
+<div class="displaymath" id="a0000000328">
   \[ (s,t)(x,y) = T_{L,s}T_{R,t}(x,y) = (sx,sty) \]
 </div>
 <p> makes \(X^2\) an \(S^2\) system. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000322">
+<div class="proof_wrapper" id="a0000000327">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7746,7 +7906,7 @@
 
     <a class="icon proof" href="index.html#lemma_x3_to_x2_is_S2_factor_map">#</a>
     
-    <a class="icon proof" href="index.html#a0000000324"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000329"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7758,7 +7918,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000324">
+<div class="proof_wrapper" id="a0000000329">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7767,7 +7927,7 @@
   </div>
   <div class="proof_content">
   <p> By <a href="index.html#lemma_S2_action_on_X2">lemma 172</a>, both \(X^3\) and \(X^2\) are \(S^2\)-systems. We need only show that for all \((s,t) \in S^2\), \((s,t) \pi _{12} = \pi _{12} (s,t)\). Let \((s,t) \in S^2\) and \((x,y,z) \in X^3\). Then </p>
-<div class="displaymath" id="a0000000325">
+<div class="displaymath" id="a0000000330">
   \[ (s,t) \pi _{12} (x,y,z) = (s,t)(x,y) = (sx,sty) = \pi _{12} (s,t) (x,y,z). \]
 </div>
 
@@ -7786,7 +7946,7 @@
 
     <a class="icon proof" href="index.html#lem_minimal_h_from_g">#</a>
     
-    <a class="icon proof" href="index.html#a0000000326"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000331"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7798,7 +7958,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000326">
+<div class="proof_wrapper" id="a0000000331">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7807,7 +7967,7 @@
   </div>
   <div class="proof_content">
   <p>We will show that every point in \(X^2\) has a dense \(S^2\)-orbit. Let \((x,y) \in X^2\), \(U \subseteq X\), and \(V \subseteq X\). Since \(X\) is a minimal \(S\)-system, there exists \(s \in R_S(x,U)\) so that \((sx,sy) \in U \times X\). Since \(X\) is a minimal \(S\)-system, there exists \(t \in R_S(sy,V)\) so that </p>
-<div class="displaymath" id="a0000000327">
+<div class="displaymath" id="a0000000332">
   \[ (s,t) (x,y) = (sx,tsy) \in U \times V. \]
 </div>
 
@@ -7826,7 +7986,7 @@
 
     <a class="icon proof" href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v2">#</a>
     
-    <a class="icon proof" href="index.html#a0000000328"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000333"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7835,14 +7995,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(X\) be a \(S\)-system and \(x, y, z \in X\). If \((x,y,z)\) is \(S^2\)-uniformly recurrent, then </p>
-<div class="displaymath" id="a0000000329">
+<div class="displaymath" id="a0000000334">
   \[ \overline{S (x,y)} \times \{ z\}  \subseteq \overline{S^2(x,y,z)}. \]
 </div>
 
   </div>
 </div>
 <p>Daniel says: We can strengthen this by replacing “uniformly recurrent” with “recurrent,” but we don’t have an application for that, and we’ve not defined recurrent. </p>
-<div class="proof_wrapper" id="a0000000328">
+<div class="proof_wrapper" id="a0000000333">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7867,7 +8027,7 @@
 
     <a class="icon proof" href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v3">#</a>
     
-    <a class="icon proof" href="index.html#a0000000330"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000335"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7876,13 +8036,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p> Let \(X\) be a \(S\)-system and \(x, y, z \in X\). If \((x,y,z)\) is \(S^2\)-uniformly recurrent, then </p>
-<div class="displaymath" id="a0000000331">
+<div class="displaymath" id="a0000000336">
   \[ \{ x\}  \times \overline{S (y,z)} \subseteq \overline{S^2(x,y,z)}. \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000330">
+<div class="proof_wrapper" id="a0000000335">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7895,13 +8055,13 @@
   </div>
 </div>
 
-<h3 id="a0000000332">Action of \(S^2\) on \(X\)</h3>
+<h3 id="a0000000337">Action of \(S^2\) on \(X\)</h3>
 <p>Overloading notation again, for \(s, t \in S\), we define maps \(T_{L,s}, T_{R,s}: X \to X\) by </p>
-<div class="displaymath" id="a0000000333">
+<div class="displaymath" id="a0000000338">
   \begin{align*}  T_{L,s}z & = z\\ T_{R,t}z & = tz. \end{align*}
 </div>
 <p> We define an action of \(S^2\) on \(X\) via </p>
-<div class="displaymath" id="a0000000334">
+<div class="displaymath" id="a0000000339">
   \[ (s,t)z = T_{L,s}T_{R,t}z = tz. \]
 </div>
 <div class="lemma_thmwrapper theorem-style-plain" id="lemma_S2_action_on_X">
@@ -7918,7 +8078,7 @@
 
     <a class="icon proof" href="index.html#lemma_S2_action_on_X">#</a>
     
-    <a class="icon proof" href="index.html#a0000000335"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000340"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7927,14 +8087,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  The map \(S^2 \times X \to X\) given by </p>
-<div class="displaymath" id="a0000000336">
+<div class="displaymath" id="a0000000341">
   \[ (s,t)z = T_{L,s}T_{R,t}z = tz \]
 </div>
 <p> makes \(X\) an \(S^2\) system. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000335">
+<div class="proof_wrapper" id="a0000000340">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7959,7 +8119,7 @@
 
     <a class="icon proof" href="index.html#lemma_x3_to_x_is_S2_factor_map">#</a>
     
-    <a class="icon proof" href="index.html#a0000000337"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000342"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -7971,7 +8131,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000337">
+<div class="proof_wrapper" id="a0000000342">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -7980,7 +8140,7 @@
   </div>
   <div class="proof_content">
   <p> By <a href="index.html#lemma_S2_action_on_X">lemma 177</a>, both \(X^3\) and \(X\) are \(S^2\)-systems. We need only show that for all \((s,t) \in S^2\), \((s,t) \pi _{3} = \pi _{3} (s,t)\). Let \((s,t) \in S^2\) and \((x,y,z) \in X^3\). Then </p>
-<div class="displaymath" id="a0000000338">
+<div class="displaymath" id="a0000000343">
   \[ (s,t) \pi _{3} (x,y,z) = (s,t)z = tz) = \pi _{3} (s,t) (x,y,z). \]
 </div>
 
@@ -7999,7 +8159,7 @@
 
     <a class="icon proof" href="index.html#lemma_prox_in_h_implies_in_g">#</a>
     
-    <a class="icon proof" href="index.html#a0000000339"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000344"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8011,7 +8171,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000339">
+<div class="proof_wrapper" id="a0000000344">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8023,7 +8183,7 @@
 
   </div>
 </div>
-<h3 id="a0000000340">Ultrafilters and the corner space</h3>
+<h3 id="a0000000345">Ultrafilters and the corner space</h3>
 <p>We showed above that \(X^3\), \(X^2\), and \(X\) are all \(S^2\)-systems. By <a href="index.html#thm_ultra_semigroup_action">theorem 144</a>, we can consider the semigroup action of \(\beta S^2\) on \(X^3\), \(X^2\), and \(X\). For \(p \in \beta S^2\), we write \(p(x,y,z)\), \(p(x,y)\), and \(px\) to denote this action. </p>
 <div class="lemma_thmwrapper theorem-style-plain" id="lemma_ultrafilter_action_on_X3">
   <div class="lemma_thmheading">
@@ -8038,7 +8198,7 @@
 
     <a class="icon proof" href="index.html#lemma_ultrafilter_action_on_X3">#</a>
     
-    <a class="icon proof" href="index.html#a0000000341"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000346"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8047,13 +8207,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p> For all \(p \in \beta S^2\) and all \((x,y,z) \in X^3\), </p>
-<div class="displaymath" id="<plasTeX.TeXFragment object at 0x10dc22760>">
+<div class="displaymath" id="<plasTeX.TeXFragment object at 0x10542a7c0>">
   \begin{align}  \label{eqn_ultrafilter_action_on_X3} p (x,y,z) = (p (x,y), p z). \end{align}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000341">
+<div class="proof_wrapper" id="a0000000346">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8065,7 +8225,7 @@
 
   </div>
 </div>
-<h2 id="a0000000342">0.7.2 The \(\mathbf{RP}\) relation and corner space dynamics</h2>
+<h2 id="a0000000347">0.7.2 The \(\mathbf{RP}\) relation and corner space dynamics</h2>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm_xxx_is_trtl_unif_rec_v3">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
@@ -8079,7 +8239,7 @@
 
     <a class="icon proof" href="index.html#thm_xxx_is_trtl_unif_rec_v3">#</a>
     
-    <a class="icon proof" href="index.html#a0000000343"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000348"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8091,7 +8251,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000343">
+<div class="proof_wrapper" id="a0000000348">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8119,7 +8279,7 @@
 
     <a class="icon proof" href="index.html#theorem_cube_space_orbit_implies_rp">#</a>
     
-    <a class="icon proof" href="index.html#a0000000344"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000349"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8131,7 +8291,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000344">
+<div class="proof_wrapper" id="a0000000349">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8140,31 +8300,31 @@
   </div>
   <div class="proof_content">
   <p> Suppose \((x,y) \in \mathbf{RP}\). By <a href="index.html#lemma_rp_implies_net_iff">lemma 92</a>, there exists \(w \in X\) and a net \((a_n, b_n, s_n)_n \subseteq X \times X \times S\) such that </p>
-<div class="displaymath" id="a0000000345">
+<div class="displaymath" id="a0000000350">
   \[ (a_n, b_n, s_n a_n, s_n b_n) \to (w, w, x, y). \]
 </div>
 <p>Fix a minimal left ideal \(L \subseteq \beta S^2\). Since \(X^2\) is a minimal \(S^2\)-system, by <a href="index.html#lemma_ultrafilter_surjective_action">lemma 150</a>, there exists \(p_n \in L\) such that \(p_n (w,w) = (a_n, b_n)\). By <a href="index.html#lemma_ultrafilter_action_on_X3">lemma 180</a>, \(p_n (w,w,y) = (a_n, b_n, p_n y)\). </p>
 <p>Since \(L\) is compact, the net \((p_n)_n\) in \(L\) has an accumulation point \(p \in L\). Pass to a convergent subnet so that </p>
-<div class="displaymath" id="a0000000346">
+<div class="displaymath" id="a0000000351">
   \[ (a_m, b_m, s_m a_m, s_m b_m, p_m) \to (w, w, x, y, p). \]
 </div>
 <p> By <a href="index.html#thm_ultrafilter_action_with_fixed_x_is_continuous">theorem 145</a>, the map \(\beta S^2 \to X^2\) given by \(q \mapsto q(w,w)\) is continuous. Since \(p_m \to p\), we have that \(p_m(w,w) \to p(w,w)\). But \(p_n(w,w) = (a_n,b_n)\) and \((a_n,b_n) \to (w,w)\), so we see that \(p (w,w) = (w,w)\). </p>
 <p>By <a href="index.html#lemma_ultrafilter_idempotent_lift">lemma 154</a>, there exists \(q \in L\) such that \(q (w,w) = (w,w)\) and \(pq\) is idempotent. Since the map \(\beta S^2 \to X\) given by \(r \mapsto rqy\) is continuous (<a href="index.html#thm_ultrafilter_action_with_fixed_x_is_continuous">theorem 145</a>) and \(p_m \to p\), we see that \(p_m q y \to p q y\). Consequently: </p>
-<div class="displaymath" id="<plasTeX.TeXFragment object at 0x10dc87580>">
+<div class="displaymath" id="<plasTeX.TeXFragment object at 0x1054815e0>">
   \begin{align}  \label{eqn_orb_closure_eqn_1} T_{L,s_m} p_m q (w,w,y) = T_{L,g_m} p_m (w,w, q y) = (s_ma_m, s_mb_m, p_m q y) \to (x, y, p q y). \end{align}
 </div>
 <p> Since \(p_mq \in L \subseteq \beta S^2\), we have by <a href="index.html#thm_ultra_point_in_orb_closure">theorem 147</a> that \((a_m, b_m, p_m q y) \in \overline{S^2 (w,w,y)}\). Since \((w,w,y)\) is \(S^2\)-uniformly recurrent (by <a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>) and \((s_ma_m, s_mb_m) \in \overline{S(a_m,b_m)}\), we have by <a href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v2">lemma 175</a> that \((s_ma_m, s_mb_m, p_m q y) \in \overline{S^2 (a_m,b_m,p_mqy)}\). By transitivity (<a href="index.html#theorem_orbit_closure_transitivity">theorem 55</a>), we get that </p>
-<div class="displaymath" id="a0000000347">
+<div class="displaymath" id="a0000000352">
   \[ (s_ma_m, s_mb_m, p_m q y) \in \overline{S^2 (w,w,y)}. \]
 </div>
 <p> Since \(\overline{S^2 (w,w,y)}\) is closed, we conclude from ?? that \((x, y, p q y) \in \overline{S^2 (w,w,y)}\). </p>
 <p>Since \(X\) is a minimal \(S\)-system, by the definition of minimal and the diagonal action, \((w,w) \in \overline{S(y,y)}\). Since \((y,y,y)\) is \(S^2\)-uniformly recurrent (<a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>), by <a href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v2">lemma 175</a>, we have that \((w,w,y) \in \overline{S^2(y,y,y)}\). By transitivity (<a href="index.html#theorem_orbit_closure_transitivity">theorem 55</a>), we get that </p>
-<div class="displaymath" id="a0000000348">
+<div class="displaymath" id="a0000000353">
   \[ (x, y, pq y) \in \overline{S^2(y,y,y)}. \]
 </div>
 <p> Note that since \((y,y,y)\) is \(S^2\)-uniformly recurrent (<a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>), by <a href="index.html#lemma_in_orb_clos_of_ur_implies_ur">lemma 83</a>, we have that \((x,y, pq y)\) is \(S^2\)-uniformly recurrent. </p>
 <p>Since \(pq \in L \subseteq \beta S^2\) is idempotent, the point \(pq y\) is \(S^2\)-proximal to \(y\). By <a href="index.html#lemma_prox_in_h_implies_in_g">lemma 179</a>, the points \(pq y\) and \(y\) are \(S\)-proximal. It follows that \((y,y) \in \overline{S(y,pqy)}\). Since \((x,y, pq y)\) is \(S^2\)-uniformly recurrent, by <a href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v3">lemma 176</a>, \((x, y, y) \in \overline{S^2 (x, y, pq y)}\). By transitivity (<a href="index.html#theorem_orbit_closure_transitivity">theorem 55</a>), we have that </p>
-<div class="displaymath" id="a0000000349">
+<div class="displaymath" id="a0000000354">
   \[ (x, y, y) \in \overline{S^2 (y,y,y)}, \]
 </div>
 <p> as was to be shown. </p>
@@ -8173,7 +8333,7 @@
 
   </div>
 </div>
-<h2 id="a0000000350">0.7.3 RP is an equivalence relation</h2>
+<h2 id="a0000000355">0.7.3 RP is an equivalence relation</h2>
 <div class="theorem_thmwrapper theorem-style-plain" id="theorem_rp_is_transitive">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
@@ -8187,7 +8347,7 @@
 
     <a class="icon proof" href="index.html#theorem_rp_is_transitive">#</a>
     
-    <a class="icon proof" href="index.html#a0000000351"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000356"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8199,7 +8359,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000351">
+<div class="proof_wrapper" id="a0000000356">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8209,11 +8369,11 @@
   <div class="proof_content">
   <p> Let \((x,y), (y,z) \in \mathbf{RP}\). Since \((x,y) \in \mathbf{RP}\), by <a href="index.html#theorem_cube_space_orbit_implies_rp">theorem 182</a>, we have that \((x,y,y) \in \overline{S^2(y,y,y)}\). By minimality, \((z,z) \in \overline{S(y,y)}\). Since \((x,y,y)\) is \(S^2\)-uniformly recurrent (<a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>), by <a href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v3">lemma 176</a>, \((x,z,z) \in \overline{S^2(x,y,y)}\). Since \((y,z) \in \mathbf{RP}\), by <a href="index.html#theorem_cube_space_orbit_implies_rp">theorem 182</a>, we have that \((y,z,z) \in \overline{S^2(z,z,z)}\). By minimality, \((y,y) \in \overline{S(z,z)}\). Since \((y,z,z)\) is \(S^2\)-uniformly recurrent (<a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>), by <a href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v3">lemma 176</a>, \((y,y,y) \in \overline{S^2(y,z,z)}\). </p>
 <p>Recapping the conclusions from the previous paragraph: </p>
-<div class="displaymath" id="a0000000352">
+<div class="displaymath" id="a0000000357">
   \begin{align*}  (y,z,z) \in \overline{S^2(z,z,z)}\\ (y,y,y) \in \overline{S^2(y,z,z)}\\ (x,y,y) \in \overline{S^2(y,y,y)}\\ (x,z,z) \in \overline{S^2(x,y,y)}\\ \end{align*}
 </div>
 <p> By transitivity (<a href="index.html#theorem_orbit_closure_transitivity">theorem 55</a>), we see that </p>
-<div class="displaymath" id="a0000000353">
+<div class="displaymath" id="a0000000358">
   \[ (x,z,z) \in \overline{S^2(z,z,z)}. \]
 </div>
 <p> It follows by <a href="index.html#theorem_cube_space_orbit_implies_rp">theorem 182</a> that \((x,z) \in \mathbf{RP}\), as was to be shown. </p>
@@ -8233,7 +8393,7 @@
 
     <a class="icon proof" href="index.html#theorem_rp_is_ICER">#</a>
     
-    <a class="icon proof" href="index.html#a0000000354"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000359"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8245,7 +8405,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000354">
+<div class="proof_wrapper" id="a0000000359">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8270,7 +8430,7 @@
 
     <a class="icon proof" href="index.html#thm_rp_equals_s">#</a>
     
-    <a class="icon proof" href="index.html#a0000000355"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000360"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8282,7 +8442,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000355">
+<div class="proof_wrapper" id="a0000000360">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8294,7 +8454,7 @@
 
   </div>
 </div>
-<h2 id="a0000000356">0.7.4 A set recurrence corollary</h2>
+<h2 id="a0000000361">0.7.4 A set recurrence corollary</h2>
 <p>Here is another application of the material in this section. The theorem below is used later to build \(\Delta \) sets. A version of this theorem for abelian group actions can be found already in Veech <span class="cite">
 	[
 </span>. </p>
@@ -8311,7 +8471,7 @@
 
     <a class="icon proof" href="index.html#thm_delta_set_builder_prestep">#</a>
     
-    <a class="icon proof" href="index.html#a0000000357"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000362"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8320,14 +8480,14 @@
   </div>
   <div class="theorem_thmcontent">
   <p> Let \(S\) be a commutative semigroup, let \(X\) be a minimal \(S\)-system, and let \(x, y \in X\). If \((x,y) \in \mathbf{RP}\), then for all non-empty, open \(U, V \subseteq X\) with \(y \in V\), we have that </p>
-<div class="displaymath" id="a0000000358">
+<div class="displaymath" id="a0000000363">
   \[ R(x,U) \cap R(V,U) \]
 </div>
 <p> is syndetic. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000357">
+<div class="proof_wrapper" id="a0000000362">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8337,7 +8497,7 @@
   <div class="proof_content">
   <p> Let \(U, V \subseteq X\) be non-empty, open with \(y \in V\). Let \(z \in U\). By <a href="index.html#lemma_rp_basics">lemma 88</a>, \(\mathbf{RP}\) is symmetric, so \((y,x) \in \mathbf{RP}\). By <a href="index.html#theorem_cube_space_orbit_implies_rp">theorem 182</a>, \((y,x,x) \in \overline{S^2 (x,x,x)}\). By minimality, \((z,z) \in \overline{S(x,x)}\). Since \((x,x,x)\) is \(S^2\)-uniformly recurrent (<a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>), by <a href="index.html#lemma_S_orb_closure_contained_in_S2_orbit_closure_v3">lemma 176</a>, \((y,z,z) \in \overline{S^2(y,x,x)}\). By transitivity (<a href="index.html#theorem_orbit_closure_transitivity">theorem 55</a>), \((y,z,z) \in \overline{S^2 (x,x,x)}\). </p>
 <p>By <a href="index.html#thm_xxx_is_trtl_unif_rec_v3">theorem 181</a>, the point \((x,x,x)\) is \(S^2\)-uniformly recurrent. Since \(V \times U \times U\) is an open neighborhood of \((y,z,z)\) and \((y,z,z) \in \overline{S^2 (x,x,x)}\), we get that \(R_{S^2}((x,x,x), V \times U \times U)\) is syndetic. This is the set of pairs \((g,r) \in S^2\) such that \(T_{L,g} T_{R,r} (x,x,x) \in V \times U \times U\) – that is, such that \(r \in R(x,U)\), \(g \in R(x,V)\), \(rg \in R(x,U)\). For each such pair \((g,r) \in S^2\), we see by <a href="index.html#lemma_return_time_algebra_three">lemma 70</a> that </p>
-<div class="displaymath" id="a0000000359">
+<div class="displaymath" id="a0000000364">
   \[ r \in R(x,U) \cap (R(x,U) R(x,V)^{-1}) = R(x,U) \cap R(V,U). \]
 </div>
 <p> Applying \(\pi _2: S^2 \to S\), a surjective semigroup homomorphism, to this set of pairs and using <a href="index.html#lemma_image_of_syndetic">lemma 158</a>, we see that the set \(R(x,U) \cap R(V,U)\) is syndetic, as desired. </p>
@@ -8352,8 +8512,8 @@
   <li><p>This is the main application: \(\mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}= \mathcal{S}\curlywedge \Delta \) </p>
 </li>
 </ul>
-<h2 id="a0000000360">0.8.1 Reduction to dynamically syndetic sets</h2>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000361">
+<h2 id="a0000000365">0.8.1 Reduction to dynamically syndetic sets</h2>
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000366">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -8364,7 +8524,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000361">#</a>
+    <a class="icon proof" href="index.html#a0000000366">#</a>
     
     
     
@@ -8395,13 +8555,13 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(S\) be a semigroup. The symbolic system on \(S\) is set \(X = \{ 0,1\} ^S\) with the product topology (so that it is compact and Hausdorff) together with the action of \(S\) on \(X\) given for \(s \in S\) and \(\omega \in X\) by </p>
-<div class="displaymath" id="a0000000362">
+<div class="displaymath" id="a0000000367">
   \[ \forall \  t \in S, \  (s \omega )(t) = \omega (st). \]
 </div>
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="a0000000363">
+<div class="definition_thmwrapper theorem-style-definition" id="a0000000368">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
@@ -8413,7 +8573,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="index.html#a0000000363">#</a>
+    <a class="icon proof" href="index.html#a0000000368">#</a>
     
     
     
@@ -8421,7 +8581,7 @@
   </div>
   <div class="definition_thmcontent">
   <p> Let \(S\) be a set, \(s \in S\), and \(a \in \{ 0,1\} \). The cylinder set \([a]_s\) is defined as </p>
-<div class="displaymath" id="a0000000364">
+<div class="displaymath" id="a0000000369">
   \[ \{ \omega \in \{ 0,1\} ^{S} : \omega (s) = a\} . \]
 </div>
 
@@ -8440,7 +8600,7 @@
 
     <a class="icon proof" href="index.html#lemma_unif_rec_implies_CRTURP">#</a>
     
-    <a class="icon proof" href="index.html#a0000000365"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000370"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8452,7 +8612,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000365">
+<div class="proof_wrapper" id="a0000000370">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof outline
@@ -8464,7 +8624,7 @@
 <p>But we don’t want to assume that \(S\) has an identity. Thus, here is the outline for the proof in that case. </p>
 <ol class="enumerate">
   <li><p>Let \(S\) be a semigroup, \(T\) be a semigroup with identity \(e_T\), and \(i: S \to T\) be an injective homomorphism of semigroups. Suppose that \(e_T\) is not in the range of \(i\). (This is a strange technical condition that our setting will satisfy.) From <a href="index.html#def_symbolic_system">definition 188</a>, \(T\) acts on \(\{ 0,1\} ^T\). Via the homomorphism \(i\), we have by <a href="index.html#def_hom_system">definition 54</a> that \(\{ 0,1\} ^T\) is an \(S\)-system. Thus, for \(\omega \in \{ 0,1\} ^T\), we have </p>
-<div class="displaymath" id="a0000000366">
+<div class="displaymath" id="a0000000371">
   \[  \forall \  t \in T, \  (s \omega )(t) = \omega ((is)t).  \]
 </div>
 </li>
@@ -8494,7 +8654,7 @@
 
     <a class="icon proof" href="index.html#lem:auslander-ellis">#</a>
     
-    <a class="icon proof" href="index.html#a0000000367"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000372"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8506,7 +8666,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000367">
+<div class="proof_wrapper" id="a0000000372">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8516,19 +8676,19 @@
   <div class="proof_content">
   <p> Since \(H\) is thick, by <a href="index.html#lemma_thick_closure_contains_strong_ultrafilter">lemma 162</a>, there exists a minimal, idempotent ultrafilter \(p \in \overline{H} \subseteq \beta S\) such that for all finite \(F \subseteq S\), \(\cap _{f \in F} f^{-1} H \in p\). Let \(1_B = p 1_{A \cap H}\). It follows from <a href="index.html#lemma_minimal_implies_uniformly_recurrent">lemma 153</a> that \(1_B\) is \(S\)-uniformly recurrent. By <a href="index.html#lemma_unif_rec_implies_CRTURP">lemma 190</a>, \(B\) is a CRTURP set. Define \(T = \{ g \in S \mid 1_B(g) = 1_{A \cap H}(g) \} \). </p>
 <p>We claim that the set \(H \cap T\) is thick. Indeed, let \(F \subseteq S\) be finite. The set </p>
-<div class="displaymath" id="a0000000368">
+<div class="displaymath" id="a0000000373">
   \[ U \vcentcolon =\{ (\alpha , \beta ) \in (\{ 0,1\} ^S)^2 \mid \forall f \in F, \  \alpha (f) = \beta (f)\}  \subseteq (\{ 0,1\} ^S)^2 \]
 </div>
 <p> is, by the definition of the product topology on \(\{ 0,1\} ^S\), an open set containing the diagonal. Since \(p = pp\), we see </p>
-<div class="displaymath" id="a0000000369">
+<div class="displaymath" id="a0000000374">
   \[ p 1_B = p p 1_{A \cap H} = p 1_{A \cap H}, \]
 </div>
 <p> we see by <a href="index.html#lemma_plim_in_open_set_return_time">theorem 149</a> that \(R_S((1_B,1_{A \cap H}), U) \in p\) in the product space \((\{ 0,1\} ^S)^2\) under the diagonal action. By the property of \(p\), we see that \(\bigcap _{f \in F} f^{-1} H \in p\). Since \(p\) is a filter, </p>
-<div class="displaymath" id="a0000000370">
+<div class="displaymath" id="a0000000375">
   \[ \bigcap _{f \in F} f^{-1} H \cap R_S((1_B,1_{A \cap H}), U) \in p. \]
 </div>
 <p> Choose \(g\) in this set. We see for all \(f \in F\), by commutativity, \(gf = fg \in H\) and </p>
-<div class="displaymath" id="a0000000371">
+<div class="displaymath" id="a0000000376">
   \[ 1_B(gf) = (g1_B)(f) = (g1_{A \cap H})(f) = 1_{A \cap H}(gf). \]
 </div>
 <p> Therefore, \(Fg \subseteq H \cap T\), as desired. </p>
@@ -8549,7 +8709,7 @@
 
     <a class="icon proof" href="index.html#thm_lspwf_upgrade">#</a>
     
-    <a class="icon proof" href="index.html#a0000000372"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000377"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8558,13 +8718,13 @@
   </div>
   <div class="theorem_thmcontent">
   <p> Let \(S\) be a commutative semigroup. Let \(\mathcal{F}\) and \(\mathcal{G}\) be families of subsets of \(S\). Suppose that for all CRTURP sets \(B \subseteq S\) and all thick \(H \subseteq S\), if \(B \cap H \in \mathcal{F}\), then \(B \cap H \in \mathcal{G}\). Then we have </p>
-<div class="displaymath" id="a0000000373">
+<div class="displaymath" id="a0000000378">
   \[ \mathcal{S}\curlywedge \mathcal{F}\subseteq \mathcal{S}\curlywedge \mathcal{G}. \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000372">
+<div class="proof_wrapper" id="a0000000377">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8592,7 +8752,7 @@
 
   </div>
 </div>
-<h2 id="a0000000374">0.8.2 A delta set builder</h2>
+<h2 id="a0000000379">0.8.2 A delta set builder</h2>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm_delta_from_kronecker">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
@@ -8606,7 +8766,7 @@
 
     <a class="icon proof" href="index.html#thm_delta_from_kronecker">#</a>
     
-    <a class="icon proof" href="index.html#a0000000375"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000380"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8618,7 +8778,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000375">
+<div class="proof_wrapper" id="a0000000380">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8630,25 +8790,25 @@
 <ol class="enumerate">
   <li><ol class="enumerate">
   <li><p>By <a href="index.html#thm_delta_set_builder_prestep">theorem 186</a>, the set \(R(x,U_1) \cap R(V,U_1)\) is syndetic. By assumption, the set \(B_1\) is thick. By <a href="index.html#lemma_synd_thick_dual">lemma 157</a>, the intersection of a thick set and a syndetic set is non-empty. Therefore, there exists </p>
-<div class="displaymath" id="a0000000376">
+<div class="displaymath" id="a0000000381">
   \[ t_1 \in R(x,U_1) \cap R(V,U_1) \cap B_1. \]
 </div>
 </li>
   <li><p>Choose \(s_1 \in S\) arbitrarily. Since \(t_1 \in R(x,V) \cap B\), we see that </p>
-<div class="displaymath" id="<plasTeX.TeXFragment object at 0x10ddaf880>">
+<div class="displaymath" id="<plasTeX.TeXFragment object at 0x1055ab8e0>">
   \begin{align}  \label{eqn_delta_it_one} s_2 \vcentcolon =s_1t_1 \in s_1 (R(x,V) \cap B). \end{align}
 </div>
 </li>
   <li><p>Since \(t_1 \in R(V,V)\), \(V \cap t_1^{-1} V \neq \emptyset \). Since \(s_1\) acts surjectively (<a href="index.html#lemma_minimal_comm_action_implies_surjective">lemma 79</a>), </p>
-<div class="displaymath" id="a0000000377">
+<div class="displaymath" id="a0000000382">
   \[ U_2 \vcentcolon =s_1^{-1} V \cap s_2^{-1} V = s_1^{-1} (V \cap t_1^{-1} V) \neq \emptyset . \]
 </div>
 <p> Note that by <a href="index.html#lemma_return_time_algebra_one">lemma 69</a> and <a href="index.html#lemma_return_to_intersection">lemma 71</a>, </p>
-<div class="displaymath" id="a0000000378">
+<div class="displaymath" id="a0000000383">
   \[ R(x,U_2) = s_1^{-1} R(x,V) \cap s_2^{-1} R(x,V). \]
 </div>
 <p> Put </p>
-<div class="displaymath" id="a0000000379">
+<div class="displaymath" id="a0000000384">
   \[ B_2 \vcentcolon =s_1^{-1} B \cap s_2^{-1} B. \]
 </div>
 </li>
@@ -8656,29 +8816,29 @@
 </li>
   <li><ol class="enumerate">
   <li><p>By <a href="index.html#thm_delta_set_builder_prestep">theorem 186</a>, the set \(R(x,U_2) \cap R(V,U_2)\) is syndetic. By <a href="index.html#lemma_preimage_intersection_of_thick_is_thick">lemma 163</a>, the set \(B_2\) is thick. By <a href="index.html#lemma_synd_thick_dual">lemma 157</a>, the intersection of a thick set and a syndetic set is non-empty. Therefore, there exists </p>
-<div class="displaymath" id="a0000000380">
+<div class="displaymath" id="a0000000385">
   \[ t_2 \in R(x,U_2) \cap R(V,U_2) \cap B_2. \]
 </div>
 </li>
   <li><p>By <a href="index.html#lemma_return_time_algebra_one">lemma 69</a> and <a href="index.html#lemma_return_to_intersection">lemma 71</a> and the definition of \(B_2\), </p>
-<div class="displaymath" id="a0000000381">
+<div class="displaymath" id="a0000000386">
   \[ t_2 \in R(x,U_2) \cap B_2 = s_1^{-1} R(x,V) \cap s_1^{-1} B \cap s_2^{-1} R(x,V) \cap s_2^{-1} B. \]
 </div>
 <p> Therefore, \(s_1 t_2, s_2 t_2 \in R(x,V) \cap B\). Therefore </p>
-<div class="displaymath" id="<plasTeX.TeXFragment object at 0x10ddd3100>">
+<div class="displaymath" id="<plasTeX.TeXFragment object at 0x1055cf160>">
   \begin{align}  \label{eqn_delta_it_two} s_3 \vcentcolon =s_1s_2t_2 \in s_1 (R(x,V) \cap B) \cap s_2 (R(x,V) \cap B). \end{align}
 </div>
 </li>
   <li><p>Since \(t_2 \in R(V,U_2)\), \(V \cap t_2^{-1} U_2 \neq \emptyset \). Since \(s_1s_2\) acts surjectively (<a href="index.html#lemma_minimal_comm_action_implies_surjective">lemma 79</a>), </p>
-<div class="displaymath" id="a0000000382">
+<div class="displaymath" id="a0000000387">
   \begin{align*}  U_3 & \vcentcolon =(s_1s_2)^{-1} V \cap (s_1 s_3)^{-1} V \cap (s_2 s_3)^{-1} V \\ & = (s_1s_2)^{-1} \big( V \cap (s_1 t_2)^{-1} V \cap (s_2 t_2)^{-1} V \big)\\ & = (s_1s_2)^{-1} \big( V \cap t_2^{-1} U_2\big) \neq \emptyset . \end{align*}
 </div>
 <p> Note that by <a href="index.html#lemma_return_time_algebra_one">lemma 69</a> and <a href="index.html#lemma_return_to_intersection">lemma 71</a>, </p>
-<div class="displaymath" id="a0000000383">
+<div class="displaymath" id="a0000000388">
   \[ R(x,U_3) = (s_1s_2)^{-1} R(x,V) \cap (s_1s_3)^{-1} R(x,V) \cap (s_2s_3)^{-1}R(x,V). \]
 </div>
 <p> Put </p>
-<div class="displaymath" id="a0000000384">
+<div class="displaymath" id="a0000000389">
   \[ B_3 \vcentcolon =(s_1s_2)^{-1} B \cap (s_1s_3)^{-1} B \cap (s_2s_3)^{-1} B. \]
 </div>
 </li>
@@ -8686,29 +8846,29 @@
 </li>
   <li><ol class="enumerate">
   <li><p>By <a href="index.html#thm_delta_set_builder_prestep">theorem 186</a>, the set \(R(x,U_3) \cap R(V,U_3)\) is syndetic. By <a href="index.html#lemma_preimage_intersection_of_thick_is_thick">lemma 163</a>, the set \(B_3\) is thick. By <a href="index.html#lemma_synd_thick_dual">lemma 157</a>, the intersection of a thick set and a syndetic set is non-empty. Therefore, there exists </p>
-<div class="displaymath" id="a0000000385">
+<div class="displaymath" id="a0000000390">
   \[ t_3 \in R(x,U_3) \cap R(V,U_3) \cap B_3. \]
 </div>
 </li>
   <li><p>By <a href="index.html#lemma_return_time_algebra_one">lemma 69</a> and <a href="index.html#lemma_return_to_intersection">lemma 71</a> and the definition of \(B_3\), </p>
-<div class="displaymath" id="a0000000386">
+<div class="displaymath" id="a0000000391">
   \begin{align*}  t_3 & \in R(x,U_3) \cap B_3 \\ & = (s_1s_2)^{-1} (R(x,V) \cap B) \cap (s_1s_3)^{-1} (R(x,V) \cap B) \cap (s_2s_3)^{-1}(R(x,V) \cap B). \end{align*}
 </div>
 <p> Therefore, \(s_1 s_2 t_3, s_1 s_3 t_3, s_2 s_3 t_3 \in R(x,V) \cap B\). Therefore </p>
-<div class="displaymath" id="<plasTeX.TeXFragment object at 0x10de04880>">
+<div class="displaymath" id="<plasTeX.TeXFragment object at 0x1055fe8e0>">
   \begin{align}  \label{eqn_delta_it_three} s_4 \vcentcolon =s_1s_2 s_3t_3 \in s_1 (R(x,V) \cap B) \cap s_2 (R(x,V) \cap B) \cap s_3 (R(x,V) \cap B). \end{align}
 </div>
 </li>
   <li><p>Since \(t_3 \in R(V,U_3)\), \(V \cap t_3^{-1} U_3 \neq \emptyset \). Since \(s_1s_2s_3\) acts surjectively (<a href="index.html#lemma_minimal_comm_action_implies_surjective">lemma 79</a>), </p>
-<div class="displaymath" id="a0000000387">
+<div class="displaymath" id="a0000000392">
   \begin{align*}  U_4 & \vcentcolon =(s_1s_2s_3)^{-1} V \cap (s_1 s_2 s_4)^{-1} V \cap (s_1 s_3 s_4)^{-1} V \cap (s_2s_3s_4)^{-1} V \\ & = (s_1s_2s_3)^{-1} \big( V \cap (s_1 s_2t_3)^{-1} V \cap (s_1 s_3 t_3)^{-1} V \cap (s_2s_3 t_3)^{-1}V \big)\\ & = (s_1s_2s_3)^{-1} \big( V \cap t_3^{-1} U_3\big) \neq \emptyset . \end{align*}
 </div>
 <p> Note that by <a href="index.html#lemma_return_time_algebra_one">lemma 69</a> and <a href="index.html#lemma_return_to_intersection">lemma 71</a>, </p>
-<div class="displaymath" id="a0000000388">
+<div class="displaymath" id="a0000000393">
   \[ R(x,U_4) = (s_1s_2s_3)^{-1} R(x,V) \cap (s_1s_2s_4)^{-1} R(x,V) \cap (s_1s_3s_4)^{-1}R(x,V) \cap (s_2s_3s_4)^{-1}R(x,V). \]
 </div>
 <p> Put </p>
-<div class="displaymath" id="a0000000389">
+<div class="displaymath" id="a0000000394">
   \[ B_4 \vcentcolon =(s_1s_2s_3)^{-1} B \cap (s_1s_2s_4)^{-1} B \cap (s_1s_3s_4)^{-1} B \cap (s_2s_3s_4)^{-1} B. \]
 </div>
 </li>
@@ -8719,7 +8879,7 @@
 
   </div>
 </div>
-<h2 id="a0000000390">0.8.3 Equivalences for dynamically syndetic sets</h2>
+<h2 id="a0000000395">0.8.3 Equivalences for dynamically syndetic sets</h2>
 <p>A version of the following theorem can be found (for \(\mathbb {Z}\)-actions, or more generally?) in <span class="cite">
 	[
 </span>. </p>
@@ -8736,7 +8896,7 @@
 
     <a class="icon proof" href="index.html#thm_dcthickbohr_is_delta_for_rxu">#</a>
     
-    <a class="icon proof" href="index.html#a0000000391"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000396"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8748,7 +8908,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000391">
+<div class="proof_wrapper" id="a0000000396">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8763,9 +8923,9 @@
 
   </div>
 </div>
-<h2 id="a0000000392">0.8.4 Proof of <a href="index.html#thm_bfw_dual_abelian">theorem 195</a> and some corollaries</h2>
+<h2 id="a0000000397">0.8.4 Proof of <a href="index.html#thm_bfw_dual_abelian">theorem 195</a> and some corollaries</h2>
 <p>If you only care about the combinatorics, the following is a weaker, but purely combinatorial and still highly-nontrivial-looking consequence: </p>
-<div class="displaymath" id="a0000000393">
+<div class="displaymath" id="a0000000398">
   \[ \mathcal{S}\curlywedge \Delta = \mathcal{S}\curlywedge \Delta _0. \]
 </div>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm_bfw_dual_abelian">
@@ -8781,7 +8941,7 @@
 
     <a class="icon proof" href="index.html#thm_bfw_dual_abelian">#</a>
     
-    <a class="icon proof" href="index.html#a0000000394"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000399"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8790,13 +8950,13 @@
   </div>
   <div class="theorem_thmcontent">
   <p> In a commutative semigroup \(S\), </p>
-<div class="displaymath" id="a0000000395">
+<div class="displaymath" id="a0000000400">
   \[ \mathcal{S}\curlywedge \Delta = \mathcal{S}\curlywedge \Delta _0 = \mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}. \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000394">
+<div class="proof_wrapper" id="a0000000399">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8805,15 +8965,15 @@
   </div>
   <div class="proof_content">
   <p> That </p>
-<div class="displaymath" id="a0000000396">
+<div class="displaymath" id="a0000000401">
   \[ \mathcal{S}\curlywedge \Delta \subseteq \mathcal{S}\curlywedge \Delta _0 \subseteq \mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}. \]
 </div>
 <p> follows from \(\Delta \subseteq \Delta _0\) (<a href="index.html#thm_delta_in_deltazero">theorem 165</a>), \(\Delta _0 \subseteq dc\mathcal{T}_{\text{Bohr}_0}\) (<a href="index.html#thm_delta_zero_set_of_bohr_rec">theorem 170</a>), and the monotonicity of \(\curlywedge \) (<a href="index.html#thm_classcapdual_is_monotonic">theorem 39</a>). So we have only left to show that </p>
-<div class="displaymath" id="a0000000397">
+<div class="displaymath" id="a0000000402">
   \[ \mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}\subseteq \mathcal{S}\curlywedge \Delta . \]
 </div>
 <p> According to <a href="index.html#thm_lspwf_upgrade">theorem 192</a>, it suffices to show this inclusion for CRTURP sets. Let \(B \in \mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}\) be a CRTURP set. From <a href="index.html#thm_classcapdual_contained_in_intersection">theorem 36</a>, we have that </p>
-<div class="displaymath" id="a0000000398">
+<div class="displaymath" id="a0000000403">
   \[ \mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}\subseteq dc\mathcal{T}_{\text{Bohr}_0}, \]
 </div>
 <p> whence \(B \in dc\mathcal{T}_{\text{Bohr}_0}\). We have from <a href="index.html#thm_dcthickbohr_is_delta_for_rxu">theorem 194</a> that since \(B \in dc\mathcal{T}_{\text{Bohr}_0}\), \(B \in \mathcal{S}\curlywedge \Delta \), as desired. </p>
@@ -8833,7 +8993,7 @@
 
     <a class="icon proof" href="index.html#thm_delta_star_locally_bohr">#</a>
     
-    <a class="icon proof" href="index.html#a0000000399"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="index.html#a0000000404"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -8842,13 +9002,13 @@
   </div>
   <div class="theorem_thmcontent">
   <p> Let \(S\) be a commutative semigroup. Delta star sets are locally Bohr. Actually: </p>
-<div class="displaymath" id="a0000000400">
+<div class="displaymath" id="a0000000405">
   \[ \Delta ^* \subseteq \mathcal{S}\curlywedge (\mathcal{T}\curlyvee dc\mathcal{S}_{\text{Bohr}_0}). \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000399">
+<div class="proof_wrapper" id="a0000000404">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -8857,7 +9017,7 @@
   </div>
   <div class="proof_content">
   <p> From <a href="index.html#thm_bfw_dual_abelian">theorem 195</a>, we have that </p>
-<div class="displaymath" id="a0000000401">
+<div class="displaymath" id="a0000000406">
   \[ \mathcal{S}\curlywedge dc\mathcal{T}_{\text{Bohr}_0}\subseteq \mathcal{S}\curlywedge \Delta . \]
 </div>
 <p> Since \(\mathcal{S}^* = \mathcal{T}\) (<a href="index.html#lemma_synd_thick_dual">lemma 157</a>) and \(dc\mathcal{T}_{\text{Bohr}_0}^* = dc\mathcal{S}_{\text{Bohr}_0}\) (<a href="index.html#lemma_dcsyndeticbohr_dcthickbohr_dual">lemma 167</a>), we have the conclusion from <a href="index.html#thm_combo_algebra_statement_one">theorem 44</a>. </p>
