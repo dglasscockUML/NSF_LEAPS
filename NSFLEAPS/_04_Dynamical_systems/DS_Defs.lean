@@ -408,7 +408,7 @@ by
 /-- If a commutative semigroup `S` acts minimally, then it acts surjectively -/
 theorem minimalCommActionIsSurjective
 {S} [commSemi : CommSemigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [csX : CompactSpace X] [T2Space X] [nonX : Nonempty X]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
 ∀ s : S, Function.Surjective (dSystem.toFun s) :=
 by
@@ -420,7 +420,7 @@ by
     · unfold sX
       rewrite [Set.image_nonempty (f := dSystem.toFun s)]
       exact Set.univ_nonempty
-    · exact (IsCompact.image csX.isCompact_univ (dSystem.cont' s))
+    · exact (IsCompact.image isCompact_univ (dSystem.cont' s))
     · infer_instance
     · unfold isInvariantSet
       intro t x xinsX
@@ -565,7 +565,7 @@ isMinimalSystem (fromSubSystemToSystem dSystem (orbitClosureIsSubDynamicalSystem
 
 theorem inMinCommSystemURPairsDense
 {S} [commSemi : CommSemigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [csX : CompactSpace X] [T2Space X] [nonX : Nonempty X]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
 Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} :=
 by sorry
@@ -575,6 +575,13 @@ end Uniform_recurrence
 
 
 section Proximality
+
+
+def proximal
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (x y : X) :
+
 
 end Proximality
 

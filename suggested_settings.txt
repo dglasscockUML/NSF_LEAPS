@@ -1,0 +1,24 @@
+In the search bar at the top, type >User settings and open the json file.  Mine looks like this to turn off
+the VS code auto suggestions
+{
+    "lean4.alwaysAskBeforeInstallingLeanVersions": false,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "editor.inlineSuggest.enabled": false,
+    "editor.quickSuggestions": {
+    "other": "off",
+    "comments": "off",
+    "strings": "off"
+    },
+    "editor.parameterHints.enabled": false,
+    "editor.hover.enabled": false
+}
+
+In the search bar at the top, type >keybindings.json and open the json file.  Add these lines to get "cmd+r" to bring
+up the VS code tool tip where there is a suggestion or error.  This is a replacement for turning the tool tip off (above)
+
+{
+    "key": "cmd+r",
+    "command": "editor.action.showDefinitionPreviewHover",
+    "when": "editorTextFocus"
+}
