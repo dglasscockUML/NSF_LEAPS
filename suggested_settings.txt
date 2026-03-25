@@ -1,4 +1,4 @@
-In the search bar at the top, type >User settings and open the json file.  Mine looks like this to turn off
+In the search bar at the top, type ">User settings" and open the json file.  Mine looks like this to turn off
 the VS code auto suggestions
 {
     "lean4.alwaysAskBeforeInstallingLeanVersions": false,
@@ -14,7 +14,7 @@ the VS code auto suggestions
     "editor.hover.enabled": false
 }
 
-In the search bar at the top, type >keybindings.json and open the json file.  Add these lines to get "cmd+r" to bring
+In the search bar at the top, type ">keyboard shortcuts" and open the keybindings.json file.  Add these lines to get "cmd+r" to bring
 up the VS code tool tip where there is a suggestion or error.  This is a replacement for turning the tool tip off (above)
 
 {

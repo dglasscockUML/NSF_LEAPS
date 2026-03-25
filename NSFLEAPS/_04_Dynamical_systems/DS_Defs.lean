@@ -9,7 +9,8 @@ section Definitions
 
 /-- A semigroup action is an action by a semigroup `S` on a set `X` -/
 structure SemigroupAction
-(S : Type*) [Semigroup S] [Nonempty S] (X : Type*) [Nonempty X] where
+(S : Type*) [Semigroup S] [Nonempty S]
+(X : Type*) [Nonempty X] where
   toFun : S → X → X
   map_mult' : ∀ s₁ s₂ x, toFun (s₁ * s₂) x = toFun s₁ (toFun s₂ x)
 
@@ -24,7 +25,8 @@ extends SemigroupAction S X where
 /-- The orbit of a point `x` under the action of a semigroup `S` is the
 image of `S` under the map `s ↦ sx` -/
 def orbit
-{S} [Semigroup S] [Nonempty S] {X} [Nonempty X]
+{S} [Semigroup S] [Nonempty S]
+{X} [Nonempty X]
 (sAction : SemigroupAction S X) (x : X) :
 Set X := Set.range (fun s ↦ sAction.toFun s x)
 -- '' (Set.univ : Set S)
@@ -32,7 +34,8 @@ Set X := Set.range (fun s ↦ sAction.toFun s x)
 /-- The orbit closure of a point `x` under the action of a semigroup `S` is the
 closure of the image of `S` under the map `s ↦ sx` -/
 def orbitClosure
-{S} [Semigroup S] [Nonempty S] {X} [TopologicalSpace X] [Nonempty X]
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [Nonempty X]
 (sAction : SemigroupAction S X) (x : X) :
 Set X :=
 closure (orbit sAction x)
@@ -564,7 +567,7 @@ isMinimalSystem (fromSubSystemToSystem dSystem (orbitClosureIsSubDynamicalSystem
 --fromSubSystemToSystem
 
 theorem inMinCommSystemURPairsDense
-{S} [commSemi : CommSemigroup S] [Nonempty S]
+{S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
 Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} :=
@@ -576,11 +579,14 @@ end Uniform_recurrence
 
 section Proximality
 
-
+/-- The predicate saying that `x` and `y` are proximal under the semigroup action of `S` on `X` -/
 def proximal
 {S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (x y : X) :
+{X} [TopologicalSpace X] [Nonempty X]
+(sAction : SemigroupAction S X) (x y : X) :
+Prop :=
+∀ α ∈ nhdsSet (Set.diagonal X), ∃ (s : S), (sAction.toFun s x, sAction.toFun s y) ∈ α
+-- for all (open) neighborhoods of the diagonal in X^2, there is s ∈ S so that (sx, sy) ∈ nbhd
 
 
 end Proximality
