@@ -260,6 +260,18 @@ end Definitions
 
 section Factor_maps_and_ICERS
 
+/-- The definition of a dynamical system Y being a factor of a dynamical system X -/
+def isFactor
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemX : DynamicalSystem S X)
+(dSystemY : DynamicalSystem S Y) :
+Prop :=
+∃ F : X → Y, Continuous F ∧ Function.Surjective F ∧
+(∀ x : X, ∀ s : S, F (dSystemX.toFun s x) = dSystemY.toFun s (F (x)))
+
+
 end Factor_maps_and_ICERS
 
 
