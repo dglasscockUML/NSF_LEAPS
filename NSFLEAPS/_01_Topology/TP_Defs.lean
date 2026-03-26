@@ -23,6 +23,22 @@ theorem openClosureProductInEntourage
 ∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) :=
 sorry
 
+-- The following is an alternative to openClosureProductInEntourage using nbhds of diagonal
+/-- Given an entourage `α` of `X` and a point `x ∈ X`
+there exists an open neighborhood `U` of `x` such that
+the closure of `U × U` is a subset of `α` -/
+theorem openClosureProductInNhdDiag
+{X} [TopologicalSpace X]
+(x : X) (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
+∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) :=
+sorry
+
+theorem closureIntersect
+{X} [TopologicalSpace X]
+{A B : Set X} (hInt : ∀ U ∈ nhdsSet A, (U ∩ B).Nonempty) :
+(A ∩ closure B).Nonempty :=
+by sorry
+
 /-- The image of an entourage `α` of `X` under a continuous
 surjection `π: X → Y` contains a set of the form `U × U`
 where `U` is an open subset of `Y` -/

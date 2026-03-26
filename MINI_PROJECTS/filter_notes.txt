@@ -1,0 +1,15 @@
+There are no nets in Mathlib, only filters
+
+IsCompact.exists_clusterPt
+exists_clusterPt_of_compactSpace
+    If X is compact, then every filter has a cluster point
+
+A point x is a cluster point of a filter f if all neighborhoods of x
+meet all sets in the filter.  This is "(nhds x ⊓ F).NeBot" in mathlib
+
+Filter.atTop : Filter I
+    This is the "tail"/"cofinal" filter on a directed set I
+
+Suppose I is a directed set and f : I to X is a net.
+We say the net converges to c if the image of the cofinal filter
+tends to c.  That is: "Tendsto f Filter.atTop c"

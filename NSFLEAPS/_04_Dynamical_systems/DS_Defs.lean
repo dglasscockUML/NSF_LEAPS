@@ -579,18 +579,104 @@ end Uniform_recurrence
 
 section Proximality
 
-/-- The predicate saying that `x` and `y` are proximal under the semigroup action of `S` on `X` -/
+/-- Points `x` and `y` are proximal under the semigroup action of `S` on `X`
+if for all neighborhoods `α` of the diagonal in `X × X`, there exists `s ∈ S`
+such that `(sx, sy) ∈ α` -/
 def proximal
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [Nonempty X]
 (sAction : SemigroupAction S X) (x y : X) :
 Prop :=
 ∀ α ∈ nhdsSet (Set.diagonal X), ∃ (s : S), (sAction.toFun s x, sAction.toFun s y) ∈ α
--- for all (open) neighborhoods of the diagonal in X^2, there is s ∈ S so that (sx, sy) ∈ nbhd
+
+/-- In a minimal action of `S` on `X`, if `x` and `y` are proximal, then
+the `S`-orbit closure (under the diagonal action) of `(x,y)` contains the diagonal of `X` -/
+theorem minSystemOrbitClosProxPairContainsDiag
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
+{x y : X} (hProx : proximal dSystem.toSemigroupAction x y) :
+Set.diagonal X ⊆
+orbitClosure (diagDynamicalSystem dSystem dSystem).toSemigroupAction (x,y) :=
+by
+  unfold proximal at hProx
+  unfold Set.diagonal
+  intro z hz
+  let diagSemiAct := (diagDynamicalSystem dSystem dSystem).toSemigroupAction
+  let orb := orbit diagSemiAct (x,y)
+  have orbMeetsNhdDiag : ∀ α ∈ nhdsSet (Set.diagonal X), (α ∩ orb).Nonempty := by
+    intro α αNhd
+    rcases (hProx α αNhd) with ⟨s, hs⟩
+    have proxResultInorb : (dSystem.toFun s x, dSystem.toFun s y) ∈ orb := by
+      use s
+      rfl
+    exact Set.nonempty_of_mem ⟨hs, proxResultInorb⟩
+  let orbClos := orbitClosure diagSemiAct (x,y)
+  have orbClosMeetsDiag : (Set.diagonal X ∩ orbClos).Nonempty := by exact closureIntersect orbMeetsNhdDiag
+  rcases orbClosMeetsDiag with ⟨w, hw⟩
+  have diagInOrbofw : z ∈ orbitClosure diagSemiAct w := by
+    unfold orbitClosure
+    simp only [mem_closure_iff]
+    intro W WOpen zInW
+    have WisNhd : W ∈ nhds (z.1,z.1) := by
+      rewrite [mem_nhds_iff]
+      nth_rw 2 [hz] -- Rewrite only the second instance of z.1 to a z.2
+      use W
+    simp only [mem_nhds_prod_iff] at WisNhd
+    rcases WisNhd with ⟨U, Unhd, V, Vnhd, UtimesVinW⟩
+    have UcapVnhd : U ∩ V ∈ nhds z.1 := Filter.inter_mem Unhd Vnhd
+    have orbw1VisitsUcapV : ∃ (s : S), dSystem.toFun s w.1 ∈ U ∩ V := by
+      rewrite [mem_nhds_iff] at UcapVnhd
+      rcases UcapVnhd with ⟨E, EinUcapV, Eopen, z1inE⟩
+      rewrite [minimalIffDenseOrbits] at hMin
+      specialize hMin w.1
+      apply Dense.inter_open_nonempty at hMin
+      specialize hMin E Eopen (Set.nonempty_of_mem z1inE)
+      rcases hMin with ⟨k,hk,hk2⟩
+      unfold orbit Set.range at hk2
+      rcases hk2 with ⟨s, hs⟩
+      change dSystem.toFun s w.1 = k at hs
+      apply (EinUcapV) at hk
+      rewrite [hs.symm] at hk
+      use s
+    rcases orbw1VisitsUcapV with ⟨s, hs⟩
+    have orbwVisitsW : (dSystem.toFun s w.1, dSystem.toFun s w.2) ∈ W := by
+      have orbwVisitsUV : (dSystem.toFun s w.1, dSystem.toFun s w.2) ∈ U ×ˢ V := by
+        constructor
+        · change dSystem.toFun s w.1 ∈ U
+          exact Set.inter_subset_left hs
+        · change dSystem.toFun s w.2 ∈ V
+          rewrite [← hw.1]
+          exact Set.inter_subset_right hs
+      exact UtimesVinW orbwVisitsUV
+    have orbwinOrb : (dSystem.toFun s w.1, dSystem.toFun s w.2) ∈ orbit diagSemiAct w := by sorry
+    exact Set.nonempty_of_mem ⟨orbwVisitsW, orbwinOrb⟩
+  exact orbitTransitivity hw.2 diagInOrbofw
+
 
 
 end Proximality
 
+    /-have almostGoal : (Set.diagonal X ∩ (closure orb)).Nonempty := by
+      exact closureIntersect orbMeetsNhdDiag
+    exact almostGoal-/
+    --apply closureIntersect to orbMeetsNhdDiag
+/-have orbClosMeetsDiag : (Set.diagonal X ∩ orbClos).Nonempty := by
+    by_contra emptyIntersection
+    have disjoint : Disjoint (Set.diagonal X) (closure orbClos) := by sorry
+    simp only [← disjoint_nhdsSet_principal] at disjoint
+    simp only [Filter.disjoint_iff] at disjoint
+    rcases disjoint with ⟨α, hα, orbSup, horbSup, hDisjoint⟩
+    -- use hα in conjunction with proximality to reach a contradiction-/
+        /-unfold orb orbit Set.range diagSemiAct
+    have proxResultInα : (dSystem.toFun s x, dSystem.toFun s y) ∈ {x_1 |
+    ∃ y_1, (fun s ↦ (diagSemigroupAction dSystem.toSemigroupAction dSystem.toSemigroupAction).toFun
+    s (x, y)) y_1 = x_1} := by
+      use s
+      change (diagSemigroupAction dSystem.toSemigroupAction dSystem.toSemigroupAction).toFun s (x, y) = (dSystem.toFun s x, dSystem.toFun s y)
+      change (dSystem.toFun s x, dSystem.toFun s y) = (dSystem.toFun s x, dSystem.toFun s y)
+      rfl
+    exact Set.nonempty_of_mem ⟨hs, proxResultInα⟩-/
 
 
 section Regional_proximality
