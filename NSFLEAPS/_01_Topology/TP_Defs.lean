@@ -11,8 +11,10 @@ theorem imageClosureIsClosureImage
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
 (f : X → Y) {fc : Continuous f} (A : Set X) :
-f '' (closure A) = closure (f '' A) :=
-sorry
+f '' (closure A) = closure (f '' A) := by
+have h1 : IsProperMap f := by apply Continuous.isProperMap fc
+have h2 : IsClosedMap f := by apply IsProperMap.isClosedMap h1
+rw [<- IsClosedMap.closure_image_eq_of_continuous h2 fc]
 
 /-- Given an entourage `α` of `X` and a point `x ∈ X`
 there exists an open neighborhood `U` of `x` such that
