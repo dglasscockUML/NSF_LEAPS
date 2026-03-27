@@ -78,8 +78,6 @@ DynamicalSystem S (X × Y) :=
     exact Continuous.prodMap (dSystemX.cont' s) (dSystemY.cont' s)
 }
 
--- Do we need: diagDynamicalSystem?  Wait.
-
 /-- When `S` acts on `X`, if `y` is in the orbit closure of `x` and `z` is
 in the orbit closure of `y`, then `z` is in the orbit closure of `x`. -/
 theorem orbitTransitivity
@@ -132,7 +130,9 @@ def isInvariantSet
 {S} [Semigroup S] [Nonempty S] {X} [Nonempty X]
 (sAction : SemigroupAction S X) (A : Set X) :
 Prop :=
-∀ (s : S)(x : X), x ∈ A → sAction.toFun s x ∈ A
+∀ s : S, Set.MapsTo (sAction.toFun s) A A
+--∀ (s : S)(x : X), x ∈ A → sAction.toFun s x ∈ A
+
 
 /-- In dynamical system given by an action of a semigroup `S` on a space `X`,
 the closure of an `S`-invariant set `A ⊆ X` is `S`-invariant -/
@@ -154,10 +154,20 @@ isInvariantSet dSystem.toSemigroupAction (orbitClosure dSystem.toSemigroupAction
 by sorry
 -- Use closureOfInvIsInv
 
+/- A sub (topological) dynamical system of a topological dynmical system given by
+a semigroup `S` acting on `X` is a nonempty, compact, invariant subset of `X`
+together with the action by `S`.
+def isSubDynamicalSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (Z : Set X) :
+Prop :=
+Z.Nonempty ∧ IsCompact Z ∧ T2Space Z ∧ isInvariantSet dSystem.toSemigroupAction Z-/
+
 /-- A sub (topological) dynamical system of a topological dynmical system given by
 a semigroup `S` acting on `X` is a nonempty, compact, invariant subset of `X`
 together with the action by `S`. -/
-def isSubDynamicalSystem
+def isNonemptyCompactT2InvariantSubset
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (Z : Set X) :
@@ -178,19 +188,19 @@ class SubDynamicalSystem
   carrier_nonempty := Z.Nonempty
   carrier_compact := IsCompact Z
 
-/-- Given a system of `S` acting on `X` and a subset `Z` satisfying
- `isSubDynamicalSystem dSystem Z`, create a term of type `DynamicalSystem S Z` -/
-def fromSubSystemToSystem
+/- Given a system of `S` acting on `X` and a subset `Z` satisfying
+ `isNonemptyCompactT2InvariantSubset dSystem Z`, create a term of type `DynamicalSystem S Z` -/
+/-def fromSubsystemToSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
-(isSubsys : isSubDynamicalSystem dSystem Z) :
+(isSubsys : isNonemptyCompactT2InvariantSubset dSystem Z) :
 DynamicalSystem S ↑Z :=
 {
   toFun := by
     intro s ⟨z,hz⟩
-    unfold isSubDynamicalSystem at isSubsys
+    unfold isNonemptyCompactT2InvariantSubset at isSubsys
     unfold isInvariantSet at isSubsys
     rcases isSubsys with ⟨hNon,hCmct,hT2,hInv⟩
     exact ⟨(dSystem.toFun s z : X), hInv s z hz⟩
@@ -198,15 +208,36 @@ DynamicalSystem S ↑Z :=
     intro s t ⟨z,hz⟩
     sorry
   cont' := by sorry
+}-/
+
+/-- Given a system of `S` acting on `X` and a nonempty, compact, T2, invariant `Z ⊆ X`,
+create a term of type `DynamicalSystem S ↑Z`, where note that `↑Z` is the type
+corresponding to membership in `Z` (tuples of term of type `X` and proof of
+membership in `Z`) -/
+def fromNonemptyCompactT2InvariantSubsetToSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
+(isInv : isInvariantSet dSystem.toSemigroupAction Z) :
+DynamicalSystem S ↑Z :=
+{
+  toFun := (fun (s : S) ↦ Set.MapsTo.restrict (dSystem.toFun s) Z Z (isInv s))
+  map_mult' := by
+    intro s t ⟨z,hz⟩
+    unfold Set.MapsTo.restrict Subtype.map
+    simp only [dSystem.map_mult' s]
+  cont' := by
+    intro s
+    exact Continuous.restrict (isInv s) (dSystem.cont' s)
 }
 
-
 -- Still working on this definition.  Not sure how to make lean see that
--- the compactness of Z will come from the assumption isSubDynamicalSystem dSystem Z
+-- the compactness of Z will come from the assumption isNonemptyCompactT2InvariantSubset dSystem Z
 /-def makeDynamicalSystemFromSub {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (Z : Set X)
-{hZ : isSubDynamicalSystem dSystem Z} : DynamicalSystem S Z := sorry
+{hZ : isNonemptyCompactT2InvariantSubset dSystem Z} : DynamicalSystem S Z := sorry
 
 instance
     {S : Type*} [Semigroup S] [Nonempty S]
@@ -226,9 +257,9 @@ theorem orbitClosureIsSubDynamicalSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (x : X) :
-isSubDynamicalSystem dSystem (orbitClosure dSystem.toSemigroupAction x) :=
+isNonemptyCompactT2InvariantSubset dSystem (orbitClosure dSystem.toSemigroupAction x) :=
 by
-  unfold isSubDynamicalSystem
+  unfold isNonemptyCompactT2InvariantSubset
   refine ⟨?_, ?_, ?_, ?_⟩
   · unfold orbitClosure
     unfold orbit
@@ -240,10 +271,10 @@ by
 
 
 /-- An intersection of `S`-invariant sets is `S`-invariant -/
-theorem InterOfInvIsInv
+theorem intersectionOfInvIsInv
 {S} [Semigroup S] [Nonempty S] {X} [Nonempty X]
 (sAction : SemigroupAction S X)
-{i : Set (Set X)} (h : ∀ (A : Set X), A ∈ i → isInvariantSet sAction A) :
+{i : Set (Set X)} (h : ∀ A ∈ i, isInvariantSet sAction A) :
 isInvariantSet sAction (⋂₀ i) := by
   intro s x hx
   rw [← Set.sInf_eq_sInter]
@@ -252,8 +283,8 @@ isInvariantSet sAction (⋂₀ i) := by
   rw [← Set.sInf_eq_sInter] at hx
   simp only [sInf] at hx
   have xinA : x ∈ A := hx A AinI
-  unfold isInvariantSet at h
-  exact h A AinI s x xinA
+  unfold isInvariantSet Set.MapsTo at h
+  exact h A AinI s xinA
 
 end Definitions
 
@@ -346,7 +377,7 @@ def isMinimalSystem
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
 Prop :=
-∀ Z : Set X, isSubDynamicalSystem dSystem Z → Z = (Set.univ (α := X))
+∀ Z : Set X, isNonemptyCompactT2InvariantSubset dSystem Z → Z = (Set.univ (α := X))
 
 /-- A subset `Y ⊆ X` is a minimal subset of `X` if it is minimal by containment
 amongst all non-empty, compact, `S` invariant sets -/
@@ -355,8 +386,8 @@ def isMinimalSubset
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (Y : Set X) :
 Prop :=
-(isSubDynamicalSystem dSystem Y) ∧
-(∀ Z : Set X, Z ⊆ Y → isSubDynamicalSystem dSystem Z → Y = Z)
+(isNonemptyCompactT2InvariantSubset dSystem Y) ∧
+(∀ Z ⊆ Y, isNonemptyCompactT2InvariantSubset dSystem Z → Y = Z)
 
 /-- Every system contains a minimal subset -/
 theorem existsMinimalSubset
@@ -373,7 +404,7 @@ theorem minimalSubsetIsMinimalSystem
 (dSystem : DynamicalSystem S X)
 {Y : Set X} [CompactSpace Y] [Nonempty Y]
 (hMinSubset : isMinimalSubset dSystem Y) :
-isMinimalSystem (fromSubSystemToSystem dSystem (hMinSubset.1)) :=
+isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1.2.2.2)) :=
 by sorry
 
 /-- A system is minimal if and only if for all points `x ∈ X`, the `S`-orbit of
@@ -398,10 +429,10 @@ by
       unfold orbit
       unfold Set.range
       intro x hx
-      unfold isInvariantSet at hInv
+      unfold isInvariantSet Set.MapsTo at hInv
       rcases hx with ⟨s,hs⟩
       rewrite [← hs]
-      exact hInv s z hz
+      exact hInv s hz
     have orbitClosInZ : closure (orbit dSystem.toSemigroupAction z) ⊆ Z :=
       closure_minimal orbitInZ (IsCompact.isClosed hCmct)
     simp only [dense_iff_closure_eq] at hDense
@@ -417,8 +448,8 @@ theorem minimalCommActionIsSurjective
 by
   intro s y
   let sX := (dSystem.toFun s) '' Set.univ
-  have imageIsSubsystem : isSubDynamicalSystem dSystem sX := by
-    unfold isSubDynamicalSystem
+  have imageIsSubsystem : isNonemptyCompactT2InvariantSubset dSystem sX := by
+    unfold isNonemptyCompactT2InvariantSubset
     refine ⟨?_ ,?_ ,?_ ,?_⟩
     · unfold sX
       rewrite [Set.image_nonempty (f := dSystem.toFun s)]
@@ -457,10 +488,8 @@ end Minimality
 
 section Uniform_recurrence
 
--- mem_of_mem_nhds : U ∈ 𝓝 x → x ∈ U
--- IsOpen.mem_nhds : IsOpen U → x ∈ U → U ∈ 𝓝 x
-
-/-- An action of `S` on `X` is minimal if `X` is a minimal subset -/
+/-- A point `x ∈ X` is uniformly recurrent if for all neighborhoods `U` of `x`
+the set of visit times `R(x,U)` is a syndetic subset of `S` -/
 def isUniformlyRecurrent
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -540,7 +569,7 @@ by
   use s_chooser y
 
 
-/-- In a minimal system, every point is uniformly recurrent -/
+/-- Every point in a minimal system is uniformly recurrent -/
 theorem minimalImpliesUniformlyRecurrent
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -555,17 +584,29 @@ by
     minimalImpliesSyndeticVisits (hMin := hMin) dSystem x V Vnonempty Vopen
   exact syndeticIsMonotone goalforV (visitTimesMono dSystem.toSemigroupAction x VinU)
 
-/- The orbit closure of a uniformly recurrent point is a minimal system -/
-/- theorem orbitClosureOfURPointIsMinimal
+/-- The orbit closure of a uniformly recurrent point is a minimal set -/
+theorem orbitClosureOfURPointIsMinimalSubset
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x) :
-isMinimalSystem (fromSubSystemToSystem dSystem (orbitClosureIsSubDynamicalSystem dSystem x)) -/
+isMinimalSubset dSystem (orbitClosure dSystem.toSemigroupAction x) :=
+by sorry
 
---orbitClosureIsSubDynamicalSystem
---fromSubSystemToSystem
+/-- If `y` is in the orbit closure of a uniformly recurrent point `x`, then
+`y` is uniformly recurrent -/
+theorem inOrbitClosOfURPointImpliesUR
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+{x : X} (xisUR : isUniformlyRecurrent dSystem x)
+{y : X} (yinOrbClos : y ∈ orbitClosure dSystem.toSemigroupAction x) :
+isUniformlyRecurrent dSystem y :=
+by sorry
 
+/-- If `S` is a commutative semigroup that acts minimally on `X`, then the set
+of pairs `(x,y) ∈ X × X` that are uniformly recurrent under the diagonal action
+is dense in `X × X` -/
 theorem inMinCommSystemURPairsDense
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -657,26 +698,6 @@ by
 
 end Proximality
 
-    /-have almostGoal : (Set.diagonal X ∩ (closure orb)).Nonempty := by
-      exact closureIntersect orbMeetsNhdDiag
-    exact almostGoal-/
-    --apply closureIntersect to orbMeetsNhdDiag
-/-have orbClosMeetsDiag : (Set.diagonal X ∩ orbClos).Nonempty := by
-    by_contra emptyIntersection
-    have disjoint : Disjoint (Set.diagonal X) (closure orbClos) := by sorry
-    simp only [← disjoint_nhdsSet_principal] at disjoint
-    simp only [Filter.disjoint_iff] at disjoint
-    rcases disjoint with ⟨α, hα, orbSup, horbSup, hDisjoint⟩
-    -- use hα in conjunction with proximality to reach a contradiction-/
-        /-unfold orb orbit Set.range diagSemiAct
-    have proxResultInα : (dSystem.toFun s x, dSystem.toFun s y) ∈ {x_1 |
-    ∃ y_1, (fun s ↦ (diagSemigroupAction dSystem.toSemigroupAction dSystem.toSemigroupAction).toFun
-    s (x, y)) y_1 = x_1} := by
-      use s
-      change (diagSemigroupAction dSystem.toSemigroupAction dSystem.toSemigroupAction).toFun s (x, y) = (dSystem.toFun s x, dSystem.toFun s y)
-      change (dSystem.toFun s x, dSystem.toFun s y) = (dSystem.toFun s x, dSystem.toFun s y)
-      rfl
-    exact Set.nonempty_of_mem ⟨hs, proxResultInα⟩-/
 
 
 section Regional_proximality
