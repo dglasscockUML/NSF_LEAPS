@@ -142,7 +142,31 @@ theorem closureOfInvIsInv
 {dSystem : DynamicalSystem S X} {A : Set X}
 (h : isInvariantSet dSystem.toSemigroupAction A) :
 isInvariantSet dSystem.toSemigroupAction (closure A) :=
-by sorry
+by
+intro s
+have h1 : (dSystem.toFun s) '' (closure A) = closure ((dSystem.toFun s) '' A) := by
+  apply imageClosureIsClosureImage
+  apply dSystem.cont'
+have h2 : Set.MapsTo (dSystem.toFun s) (closure A) (closure ((dSystem.toFun s) '' A)) := by
+  rw [<- h1]
+  intro x hx
+  use x
+have h3 : dSystem.toFun s '' A ⊆ A := by
+  specialize h s
+  intro y hy
+  rcases hy with ⟨w, hw⟩
+  obtain ⟨hw1, hw2⟩ := hw
+  specialize h hw1
+  rw [<- hw2]
+  exact h
+have h4 : dSystem.toFun s '' closure A ⊆ closure A := by
+  rw [h1]
+  apply closure_mono
+  exact h3
+unfold Set.MapsTo
+intro z hz
+apply h4
+exact ⟨z, hz, rfl⟩
 -- Use imageClosureIsClosureImage from the topology file
 
 /-- The `S`-orbit closure of a point `x` is an `S`-invariant subset of `X` -/
