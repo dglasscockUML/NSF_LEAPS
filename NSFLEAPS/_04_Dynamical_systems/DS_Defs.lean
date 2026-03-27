@@ -150,8 +150,21 @@ theorem orbClosIsInv
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} {x : X} :
-isInvariantSet dSystem.toSemigroupAction (orbitClosure dSystem.toSemigroupAction x) :=
-by sorry
+isInvariantSet dSystem.toSemigroupAction (orbitClosure dSystem.toSemigroupAction x) := by
+have h1 : (orbitClosure dSystem.toSemigroupAction x) = closure (orbit dSystem.toSemigroupAction x) := rfl
+have h2 : isInvariantSet (dSystem.toSemigroupAction) (orbit dSystem.toSemigroupAction x) := by
+  intro r y hy
+  rcases hy with ⟨s, hs⟩
+  have h3 : dSystem.toFun s x = y := hs
+  rw [<- h3]
+  have h4 : dSystem.toFun (r*s) x = dSystem.toFun r (dSystem.toFun s x):= by
+    simpa using dSystem.map_mult' r s x
+  rewrite [<- h4]
+  unfold orbit
+  exact ⟨r*s, rfl⟩
+rw [h1]
+apply closureOfInvIsInv
+apply h2
 -- Use closureOfInvIsInv
 
 /- A sub (topological) dynamical system of a topological dynmical system given by
@@ -290,6 +303,18 @@ end Definitions
 
 
 section Factor_maps_and_ICERS
+
+/-- The definition of a dynamical system Y being a factor of a dynamical system X -/
+def isFactor
+{S} [Semigroup S] [Nonempty S]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemY : DynamicalSystem S Y)
+(dSystemX : DynamicalSystem S X) :
+Prop :=
+∃ F : X → Y, Continuous F ∧ Function.Surjective F ∧
+(∀ x : X, ∀ s : S, F (dSystemX.toFun s x) = dSystemY.toFun s (F (x)))
+
 
 end Factor_maps_and_ICERS
 
