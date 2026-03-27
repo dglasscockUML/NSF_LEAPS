@@ -28,8 +28,17 @@ def orbit
 {S} [Semigroup S] [Nonempty S]
 {X} [Nonempty X]
 (sAction : SemigroupAction S X) (x : X) :
-Set X := Set.range (fun s ↦ sAction.toFun s x)
--- '' (Set.univ : Set S)
+Set X :=
+Set.range (fun s ↦ sAction.toFun s x)
+
+/-- The orbit of a set `Z ⊆ X` under the action of a semigroup `S` is the
+image of `S` under the map `s ↦ sx` -/
+def setOrbit
+{S} [Semigroup S] [Nonempty S]
+{X} [Nonempty X]
+(sAction : SemigroupAction S X) (Z : Set X) :
+Set X :=
+Set.range (fun ((s,z) : S × Z) ↦ sAction.toFun s z)
 
 /-- The orbit closure of a point `x` under the action of a semigroup `S` is the
 closure of the image of `S` under the map `s ↦ sx` -/
@@ -39,6 +48,15 @@ def orbitClosure
 (sAction : SemigroupAction S X) (x : X) :
 Set X :=
 closure (orbit sAction x)
+
+/-- The orbit closure of a set `Z ⊆ X` under the action of a semigroup `S` is the
+closure of the image of `S` under the map `s ↦ sZ` -/
+def setOrbitClosure
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [Nonempty X]
+(sAction : SemigroupAction S X) (Z : Set X) :
+Set X :=
+closure (setOrbit sAction Z)
 
 /-- Given semigroup actions of `S` on `X` and `Y`, the diagonal semigroup
 action of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
@@ -702,7 +720,8 @@ by
       rfl
     exact Set.nonempty_of_mem ⟨hs, proxResultInorb⟩
   let orbClos := orbitClosure diagSemiAct (x,y)
-  have orbClosMeetsDiag : (Set.diagonal X ∩ orbClos).Nonempty := by exact closureIntersect orbMeetsNhdDiag
+  have orbClosMeetsDiag : (Set.diagonal X ∩ orbClos).Nonempty :=
+    by exact closureIntersect orbMeetsNhdDiag
   rcases orbClosMeetsDiag with ⟨w, hw⟩
   have diagInOrbofw : z ∈ orbitClosure diagSemiAct w := by
     unfold orbitClosure
@@ -739,7 +758,9 @@ by
           rewrite [← hw.1]
           exact Set.inter_subset_right hs
       exact UtimesVinW orbwVisitsUV
-    have orbwinOrb : (dSystem.toFun s w.1, dSystem.toFun s w.2) ∈ orbit diagSemiAct w := by sorry
+    have orbwinOrb : (dSystem.toFun s w.1, dSystem.toFun s w.2) ∈ orbit diagSemiAct w := by
+      change (diagDynamicalSystem dSystem dSystem).toFun s w ∈ orbit diagSemiAct w
+      use s
     exact Set.nonempty_of_mem ⟨orbwVisitsW, orbwinOrb⟩
   exact orbitTransitivity hw.2 diagInOrbofw
 
@@ -751,6 +772,13 @@ end Proximality
 
 section Regional_proximality
 
+def RP
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (X × X) :=
+⋂ α ∈ nhdsSet (Set.diagonal X),
+setOrbitClosure (diagDynamicalSystem dSystem dSystem).toSemigroupAction α
 
 end Regional_proximality
 
