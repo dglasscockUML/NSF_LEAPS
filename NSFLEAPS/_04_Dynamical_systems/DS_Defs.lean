@@ -780,6 +780,33 @@ Set (X × X) :=
 ⋂ α ∈ nhdsSet (Set.diagonal X),
 setOrbitClosure (diagDynamicalSystem dSystem dSystem).toSemigroupAction α
 
+def setToRel
+{X} (s : Set (X × X)) :
+X → X → Prop :=
+fun x y => (x, y) ∈ s
+
+theorem RPisSymm
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Std.Symm (setToRel (RP dSystem)) :=
+by sorry
+
+theorem RPisTrans
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+IsTrans X (setToRel (RP dSystem)) :=
+by sorry
+
+theorem RPisReflexIfNondegen
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+(hNondegen : setOrbitClosure dSystem.toSemigroupAction Set.univ = Set.univ) :
+Std.Refl (setToRel (RP dSystem)) :=
+by sorry
+
 end Regional_proximality
 
 
