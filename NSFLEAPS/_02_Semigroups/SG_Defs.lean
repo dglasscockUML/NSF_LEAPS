@@ -56,7 +56,7 @@ def isSyndetic
 Prop :=
 ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
 
-
+/-- If `A ⊆ S` is syndetic and `A ⊆ B`, then `B` is syndetic. -/
 theorem syndeticIsMonotone
 {S : Type*} [Semigroup S]
 {A B : Set S} (hSA : isSyndetic A) (hAB : A ⊆ B):
@@ -73,3 +73,15 @@ by
     constructor
     · exact finF
     · exact hAB fsinA
+
+
+class SemigroupHom
+{S T} [Semigroup S] [Semigroup T] (φ : S → T) where
+  hom_prop : ∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
+
+/- A semigroup action is an action by a semigroup `S` on a set `X` -/
+/-structure SemigroupAction
+(S : Type*) [Semigroup S] [Nonempty S]
+(X : Type*) [Nonempty X] where
+  toFun : S → X → X
+  map_mult' : ∀ s₁ s₂ x, toFun (s₁ * s₂) x = toFun s₁ (toFun s₂ x)-/

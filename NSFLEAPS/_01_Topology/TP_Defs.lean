@@ -5,6 +5,11 @@ Cartesian product of sets: A ×ˢ B
   This gives Set (X × Y) from A : Set X and B : Set Y
 -/
 
+-- Continuous.isProperMap
+-- IsProperMap.isClosedMap
+-- IsCompact.image: continuous image of compact is compact
+-- isCompact.isClosed: compact implies closed
+
 /-- The image of the closure of a set `A` under a
 continuous map `f` is the closure of the image of `A` -/
 theorem imageClosureIsClosureImage
