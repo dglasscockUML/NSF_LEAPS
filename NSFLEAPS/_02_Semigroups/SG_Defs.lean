@@ -74,6 +74,28 @@ by
     · exact finF
     · exact hAB fsinA
 
+/- Still not sure we want to pursue this route, but it would make sense to define class Syndetic as follows. -/
+class Syndetic
+{S : Type*} [Semigroup S] (A : Set S) where
+  syndetic_prop : ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
+
+/-- If `A ⊆ S` is syndetic and `A ⊆ B`, then `B` is syndetic. -/
+theorem syndeticIsMonotonev2
+{S : Type*} [Semigroup S]
+{A B : Set S} [hSA : Syndetic A] (hAB : A ⊆ B) :
+Syndetic B :=
+by
+  rcases hSA.syndetic_prop with ⟨F, Ffinite, hF⟩
+  use F
+  constructor
+  · exact Ffinite
+  · intro s
+    rcases (hF s) with ⟨f, finF, fsinA⟩
+    use f
+    constructor
+    · exact finF
+    · exact hAB fsinA
+
 
 class SemigroupHom
 {S T} [Semigroup S] [Semigroup T] (φ : S → T) where

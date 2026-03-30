@@ -61,20 +61,14 @@ DynamicalSystem S (X × Y) :=
 }
 
 /- homDynamicalSystem .  Need to update. -/
-/- def homDynamicalSystem
-(dSystem : DynamicalSystem)
+def homDynamicalSystem
+{S} [Semigroup S] [Nonempty S]
 {T} [Semigroup T] [Nonempty T]
-(φ : T → dSystem.S) [hSemiHom : SemigroupHom φ] :
-DynamicalSystem :=
+(φ : T → S) [hSemiHom : SemigroupHom φ]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+DynamicalSystem T X :=
 {
-  S := T
-  S_semigroup := by infer_instance
-  S_nonempty := by infer_instance
-  X := dSystem.X
-  X_topspace := dSystem.X_topspace
-  X_compact := dSystem.X_compact
-  X_t2 := dSystem.X_t2
-  X_nonempty := dSystem.X_nonempty
   map := fun (t : T) ↦ dSystem.map (φ t)
   mapMult := by
     intro t1 t2 x
@@ -82,7 +76,7 @@ DynamicalSystem :=
     rewrite [dSystem.mapMult]
     rfl
   mapCont := fun (t : T) ↦ dSystem.mapCont (φ t)
-} -/
+}
 
 end Structures
 
@@ -479,14 +473,13 @@ theorem existsMinimalSubset
 ∃ Y : Set X, isMinimalSubset dSystem Y :=
 by sorry
 
--- UNHAPPY
 /-- A minimal set, when made into a system, is a minimal system -/
 theorem minimalSubsetIsMinimalSystem
 (dSystem : DynamicalSystem S X)
 {Y : Set X} [CompactSpace Y] [Nonempty Y]
 (hMinSubset : isMinimalSubset dSystem Y) :
 isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1.2.2.2)) :=
-by sorry
+by sorry -- UNHAPPY, WAIT TO TOUCH
 
 /-- A system is minimal if and only if for all points `x ∈ X`, the `S`-orbit of
 `x` is dense -/
