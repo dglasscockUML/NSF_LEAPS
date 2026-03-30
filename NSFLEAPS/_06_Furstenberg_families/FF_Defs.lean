@@ -34,6 +34,5 @@ by
     rcases AisThick with ⟨s, sMapsFintoA⟩
     specialize BisSyndetic s
     rcases BisSyndetic with ⟨f,fInF,fTimessinB⟩
-    unfold Set.image at sMapsFintoA
-    --finish
-    sorry
+    have fstarsInImage : f * s ∈ (fun x ↦ x * s) '' F := by sorry -- Finish
+    exact Set.nonempty_of_mem ⟨sMapsFintoA fstarsInImage, fTimessinB⟩
