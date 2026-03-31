@@ -31,7 +31,7 @@ def partitionRegularTwoSets (F : Set (Set α)) : Prop :=
   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
 
 --family structures
-structure Family (α : Type) where
+structure Family (α : Type*) where
   sets : Set (Set α)
   upward_closed : upwardClosed sets
 

@@ -59,7 +59,7 @@ Prop :=
 /-- If `A ⊆ S` is syndetic and `A ⊆ B`, then `B` is syndetic. -/
 theorem syndeticIsMonotone
 {S : Type*} [Semigroup S]
-{A B : Set S} (hSA : isSyndetic A) (hAB : A ⊆ B):
+{A B : Set S} (hSA : isSyndetic A) (hAB : A ⊆ B) :
 isSyndetic B :=
 by
   unfold isSyndetic at hSA
