@@ -24,11 +24,91 @@ rw [<- IsClosedMap.closure_image_eq_of_continuous h2 fc]
 /-- Given an entourage `α` of `X` and a point `x ∈ X`
 there exists an open neighborhood `U` of `x` such that
 the closure of `U × U` is a subset of `α` -/
+--still working on this...
 theorem openClosureProductInEntourage
 {X} [UniformSpace X] (x : X)
 (α : Set (X × X)) {ha : α ∈ uniformity X} :
-∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) :=
-sorry
+∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) := by
+
+have hXregular : RegularSpace X := by
+  sorry
+
+have hV0 : ∃ V ∈ nhds x, V ×ˢ V ⊆ α := by
+  rcases comp_mem_uniformity_sets ha with ⟨γ, hγ1, hγ2⟩
+
+  let β := γ ∩ Prod.swap ⁻¹' γ
+
+  have hβ_symmetric : β = Prod.swap ⁻¹' β := by
+    unfold β
+    simp only [Set.preimage_inter]
+    have hb4 : Prod.swap ⁻¹' (Prod.swap ⁻¹' γ) = γ := by
+      ext p
+      constructor
+      intro hp
+      simpa [Set.preimage, Prod.swap] using hp
+      intro hp
+      simpa [Set.preimage, Prod.swap] using hp
+    rw [hb4]
+    apply Set.inter_comm
+
+  have hProdSwap: Prod.swap ⁻¹' γ ∈ uniformity X := by
+    sorry
+
+  have hβ_uniformity : β ∈ uniformity X := by
+    apply (uniformity X).inter_mem
+    exact hγ1
+    exact hProdSwap
+
+  have β_subset_γ : β ⊆ γ := by
+    apply Set.inter_subset_left
+
+  have hβ_SetRel_γ : SetRel.comp β β ⊆ SetRel.comp γ γ := by
+    apply SetRel.comp_subset_comp β_subset_γ β_subset_γ
+
+  have hβ_α: SetRel.comp β β ⊆ α := by
+    exact (hβ_SetRel_γ.trans) hγ2
+
+  refine ⟨UniformSpace.ball x β, UniformSpace.ball_mem_nhds x hβ_uniformity, ?_⟩
+  intro p hp
+  rcases hp with ⟨hy, hz⟩
+
+  have hp1: (x, p.1) ∈ β := by
+    simpa [UniformSpace.ball] using hy
+
+  have hp1x : (p.1, x) ∈ β := by
+    have hx' : (p.1, x) ∈ Prod.swap ⁻¹' β := by
+      simpa using hp1
+    rw [hβ_symmetric]
+    exact hx'
+
+  exact hβ_α ⟨x, by simpa [UniformSpace.ball] using hp1x,
+    by simpa [UniformSpace.ball] using hz⟩
+
+obtain ⟨V, hV1, hV2⟩ := hV0
+
+obtain ⟨W, hW⟩ := exists_mem_nhds_isClosed_subset hV1
+obtain ⟨hW1, hW2, hW3⟩ := hW
+rcases mem_nhds_iff.mp hW1 with ⟨U, hUsub, hUopen, hxU⟩
+have hUW : closure U ⊆ W := by
+  have hWclosure: closure W = W := by
+    apply IsClosed.closure_eq
+    exact hW2
+  rw [<- hWclosure]
+  exact closure_mono hUsub
+have h1 : closure U ×ˢ closure U ⊆ W ×ˢ W := by
+  exact Set.prod_mono hUW hUW
+have h2 : W ×ˢ W ⊆ V ×ˢ V := by
+  exact Set.prod_mono hW3 hW3
+have h4 : closure U ×ˢ closure U ⊆ α :=
+  (h1.trans h2).trans hV2
+use U
+constructor
+apply IsOpen.mem_nhds
+exact hUopen
+exact hxU
+constructor
+exact hUopen
+exact h4
 
 -- The following is an alternative to openClosureProductInEntourage using nbhds of diagonal
 /-- Given an entourage `α` of `X` and a point `x ∈ X`
