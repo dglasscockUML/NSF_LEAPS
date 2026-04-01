@@ -45,6 +45,9 @@ def thickFamily
     exact thickIsMonotone hA hAB
 }
 
+-- There is an easier way to do this one (and others like it).
+-- Prove: A syndetic iff Aᶜ is not thick.
+-- Then: apply thm_equiv_dual_formulation.
 /-- Syndetic and thick families are dual -/
 theorem dualSyndeticThick
 {S : Type*} [Semigroup S] :
@@ -134,6 +137,29 @@ def deltaZeroFamily
     exact deltaZeroIsMonotone hA hAB
 }
 
+/-- A set `A ⊆ S` is Delta if ... -/
+def isDelta
+{S : Type*} [Semigroup S] (A : Set S) :
+Prop :=
+by sorry
+
+/-- If `A ⊆ S` is Delta and `A ⊆ B`, then `B` is Delta. -/
+theorem deltaIsMonotone
+{S : Type*} [Semigroup S]
+{A B : Set S} (hA : isDelta A) (hAB : A ⊆ B) :
+isDelta B :=
+by sorry
+
+/-- The family of Delta subsets of a semigroup -/
+def deltaFamily
+(S : Type*) [Semigroup S] : Family S :=
+{
+  sets := {A : Set S | isDelta A}
+  upward_closed := by
+    intro A B hA hAB
+    exact deltaIsMonotone hA hAB
+}
+
 end Delta_sets
 
 
@@ -191,11 +217,18 @@ def setOfBohrRecurrenceFamily
     exact setOfBohrRecurrenceIsMonotone hA hAB
 }
 
+theorem bohrZeroiffCompNotSetOfRec
+{S : Type*} [Semigroup S] (A : Set S) :
+isBohrZero A ↔ ¬ (isSetOfBohrRecurrence Aᶜ) :=
+  by sorry
+  -- This should be easy logical consequence of the definitions
+
 /-- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
 theorem dualBohrZeroSetsOfBohrRecurrence
 {S : Type*} [Semigroup S] :
 (bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
   by sorry
+  -- Combine thm_equiv_dual_formulation and bohrZeroiffCompNotSetOfRec
 
 /-- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
 theorem commBohrZeroFamilyIsFilter
