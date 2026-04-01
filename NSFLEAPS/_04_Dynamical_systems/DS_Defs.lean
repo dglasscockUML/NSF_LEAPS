@@ -60,7 +60,8 @@ DynamicalSystem S (X × Y) :=
     exact Continuous.prodMap (dSystemX.mapCont s) (dSystemY.mapCont s)
 }
 
-/- homDynamicalSystem .  Need to update. -/
+/- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
+we get an action of `T` on `X` by setting `tx = (φ t)x` -/
 def homDynamicalSystem
 {S} [Semigroup S] [Nonempty S]
 {T} [Semigroup T] [Nonempty T]

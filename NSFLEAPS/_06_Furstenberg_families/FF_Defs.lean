@@ -1,5 +1,4 @@
-import NSFLEAPS._03_Family_algebra.FA_Theorems
--- Family_algebra has two files.  We need to import the later one.
+import NSFLEAPS._03_Family_algebra.FA_Theorems -- Family_algebra has two files.  We need to import the later one.
 import NSFLEAPS._04_Dynamical_systems.DS_Defs
 
 section Syndetic_and_thick_sets
@@ -74,6 +73,7 @@ by
     simp only [thm_equiv_dual_formulation (syndeticFamily S)]
     simp only [Set.mem_setOf_eq, not_not]
     exact AcompIsSyndetic
+
   · intro AisThick B BisSyndetic
     unfold thickFamily isThick at AisThick
     unfold syndeticFamily isSyndetic at BisSyndetic
@@ -160,6 +160,12 @@ def deltaFamily
     exact deltaIsMonotone hA hAB
 }
 
+/-- In a semigroup S, Delta sets are Delta_0 -/
+theorem deltaFamilyContainedInDeltaZeroFamily
+{S : Type*} [Semigroup S] :
+deltaFamily S ⊆ deltaZeroFamily S :=
+by sorry
+
 end Delta_sets
 
 
@@ -230,18 +236,18 @@ theorem dualBohrZeroSetsOfBohrRecurrence
   by sorry
   -- Combine thm_equiv_dual_formulation and bohrZeroiffCompNotSetOfRec
 
-/-- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
-theorem commBohrZeroFamilyIsFilter
+/- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
+/- theorem commBohrZeroFamilyIsFilter
 {S : Type*} [CommSemigroup S] :
 isFilterFamily (bohrZeroFamily S) :=
-by sorry
+by sorry -/
 
-/-- In a commutative semigroup, the family of sets of Bohr
+/- In a commutative semigroup, the family of sets of Bohr
 recurrence is partition regular -/
-theorem commSetOfBohrRecurrenceFamilyIsPR
+/- theorem commSetOfBohrRecurrenceFamilyIsPR
 {S : Type*} [CommSemigroup S] :
 isPRFamily (setOfBohrRecurrenceFamily S) :=
-by sorry
+by sorry -/
 
 /-- In a commutative semigroup, a Delta_0 set is a set of Bohr recurrence -/
 theorem commDeltaZeroImpliesSetOfBohrRecurrence

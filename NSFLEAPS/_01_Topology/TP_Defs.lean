@@ -30,8 +30,7 @@ theorem openClosureProductInEntourage
 (α : Set (X × X)) {ha : α ∈ uniformity X} :
 ∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) := by
 
-have hXregular : RegularSpace X := by
-  sorry
+have hXregular : RegularSpace X := by infer_instance
 
 have hV0 : ∃ V ∈ nhds x, V ×ˢ V ⊆ α := by
   rcases comp_mem_uniformity_sets ha with ⟨γ, hγ1, hγ2⟩
