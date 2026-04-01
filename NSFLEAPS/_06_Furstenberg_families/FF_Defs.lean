@@ -110,12 +110,40 @@ rw [<- hSemiHom.hom_prop]
 simp only [Set.mem_image]
 use e * s
 
+/-- If A is a thick set and K is a finite set of a semigroup S,
+then ⋂ k ∈ K, (k * ·) ⁻¹' A is thick -/
 theorem inverseDilateCapOfThickIsThick
 {S} [Semigroup S] [Nonempty S]
 (A : Set S) {hA : isThick A}
 (K : Set S) {KIsFinite : K.Finite} :
-isThick (⋂ k ∈ K, (k * ·) ⁻¹' A) :=
-by sorry
+isThick (⋂ k ∈ K, (k * ·) ⁻¹' A) := by
+intro F hF
+let E := (⋃ k ∈ K, (k * ·) '' F)
+have hFinite: ∀ k ∈ K, ((k * ·) '' F).Finite := by
+  intro k hk
+  apply hF.image (k * ·)
+have hEFinite: E.Finite := by
+  apply KIsFinite.biUnion hFinite
+specialize hA E hEFinite
+obtain ⟨s, hs⟩ := hA
+use s
+intro a ha
+simp only [Set.mem_iInter]
+intro i hi
+simp only [Set.mem_preimage]
+obtain ⟨b, hb1, hb2⟩ := ha
+have hb3 : b * s = a:= by
+  simp only at hb2
+  exact hb2
+rw [<- hb3]
+apply hs
+unfold E
+simp only [Set.mem_image, Set.mem_iUnion, exists_prop, exists_exists_and_exists_and_eq_and]
+use i
+simp only [hi, true_and]
+use b
+simp only [hb1, true_and]
+apply Semigroup.mul_assoc
 
 theorem commDilateCapOfThickIsThick
 {S} [CommSemigroup S] [Nonempty S]
