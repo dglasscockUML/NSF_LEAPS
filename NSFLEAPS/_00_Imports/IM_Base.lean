@@ -20,3 +20,4 @@ import Mathlib.Topology.Defs.Filter
 import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Topology.UniformSpace.Defs
 import Mathlib.Topology.Maps.Proper.Basic
+import Mathlib.Topology.UniformSpace.Separation
