@@ -99,6 +99,7 @@ exact h4
 /-- Given an entourage `α` of `X` and a point `x ∈ X`
 there exists an open neighborhood `U` of `x` such that
 the closure of `U × U` is a subset of `α` -/
+-- Since we already proved openClosureProductInEntourage, this theorem is no longer needed
 theorem openClosureProductInNhdDiag
 {X} [TopologicalSpace X]
 (x : X) (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :

@@ -86,14 +86,29 @@ by
       exact Set.mem_image_of_mem (fun x ↦ x * s) fInF
     exact Set.nonempty_of_mem ⟨sMapsFintoA fstarsInImage, fTimessinB⟩
 
-
+/-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
 theorem surjImgOfSyndeticIsSyndetic
 {S} [Semigroup S] [Nonempty S]
 {T} [Semigroup T] [Nonempty T]
 (φ : S → T) [hSemiHom : SemigroupHom φ] {hSurj : Function.Surjective φ}
 (A : Set S) {hA : isSyndetic A} :
-isSyndetic (φ '' A) :=
-by sorry
+isSyndetic (φ '' A) := by
+obtain ⟨F, hF1, hF2⟩ := hA
+use φ '' F
+constructor
+· apply hF1.image φ
+intro t
+obtain ⟨s, hs⟩ := hSurj t
+specialize hF2 s
+obtain ⟨e, he1, he2⟩ := hF2
+use φ (e)
+constructor
+· simp only [Set.mem_image]
+  · use e
+rw [<- hs]
+rw [<- hSemiHom.hom_prop]
+simp only [Set.mem_image]
+use e * s
 
 theorem inverseDilateCapOfThickIsThick
 {S} [Semigroup S] [Nonempty S]
