@@ -2,19 +2,30 @@ import NSFLEAPS._04_Dynamical_systems.DS_Defs
 
 /- This file is intended to keep the code describing the dynamical system {0,1}^S with the shift -/
 
-/- funSpace S gives {0,1}^S as a compact Hausdorff space -/
-/- def funSpace
-(S : Type*) [Semigroup S] [Nonempty S] : -/
-
+/- A general note: Bool is a type with terms `true` and `false`.
+Apparently, Lean automatically gives it the discrete topology?
+Then `S → Bool` has the product topology by association with `Bool^S`.
+Since this is a product of compact, Hausdorff spaces, it is compact, Hausdorff.
+Apparently Lean knows all of this automatically. -/
 
 /-- symbolicSystem S is the dynamical system consisting of {0,1}^S with the natural S action -/
 def symbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
-DynamicalSystem S (funSpace S) :=
-by sorry
+DynamicalSystem S (S → Bool) := {
+    /-map := by
+        intro s φ t
+        exact φ (s * t)-/
+    map := fun (s : S) ↦ (fun (φ : S → Bool) ↦ (fun (t : S) ↦ φ (t * s)))
+    mapMult := by
+        intro s1 s2 φ
+        simp only [mul_assoc]
+    mapCont := by sorry
+}
 
 /-- indicator A gives the indicator function of A -/
+noncomputable
 def indicator
-{S : Type*} [Semigroup S] [Nonempty S] :
-Set S → funSpace S :=
-by sorry
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+S → Bool := by
+classical
+exact fun s => decide (s ∈ A)

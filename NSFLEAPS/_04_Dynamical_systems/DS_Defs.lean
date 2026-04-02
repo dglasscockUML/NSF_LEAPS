@@ -2,7 +2,8 @@ import NSFLEAPS._01_Topology.TP_Defs
 import NSFLEAPS._02_Semigroups.SG_Defs
 
 /- The following namespace line gives all definitions, theorems, etc... a prefix of `DS.` -/
-namespace DS
+-- DGG: I've decided not to use the namespace.  It probably won't be helpful for us.
+--namespace DS
 
 /- Sections are used for organizational purposes only.  See the `Outline` pane under `Explorer`. -/
 section Structures
@@ -362,6 +363,9 @@ end Subsystems
 
 section Factor_maps_and_ICERS
 
+/- DGG: I am playing around with different definition structures in this section
+until we land on one that works nicely. -/
+
 /-- The definition of a dynamical system Y being a factor of a dynamical system X -/
 def isFactor
 {S} [Semigroup S] [Nonempty S]
@@ -372,6 +376,18 @@ def isFactor
 Prop :=
 ∃ F : X → Y, Continuous F ∧ Function.Surjective F ∧
 (∀ x : X, ∀ s : S, F (dSystemX.map s x) = dSystemY.map s (F (x)))
+
+def isFactorMap
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
+Prop :=
+Continuous π ∧ Function.Surjective π ∧
+(∀ x : X, ∀ s : S, π (dSystemX.map s x) = dSystemY.map s (π x))
+
 
 
 end Factor_maps_and_ICERS
@@ -768,6 +784,7 @@ end Proximality
 
 section Regional_proximality
 
+/-- The regionally proximal relation for a dynamical system -/
 def RP
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -804,6 +821,29 @@ theorem RPisReflexIfNondegen
 Std.Refl (setToRel (RP dSystem)) :=
 by sorry
 
+/-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
+theorem imageOfRPIsInRP
+{S : Type*} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
+(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY :=
+by sorry
+
+/-- For `π : X → Y` a factor map of minimal systems with a commutative
+acting semigroup, `RP_Y ⊆ (π ⊗ π) RP_X` -/
+theorem commMinRPIsInImageOfRP
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X) {hMin : isMinimalSystem dSystemX}
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
+RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) :=
+by sorry
+
 end Regional_proximality
 
 
@@ -817,4 +857,4 @@ section Equicontinuous_structure_relation
 
 end Equicontinuous_structure_relation
 
-end DS
+--end DS

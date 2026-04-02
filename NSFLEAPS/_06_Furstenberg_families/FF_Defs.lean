@@ -280,17 +280,17 @@ theorem dualBohrZeroSetsOfBohrRecurrence
   -- Combine thm_equiv_dual_formulation and bohrZeroiffCompNotSetOfRec
 
 /- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
-/- theorem commBohrZeroFamilyIsFilter
+theorem commBohrZeroFamilyIsFilter
 {S : Type*} [CommSemigroup S] :
 isFilterFamily (bohrZeroFamily S) :=
-by sorry -/
+by sorry
 
 /- In a commutative semigroup, the family of sets of Bohr
 recurrence is partition regular -/
-/- theorem commSetOfBohrRecurrenceFamilyIsPR
+theorem commSetOfBohrRecurrenceFamilyIsPR
 {S : Type*} [CommSemigroup S] :
 isPRFamily (setOfBohrRecurrenceFamily S) :=
-by sorry -/
+by sorry
 
 /-- In a commutative semigroup, a Delta_0 set is a set of Bohr recurrence -/
 theorem commDeltaZeroImpliesSetOfBohrRecurrence
