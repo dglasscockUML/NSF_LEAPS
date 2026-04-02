@@ -63,6 +63,9 @@ instance {α} : Union (Family α) where
 def isIntersectionClosed (F : Set (Set α)) : Prop :=
   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
 
+def isFilterFamily (F : Family α) : Prop :=
+  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+
 structure PRFamily (α : Type) extends Family α where
   partition_regular : partitionRegularTwoSets sets
 

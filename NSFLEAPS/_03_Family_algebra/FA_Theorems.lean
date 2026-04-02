@@ -11,7 +11,7 @@ variable (α : Type _) (J K L : Set (Set α))
 #check K
 
 theorem thm_equiv_dual_formulation {α} (F : Family α) :
-(F*).sets = {A : Set α | Aᶜ ∉ F.sets} :=
+F* = {A : Set α | Aᶜ ∉ F} :=
   by
   -- {A | ∀ B ∈ F.sets, (A ∩ B).Nonempty} = {A | Aᶜ ∉ F.sets}
   -- set equality proof -> prove 2 directions
@@ -77,7 +77,7 @@ theorem thm_dual_is_involution (F : Family α) : F** = F :=
         contradiction
       have : Aᶜ ∈ F.sets :=
         F.upward_closed B Aᶜ BinF hsubset
-      sorry
+      exact hEmpty BinF h AinDual
     sorry
   · -- F ⊆ F**
     intro AinF
@@ -114,8 +114,8 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
  by sorry
 -- need to define what a subset of Fam is
 
---theorem thm_pr_iff_dual_is_filter (P : PRFamily α) : FilterFamily (P.sets*) :=
---  by sorry
+theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔ partitionRegularTwoSets (P.sets) :=
+ by sorry
 
 --thm_family_equal_to_dual_iff_ultrafilter
 --theorem thm_family_equal_to_dual_iff_ultrafilter (F : Family α) : F* = F ↔ UltrafilterFamily F :=
@@ -134,8 +134,8 @@ theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by sorry
 
 --thm_classcap_contains_union
---theorem thm_classcap_contains_union (F G : Family α) : F ⋎ G ⊇ F ∪ G :=
---  by sorry
+theorem thm_classcap_contains_union (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G)  :=
+  by sorry
 -- need to define what a subset of Fam is
 
 --thm_classcap_commutative
@@ -156,14 +156,13 @@ theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoS
 
 --thm_classcap_idempotent_at_filters
 
---thm_family_classcapdual_is_family
+--thm_family_classcapdual_is_family don't need
 --theorem thm_family_classcapdual_is_family (F : Family α) : Family (F ⋎ F*) :=
- -- by sorry
+--  by sorry
 
 --thm_classcapdual_contained_in_intersection
 theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G) ⊆ (F ∩ G) :=
   by sorry
--- need to define what a subset of Fam is
 
 
 --thm_classcapdual_commutative
@@ -177,7 +176,7 @@ theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = (
 theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by sorry
 --thm_family_classcapdual_dual_is_filter
---theorem thm_family_classcapdual_dual_is_filter (F : Family α) : FilterFamily (F ⋏ F*) :=
- -- by sorry
+theorem thm_family_classcapdual_dual_is_filter (F : Family α) : isFilterFamily (F ⋏ F*) :=
+  by sorry
 
 --thm_classcapdual_idempotent_at_pr_families
