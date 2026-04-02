@@ -1,6 +1,9 @@
 import NSFLEAPS._01_Topology.TP_Defs
 import NSFLEAPS._02_Semigroups.SG_Defs
 
+import Mathlib.Topology.UniformSpace.Equicontinuity
+import Mathlib.Topology.UniformSpace.OfCompactT2
+
 /- The following namespace line gives all definitions, theorems, etc... a prefix of `DS.` -/
 -- DGG: I've decided not to use the namespace.  It probably won't be helpful for us.
 --namespace DS
@@ -847,7 +850,31 @@ by sorry
 end Regional_proximality
 
 
+
 section Equicontinuity_and_regional_proximality
+
+variable {S} [Semigroup S] [Nonempty S]
+variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+
+/- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
+instance : UniformSpace X := uniformSpaceOfCompactR1
+
+def isEquicontinuousSystem
+(dSystem : DynamicalSystem S X) :
+Prop :=
+UniformEquicontinuous dSystem.map
+
+theorem diagSystemOfEquiSystemsIsEquiSystem
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
+{dSystemY : DynamicalSystem S Y} (hYEqui : isEquicontinuousSystem dSystemY) :
+isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) :=
+by sorry
+
+theorem equicontinuousIffRPTrivial
+(dSystem : DynamicalSystem S X) :
+RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem :=
+by sorry
 
 
 end Equicontinuity_and_regional_proximality

@@ -157,11 +157,12 @@ end Syndetic_and_thick_sets
 
 section Delta_sets
 
-/-- A set `A ⊆ S` is Delta_0 if ... -/
+/-- A set `A ⊆ S` is Delta_0 if for all `n`, there exist `s_1, ..., s_n ∈ S`
+such that for all `1 ≤ i < j ≤ k`, `s_j ∈ s_i A` -/
 def isDeltaZero
-{S : Type*} [Semigroup S] (A : Set S) :
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-by sorry
+∀ (k : ℕ), ∃ (s : Fin k → S), ∀ (i j : Fin k), i < j → (s j) ∈ ((s i) * ·) '' A
 
 /-- If `A ⊆ S` is Delta_0 and `A ⊆ B`, then `B` is Delta_0. -/
 theorem deltaZeroIsMonotone
@@ -180,22 +181,23 @@ def deltaZeroFamily
     exact deltaZeroIsMonotone hA hAB
 }
 
-/-- A set `A ⊆ S` is Delta if ... -/
+/-- A set `A ⊆ S` is Delta if there exist `s_1, s_2, ... ∈ S`
+such that for all `1 ≤ i < j`, `s_j ∈ s_i A` -/
 def isDelta
-{S : Type*} [Semigroup S] (A : Set S) :
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-by sorry
+∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
 
 /-- If `A ⊆ S` is Delta and `A ⊆ B`, then `B` is Delta. -/
 theorem deltaIsMonotone
-{S : Type*} [Semigroup S]
+{S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDelta A) (hAB : A ⊆ B) :
 isDelta B :=
 by sorry
 
 /-- The family of Delta subsets of a semigroup -/
 def deltaFamily
-(S : Type*) [Semigroup S] : Family S :=
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isDelta A}
   upward_closed := by
@@ -220,7 +222,10 @@ a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
 def isBohrZero
 {S : Type*} [Semigroup S] (A : Set S) :
 Prop :=
-by sorry
+∃ (X : Type*) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(x : X) (U : Set X) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A
 
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
 theorem bohrZeroIsMonotone
