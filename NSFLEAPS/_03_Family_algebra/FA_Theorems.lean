@@ -1,8 +1,8 @@
 import NSFLEAPS._03_Family_algebra.FA_Defs
 
-variable (fam : Family S)
+variable (fam famB: Family S)
 #check fam
-#check fam*
+#check fam* = fam
 variable (α : Type _) (J K L : Set (Set α))
 #check J
 #check J*
@@ -55,64 +55,70 @@ lemma Family.ext {α} {F G : Family α}
   cases h
   rfl
 
-theorem thm_dual_is_involution (F : Family α) : F** = F :=
-  by
+@[simp]
+lemma dual_sets (F : Family α) :
+  (F* : Set (Set α)) = {A : Set α | Aᶜ ∉ F} :=
+by
+  simpa using thm_equiv_dual_formulation (F := F)
+#check thm_equiv_dual_formulation
+
+theorem thm_dual_is_involution (F : Family α) : F** = F := by
   ext A
+  change A ∈ (F** : Set (Set α)) ↔ A ∈ (F : Set (Set α))
   constructor
-  · -- F** ⊆ F
-    intro AinDualDual --have some F**
-    by_contra h --assume F** not in F
-    have AinDual : A ∈ (F*).sets := by
-      intro B BinF
-      by_contra hEmpty
-      have hsubset : B ⊆ Aᶜ := by
-        intro x xinB
-        by_contra xninAc
-        have xinA : x ∈ A := by
-          rw [Set.mem_compl_iff] at xninAc
-          push_neg at xninAc
-          exact xninAc
-        have : x ∈ A ∩ B := ⟨xinA, xinB⟩
-        have : (A ∩ B).Nonempty := ⟨x, this⟩
-        contradiction
-      have : Aᶜ ∈ F.sets :=
-        F.upward_closed B Aᶜ BinF hsubset
-      exact hEmpty BinF h AinDual
-    sorry
-  · -- F ⊆ F**
-    intro AinF
-    by_contra h
-    have AinDual : A ∈ (F*).sets := by
-      intro B BinF
-      by_contra hEmpty
-      have hsubset : B ⊆ Aᶜ := by
-        intro x xinB
-        by_contra xninAc
-        have xinA : x ∈ A := by
-          rw [Set.mem_compl_iff] at xninAc
-          push_neg at xninAc
-          exact xninAc
-        have : x ∈ A ∩ B := ⟨xinA, xinB⟩
-        have : (A ∩ B).Nonempty := ⟨x, this⟩
-        contradiction
-      have : Aᶜ ∈ F.sets :=
-        F.upward_closed B Aᶜ BinF hsubset
+  -- F** ⊆ F
+  · intro h
+    have h1 : Aᶜ ∉ (F* : Set (Set α)) := by
+      intro hAc
+      let hAc' : Aᶜ ∈ {B | Bᶜ ∉ F} := sorry -- need to get rid of this sorry
+      have hAc'' : (Aᶜ)ᶜ ∉ F := by
+        rw [Set.mem_setOf] at hAc'
+        exact hAc'
+      exact hAc'' h
+    -- Use characterization of F*: Aᶜ ∉ F* ↔ (Aᶜ)ᶜ = A ∈ F
+    by_contra hA
+    have h2 : Aᶜ ∈ (F* : Set (Set α)) := by
+      simp [thm_equiv_dual_formulation] at hA
+      sorry
+    exact h1 h2
+
+
+  --F ⊆ F**
+  · intro hA
+    have h1 : Aᶜ ∉ (F* : Set (Set α)) := by
+      intro hAc
       sorry
     sorry
-  --split into 2 cases,
  -- F** ⊆ F
  -- F ⊆ F**
 
 
 theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
   (h : ∀ F, dual (dual F) = F) : Function.Bijective dual :=
-  by sorry
+  by
+  constructor
+  · -- injective
+    intro F G hFG
+    have := congrArg dual hFG
+    simpa [h F, h G] using this
+  · -- surjective
+    intro F
+    use dual F
+    exact h F
 
 -- theorem thm_dual_is_antitone (F G : Family α) : F.sets ⊆ G.sets → (F*).sets ⊆ (G*).sets :=
 --  by sorry
 theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
- by sorry
--- need to define what a subset of Fam is
+ by
+  intro h A hAinF
+  -- rewrite F* membership using characterization
+  rw [thm_equiv_dual_formulation] at hAinF
+  -- want: A ∈ G* ↔ Aᶜ ∉ G
+  rw [thm_equiv_dual_formulation]
+  -- prove by contradiction
+  intro hAcinG
+  -- F ⊆ G means if Aᶜ ∈ F then Aᶜ ∈ G, so contrapositive: if Aᶜ ∉ G then Aᶜ ∉ F
+  sorry
 
 theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔ partitionRegularTwoSets (P.sets) :=
  by sorry
