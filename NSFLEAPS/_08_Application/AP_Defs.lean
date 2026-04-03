@@ -67,14 +67,14 @@ section Application
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
 {S : Type*} [CommSemigroup S] [Nonempty S] :
-(syndeticFamily S) ⋏ (deltaFamily S) = (syndeticFamily S) ⋏ (setOfBohrRecurrenceFamily S) :=
+((syndeticFamily S) ⋏ (deltaFamily S)) = ((syndeticFamily S) ⋏ (setOfBohrRecurrenceFamily S)):=
 by sorry
 
 
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ Δ_0 -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
-(syndeticFamily S) ⋏ (deltaFamily S) = (syndeticFamily S) ⋏ (deltaZeroFamily S) :=
+((syndeticFamily S) ⋏ (deltaFamily S)) = ((syndeticFamily S) ⋏ (deltaZeroFamily S)) :=
 by sorry
 
 /-- In a commutative semigroup, Δ* ⊆ S ⋏ (T ⋎ dcS_Bohr) -/

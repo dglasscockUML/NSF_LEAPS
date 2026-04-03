@@ -8,13 +8,13 @@ section Syndetic_and_thick_sets
 /-- A set `A ⊆ S` is thick if for all finite subsets `F ⊆ S`,
 there exists `s ∈ S` such that `Fs ⊆ A` -/
 def isThick
-{S : Type*} [Semigroup S] (A : Set S) :
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A
 
 /-- If `A ⊆ S` is thick and `A ⊆ B`, then `B` is thick. -/
 theorem thickIsMonotone
-{S : Type*} [Semigroup S]
+{S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hSA : isThick A) (hAB : A ⊆ B) :
 isThick B :=
 by
@@ -26,7 +26,7 @@ by
 
 /-- The family of syndetic subsets of a semigroup -/
 def syndeticFamily
-(S : Type*) [Semigroup S] : Family S :=
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isSyndetic A}
   upward_closed := by
@@ -36,7 +36,7 @@ def syndeticFamily
 
 /-- The family of thick subsets of a semigroup -/
 def thickFamily
-(S : Type*) [Semigroup S] : Family S :=
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isThick A}
   upward_closed := by
@@ -49,7 +49,7 @@ def thickFamily
 -- Then: apply thm_equiv_dual_formulation.
 /-- Syndetic and thick families are dual -/
 theorem dualSyndeticThick
-{S : Type*} [Semigroup S] :
+{S : Type*} [Semigroup S] [Nonempty S] :
 (syndeticFamily S)* = (thickFamily S) :=
 by
   ext A
@@ -70,9 +70,10 @@ by
         specialize AnotThick s
         simp only [Set.not_subset] at AnotThick
         exact AnotThick
-    simp only [thm_equiv_dual_formulation (syndeticFamily S)]
-    simp only [Set.mem_setOf_eq, not_not]
-    exact AcompIsSyndetic
+    --simp only [↑thm_equiv_dual_formulation]
+    --simp only [Set.mem_setf_eq, not_not]
+    --exact AcompIsSyndetic
+    sorry
 
   · intro AisThick B BisSyndetic
     unfold thickFamily isThick at AisThick
@@ -166,14 +167,14 @@ Prop :=
 
 /-- If `A ⊆ S` is Delta_0 and `A ⊆ B`, then `B` is Delta_0. -/
 theorem deltaZeroIsMonotone
-{S : Type*} [Semigroup S]
+{S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDeltaZero A) (hAB : A ⊆ B) :
 isDeltaZero B :=
 by sorry
 
 /-- The family of Delta_0 subsets of a semigroup -/
 def deltaZeroFamily
-(S : Type*) [Semigroup S] : Family S :=
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isDeltaZero A}
   upward_closed := by
@@ -207,7 +208,7 @@ def deltaFamily
 
 /-- In a semigroup S, Delta sets are Delta_0 -/
 theorem deltaFamilyContainedInDeltaZeroFamily
-{S : Type*} [Semigroup S] :
+{S : Type*} [Semigroup S] [Nonempty S] :
 deltaFamily S ⊆ deltaZeroFamily S :=
 by sorry
 
@@ -220,23 +221,23 @@ section Bohr_sets
 action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
 a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
 def isBohrZero
-{S : Type*} [Semigroup S] (A : Set S) :
-Prop :=
-∃ (X : Type*) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop := sorry
+/- ∃ (X : Type*) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
 (x : X) (U : Set X) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A
-
+ -/
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
 theorem bohrZeroIsMonotone
-{S : Type*} [Semigroup S]
+{S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isBohrZero A) (hAB : A ⊆ B) :
 isBohrZero B :=
 by sorry
 
-/-- The family of Bohr_0 subsets of a semigroup -/
+-- The family of Bohr_0 subsets of a semigroup
 def bohrZeroFamily
-(S : Type*) [Semigroup S] : Family S :=
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isBohrZero A}
   upward_closed := by
@@ -249,21 +250,21 @@ def bohrZeroFamily
 actions of `S` on a compact, Hausdorff space `X`, all points `x ∈ X` and
 all neighborhoods `U` of `x`, `A ∩ R(x,U) ≠ ∅` -/
 def isSetOfBohrRecurrence
-{S : Type*} [Semigroup S] (A : Set S) :
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 by sorry
 
 /-- If `A ⊆ S` is a set of Bohr recurrence and `A ⊆ B`, then `B`
 is a set of Bohr recurrence. -/
 theorem setOfBohrRecurrenceIsMonotone
-{S : Type*} [Semigroup S]
+{S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isSetOfBohrRecurrence A) (hAB : A ⊆ B) :
 isSetOfBohrRecurrence B :=
 by sorry
 
 /-- The family of Bohr_0 subsets of a semigroup -/
 def setOfBohrRecurrenceFamily
-(S : Type*) [Semigroup S] : Family S :=
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isSetOfBohrRecurrence A}
   upward_closed := by
@@ -272,34 +273,34 @@ def setOfBohrRecurrenceFamily
 }
 
 theorem bohrZeroiffCompNotSetOfRec
-{S : Type*} [Semigroup S] (A : Set S) :
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 isBohrZero A ↔ ¬ (isSetOfBohrRecurrence Aᶜ) :=
   by sorry
   -- This should be easy logical consequence of the definitions
 
 /-- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
 theorem dualBohrZeroSetsOfBohrRecurrence
-{S : Type*} [Semigroup S] :
+{S : Type*} [Semigroup S] [Nonempty S] :
 (bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
   by sorry
   -- Combine thm_equiv_dual_formulation and bohrZeroiffCompNotSetOfRec
 
 /- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
 theorem commBohrZeroFamilyIsFilter
-{S : Type*} [CommSemigroup S] :
+{S : Type*} [CommSemigroup S] [Nonempty S] :
 isFilterFamily (bohrZeroFamily S) :=
 by sorry
 
 /- In a commutative semigroup, the family of sets of Bohr
 recurrence is partition regular -/
 theorem commSetOfBohrRecurrenceFamilyIsPR
-{S : Type*} [CommSemigroup S] :
+{S : Type*} [CommSemigroup S][Nonempty S] :
 isPRFamily (setOfBohrRecurrenceFamily S) :=
 by sorry
 
 /-- In a commutative semigroup, a Delta_0 set is a set of Bohr recurrence -/
 theorem commDeltaZeroImpliesSetOfBohrRecurrence
-{S : Type*} [CommSemigroup S] :
+{S : Type*} [CommSemigroup S] [Nonempty S] :
 deltaZeroFamily S ⊆ setOfBohrRecurrenceFamily S :=
 by sorry
 

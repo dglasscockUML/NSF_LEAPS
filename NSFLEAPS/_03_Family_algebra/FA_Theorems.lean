@@ -55,11 +55,11 @@ lemma Family.ext {α} {F G : Family α}
   cases h
   rfl
 
-@[simp]
+/- @[simp]
 lemma dual_sets (F : Family α) :
   (F* : Set (Set α)) = {A : Set α | Aᶜ ∉ F} :=
 by
-  simpa using thm_equiv_dual_formulation (F := F)
+  simpa using thm_equiv_dual_formulation (F := F) -/
 
 #check thm_equiv_dual_formulation
 
@@ -96,9 +96,9 @@ theorem thm_dual_is_involution (F : Family α) : F** = F := by
  -- F** ⊆ F
  -- F ⊆ F**
 
-
+--maybe funky
 theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
-  (h : ∀ F, dual (dual F) = F) : Function.Bijective dual :=
+  (h : ∀ (F: Family α), dual (dual F) = F) : Function.Bijective dual :=
   by
   constructor
   · -- injective
@@ -188,7 +188,7 @@ theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoS
 --theorem thm_family_classcapdual_is_family (F : Family α) : Family (F ⋎ F*) :=
 --  by sorry
 
---thm_classcapdual_contained_in_intersection
+--thm_classcapdual_contained_in_intersection ***
 theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G) ⊆ (F ∩ G) :=
   by sorry
 
@@ -200,7 +200,7 @@ theorem thm_classcapdual_commutative (F G : Family α) : (F ⋏ G) = (G ⋏ F) :
 theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
   by sorry
 
---thm_classcapdual_monotone
+--thm_classcapdual_monotone ***
 theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by sorry
 --thm_family_classcapdual_dual_is_filter
@@ -208,3 +208,5 @@ theorem thm_family_classcapdual_dual_is_filter (F : Family α) : isFilterFamily 
   by sorry
 
 --thm_classcapdual_idempotent_at_pr_families
+
+--H* ⊆ F ⋏ (F* ⋎ G*) if and only if F ⋏ G ⊆ F ⋏ H. **

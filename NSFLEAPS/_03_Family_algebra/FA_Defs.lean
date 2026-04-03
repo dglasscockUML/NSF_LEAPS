@@ -59,12 +59,19 @@ instance {α} : Union (Family α) where
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
-
 def isIntersectionClosed (F : Set (Set α)) : Prop :=
   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
 
 def isFilterFamily (F : Family α) : Prop :=
   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+
+-- want to define pr for beyond two sets
+def PartitionRegular (F : Family α): Prop := --rewrite this to not use ℕ **
+  sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+
+def isPRFamily (F : Family α) : Prop :=
+  sorry --∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+
 
 structure PRFamily (α : Type) extends Family α where
   partition_regular : partitionRegularTwoSets sets
@@ -191,5 +198,3 @@ instance : HasFamMeet (Set (Set α))  where
   famMeet := _root_.famMeet
 noncomputable instance : HasFamMeet (Family α) where
   famMeet := @Family.famMeet α
-
-
