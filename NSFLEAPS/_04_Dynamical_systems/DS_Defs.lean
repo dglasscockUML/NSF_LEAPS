@@ -129,8 +129,7 @@ intro z hz
 apply h4
 exact ⟨z, hz, rfl⟩
 
-/-- The predicate that the set `Z ⊆ X` is a nonempty, compact, T2 subset that is
-invariant under the action `dSystem.map` -/
+/-- The predicate that the set `Z ⊆ X` is a nonempty, compact, T2 subset that is invariant under the action `dSystem.map` -/
 def isNonemptyCompactT2InvariantSubset
 (dSystem : DynamicalSystem S X) (Z : Set X) :
 Prop :=
@@ -369,16 +368,17 @@ section Factor_maps_and_ICERS
 /- DGG: I am playing around with different definition structures in this section
 until we land on one that works nicely. -/
 
-/-- The definition of a dynamical system Y being a factor of a dynamical system X -/
-def isFactor
+/-- A map between the phase spaces of two dynamical systems is
+interwining if `π ∘ s = s ∘ π`. (See MulActionHom for precedent) -/
+def isIntertwining
 {S} [Semigroup S] [Nonempty S]
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
-(dSystemX : DynamicalSystem S X) :
+(π : X → Y) :
 Prop :=
-∃ F : X → Y, Continuous F ∧ Function.Surjective F ∧
-(∀ x : X, ∀ s : S, F (dSystemX.map s x) = dSystemY.map s (F (x)))
+∀ x : X, ∀ s : S, π (dSystemX.map s x) = dSystemY.map s (π x)
 
 def isFactorMap
 {S} [Semigroup S] [Nonempty S]
@@ -388,10 +388,65 @@ def isFactorMap
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) :
 Prop :=
-Continuous π ∧ Function.Surjective π ∧
-(∀ x : X, ∀ s : S, π (dSystemX.map s x) = dSystemY.map s (π x))
+Continuous π ∧ Function.Surjective π ∧ isIntertwining dSystemX dSystemY π
 
 
+/-- The definition of a dynamical system Y being a factor of a dynamical system X -/
+def isFactor
+{S} [Semigroup S] [Nonempty S]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemY : DynamicalSystem S Y)
+(dSystemX : DynamicalSystem S X) :
+Prop :=
+∃ (π : X → Y), isFactorMap dSystemX dSystemY π
+
+/- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
+a continuous, intertwining map `π: X → Y` as a dynamical system -/
+def imageDynamicalSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) {hπCont : Continuous π} {hπInt : isIntertwining dSystemX dSystemY π}
+{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
+(hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
+DynamicalSystem S ↑(π '' Z) :=
+by sorry
+
+/- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
+a continuous, intertwining map `π: X → Y` is a nonempty, compact, T2,
+`S`-invariant subset of `Y` -/
+/- Depracated in favor of imageSystem -/
+/- theorem contIntertwiningImageOfNonemptyComT2InvIsNonemptyComT2Inv
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) {hπCont : Continuous π} {hπInt : isIntertwining dSystemX dSystemY π}
+{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
+(hZisInv : isInvariantSet dSystemX Z) :
+isNonemptyCompactT2InvariantSubset dSystemY (π '' Z)
+:= by sorry -/
+
+/-- The restriction of a continuous, intertwining map to a nonempty, compact,
+T2, invariant subset `Z ⊆ X` is a factor map from `Z` as an `S`-system to its
+image under the map as a `S`-system -/
+theorem contIntertwineRestrictionIsFactorMap
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) {hπCont : Continuous π} {hπInt : isIntertwining dSystemX dSystemY π}
+{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
+(hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
+isFactorMap (fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
+(imageDynamicalSystem dSystemX dSystemY π (hπInt := hπInt) (hπCont := hπCont) hZisInv)
+(Set.MapsTo.restrict π Z (π '' Z) (Set.mapsTo_image π Z))
+:= by sorry
 
 end Factor_maps_and_ICERS
 
@@ -501,8 +556,8 @@ theorem minimalSubsetIsMinimalSystem
 isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1.2.2.2)) :=
 by sorry -- UNHAPPY, WAIT TO TOUCH
 
-/-- A system is minimal if and only if for all points `x ∈ X`, the `S`-orbit of
-`x` is dense -/
+/-- A system is minimal if and only if for all points `x ∈ X`,
+the `S`-orbit of `x` is dense -/
 theorem minimalIffDenseOrbits
 (dSystem : DynamicalSystem S X) :
 isMinimalSystem dSystem ↔ ∀ x : X, Dense (orbit dSystem x) :=
@@ -531,7 +586,13 @@ by
     rewrite [hDense z] at orbitClosInZ
     exact Set.Subset.antisymm (Set.subset_univ Z) orbitClosInZ
 
-
+/-- A factor of a minimal system is a minimal system -/
+theorem factorOfMinimalIsMinimal
+{dSystemX : DynamicalSystem S X} (hXMin : isMinimalSystem dSystemX)
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y} (hFactor : isFactor dSystemY dSystemX) :
+isMinimalSystem dSystemY :=
+by sorry
 
 end Minimality
 
