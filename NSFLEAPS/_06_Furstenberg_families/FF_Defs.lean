@@ -44,48 +44,28 @@ def thickFamily
     exact thickIsMonotone hA hAB
 }
 
--- There is an easier way to do this one (and others like it).
--- Prove: A syndetic iff Aᶜ is not thick.
--- Then: apply thm_equiv_dual_formulation.
-/-- Syndetic and thick families are dual -/
+/-- A set is thick iff its complement is not syndetic -/
+theorem thickIffComplementNotSyndetic
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isThick A ↔ ¬isSyndetic Aᶜ :=
+by sorry
+
+
+/-- The families of syndetic sets and thick sets are dual -/
 theorem dualSyndeticThick
 {S : Type*} [Semigroup S] [Nonempty S] :
 (syndeticFamily S)* = (thickFamily S) :=
 by
   ext A
-  constructor
-  · contrapose
-    intro AnotThick
-    unfold thickFamily at AnotThick
-    simp only [Set.mem_setOf_eq] at AnotThick
-    unfold isThick at AnotThick
-    simp only [Set.image_subset_iff, not_forall, not_exists] at AnotThick
-    rcases AnotThick with ⟨F,FFinite,AnotThick⟩
-    have AcompIsSyndetic : isSyndetic Aᶜ := by
-      unfold isSyndetic
-      use F
-      constructor
-      · exact FFinite
-      · intro s
-        specialize AnotThick s
-        simp only [Set.not_subset] at AnotThick
-        exact AnotThick
-    --simp only [↑thm_equiv_dual_formulation]
-    --simp only [Set.mem_setf_eq, not_not]
-    --exact AcompIsSyndetic
-    sorry
+  have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
+    thm_equiv_dual_formulation (syndeticFamily S)
+  rw [dualEquivForm]
+  change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
+  unfold syndeticFamily
+  unfold thickFamily
+  simp only [Set.mem_setOf_eq]
+  exact Iff.symm (thickIffComplementNotSyndetic A)
 
-  · intro AisThick B BisSyndetic
-    unfold thickFamily isThick at AisThick
-    unfold syndeticFamily isSyndetic at BisSyndetic
-    rcases BisSyndetic with ⟨F, Ffinite, BisSyndetic⟩
-    specialize AisThick F Ffinite
-    rcases AisThick with ⟨s, sMapsFintoA⟩
-    specialize BisSyndetic s
-    rcases BisSyndetic with ⟨f,fInF,fTimessinB⟩
-    have fstarsInImage : f * s ∈ (fun x ↦ x * s) '' F := by
-      exact Set.mem_image_of_mem (fun x ↦ x * s) fInF
-    exact Set.nonempty_of_mem ⟨sMapsFintoA fstarsInImage, fTimessinB⟩
 
 /-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
 theorem surjImgOfSyndeticIsSyndetic
@@ -217,17 +197,24 @@ end Delta_sets
 
 section Bohr_sets
 
+set_option pp.universes true in
+#check DynamicalSystem
+
+--universe u
 /-- A set `A ⊆ S` is Bohr_0 if there exists a minimal, equicontinuous
 action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
 a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
 def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := sorry
-/- ∃ (X : Type*) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(x : X) (U : Set X) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A
- -/
+Prop := by sorry
+--∃ (X : Type u), 1+1=2
+/- ∃ (X : Type u) (name1 : TopologicalSpace X)
+(name2 : CompactSpace X) (name3 : T2Space X) (name4 : Nonempty X)
+(dSystem : DynamicalSystem S X) (name5 : isEquicontinuousSystem dSystem)
+(x : X) (U : Set X) (name6 : IsOpen U),
+visitTimeSet dSystem x U ⊆ A -/
+
+
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
 theorem bohrZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -274,7 +261,7 @@ def setOfBohrRecurrenceFamily
 
 theorem bohrZeroiffCompNotSetOfRec
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isBohrZero A ↔ ¬ (isSetOfBohrRecurrence Aᶜ) :=
+isSetOfBohrRecurrence A ↔ ¬(isBohrZero Aᶜ) :=
   by sorry
   -- This should be easy logical consequence of the definitions
 
@@ -282,8 +269,16 @@ isBohrZero A ↔ ¬ (isSetOfBohrRecurrence Aᶜ) :=
 theorem dualBohrZeroSetsOfBohrRecurrence
 {S : Type*} [Semigroup S] [Nonempty S] :
 (bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
-  by sorry
-  -- Combine thm_equiv_dual_formulation and bohrZeroiffCompNotSetOfRec
+by
+  ext A
+  have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=
+    thm_equiv_dual_formulation (bohrZeroFamily S)
+  rw [dualEquivForm]
+  change A ∈ {A | Aᶜ ∉ (bohrZeroFamily S).sets} ↔ A ∈ (setOfBohrRecurrenceFamily S).sets
+  unfold bohrZeroFamily
+  unfold setOfBohrRecurrenceFamily
+  simp only [Set.mem_setOf_eq]
+  exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
 /- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
 theorem commBohrZeroFamilyIsFilter
