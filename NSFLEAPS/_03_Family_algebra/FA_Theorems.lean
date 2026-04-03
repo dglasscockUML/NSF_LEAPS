@@ -60,6 +60,7 @@ lemma dual_sets (F : Family α) :
   (F* : Set (Set α)) = {A : Set α | Aᶜ ∉ F} :=
 by
   simpa using thm_equiv_dual_formulation (F := F)
+
 #check thm_equiv_dual_formulation
 
 theorem thm_dual_is_involution (F : Family α) : F** = F := by
@@ -129,7 +130,24 @@ theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets
 
 --thm_de_morgan_union_v1
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
-  by sorry
+  by
+    ext A
+    constructor
+    · intro h
+    -- want: A ∈ F* ⋏ G* ↔ Aᶜ ∉ F.sets ∧ Aᶜ ∉ G.sets
+      constructor
+      · intro hF
+      -- hF : Aᶜ ∈ F.sets → contradiction with h
+        exact h (Or.inl hF)
+      · intro hG
+        exact h (Or.inr hG)
+    · intro h
+    -- h : ¬Aᶜ ∈ F.sets ∧ ¬Aᶜ ∈ G.sets
+      intro hOr
+      cases hOr with
+      | inl hF => exact h.left hF
+      | inr hG => exact h.right hG
+
 
 --thm_de_morgan_union_v2
 theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
