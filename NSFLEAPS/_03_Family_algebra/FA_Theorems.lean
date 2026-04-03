@@ -64,32 +64,35 @@ by
 #check thm_equiv_dual_formulation
 
 theorem thm_dual_is_involution (F : Family α) : F** = F := by
-  ext A
-  change A ∈ (F** : Set (Set α)) ↔ A ∈ (F : Set (Set α))
+  /- ext A
   constructor
   -- F** ⊆ F
   · intro h
-    have h1 : Aᶜ ∉ (F* : Set (Set α)) := by
+    have h1 : Aᶜ ∉ (F*) := by
       intro hAc
-      let hAc' : Aᶜ ∈ {B | Bᶜ ∉ F} := sorry -- need to get rid of this sorry
+      have hAc' : Aᶜ ∈ {A | Aᶜ ∉ F} := by
+        rw [←thm_equiv_dual_formulation]
+        exact
+
+         -- need to get rid of this sorry
       have hAc'' : (Aᶜ)ᶜ ∉ F := by
         rw [Set.mem_setOf] at hAc'
         exact hAc'
-      exact hAc'' h
+        sorry --exact hAc'' h
     -- Use characterization of F*: Aᶜ ∉ F* ↔ (Aᶜ)ᶜ = A ∈ F
     by_contra hA
     have h2 : Aᶜ ∈ (F* : Set (Set α)) := by
-      simp [thm_equiv_dual_formulation] at hA
-      sorry
-    exact h1 h2
+      simp [←thm_equiv_dual_formulation]
+      sorry -/
+    sorry --exact h1 h2
 
 
   --F ⊆ F**
-  · intro hA
+  /- · intro hA
     have h1 : Aᶜ ∉ (F* : Set (Set α)) := by
       intro hAc
       sorry
-    sorry
+    sorry -/
  -- F** ⊆ F
  -- F ⊆ F**
 
@@ -132,7 +135,8 @@ theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
     ext A
-    constructor
+    sorry
+    /- constructor
     · intro h
     -- want: A ∈ F* ⋏ G* ↔ Aᶜ ∉ F.sets ∧ Aᶜ ∉ G.sets
       constructor
@@ -147,7 +151,7 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
       cases hOr with
       | inl hF => exact h.left hF
       | inr hG => exact h.right hG
-
+ -/
 
 --thm_de_morgan_union_v2
 theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
