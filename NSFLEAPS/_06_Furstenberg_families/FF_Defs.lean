@@ -47,9 +47,39 @@ def thickFamily
 /-- A set is thick iff its complement is not syndetic -/
 theorem thickIffComplementNotSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isThick A ↔ ¬isSyndetic Aᶜ :=
-by sorry
-
+isThick A ↔ ¬isSyndetic Aᶜ := by
+constructor
+-- prove the only if direction
+· intro hA
+  by_contra hAc
+  obtain ⟨F, hF1, hF2⟩ := hAc
+  specialize hA F hF1
+  obtain ⟨s, hs⟩ := hA
+  specialize hF2 s
+  have h1 : ∀ f ∈ F, f * s ∈ A := by
+    intro f hf0
+    apply hs
+    exact ⟨f, hf0, rfl⟩
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  specialize h1 f hf1
+  exact hf2 h1
+-- prove the if direction
+· contrapose!
+  intro hA_nThick
+  have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
+    exact hA_nThick
+  have hA4 : ∃ F : Set S, (F.Finite ∧ ∀ s : S, ¬(· * s) '' F ⊆ A) := by
+    push_neg at hA1
+    exact hA1
+  obtain ⟨F, hF1, hF2⟩ := hA4
+  use F
+  constructor
+  · apply hF1
+  · intro s
+    specialize hF2 s
+    have hA5 : ((fun x ↦ x * s) '' F ∩ Aᶜ).Nonempty := by
+      simpa [Set.subset_def, Set.ext_iff] using hF2
+    simpa using hA5
 
 /-- The families of syndetic sets and thick sets are dual -/
 theorem dualSyndeticThick
@@ -65,7 +95,6 @@ by
   unfold thickFamily
   simp only [Set.mem_setOf_eq]
   exact Iff.symm (thickIffComplementNotSyndetic A)
-
 
 /-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
 theorem surjImgOfSyndeticIsSyndetic
