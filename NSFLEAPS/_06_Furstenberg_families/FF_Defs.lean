@@ -235,14 +235,13 @@ action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
 a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
 def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := by sorry
---∃ (X : Type u), 1+1=2
-/- ∃ (X : Type u) (name1 : TopologicalSpace X)
+Prop :=
+--∃ (n : ℕ), ∃ (X : Type n), 1+1=2
+∃ (X : Type*) (name1 : TopologicalSpace X)
 (name2 : CompactSpace X) (name3 : T2Space X) (name4 : Nonempty X)
 (dSystem : DynamicalSystem S X) (name5 : isEquicontinuousSystem dSystem)
 (x : X) (U : Set X) (name6 : IsOpen U),
-visitTimeSet dSystem x U ⊆ A -/
-
+visitTimeSet dSystem x U ⊆ A
 
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
 theorem bohrZeroIsMonotone
@@ -256,6 +255,20 @@ def bohrZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isBohrZero A}
+  upward_closed := by
+    intro A B hA hAB
+    exact bohrZeroIsMonotone hA hAB
+}
+
+-- The family of Bohr_0 subsets of a semigroup
+def bohrZeroFamilyv2
+(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
+{
+  sets := {A : Set S | ∃ (X : Type*) (name1 : TopologicalSpace X)
+(name2 : CompactSpace X) (name3 : T2Space X) (name4 : Nonempty X)
+(dSystem : DynamicalSystem S X) (name5 : isEquicontinuousSystem dSystem)
+(x : X) (U : Set X) (name6 : IsOpen U),
+visitTimeSet dSystem x U ⊆ A}
   upward_closed := by
     intro A B hA hAB
     exact bohrZeroIsMonotone hA hAB
