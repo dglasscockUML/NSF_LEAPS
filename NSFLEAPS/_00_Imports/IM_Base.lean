@@ -25,3 +25,6 @@ import Mathlib.Topology.UniformSpace.Separation
 
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.Compactness.Compact
+
+import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic

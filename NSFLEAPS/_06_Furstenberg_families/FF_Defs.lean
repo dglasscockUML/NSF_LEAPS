@@ -155,12 +155,55 @@ use b
 simp only [hb1, true_and]
 apply Semigroup.mul_assoc
 
+-- I changed the hypothesis of this theorem from Semigroup S to Monoid S.
+-- The purpose is to have access to Finset.prod function ∏ which is only available for Monoid
+-- We may weaken the hypothesis to Semigroup later by using WithOne function
 theorem commDilateCapOfThickIsThick
-{S} [CommSemigroup S] [Nonempty S]
+{S} [CommMonoid S] [Nonempty S]
 (A : Set S) {hA : isThick A}
 (K : Set S) {KIsFinite : K.Finite} :
-isThick (⋂ k ∈ K, (k * ·) '' A) :=
-by sorry
+isThick (⋂ k ∈ K, (k * ·) '' A) := by
+intro F hF
+let p : S := ∏ x ∈ KIsFinite.toFinset, x
+classical
+let f : S → S := fun k ↦ ∏ x ∈ KIsFinite.toFinset.erase k, x
+let Q := ⋂ x ∈ f '' K, (x * ·) ⁻¹' A
+have hqThick : isThick (Q) := by
+  apply inverseDilateCapOfThickIsThick
+  · exact hA
+  exact KIsFinite.image f
+specialize hqThick F hF
+obtain ⟨s, hs⟩ := hqThick
+use p * s
+intro b hb
+obtain ⟨a, ha1, ha2⟩ := hb
+have hb2 : b = a * (p * s) := by
+  rw [<- ha2]
+-- redefine the goal
+have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
+  intro k hk
+  have ha_in_Q : a * s ∈ Q := by
+    exact hs ⟨a, ha1, rfl⟩
+  have hQ : ∀ q ∈ Q, ∀ x ∈ f '' K, x * q ∈ A := by
+    unfold Q
+    simp
+  specialize hQ (a * s) ha_in_Q
+  specialize hQ (f k) ⟨k, hk, rfl⟩
+  have hk1 : k ∈ KIsFinite.toFinset := by
+    simpa using hk
+  have hp : k * f (k) = p := by
+    classical
+    simpa using (Finset.mul_prod_erase (s := KIsFinite.toFinset) (f := fun x => x) hk1)
+  rw [<- hp] at hb2
+  have hb_rewrite: b = k * ((f k) * (a * s)) := by
+    simp [hb2, mul_comm, mul_left_comm, mul_assoc]
+  simp only [Set.mem_image]
+  use ((f k) * (a * s))
+  constructor
+  · exact hQ
+  rw [hb_rewrite]
+-- finish proof of goal_redefined
+simpa [Set.mem_iInter] using goal_redefined
 
 end Syndetic_and_thick_sets
 
