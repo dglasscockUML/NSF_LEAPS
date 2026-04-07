@@ -47,9 +47,39 @@ def thickFamily
 /-- A set is thick iff its complement is not syndetic -/
 theorem thickIffComplementNotSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isThick A ↔ ¬isSyndetic Aᶜ :=
-by sorry
-
+isThick A ↔ ¬isSyndetic Aᶜ := by
+constructor
+-- prove the only if direction
+· intro hA
+  by_contra hAc
+  obtain ⟨F, hF1, hF2⟩ := hAc
+  specialize hA F hF1
+  obtain ⟨s, hs⟩ := hA
+  specialize hF2 s
+  have h1 : ∀ f ∈ F, f * s ∈ A := by
+    intro f hf0
+    apply hs
+    exact ⟨f, hf0, rfl⟩
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  specialize h1 f hf1
+  exact hf2 h1
+-- prove the if direction
+· contrapose!
+  intro hA_nThick
+  have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
+    exact hA_nThick
+  have hA4 : ∃ F : Set S, (F.Finite ∧ ∀ s : S, ¬(· * s) '' F ⊆ A) := by
+    push_neg at hA1
+    exact hA1
+  obtain ⟨F, hF1, hF2⟩ := hA4
+  use F
+  constructor
+  · apply hF1
+  · intro s
+    specialize hF2 s
+    have hA5 : ((fun x ↦ x * s) '' F ∩ Aᶜ).Nonempty := by
+      simpa [Set.subset_def, Set.ext_iff] using hF2
+    simpa using hA5
 
 /-- The families of syndetic sets and thick sets are dual -/
 theorem dualSyndeticThick
@@ -65,7 +95,6 @@ by
   unfold thickFamily
   simp only [Set.mem_setOf_eq]
   exact Iff.symm (thickIffComplementNotSyndetic A)
-
 
 /-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
 theorem surjImgOfSyndeticIsSyndetic
@@ -126,12 +155,55 @@ use b
 simp only [hb1, true_and]
 apply Semigroup.mul_assoc
 
+-- I changed the hypothesis of this theorem from Semigroup S to Monoid S.
+-- The purpose is to have access to Finset.prod function ∏ which is only available for Monoid
+-- We may weaken the hypothesis to Semigroup later by using WithOne function
 theorem commDilateCapOfThickIsThick
-{S} [CommSemigroup S] [Nonempty S]
+{S} [CommMonoid S] [Nonempty S]
 (A : Set S) {hA : isThick A}
 (K : Set S) {KIsFinite : K.Finite} :
-isThick (⋂ k ∈ K, (k * ·) '' A) :=
-by sorry
+isThick (⋂ k ∈ K, (k * ·) '' A) := by
+intro F hF
+let p : S := ∏ x ∈ KIsFinite.toFinset, x
+classical
+let f : S → S := fun k ↦ ∏ x ∈ KIsFinite.toFinset.erase k, x
+let Q := ⋂ x ∈ f '' K, (x * ·) ⁻¹' A
+have hqThick : isThick (Q) := by
+  apply inverseDilateCapOfThickIsThick
+  · exact hA
+  exact KIsFinite.image f
+specialize hqThick F hF
+obtain ⟨s, hs⟩ := hqThick
+use p * s
+intro b hb
+obtain ⟨a, ha1, ha2⟩ := hb
+have hb2 : b = a * (p * s) := by
+  rw [<- ha2]
+-- redefine the goal
+have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
+  intro k hk
+  have ha_in_Q : a * s ∈ Q := by
+    exact hs ⟨a, ha1, rfl⟩
+  have hQ : ∀ q ∈ Q, ∀ x ∈ f '' K, x * q ∈ A := by
+    unfold Q
+    simp
+  specialize hQ (a * s) ha_in_Q
+  specialize hQ (f k) ⟨k, hk, rfl⟩
+  have hk1 : k ∈ KIsFinite.toFinset := by
+    simpa using hk
+  have hp : k * f (k) = p := by
+    classical
+    simpa using (Finset.mul_prod_erase (s := KIsFinite.toFinset) (f := fun x => x) hk1)
+  rw [<- hp] at hb2
+  have hb_rewrite: b = k * ((f k) * (a * s)) := by
+    simp [hb2, mul_comm, mul_left_comm, mul_assoc]
+  simp only [Set.mem_image]
+  use ((f k) * (a * s))
+  constructor
+  · exact hQ
+  rw [hb_rewrite]
+-- finish proof of goal_redefined
+simpa [Set.mem_iInter] using goal_redefined
 
 end Syndetic_and_thick_sets
 
