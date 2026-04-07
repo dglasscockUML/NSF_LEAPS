@@ -17,14 +17,20 @@ import Mathlib.Data.Finset.Empty
 
 import Mathlib.Topology.Defs.Basic
 import Mathlib.Topology.Defs.Filter
+import Mathlib.Topology.Defs.Ultrafilter
 import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Topology.UniformSpace.Defs
 import Mathlib.Topology.UniformSpace.Separation
 import Mathlib.Topology.Maps.Proper.Basic
 import Mathlib.Topology.UniformSpace.Separation
-
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.Compactness.Compact
+import Mathlib.Topology.Continuous
+import Mathlib.Topology.Compactification.StoneCech
+import Mathlib.Topology.Algebra.Semigroup
 
+import Mathlib.Combinatorics.Hindman
+
+import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic

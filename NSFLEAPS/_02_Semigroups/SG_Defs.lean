@@ -2,19 +2,24 @@ import NSFLEAPS._00_Imports.IM_Base
 
 -- We may want to assume [Nonempty S] throughout, but I've not implemented that yet.
 
-structure SemigroupLeftIdeal (S) [Semigroup S] where
+structure SemigroupLeftIdeal
+(S : Type*) [Semigroup S] where
   carrier : Set S
   nonempty' : carrier.Nonempty
   mul_closed' (s : S) {x : S} : x ∈ carrier → s * x ∈ carrier
 
 /-- isLeftIdeal is the predicate that `L` is a left ideal of a semigroup `S` -/
-def isLeftIdeal {S} [Semigroup S] (L : Set S) : Prop :=
+def isLeftIdeal
+{S : Type*} [Semigroup S] (L : Set S) :
+Prop :=
 L.Nonempty ∧ (∀ (s : S), ((fun x ↦ s * x) '' L ⊆ L))
 
 /-- A non-empty intersection of left ideals of a semigroup `S` is a left ideal -/
-theorem nonemptyInterOfLeftIdealsIsLeftIdeal {S} [Semigroup S]
+theorem nonemptyInterOfLeftIdealsIsLeftIdeal
+{S : Type*} [Semigroup S]
 {i : Set (Set S)} (h : ∀ (L : Set S), L ∈ i → isLeftIdeal L) :
-(⋂₀ i).Nonempty → isLeftIdeal (⋂₀ i) := by
+(⋂₀ i).Nonempty → isLeftIdeal (⋂₀ i) :=
+by
   intro hNonempty
   constructor
   · exact hNonempty
@@ -39,10 +44,17 @@ theorem nonemptyInterOfLeftIdealsIsLeftIdeal {S} [Semigroup S]
     exact inAllL L LinI
 
 /-- isMinLeftIdeal is the predicate that `L` is a minimal left ideal of a semigroup `S` -/
-def isMinLeftIdeal {S} [Semigroup S] (L : Set S) : Prop :=
+def isMinLeftIdeal
+{S : Type*} [Semigroup S] (L : Set S) :
+Prop :=
 isLeftIdeal L ∧ (∀ (M : Set S), isLeftIdeal M → M ⊆ L → M = L)
 
 
+/-- isSubsemigroup is the predicate that `T` is a subsemigroup of a semigroup `S` -/
+def isSubsemigroup
+{S : Type*} [Semigroup S] (T : Set S) :
+Prop :=
+∀ s ∈ T, ∀ t ∈ T, s * t ∈ T
 
 /- Definition of syndetic from Hindman-Strauss, Def. 4.38
 Why I used finite sets instead of finsets:
