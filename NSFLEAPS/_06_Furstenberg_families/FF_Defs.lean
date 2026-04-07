@@ -197,10 +197,6 @@ end Delta_sets
 
 section Bohr_sets
 
-set_option pp.universes true in
-#check DynamicalSystem
-
---universe u
 /-- A set `A ⊆ S` is Bohr_0 if there exists a minimal, equicontinuous
 action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
 a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
@@ -208,10 +204,10 @@ def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 --∃ (n : ℕ), ∃ (X : Type n), 1+1=2
-∃ (X : Type*) (name1 : TopologicalSpace X)
-(name2 : CompactSpace X) (name3 : T2Space X) (name4 : Nonempty X)
-(dSystem : DynamicalSystem S X) (name5 : isEquicontinuousSystem dSystem)
-(x : X) (U : Set X) (name6 : IsOpen U),
+∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(x : X) (U : Set X) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A
 
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
@@ -222,23 +218,23 @@ isBohrZero B :=
 by sorry
 
 -- The family of Bohr_0 subsets of a semigroup
-def bohrZeroFamily
+/- def bohrZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isBohrZero A}
   upward_closed := by
     intro A B hA hAB
     exact bohrZeroIsMonotone hA hAB
-}
+} -/
 
 -- The family of Bohr_0 subsets of a semigroup
-def bohrZeroFamilyv2
+def bohrZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
-  sets := {A : Set S | ∃ (X : Type*) (name1 : TopologicalSpace X)
-(name2 : CompactSpace X) (name3 : T2Space X) (name4 : Nonempty X)
-(dSystem : DynamicalSystem S X) (name5 : isEquicontinuousSystem dSystem)
-(x : X) (U : Set X) (name6 : IsOpen U),
+  sets := {A : Set S | ∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(x : X) (U : Set X) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A}
   upward_closed := by
     intro A B hA hAB

@@ -870,13 +870,6 @@ theorem RPisSymm
 Std.Symm (setToRel (RP dSystem)) :=
 by sorry
 
-theorem RPisTrans
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) :
-IsTrans X (setToRel (RP dSystem)) :=
-by sorry
-
 theorem RPisReflexIfNondegen
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
