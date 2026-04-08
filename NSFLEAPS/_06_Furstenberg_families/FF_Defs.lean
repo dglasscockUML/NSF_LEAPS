@@ -64,7 +64,7 @@ constructor
   specialize h1 f hf1
   exact hf2 h1
 -- prove the if direction
-· contrapose!
+· contrapose
   intro hA_nThick
   have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
     exact hA_nThick
@@ -221,8 +221,12 @@ Prop :=
 theorem deltaZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDeltaZero A) (hAB : A ⊆ B) :
-isDeltaZero B :=
-by sorry
+isDeltaZero B := by
+intro k
+specialize hA k
+obtain ⟨s, hs⟩ := hA
+use s
+exact hs
 
 /-- The family of Delta_0 subsets of a semigroup -/
 def deltaZeroFamily
