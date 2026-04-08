@@ -257,8 +257,18 @@ Prop :=
 theorem deltaIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDelta A) (hAB : A ⊆ B) :
-isDelta B :=
-by sorry
+isDelta B := by
+obtain ⟨s, hs⟩ := hA
+use s
+intro i j hij
+specialize hs i j hij
+simp only [Set.mem_image] at hs
+obtain ⟨x, hx1, hx2⟩ := hs
+simp only [Set.mem_image]
+use x
+constructor
+· exact hAB hx1
+· exact hx2
 
 /-- The family of Delta subsets of a semigroup -/
 def deltaFamily
