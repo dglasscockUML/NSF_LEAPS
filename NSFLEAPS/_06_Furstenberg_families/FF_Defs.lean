@@ -202,7 +202,7 @@ have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
   constructor
   · exact hQ
   rw [hb_rewrite]
--- finish proof of goal_redefined
+-- finishing the proof
 simpa [Set.mem_iInter] using goal_redefined
 
 end Syndetic_and_thick_sets
@@ -226,7 +226,15 @@ intro k
 specialize hA k
 obtain ⟨s, hs⟩ := hA
 use s
-exact hs
+intro i j hij
+specialize hs i j hij
+simp only [Set.mem_image] at hs
+obtain ⟨x, hx1, hx2⟩ := hs
+simp only [Set.mem_image]
+use x
+constructor
+· exact hAB hx1
+· exact hx2
 
 /-- The family of Delta_0 subsets of a semigroup -/
 def deltaZeroFamily
