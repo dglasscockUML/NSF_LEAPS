@@ -61,35 +61,107 @@ by sorry
 
 end Right_topological_semigroups
 
-section Ultrafilters_as_semigroups
+section Ultrafilters_as_topological_semigroups
 
--- This section very much still under construction
+-- There is some basic semigroup stuff here that might be better in SG_Defs
 
+-- Was: semigroup_action
+/-- `semigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
+`st: X → X` is the composition of `s: X → X` and `t: X → X` -/
 structure semigroupAction
 (S : Type*) [Semigroup S] (X : Type*) where
   map : S → X → X
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
 
-instance ultra_semigroup {S} [Semigroup S] : Semigroup (Ultrafilter S) :=
+-- Was: ultra_semigroup
+/- This instance makes the semigroup structure on βS "canonical" by
+making it available to typeclass inference. -/
+instance
+{S : Type*} [Semigroup S] : Semigroup (Ultrafilter S) :=
   Ultrafilter.semigroup
 
-  -- This is an alternative description of ultrafilter multiplication
-theorem ultra_alt_prod_desc {S} [Semigroup S] (p q : Ultrafilter S) (A : Set S) :
-    A ∈ p * q ↔ {s : S | {t : S | s * t ∈ A} ∈ q} ∈ p :=
+-- Was: ultra_alt_prod_desc
+/-- An equivalent, alternative description of the ultrafilter product -/
+theorem ultraProductDescription
+{S : Type*} [Semigroup S] (p q : Ultrafilter S) (A : Set S) :
+A ∈ p * q ↔ {s : S | {t : S | s * t ∈ A} ∈ q} ∈ p :=
   Iff.rfl
 
-def ultra_right_mult {S} [Semigroup S] (q : Ultrafilter S) :
-Ultrafilter S → Ultrafilter S := (· * q)
+-- Was S_left_mult
+/-- `leftMult s : S → S` is left multiplication by `s` -/
+def leftMult
+{S: Type*} [Semigroup S] (s : S) :
+S → S :=
+  (s * ·)
 
-def ultra_left_mult {S} [Semigroup S] (q : Ultrafilter S) :
-Ultrafilter S → Ultrafilter S := (q * ·)
+/-- `rightMult s : S → S` is right multiplication by `s` -/
+def rightMult
+{S: Type*} [Semigroup S] (s : S) :
+S → S :=
+  (· * s)
 
-def S_left_mult {S} [Semigroup S] (s : S) :
-S → S := (s * ·)
+-- Was: ultra_left_mult
+/-- `leftMultUltra q : βS → βS` is left multiplication by `q` -/
+def leftMultUltra
+{S: Type*} [Semigroup S] (q : Ultrafilter S) :
+Ultrafilter S → Ultrafilter S :=
+  (q * ·)
 
--- The function pure : S → βS is a semigroup homomorphism
-theorem pure_is_hom {S} [Semigroup S] (s t : S) :
-(pure s : Ultrafilter S) * (pure t : Ultrafilter S) = pure (s * t) := by
+-- Was: ultra_right_mult
+/-- `rightMultUltra q : βS → βS` is right multiplication by `q` -/
+def rightMultUltra
+{S: Type*} [Semigroup S] (q : Ultrafilter S) :
+Ultrafilter S → Ultrafilter S :=
+(· * q)
+
+/-- The predicate that the map `φ : S → T` is a semigroup homomorphism -/
+def isSemigroupHom
+{S T : Type*} [Semigroup S] [Semigroup T] (φ : S → T) :
+Prop :=
+∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
+
+-- Was: pure_is_hom (s t : S)
+-- Was: (pure s : Ultrafilter S) * (pure t : Ultrafilter S) = pure (s * t)
+/-- The canonical injection pure : S → βS is a semigroup homomorphism -/
+theorem pureIsHom
+{S : Type*} [Semigroup S] :
+isSemigroupHom (pure : S → Ultrafilter S) :=
+by
+  unfold isSemigroupHom
+  intro s t
   constructor
 
-end Ultrafilters_as_semigroups
+-- The following proof is copied from the mathlib documentation
+-- Was: ultra_right_mult_continuous
+/-- For all `q ∈ βS`, `ultraRightMult q: βS → βS` is continuous -/
+theorem rightMultUltraContinuous
+{S : Type*} [Semigroup S] (q : Ultrafilter S) :
+Continuous (rightMultUltra q) :=
+ultrafilterBasis_is_basis.continuous_iff.2 <| Set.forall_mem_range.mpr fun A ↦
+    ultrafilter_isOpen_basic { m : S | ∀ᶠ m' in q, m * m' ∈ A }
+
+-- Was: ultra_left_mult_by_principal_continuous
+/-- For all `s ∈ S`, `ultraLeftMult (pure s): βS → βS` is continuous -/
+theorem leftMultPrincipalUltraContinuous
+{S : Type*} [Semigroup S] (s : S) :
+Continuous (leftMultUltra (pure s)) :=
+by
+  simp only [ultrafilterBasis_is_basis.continuous_iff]
+  intro U U_basis
+  rw [ultrafilterBasis, Set.range] at U_basis
+  rcases U_basis with ⟨A, U_desc⟩
+  have heq : (leftMultUltra (pure s) ⁻¹' U) = {p | Set.preimage (leftMult s) A ∈ p} := by
+    ext x
+    rewrite [Set.preimage]
+    rewrite [Set.preimage]
+    rewrite [←U_desc]
+    change A ∈ leftMultUltra (pure s) x ↔ {y | leftMult s y ∈ A} ∈ x
+    simp only [leftMultUltra]
+    simp only [leftMult]
+    rewrite [ultraProductDescription (pure s) x A]
+    simp only [Ultrafilter.mem_pure]
+    exact Iff.rfl
+  rewrite [heq]
+  exact ultrafilter_isOpen_basic (Set.preimage (leftMult s) A)
+
+end Ultrafilters_as_topological_semigroups
