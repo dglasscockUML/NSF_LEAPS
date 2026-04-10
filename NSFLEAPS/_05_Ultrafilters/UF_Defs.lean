@@ -352,14 +352,87 @@ SemigroupAction (Ultrafilter S) X :=
     simp only [nearlyGoal]
 }
 
+end Ultrafilters_as_acting_semigroup
+
+section Ultrafilter_action_theorems
+
+variable {S : Type*} [Semigroup S] [Nonempty S]
+variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+variable (dSystem : DynamicalSystem S X)
+
 /-- Given a dynamical system `dSystem : DynamicalSystem S X` and a point
-`x : X` the map `βS → X` given by `p ↦ px` is continuous -/
+`x : X`, the map `βS → X` given by `p ↦ px` is continuous -/
 theorem ultraActionWithFixedxIsContinuous
-{S : Type*} [Semigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (x : X) :
+(x : X) :
 Continuous (fun (p : Ultrafilter S) ↦ (ultraAction dSystem).map p x) :=
 by sorry
 
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
+`x : X`, and `p : βS`, the point `px` belongs to the orbit closure of `x` -/
+theorem ultraActionInOrbitClosure
+(p : Ultrafilter S) (x : X) :
+(ultraAction dSystem).map p x ∈ orbitClosure dSystem x :=
+by sorry
 
-end Ultrafilters_as_acting_semigroup
+/-- Given a factor map `π : X → Y` of dynamical systems and `p : βS`,
+the action of `p` intertwines with the factor map: `p ∘ π = π ∘ p` -/
+theorem ultraActionIntertwinesWithFactor
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+{π : X → Y} (hπ : isFactorMap dSystem dSystemY π)
+(p : Ultrafilter S) :
+((ultraAction dSystemY).map p) ∘ π = π ∘ (ultraAction dSystem).map p :=
+by sorry
+
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
+`x : X`, an open set `U ⊆ X`, and `p : βS`, if `px ∈ U`, then `R(x,U) ∈ p` -/
+theorem visitTimeSetBelongsToUltrafilter
+(x : X) (U : Set X) {hU : IsOpen U} (p : Ultrafilter S) :
+(ultraAction dSystem).map p x ∈ U → visitTimeSet dSystem x U ∈ p :=
+by sorry
+
+/-- Given a minimal dynamical system `dSystem : DynamicalSystem S X`,
+a minimal left ideal `L ⊆ βS`, and points `x, y ∈ X`, there exists `p ∈ L`
+such that `px = y` -/
+theorem minLeftIdealSurjectsOntoMinSystem
+(hdSystemMin : isMinimalSystem dSystem)
+{L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
+(x y : X) :
+∃ p ∈ L, (ultraAction dSystem).map p x = y :=
+by sorry
+
+/-- Given a minimal dynamical system `dSystem : DynamicalSystem S X`,
+a minimal left ideal `L ⊆ βS`, and a point `x ∈ X`, there exists an idempotent
+ultrafilter `p ∈ L` such that `px = x` -/
+theorem everyPointInMinFixedBySomeIdempotentUltrafilter
+(hdSystemMin : isMinimalSystem dSystem)
+{L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
+(x : X) :
+∃ p ∈ L, (p * p = p) ∧ (ultraAction dSystem).map p x = x :=
+by sorry
+
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, `p ∈ βS`, and a
+point `x ∈ X`, the points `x` and `px` are proximal -/
+theorem pointAndUltraImageAreProximal
+(x : X) (p : Ultrafilter S) :
+proximal dSystem x ((ultraAction dSystem).map p x) :=
+by sorry
+
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, a minimal ultrafilter
+`p ∈ βS`, and a point `x ∈ X`, the point `px` is `S`-uniformly recurrent -/
+theorem minUltraImageIsUniformlyRecurrent
+(x : X) {p : Ultrafilter S} (hp : isMinimalUltrafilter p) :
+isUniformlyRecurrent dSystem ((ultraAction dSystem).map p x) :=
+by sorry
+
+/-- Given a dynamical minimal system `dSystem : DynamicalSystem S X`, a minimal
+left ideal `L ⊆ βS`, and an ultrafilter `p ∈ L`, if `px = x`, then there exists
+`q ∈ L` such that `pq` is idempotent and `qx = x` -/
+theorem idempotentProductLifting
+(hdSystemMin : isMinimalSystem dSystem) (x : X)
+{L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
+{p : Ultrafilter S} (hpL : p ∈ L) (hpFix : (ultraAction dSystem).map p x = x) :
+∃ q ∈ L, ((p * q) * (p * q) = p * q) ∧ (ultraAction dSystem).map q x = x :=
+by sorry
+
+end Ultrafilter_action_theorems

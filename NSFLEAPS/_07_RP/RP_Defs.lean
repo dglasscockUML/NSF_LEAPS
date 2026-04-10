@@ -4,10 +4,12 @@ variable {S} [CommSemigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 variable {dSystem : DynamicalSystem S X}
 
+/- Projection and injection maps -/
 def π1 : X × X × X → X := fun w ↦ w.1
 def π2 : X × X × X → X := fun w ↦ w.2.1
 def π3 : X × X × X → X := fun w ↦ w.2.2
 def π12 : X × X × X → X × X := fun w ↦ ⟨w.1,w.2.1⟩
+def i21 : (X × X) × X → X × X × X := fun (w : (X × X) × X) ↦ ⟨w.1.1,w.1.2,w.2⟩
 
 section Corner_System_3
 
@@ -180,6 +182,18 @@ proximal (cornerSystem1 (dSystem := dSystem)) x y → proximal dSystem x y :=
 by sorry
 
 end Corner_System_1
+
+section Ultrafilters_and_the_corner_space
+
+/-- Given an ultrafilter `p : β(S × S)`, `p (x,y,z) = (p(x,y), pz)` -/
+theorem ultraActionOnX3
+(p : Ultrafilter (S × S)) (x y z : X) :
+(ultraAction (cornerSystem3 (dSystem := dSystem))).map p ⟨x,y,z⟩ =
+  i21 ⟨(ultraAction (cornerSystem2 (dSystem := dSystem))).map p ⟨x,y⟩,
+    (ultraAction (cornerSystem1 (dSystem := dSystem))).map p x⟩ :=
+by sorry
+
+end Ultrafilters_and_the_corner_space
 
 
 section RP_and_corner_dynamics
