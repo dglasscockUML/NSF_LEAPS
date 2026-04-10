@@ -147,9 +147,11 @@ Continuous (ultra_left_mult (pure s)) := by
   exact ultrafilter_isOpen_basic (Set.preimage (S_left_mult s) A)
 
 -- This is a lemma needed in the proof of ultra_technical_equality
-theorem ultra_S_left_extension {S} [Semigroup S] {X} [TopologicalSpace X]
-[CompactSpace X] [T2Space X] (f : S → X) (s : S) :
-Ultrafilter.extend (f ∘ (S_left_mult s)) = (Ultrafilter.extend f) ∘ (ultra_left_mult (pure s)) :=
+theorem ultra_S_left_extension
+{S} [Semigroup S] {X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+(f : S → X) (s : S) :
+Ultrafilter.extend (f ∘ (S_left_mult s)) =
+  (Ultrafilter.extend f) ∘ (ultra_left_mult (pure s)) :=
 by
   let lhs := Ultrafilter.extend (f ∘ (S_left_mult s))
   let rhs := (Ultrafilter.extend f) ∘ (ultra_left_mult (pure s))
@@ -201,10 +203,12 @@ Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (S_left_mult s)) q
 -- This theorem is a technical result needed in the proof of ultra_action
 -- It gives an explicit formula for (Ultrafilter.extend f) (p * q) that ultimately
 -- comes from the definition of ultrafilter multiplication
-theorem ultra_technical_equality_cor {S} [Semigroup S] {X} [TopologicalSpace X]
+theorem ultra_technical_equality_cor
+{S} [Semigroup S] {X} [TopologicalSpace X]
 [CompactSpace X] [T2Space X] (f : S → X) (p q : Ultrafilter S) :
 Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (S_left_mult s)) q) p =
-(Ultrafilter.extend f) (p * q) := by
+(Ultrafilter.extend f) (p * q) :=
+by
   let lhs := Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (S_left_mult s)) q)
   let rhs := (Ultrafilter.extend f) ∘ (ultra_right_mult q)
   have lhs_is_rhs_at_p : lhs p = rhs p := by

@@ -2,6 +2,7 @@ import NSFLEAPS._04_Dynamical_systems.DS_Defs
 
 section Right_topological_semigroups
 
+-- For def. of RightTopological, cf. Hindman-Strauss Def. 2.1
 /-- A topological semigroup `S` is RightTopological if for all elements `s ∈ S`,
 right multiplication by `s`, as a function from `S → S`, is continuous -/
 class RightTopological (S : Type*) [Semigroup S] [TopologicalSpace S] where
@@ -61,17 +62,40 @@ by sorry
 
 end Right_topological_semigroups
 
-section Ultrafilters_as_topological_semigroups
+section Semigroup_stuff
 
 -- There is some basic semigroup stuff here that might be better in SG_Defs
 
 -- Was: semigroup_action
-/-- `semigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
+/-- `SemigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
 `st: X → X` is the composition of `s: X → X` and `t: X → X` -/
-structure semigroupAction
+structure SemigroupAction
 (S : Type*) [Semigroup S] (X : Type*) where
   map : S → X → X
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
+
+/-- The predicate that the map `φ : S → T` is a semigroup homomorphism -/
+def isSemigroupHom
+{S T : Type*} [Semigroup S] [Semigroup T] (φ : S → T) :
+Prop :=
+∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
+
+end Semigroup_stuff
+
+section Ultrafilters_as_a_semigroup
+
+-- Was S_left_mult
+/-- `leftMult s : S → S` is left multiplication by `s` -/
+def leftMult
+{S: Type*} [Semigroup S] (s : S) :
+S → S :=
+  (s * ·)
+
+/-- `rightMult s : S → S` is right multiplication by `s` -/
+def rightMult
+{S : Type*} [Semigroup S] (s : S) :
+S → S :=
+  (· * s)
 
 -- Was: ultra_semigroup
 /- This instance makes the semigroup structure on βS "canonical" by
@@ -87,38 +111,19 @@ theorem ultraProductDescription
 A ∈ p * q ↔ {s : S | {t : S | s * t ∈ A} ∈ q} ∈ p :=
   Iff.rfl
 
--- Was S_left_mult
-/-- `leftMult s : S → S` is left multiplication by `s` -/
-def leftMult
-{S: Type*} [Semigroup S] (s : S) :
-S → S :=
-  (s * ·)
-
-/-- `rightMult s : S → S` is right multiplication by `s` -/
-def rightMult
-{S: Type*} [Semigroup S] (s : S) :
-S → S :=
-  (· * s)
-
 -- Was: ultra_left_mult
 /-- `leftMultUltra q : βS → βS` is left multiplication by `q` -/
 def leftMultUltra
-{S: Type*} [Semigroup S] (q : Ultrafilter S) :
+{S : Type*} [Semigroup S] (q : Ultrafilter S) :
 Ultrafilter S → Ultrafilter S :=
   (q * ·)
 
 -- Was: ultra_right_mult
 /-- `rightMultUltra q : βS → βS` is right multiplication by `q` -/
 def rightMultUltra
-{S: Type*} [Semigroup S] (q : Ultrafilter S) :
+{S : Type*} [Semigroup S] (q : Ultrafilter S) :
 Ultrafilter S → Ultrafilter S :=
 (· * q)
-
-/-- The predicate that the map `φ : S → T` is a semigroup homomorphism -/
-def isSemigroupHom
-{S T : Type*} [Semigroup S] [Semigroup T] (φ : S → T) :
-Prop :=
-∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
 
 -- Was: pure_is_hom (s t : S)
 -- Was: (pure s : Ultrafilter S) * (pure t : Ultrafilter S) = pure (s * t)
@@ -131,6 +136,17 @@ by
   intro s t
   constructor
 
+/-- The predicate that the ultrafilter p on S is minimal, that is, belongs to
+some minimal left ideal -/
+def isMinimalUltrafilter
+{S : Type*} [Semigroup S] (p : Ultrafilter S) :
+Prop :=
+∃ (L : Set (Ultrafilter S)), isMinLeftIdeal L ∧ (p ∈ L)
+
+end Ultrafilters_as_a_semigroup
+
+section Ultrafilters_as_topological_semigroups
+
 -- The following proof is copied from the mathlib documentation
 -- Was: ultra_right_mult_continuous
 /-- For all `q ∈ βS`, `ultraRightMult q: βS → βS` is continuous -/
@@ -139,6 +155,14 @@ theorem rightMultUltraContinuous
 Continuous (rightMultUltra q) :=
 ultrafilterBasis_is_basis.continuous_iff.2 <| Set.forall_mem_range.mpr fun A ↦
     ultrafilter_isOpen_basic { m : S | ∀ᶠ m' in q, m * m' ∈ A }
+
+/- This instance makes the RightTopological structure on βS "canonical" by
+making it available to typeclass inference. -/
+instance
+{S : Type*} [Semigroup S] : RightTopological (Ultrafilter S) :=
+  {
+    rightCont := fun (q : Ultrafilter S) ↦ rightMultUltraContinuous q
+  }
 
 -- Was: ultra_left_mult_by_principal_continuous
 /-- For all `s ∈ S`, `ultraLeftMult (pure s): βS → βS` is continuous -/
@@ -164,4 +188,178 @@ by
   rewrite [heq]
   exact ultrafilter_isOpen_basic (Set.preimage (leftMult s) A)
 
+theorem leftIdealInBetaSContainsMinIdempotent
+{S : Type*} [Semigroup S] (L : Set (Ultrafilter S)) {hL : isLeftIdeal L} :
+∃ (p : Ultrafilter S), (isMinimalUltrafilter p) ∧ (p * p = p) :=
+by sorry
+
 end Ultrafilters_as_topological_semigroups
+
+section Ultrafilters_as_phase_space
+
+/-- Given a semigroup `S`, `ultrafilterSystem S` is the dynamical system of `S`
+acting on `βS` by left multiplication -/
+def ultrafilterSystem
+(S : Type*) [Semigroup S] [Nonempty S] :
+DynamicalSystem S (Ultrafilter S) :=
+by sorry
+
+/-- The subsystems of `ultrafilterSystem S` are precisely
+the closed left ideals of `βS` -/
+theorem ultraSubsystemIffClosedLeftIdeal
+{S : Type*} [Semigroup S] [Nonempty S] (Z : Set (Ultrafilter S)) :
+isNonemptyCompactT2InvariantSubset (ultrafilterSystem S) Z ↔
+(IsClosed Z ∧ isLeftIdeal Z) :=
+  by sorry
+
+/-- The minimal subsystems of `ultrafilterSystem S` are precisely
+the minimal left ideals of `βS` -/
+theorem ultraMinSubsystemIffMinLeftIdeal
+{S : Type*} [Semigroup S] [Nonempty S] (Z : Set (Ultrafilter S)) :
+isMinimalSubset (ultrafilterSystem S) Z ↔ isMinLeftIdeal Z :=
+  by sorry
+
+/-- An ultrafilter is minimal if and only if it is `S`-uniformly recurrent -/
+theorem ultrafilterMinimalIffUnifRec
+{S : Type*} [Semigroup S] [Nonempty S] (p : Ultrafilter S) :
+isMinimalUltrafilter p ↔ isUniformlyRecurrent (ultrafilterSystem S) p :=
+  by sorry
+
+end Ultrafilters_as_phase_space
+
+section Ultrafilters_as_acting_semigroup
+
+/-- Given an ultrafilter `p` on a set `S` and a map `f : S → X` into a topological
+space `X`, `ultraLim p f`, also written `lim_{s → p} f(s)` or `p-lim_s f(s)`, is the ultrafilter
+limit of `f` along `p` -/
+noncomputable
+def ultraLim
+{S : Type*} {X : Type*} [TopologicalSpace X]
+(p : Ultrafilter S) (f : S → X) :
+X :=
+(Ultrafilter.extend f) p
+
+/-- Given an ultrafilter `p` on a set `S` and a map `f : S → X` into a topological
+space `X`, `ultraLim p f`, also written `lim_{s → p} f(s)` or `p-lim_s f(s)`, is the ultrafilter
+limit of `f` along `p` -/
+noncomputable
+def ultraLimContinuousComp
+{S : Type*}
+{X : Type*} [TopologicalSpace X] [CompactSpace X]
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y]
+(p : Ultrafilter S) {g : X → Y} (hπ : Continuous g) (f : S → X) :
+ultraLim p (g ∘ f) = g (ultraLim p f) :=
+by sorry
+
+-- This is a lemma needed in the proof of iteratedUltraLims
+lemma ultraSLeftExtension
+{S} [Semigroup S] {X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+(f : S → X) (s : S) :
+Ultrafilter.extend (f ∘ (leftMult s)) =
+  (Ultrafilter.extend f) ∘ (leftMultUltra (pure s)) :=
+by
+  let lhs := Ultrafilter.extend (f ∘ (leftMult s))
+  let rhs := (Ultrafilter.extend f) ∘ (leftMultUltra (pure s))
+  have lhs_continuous : Continuous lhs := continuous_ultrafilter_extend (f ∘ (leftMult s))
+  have rhs_continuous : Continuous rhs :=
+    Continuous.comp (continuous_ultrafilter_extend f) (leftMultPrincipalUltraContinuous s)
+  have equal_on_dense : Set.EqOn lhs rhs (Set.range pure) := by
+    rewrite [Set.EqOn]
+    intro x x_in_range
+    rewrite [Set.range] at x_in_range
+    change ∃ y, pure y = x at x_in_range
+    rcases x_in_range with ⟨t, pure_hypoth⟩
+    simp only [← pure_hypoth]
+    simp only [lhs, rhs]
+    simp only [ultrafilter_extend_pure]
+    simp only [Function.comp_apply]
+    simp only [leftMultUltra]
+    simp only [← pureIsHom s t]
+    simp only [leftMult]
+    simp only [ultrafilter_extend_pure]
+  exact Continuous.ext_on denseRange_pure lhs_continuous rhs_continuous equal_on_dense
+
+-- This is a technical lemma needed in the proof of ultra_technical_equality_cor
+lemma ultraSRightExtension
+{S} [Semigroup S] {X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+(f : S → X) (q : Ultrafilter S) :
+Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (leftMult s)) q) =
+(Ultrafilter.extend f) ∘ (rightMultUltra q) := by
+  let lhs := Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (leftMult s)) q)
+  let rhs := (Ultrafilter.extend f) ∘ (rightMultUltra q)
+  have lhs_continuous : Continuous lhs :=
+    continuous_ultrafilter_extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (leftMult s)) q)
+  have rhs_continuous : Continuous rhs :=
+    Continuous.comp (continuous_ultrafilter_extend f) (rightMultUltraContinuous q)
+  have equal_on_dense : Set.EqOn lhs rhs (Set.range pure) := by
+    rewrite [Set.EqOn]
+    intro x x_in_range
+    rewrite [Set.range] at x_in_range
+    change ∃ y, pure y = x at x_in_range
+    rcases x_in_range with ⟨t, pure_hypoth⟩
+    simp only [← pure_hypoth]
+    simp only [lhs, rhs]
+    simp only [ultrafilter_extend_pure]
+    simp only [ultraSLeftExtension]
+    simp only [Function.comp_apply]
+    simp only [leftMultUltra]
+    simp only [rightMultUltra]
+  exact Continuous.ext_on denseRange_pure lhs_continuous rhs_continuous equal_on_dense
+
+/-- The fact that `(pq)-lim f = p-lim_s (q-lim_t f(st))` -/
+theorem iteratedUltraLims
+{S : Type*} [Semigroup S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+(p q : Ultrafilter S) (f : S → X) :
+ultraLim p (fun (s : S) ↦ ultraLim q (fun (t : S) ↦ f (s * t))) = ultraLim (p * q) f :=
+by
+  unfold ultraLim
+  let lhs := Ultrafilter.extend (fun (s : S) ↦ Ultrafilter.extend (f ∘ (leftMult s)) q)
+  let rhs := (Ultrafilter.extend f) ∘ (rightMultUltra q)
+  have lhs_is_rhs_at_p : lhs p = rhs p := by
+    simp only [lhs]
+    simp only [rhs]
+    rw [ultraSRightExtension f q]
+  simp only [lhs] at lhs_is_rhs_at_p
+  simp only [rhs] at lhs_is_rhs_at_p
+  simp only [Function.comp_apply] at lhs_is_rhs_at_p
+  simp only [rightMultUltra] at lhs_is_rhs_at_p
+  exact lhs_is_rhs_at_p
+
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, `ultraAction dSystem`
+is the semigroup action of `βS` on `X` defined by `px = p-lim_s sx`. -/
+noncomputable
+def ultraAction
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+SemigroupAction (Ultrafilter S) X :=
+{
+  map := fun (p : Ultrafilter S) (x : X) ↦ ultraLim p (fun (s : S) ↦ dSystem.map s x)
+  mapMult := by
+    intro p q x
+    simp only [← iteratedUltraLims]
+    simp only [dSystem.mapMult]
+    have functionCompEquality (s : S) :
+      (fun t ↦ dSystem.map s (dSystem.map t x)) =
+      (dSystem.map s) ∘ (fun (t : S) ↦ dSystem.map t x) :=
+      by rfl
+    simp only [functionCompEquality]
+    have nearlyGoal (s : S) :
+    ultraLim q (dSystem.map s ∘ fun t ↦ dSystem.map t x) =
+      dSystem.map s (ultraLim q fun t ↦ dSystem.map t x) :=
+      by simp only [ultraLimContinuousComp q (dSystem.mapCont s) (fun (t : S) ↦ dSystem.map t x)]
+    simp only [nearlyGoal]
+}
+
+/-- Given a dynamical system `dSystem : DynamicalSystem S X` and a point
+`x : X` the map `βS → X` given by `p ↦ px` is continuous -/
+theorem ultraActionWithFixedxIsContinuous
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (x : X) :
+Continuous (fun (p : Ultrafilter S) ↦ (ultraAction dSystem).map p x) :=
+by sorry
+
+
+end Ultrafilters_as_acting_semigroup
