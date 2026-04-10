@@ -64,7 +64,7 @@ constructor
   specialize h1 f hf1
   exact hf2 h1
 -- prove the if direction
-· contrapose!
+· contrapose
   intro hA_nThick
   have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
     exact hA_nThick
@@ -202,7 +202,7 @@ have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
   constructor
   · exact hQ
   rw [hb_rewrite]
--- finish proof of goal_redefined
+-- finishing the proof
 simpa [Set.mem_iInter] using goal_redefined
 
 end Syndetic_and_thick_sets
@@ -221,8 +221,20 @@ Prop :=
 theorem deltaZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDeltaZero A) (hAB : A ⊆ B) :
-isDeltaZero B :=
-by sorry
+isDeltaZero B := by
+intro k
+specialize hA k
+obtain ⟨s, hs⟩ := hA
+use s
+intro i j hij
+specialize hs i j hij
+simp only [Set.mem_image] at hs
+obtain ⟨x, hx1, hx2⟩ := hs
+simp only [Set.mem_image]
+use x
+constructor
+· exact hAB hx1
+· exact hx2
 
 /-- The family of Delta_0 subsets of a semigroup -/
 def deltaZeroFamily
@@ -245,8 +257,18 @@ Prop :=
 theorem deltaIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDelta A) (hAB : A ⊆ B) :
-isDelta B :=
-by sorry
+isDelta B := by
+obtain ⟨s, hs⟩ := hA
+use s
+intro i j hij
+specialize hs i j hij
+simp only [Set.mem_image] at hs
+obtain ⟨x, hx1, hx2⟩ := hs
+simp only [Set.mem_image]
+use x
+constructor
+· exact hAB hx1
+· exact hx2
 
 /-- The family of Delta subsets of a semigroup -/
 def deltaFamily
