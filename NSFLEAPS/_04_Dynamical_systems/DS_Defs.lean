@@ -15,7 +15,8 @@ section Structures
 with an action by a (discrete) semigroup `S`. -/
 structure DynamicalSystem
 (S : Type*) [Semigroup S] [Nonempty S]
-(X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(X : Type*) [TopologicalSpace X] [CompactSpace X]
+[hT2 : T2Space X] [hNonempty : Nonempty X]
 where
   map : S → X → X
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
@@ -328,17 +329,17 @@ def fromNonemptyCompactT2InvariantSubsetToSystem
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
-(isInv : isInvariantSet dSystem Z) :
+(isInv : isNonemptyCompactT2InvariantSubset dSystem Z) :
 DynamicalSystem S ↑Z :=
 {
-  map := (fun (s : S) ↦ Set.MapsTo.restrict (dSystem.map s) Z Z (isInv s))
+  map := (fun (s : S) ↦ Set.MapsTo.restrict (dSystem.map s) Z Z (isInv.2.2.2 s))
   mapMult := by
     intro s t ⟨z,hz⟩
     unfold Set.MapsTo.restrict Subtype.map
     simp only [dSystem.mapMult s]
   mapCont := by
     intro s
-    exact Continuous.restrict (isInv s) (dSystem.mapCont s)
+    exact Continuous.restrict (isInv.2.2.2 s) (dSystem.mapCont s)
 }
 
 -- Still working on this definition.  Not sure how to make lean see that
@@ -362,12 +363,59 @@ instance
 
 end Subsystems
 
+section Relations_as_sets
+
+/-- setToRelation sends a set `s : Set (X × X)` to a relation `X → X → Prop` -/
+def setToRelation
+{X : Type*} (s : Set (X × X)) :
+X → X → Prop :=
+fun x y => (x, y) ∈ s
+
+/-- A set `s : Set (X × X)` is reflexive if for all `x : X`, `(x,x) ∈ s` -/
+def isReflexive
+{X : Type*} (s : Set (X × X)) :
+Prop :=
+Std.Refl (setToRelation s)
+
+/-- A set `s : Set (X × X)` is symmetric if for all `x y : X`, `(x,y) ∈ s → (y,x) ∈ s` -/
+def isSymmetric
+{X : Type*} (s : Set (X × X)) :
+Prop :=
+Std.Symm (setToRelation s)
+
+/-- A set `s : Set (X × X)` is transitive if for all `x y z : X`,
+`(x,y) ∈ s ∧ (y,z) ∈ s → (x,z) ∈ s` -/
+def isTransitive
+{X : Type*} (s : Set (X × X)) :
+Prop :=
+IsTrans X (setToRelation s)
+
+/-- A set `s : Set (X × X)` is an equivalence relation if it is reflexive, symmetric,
+and transitive -/
+def isEquivalenceRelation
+{X : Type*} (s : Set (X × X)) :
+Prop :=
+Equivalence (setToRelation s)
+--isReflexive s ∧ isSymmetric s ∧ isTransitive s
+
+/- The following exists in Mathlib as an instance, but we have some friction
+using that because of our treating relations as sets -/
+/-- The quotient of a nonempty set by an equivalence relation is nonempty -/
+theorem nonemptyQuotient
+(X : Type*) [Nonempty X]
+{I : Set (X × X)} (hIEquiv : Equivalence (setToRelation I)) :
+Nonempty (Quotient ⟨setToRelation I, hIEquiv⟩) :=
+by sorry
+
+end Relations_as_sets
+
 
 section Factor_maps_and_ICERS
 
 /- DGG: I am playing around with different definition structures in this section
 until we land on one that works nicely. -/
 
+-- TO DO: depracate in favor of isEquivariant
 /-- A map between the phase spaces of two dynamical systems is
 interwining if `π ∘ s = s ∘ π`. (See MulActionHom for precedent) -/
 def isIntertwining
@@ -380,6 +428,16 @@ def isIntertwining
 Prop :=
 ∀ x : X, ∀ s : S, π (dSystemX.map s x) = dSystemY.map s (π x)
 
+/-- Given actions `S → X → X` and `S → Y → Y`, a map `π : X → Y` is
+`S`-equivariant if it intertwines the actions -/
+def isEquivariant
+{S : Type*} [Semigroup S] {X Y : Type*}
+(actionMapX : S → X → X) (actionMapY : S → Y → Y) (π : X → Y) :
+Prop :=
+∀ (s : S), actionMapY s ∘ π = π ∘ (actionMapX s)
+
+/-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is a factor map
+if it is a continuous, equivariant surjection -/
 def isFactorMap
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -433,7 +491,7 @@ isNonemptyCompactT2InvariantSubset dSystemY (π '' Z)
 
 /-- The restriction of a continuous, intertwining map to a nonempty, compact,
 T2, invariant subset `Z ⊆ X` is a factor map from `Z` as an `S`-system to its
-image under the map as a `S`-system -/
+image under the map as an `S`-system -/
 theorem contIntertwineRestrictionIsFactorMap
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -442,11 +500,99 @@ theorem contIntertwineRestrictionIsFactorMap
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπCont : Continuous π} {hπInt : isIntertwining dSystemX dSystemY π}
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
-(hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
+(hZisInv : isNonemptyCompactT2InvariantSubset dSystemX Z) [CompactSpace ↑(π '' Z)] :
 isFactorMap (fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
-(imageDynamicalSystem dSystemX dSystemY π (hπInt := hπInt) (hπCont := hπCont) hZisInv)
-(Set.MapsTo.restrict π Z (π '' Z) (Set.mapsTo_image π Z))
-:= by sorry
+(imageDynamicalSystem dSystemX dSystemY π (hπInt := hπInt) (hπCont := hπCont) hZisInv.2.2.2)
+(Set.MapsTo.restrict π Z (π '' Z) (Set.mapsTo_image π Z)) :=
+by sorry
+
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, an ICER
+(for dSystem) is an invariant (under the diagonal action of `S`),
+closed equivalence relation -/
+def isICER
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (I : Set (X × X)) :
+Prop :=
+isInvariantSet (diagDynamicalSystem dSystem dSystem) I ∧ IsClosed I ∧
+isEquivalenceRelation I
+
+/- Testing this out -/
+/- class ICER
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (I : Set (X × X)) where
+  ICER_prop :=
+    isInvariantSet (diagDynamicalSystem dSystem dSystem) I ∧
+    IsClosed I ∧
+    isEquivalenceRelation I -/
+
+/-- An arbitrary intersection of ICERs (for a given system) is an ICER
+(for that system) -/
+theorem intersectionOfICERsIsICER
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {c : Set (Set (X × X))}
+(hc : ∀ (I : Set (X × X)), I ∈ c → isICER dSystem I) :
+isICER dSystem (⋂₀ c) :=
+by sorry
+
+/-- If `X` is a compact Hausdorff topological space and `I` is a closed
+equivalence relation on `X^2`, then `X/I` is a Hausdorff topological space -/
+theorem quotientOfCompactT2ByClosedIsT2
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{I : Set (X × X)} (hIClosed : IsClosed I)
+(hIEquiv : Equivalence (setToRelation I)) :
+T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
+by sorry
+
+/-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
+the quotient dynamical system has phase space `X/I` with an `S` action
+described by `s[x] = [sx]` -/
+def quotientDynamicalSystem
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩)
+(hT2 := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2)
+(hNonempty := nonemptyQuotient X hI.2.2) :=
+by sorry
+
+-- The follow code is part of the debugging effort around quotientMapIsEquivariant
+/- variable {S : Type*} [Semigroup S] [Nonempty S]
+variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+variable (dSystem : DynamicalSystem S X)
+variable {I : Set (X × X)} (hI : isICER dSystem I)
+
+#check quotientDynamicalSystem dSystem hI
+#check (quotientDynamicalSystem dSystem hI).map -/
+
+/- Given a dynamical system of `S` acting on `X` and an ICER `I`,
+the quotient map `X → X/I` is S-equivariant -/
+/- theorem quotientMapIsEquivariant
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+isEquivariant dSystem.map
+(quotientDynamicalSystem dSystem hI).map
+  (Quotient.mk ⟨setToRelation I, hI.2.2⟩) :=
+by sorry -/
+
+
+/- Given a dynamical system of `S` acting on `X` and an ICER `I`,
+the quotient map `X → X/I` is a factor map of S-systems -/
+-- To fix this, could pass T2 and Nonempty arguments explicitly to isFactorMap
+/- theorem quotientMapIsFactorMap
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
+  (Quotient.mk ⟨setToRelation I, hI.2.2⟩) :=
+by sorry -/
+
 
 end Factor_maps_and_ICERS
 
@@ -553,7 +699,7 @@ theorem minimalSubsetIsMinimalSystem
 (dSystem : DynamicalSystem S X)
 {Y : Set X} [CompactSpace Y] [Nonempty Y]
 (hMinSubset : isMinimalSubset dSystem Y) :
-isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1.2.2.2)) :=
+isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1)) :=
 by sorry -- UNHAPPY, WAIT TO TOUCH
 
 /-- A system is minimal if and only if for all points `x ∈ X`,
@@ -844,38 +990,49 @@ by
 
 end Proximality
 
-
-
 section Regional_proximality
 
-/-- The regionally proximal relation for a dynamical system -/
+/-- The regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RP
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
 Set (X × X) :=
 ⋂ α ∈ nhdsSet (Set.diagonal X),
 setOrbitClosure (diagDynamicalSystem dSystem dSystem) α
 
--- UNHAPPY
-def setToRel
-{X} (s : Set (X × X)) :
-X → X → Prop :=
-fun x y => (x, y) ∈ s
-
-theorem RPisSymm
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+/-- The regionally proximal relation is symmetric -/
+theorem RPisSymmetric
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-Std.Symm (setToRel (RP dSystem)) :=
+isSymmetric (RP dSystem) :=
 by sorry
 
-theorem RPisReflexIfNondegen
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+/-- The regionally proximal relation is invariant under the diagonal
+action by `S` -/
+theorem RPisInvariant
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) :=
+by sorry
+
+/-- The regionally proximal relation is closed -/
+theorem RPisClosed
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+IsClosed (RP dSystem) :=
+by sorry
+
+/-- If `SX` is dense in `X` (a basic nondegeneracy criterion), then `RP` is reflexive -/
+theorem RPisReflexiveIfNondegen
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 (hNondegen : setOrbitClosure dSystem Set.univ = Set.univ) :
-Std.Refl (setToRel (RP dSystem)) :=
+isReflexive (RP dSystem) :=
 by sorry
 
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
@@ -913,11 +1070,15 @@ variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 /- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
 instance : UniformSpace X := uniformSpaceOfCompactR1
 
+/-- A dynamical system `dSystem` is equicontinuous if the family of maps
+given by `dSystem.map` is uniformly equicontinuous -/
 def isEquicontinuousSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 UniformEquicontinuous dSystem.map
 
+/-- If `dSystem` and `dSystemY` are equicontinuous dynamical systems, then the
+diagonal action of `S` on `X × Y` is an equicontinuous dynamical system -/
 theorem diagSystemOfEquiSystemsIsEquiSystem
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 {dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
@@ -925,9 +1086,28 @@ theorem diagSystemOfEquiSystemsIsEquiSystem
 isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) :=
 by sorry
 
+/-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
+nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
+dynamical system -/
+theorem subsystemOfEquicontinuousIsEquicontinuous
+{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) :=
+by sorry
+
+/-- A dynamical system on `X` is equicontinuous if and only if the
+regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivial
 (dSystem : DynamicalSystem S X) :
 RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem :=
+by sorry
+
+/- Still working on this one -/
+def isEquicontinuousICER
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} :
+Prop :=
 by sorry
 
 

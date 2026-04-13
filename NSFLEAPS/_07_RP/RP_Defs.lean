@@ -4,12 +4,16 @@ variable {S} [CommSemigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 variable {dSystem : DynamicalSystem S X}
 
+section Projection_and_injection_maps
+
 /- Projection and injection maps -/
 def π1 : X × X × X → X := fun w ↦ w.1
 def π2 : X × X × X → X := fun w ↦ w.2.1
 def π3 : X × X × X → X := fun w ↦ w.2.2
 def π12 : X × X × X → X × X := fun w ↦ ⟨w.1,w.2.1⟩
 def i21 : (X × X) × X → X × X × X := fun (w : (X × X) × X) ↦ ⟨w.1.1,w.1.2,w.2⟩
+
+end Projection_and_injection_maps
 
 section Corner_System_3
 
@@ -226,15 +230,16 @@ end RP_and_corner_dynamics
 section RP_is_EQ_relation
 
 /-- If `S` acts minimally on `X`, then the regionally proximal relation is transitive -/
-theorem minimalImpliesRPisTrans :
-isMinimalSystem dSystem →
-IsTrans X (setToRel (RP dSystem)) :=
+theorem minimalImpliesRPisTransitive :
+isMinimalSystem dSystem → isTransitive (RP dSystem) :=
 by sorry
 
 end RP_is_EQ_relation
 
 section Set_recurrence_corollary
 
+/-- In a minimal system, for (x,y) ∈ RP and U, V ⊆ X open with y ∈ V,
+the intersection R(x,U) ∩ R(V,U) is syndetic -/
 theorem xyInRPImpliesSyndeticVisitTimeIntersection (x y : X) :
 isMinimalSystem dSystem → (x,y) ∈ RP dSystem →
 ∀ (U V : Set X), IsOpen U → IsOpen V → U.Nonempty → y ∈ V →
