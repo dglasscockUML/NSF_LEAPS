@@ -1,4 +1,5 @@
-import NSFLEAPS._03_Family_algebra.FA_Theorems -- Family_algebra has two files.  We need to import the later one.
+import NSFLEAPS._03_Family_algebra.FA_Theorems -- Family_algebra has two files.
+                                              -- We need to import the later one.
 import NSFLEAPS._04_Dynamical_systems.DS_Defs
 
 section Syndetic_and_thick_sets
@@ -283,8 +284,21 @@ def deltaFamily
 /-- In a semigroup S, Delta sets are Delta_0 -/
 theorem deltaFamilyContainedInDeltaZeroFamily
 {S : Type*} [Semigroup S] [Nonempty S] :
-deltaFamily S ⊆ deltaZeroFamily S :=
-by sorry
+deltaFamily S ⊆ deltaZeroFamily S := by
+intro A hA
+obtain ⟨x, hx⟩ := hA
+simp only [SetLike.mem_coe]
+have reduce_goal: isDeltaZero A → A ∈ deltaZeroFamily S := by
+  intro hA2
+  simpa
+apply reduce_goal
+unfold isDeltaZero
+intro k
+let s : Fin k → S := fun i ↦ x (i)
+use s
+intro i j hij
+specialize hx i j hij
+simpa
 
 end Delta_sets
 
