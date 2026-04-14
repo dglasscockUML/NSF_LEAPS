@@ -15,8 +15,7 @@ section Structures
 with an action by a (discrete) semigroup `S`. -/
 structure DynamicalSystem
 (S : Type*) [Semigroup S] [Nonempty S]
-(X : Type*) [TopologicalSpace X] [CompactSpace X]
-[hT2 : T2Space X] [hNonempty : Nonempty X]
+(X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 where
   map : S → X → X
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
@@ -130,7 +129,8 @@ intro z hz
 apply h4
 exact ⟨z, hz, rfl⟩
 
-/-- The predicate that the set `Z ⊆ X` is a nonempty, compact, T2 subset that is invariant under the action `dSystem.map` -/
+/-- The predicate that the set `Z ⊆ X` is a nonempty, compact,
+T2 subset that is invariant under the action `dSystem.map` -/
 def isNonemptyCompactT2InvariantSubset
 (dSystem : DynamicalSystem S X) (Z : Set X) :
 Prop :=
@@ -319,7 +319,6 @@ DynamicalSystem S ↑Z :=
   cont' := by sorry
 }-/
 
--- UNHAPPY
 /-- Given a system of `S` acting on `X` and a nonempty, compact, T2, invariant `Z ⊆ X`,
 create a term of type `DynamicalSystem S ↑Z`, where note that `↑Z` is the type
 corresponding to membership in `Z` (tuples of term of type `X` and proof of
@@ -328,19 +327,24 @@ def fromNonemptyCompactT2InvariantSubsetToSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
-{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
-(isInv : isNonemptyCompactT2InvariantSubset dSystem Z) :
-DynamicalSystem S ↑Z :=
-{
-  map := (fun (s : S) ↦ Set.MapsTo.restrict (dSystem.map s) Z Z (isInv.2.2.2 s))
-  mapMult := by
-    intro s t ⟨z,hz⟩
-    unfold Set.MapsTo.restrict Subtype.map
-    simp only [dSystem.mapMult s]
-  mapCont := by
-    intro s
-    exact Continuous.restrict (isInv.2.2.2 s) (dSystem.mapCont s)
-}
+{Z : Set X} (isInv : isNonemptyCompactT2InvariantSubset dSystem Z) :
+let _ : Nonempty ↥Z := (fun ⟨x, hx⟩ => ⟨⟨x, hx⟩⟩) isInv.1
+let _ : CompactSpace ↥Z := isCompact_iff_compactSpace.mp isInv.2.1
+DynamicalSystem S ↥Z :=
+by
+  letI : Nonempty ↥Z := (fun ⟨x, hx⟩ => ⟨⟨x, hx⟩⟩) isInv.1
+  letI : CompactSpace ↥Z := isCompact_iff_compactSpace.mp isInv.2.1
+  exact
+  {
+    map := (fun (s : S) ↦ Set.MapsTo.restrict (dSystem.map s) Z Z (isInv.2.2.2 s))
+    mapMult := by
+      intro s t ⟨z,hz⟩
+      unfold Set.MapsTo.restrict Subtype.map
+      simp only [dSystem.mapMult s]
+    mapCont := by
+      intro s
+      exact Continuous.restrict (isInv.2.2.2 s) (dSystem.mapCont s)
+  }
 
 -- Still working on this definition.  Not sure how to make lean see that
 -- the compactness of Z will come from the assumption isNonemptyCompactT2InvariantSubset dSystem Z
@@ -448,6 +452,12 @@ def isFactorMap
 Prop :=
 Continuous π ∧ Function.Surjective π ∧ isIntertwining dSystemX dSystemY π
 
+/-- Given a map f : X → Y, the map relation is the subset of X × X
+consisting of those points (x1,x2) such that f(x1) = f(x2) -/
+def mapRelation
+{X Y : Type*} (f : X → Y) :
+Set (X × X) :=
+(Prod.map f f) ⁻¹' (Set.diagonal Y)
 
 /-- The definition of a dynamical system Y being a factor of a dynamical system X -/
 def isFactor
@@ -546,6 +556,23 @@ theorem quotientOfCompactT2ByClosedIsT2
 T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
 by sorry
 
+/- instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{I : Set (X × X)} {hIClosed : IsClosed I}
+{hIEquiv : Equivalence (setToRelation I)} :
+T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
+by sorry
+
+instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{I : Set (X × X)} {hIClosed : IsClosed I}
+{hIEquiv : Equivalence (setToRelation I)} :
+CompactSpace (Quotient ⟨setToRelation I, hIEquiv⟩) :=
+by infer_instance
+
+instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{I : Set (X × X)} {hIClosed : IsClosed I}
+{hIEquiv : Equivalence (setToRelation I)} :
+Nonempty (Quotient ⟨setToRelation I, hIEquiv⟩) := nonemptyQuotient X hIEquiv -/
+
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient dynamical system has phase space `X/I` with an `S` action
 described by `s[x] = [sx]` -/
@@ -554,10 +581,15 @@ def quotientDynamicalSystem
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 (dSystem : DynamicalSystem S X)
 {I : Set (X × X)} (hI : isICER dSystem I) :
-DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩)
-(hT2 := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2)
-(hNonempty := nonemptyQuotient X hI.2.2) :=
+let _ : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  nonemptyQuotient X hI.2.2
+let _ : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) :=
 by sorry
+
+-- (hT2 := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2)
+-- (hNonempty := nonemptyQuotient X hI.2.2)
 
 -- The follow code is part of the debugging effort around quotientMapIsEquivariant
 /- variable {S : Type*} [Semigroup S] [Nonempty S]
@@ -565,6 +597,8 @@ variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hN
 variable (dSystem : DynamicalSystem S X)
 variable {I : Set (X × X)} (hI : isICER dSystem I)
 
+set_option pp.explicit true
+#print quotientDynamicalSystem
 #check quotientDynamicalSystem dSystem hI
 #check (quotientDynamicalSystem dSystem hI).map -/
 
@@ -1096,6 +1130,27 @@ theorem subsystemOfEquicontinuousIsEquicontinuous
 isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) :=
 by sorry
 
+/- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
+-- This seems unnecessary.  Typeclass is finding it properly.
+/- def quotientIsUniformSpace
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+by sorry -/
+
+/-- An ICER `I` on `X` is equicontinuous if
+the quotient system `X/I` is equicontinuous -/
+def isEquicontinuousICER
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+Prop :=
+by
+  letI : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  nonemptyQuotient X hI.2.2
+  letI : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+  exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
+
 /-- A dynamical system on `X` is equicontinuous if and only if the
 regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivial
@@ -1103,13 +1158,18 @@ theorem equicontinuousIffRPTrivial
 RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem :=
 by sorry
 
-/- Still working on this one -/
-def isEquicontinuousICER
+/- Note the following generalizes equicontinuousIffRPTrivial by
+applying the following to the identity map -/
+/-- A factor `π : X → Y` is equicontinuous iff `RP_X ⊆ R_π` -/
+theorem factorEquicontinuousIffRPInFactorRelation
 (dSystem : DynamicalSystem S X)
-{I : Set (X × X)} :
-Prop :=
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+{π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
+RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY :=
 by sorry
 
+-- mapRelation π
 
 end Equicontinuity_and_regional_proximality
 
