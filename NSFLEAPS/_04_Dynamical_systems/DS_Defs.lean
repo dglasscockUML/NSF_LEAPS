@@ -407,7 +407,7 @@ using that because of our treating relations as sets -/
 /-- The quotient of a nonempty set by an equivalence relation is nonempty -/
 theorem nonemptyQuotient
 (X : Type*) [Nonempty X]
-{I : Set (X × X)} (hIEquiv : Equivalence (setToRelation I)) :
+{I : Set (X × X)} [Nonempty I] (hIEquiv : Equivalence (setToRelation I)) :
 Nonempty (Quotient ⟨setToRelation I, hIEquiv⟩) :=
 by sorry
 

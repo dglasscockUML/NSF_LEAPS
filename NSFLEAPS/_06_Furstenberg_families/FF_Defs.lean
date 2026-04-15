@@ -318,12 +318,23 @@ Prop :=
 (x : X) (U : Set X) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A
 
+def isBohrZerov2
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S)
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem) :
+Prop :=
+∃ (x : X) (U : Set X) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A
+
+/- theorem [Semigroup S] : \exists X : Type*,
+\forall A : Set S, \forall Y : Type*, isBohrZero X A \iff isBohrZero Y A -/
+
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
 theorem bohrZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isBohrZero A) (hAB : A ⊆ B) :
-isBohrZero B :=
-by sorry
+isBohrZero B := by
+sorry
 
 -- The family of Bohr_0 subsets of a semigroup
 /- def bohrZeroFamily
