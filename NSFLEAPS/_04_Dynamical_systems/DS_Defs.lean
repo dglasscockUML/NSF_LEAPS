@@ -1160,21 +1160,74 @@ by sorry
 
 /- Note the following generalizes equicontinuousIffRPTrivial by
 applying the following to the identity map -/
-/-- A factor `π : X → Y` is equicontinuous iff `RP_X ⊆ R_π` -/
-theorem factorEquicontinuousIffRPInFactorRelation
-(dSystem : DynamicalSystem S X)
+/-- A factor `π : X → Y` of a minimal system is equicontinuous
+iff `RP_X ⊆ R_π` -/
+theorem minimalFactorEquicontinuousIffRPInFactorRelation
+(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
 RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY :=
 by sorry
 
--- mapRelation π
+/-- An ICER `I` of a minimal system `X` is equicontinuous iff `RP ⊆ I` -/
+theorem minimalICEREquicontinuousIffRPInICER
+(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
+{I : Set (X × X)} (hI : isICER dSystem I) :
+isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I :=
+by sorry
 
 end Equicontinuity_and_regional_proximality
 
-
 section Equicontinuous_structure_relation
+
+/-- The set of ICERS of a dynamical system -/
+def setOfICERS
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (Set (X × X)) :=
+{I : Set (X × X) | isICER dSystem I}
+
+/-- The set of equicontinuous ICERS of a dynamical system -/
+def setOfEquicontinuousICERS
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (Set (X × X)) :=
+by
+  intro x
+  by_cases h : x ∈ setOfICERS dSystem
+  · exact isEquicontinuousICER dSystem h
+  · exact False
+
+/-- The equicontinuous structure relation of a dynamical system is the
+intersection of all equicontinuous ICERS of the system -/
+def equiStructureRelation
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (X × X) :=
+⋂₀ (setOfEquicontinuousICERS dSystem)
+
+/-- The equicontinuous structure relation of a dynamical system is an ICER -/
+theorem equiStructureRelationIsICER
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isICER dSystem (equiStructureRelation dSystem) :=
+by sorry
+
+/-- The equicontinuous structure relation of a dynamical system is an
+equicontinuous ICER -/
+theorem equiStructureRelationIsEquiICER
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) :=
+by sorry
+
+
 
 end Equicontinuous_structure_relation
 

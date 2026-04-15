@@ -234,6 +234,20 @@ theorem minimalImpliesRPisTransitive :
 isMinimalSystem dSystem → isTransitive (RP dSystem) :=
 by sorry
 
+/-- The regionally proximal relation of a minimal dynamical system
+is an ICER -/
+theorem RPisICER
+(hMin : isMinimalSystem dSystem) :
+isICER dSystem (RP dSystem) :=
+by sorry
+
+/-- The regionally proximal relation of a minimal dynamical system
+is the equicontinuous structure relation -/
+theorem RPisEquiStructureRelation
+(hMin : isMinimalSystem dSystem) :
+RP dSystem = equiStructureRelation dSystem :=
+by sorry
+
 end RP_is_EQ_relation
 
 section Set_recurrence_corollary
