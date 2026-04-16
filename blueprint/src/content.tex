@@ -1,3 +1,4 @@
+
 \section{Topology}
 \label{sec_topology}
 
@@ -163,6 +164,8 @@ Contains:
 \leanok{}
     A left ideal of semigroup $S$ is a non-empty subset $L \subseteq S$ such that for all $s \in S$, $s L \subseteq L$.
 \end{definition}
+
+
 
 \begin{lemma}
     \label{lemma_intersection_of_ideals_is_ideal}
@@ -1275,6 +1278,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
 \label{lemma_closure_of_inv_is_inv}
+\lean{DS.closureOfInvIsInv}
 \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $A \subseteq X$.  If $A$ is $S$-invariant, then $\overline{A}$ is $S$-invariant.
 \end{lemma}
@@ -1324,6 +1328,9 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \subsection{Factor maps and ICERS}
 
 \begin{definition}[Factor]
+\lean{DS.isFactor}
+    \leanok{}
+\anh{[My first Lean code. Please check]}
 Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together with a continuous surjection $X \to Y$ that intertwines the action of $G$.
 \end{definition}
 
@@ -1332,11 +1339,15 @@ Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together wi
 \end{leanrmk}
 
 \begin{definition}[ICER]
+\lean{ICER}
+\leanok{}
     Let $X$ be a $G$-system.  A set $R \subseteq X^2$ is an \emph{ICER (on $X$)} if it is an equivalence relation, closed as a subset of $X^2$, and invariant under $G$ by the diagonal action.
 \end{definition}
 
 \begin{lemma}
 \label{lemma_intersection_of_icers}
+\lean{intersectionOfICERsIsICER}
+\leanok{}
     Let $(X,T)$ be a system.  The intersection of any collection of ICERs is an ICER.
 \end{lemma}
 
@@ -1346,17 +1357,28 @@ Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together wi
 
 \begin{theorem}[Quotient system]
 \label{thm_quotient_system}
-    Let $X$ be a $G$-system, and let $R$ be an ICER on $X$.
+\lean{quotientDynamicalSystem}
+\leanok{}
+    Let $X$ be a $S$-system, and let $R$ be an ICER on $X$.
     \begin{enumerate}
         \item The quotient space $X/R$ is a compact Hausdorff space;
-        \item $(g,[x]_R) \mapsto [gx]_R$ is an action of $G$ by continuous maps;
-        \item the space $X/R$ together with this $G$-action is a $G$-system; and
-        \item the quotient map $\pi: X \to X/R$ is a factor map of $G$-systems.
+        \item $(s,[x]_R) \mapsto [sx]_R$ is an action of $S$ by continuous maps;
+        \item the space $X/R$ together with this $S$-action is a $S$-system.
     \end{enumerate}
 \end{theorem}
 
 \begin{proof}
     \dgg{This is straightforward and hopefully most of it is quotable from mathlib.  If this theorem exists for ``flows'' in Mathlib, we can just adapt the proof for our tds.}
+\end{proof}
+
+\begin{theorem}
+\label{theorem_quotient_map_is_factor_map}
+\lean{quotientMapIsFactorMap}
+    The quotient map $\pi: X \to X/R$ is a factor map of $S$-systems.
+\end{theorem}
+
+\begin{proof}
+    \dgg{Clear by the definition of the system.}
 \end{proof}
 
 \begin{definition}[Quotient system]
@@ -1571,6 +1593,8 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{lemma}[Images of minimal systems are minimal]
 \label{lemma_img_of_min_is_min}
+\lean{factorOfMinimalIsMinimal}
+\leanok{}
     Let $S$ be a semigroup and $\pi: X \to Y$ be a factor map of $S$-systems. If $X$ is minimal, then $Y$ is minimal.
 \end{lemma}
 
@@ -1616,6 +1640,8 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{lemma}
     \label{lemma_orb_closure_of_ur_is_minimal}
+    \lean{orbitClosureOfURPointIsMinimalSubset}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  If $x \in X$ is $S$-uniformly recurrent, then $\overline{Sx}$ is a minimal $S$-system containing $x$.
 \end{lemma}
 
@@ -1636,6 +1662,8 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{lemma}
     \label{lemma_in_orb_clos_of_ur_implies_ur}
+    \lean{inOrbitClosOfURPointImpliesUR}
+    \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x, y \in X$. If $x$ is $S$-uniformly recurrent and $y \in \overline{Sx}$, then $y$ is $S$-uniformly recurrent. 
 \end{lemma}
 
@@ -1646,6 +1674,8 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{lemma}
     \label{lemma_dense_S_minimal_points_in_X2}
+    \lean{inMinCommSystemURPairsDense}
+    \leanok{}
     Let $S$ be a commutative semigroup, and let $X$ be a minimal $S$-system.  The set of points $(x,y) \in X^2$ that are $S$-uniformly recurrent is dense in $X^2$.
 \end{lemma}
 
@@ -1669,48 +1699,80 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{definition}[{Proximal, cf. \cite[Ch. 4, (2.11)]{devries_book_1993}}]
 \label{def_proximal}
+\lean{DS.proximal}
+\leanok{}
     Let $X$ be an $S$-system and $x, y \in X$.  The point $x$ is \emph{proximal to $y$} if for all $\alpha$ in the uniform structure on $X$, there exists $s \in S$ such that $(sx,sy) \in \alpha$.
 \end{definition}
 
 \begin{theorem}
 \label{theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal}
+\lean{DS.minSystemOrbitClosProxPairContainsDiag}
     Let $S$ be a semigroup, $X$ be a minimal $S$-system, and $x, y \in X$.  If $x$ and $y$ are $S$-proximal, then $\Delta(X)$ is contained in the $S$-orbit-closure of $(x,y)$.
 \end{theorem}
 
 \begin{proof}
 \uses{theorem_orbit_closure_transitivity}
+\leanok{}
     By the definition of proximal, for all entourages $\alpha \subseteq X^2$, there exists $s \in S$ such that $(sx,sy) \in \alpha$.  The net $\alpha \mapsto (s_\alpha x, s_\alpha y)$ has a cluster point.  Since the cluster point is in every entourage, it belongs to $\Delta(X)$.  Therefore, there exists $z \in X$ such that $(z,z)$ is in the $S$-orbit closure of $(x,y)$.  By minimality, every point $x$ is in the $S$-orbit closure of $z$, so $\Delta(X)$ is in the $S$-orbit closure of $(z,z)$.  By orbit closure transitivity (\cref{theorem_orbit_closure_transitivity}), we have that $\Delta(X)$ is contained in the $S$-orbit closure of $(x,y)$, as desired.
+\end{proof}
+
+\begin{proof}[Proof \# 2]
+    By a lemma, for all entourages $\alpha \subseteq X^2$, $R((x,y),\alpha)$ is a thick subset of $S$.  Let $w \in X$, and let $V \ni w$.  Let $\alpha \subseteq X$ be an entourage with the property that $(V \times X) \cap \alpha \subseteq V \times V$. \dgg{Why does such an entourage exist?}
+
+    Because $R(x,V)$ is syndetic and $R((x,y),\alpha)$ is thick, there is $s \in R((x,y), \alpha) \cap R(x,V)$.  By the property of $\alpha$, we have that $(sx,sy) \in V \times V$.  Since $V$ was arbitrary, we have that $(w,w)$ is in $\overline{S(x,y)}$, as was to be shown.
 \end{proof}
 
 \subsection{Regional proximality}
 
 \begin{definition}[{Regionally proximal relation, cf. \cite[Ch. 5, Section 1]{devries_book_1993}}]
 \label{def_rp_relation}
+\lean{RP}
+\leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  The \emph{regionally proximal relation} is defined as
     \[\RP = \bigcap_{\alpha} \overline{S \alpha},\]
     where the intersection is over all $\alpha$ in the uniformity on $X$, and $S$ acts diagonally.  We say that point $x \in X$ is \emph{regionally proximal to} point $y \in X$ if $(x,y) \in \RP$.
 \end{definition}
 
 \begin{lemma}
-\label{lemma_rp_basics}
-    Let $X$ be an $S$-system.  The relation $\RP$ is reflexive, symmetric, invariant, and closed.
+    \label{lemma_rp_basics_symmetric}
+    \lean{RPisSymmetric}
+    \leanok{}
+    Let $X$ be an $S$-system.  The relation $\RP$ is symmetric.
+\end{lemma}
+
+\begin{proof}
+    Denote by $\Phi: X^2 \to X^2$ the map $\Phi(x,y) = (y,x)$. Let $(x,y) \in \RP$ and $\alpha \subseteq X^2$ be an entourage. By the definition of a uniform space, $\Phi \alpha$ is an entourage (sometimes called $\alpha^{-1}$). Since $(x,y) \in \RP$, $(x,y) \in \overline{G \Phi \alpha}$. But $\overline{G \Phi \alpha} = \Phi \overline{G \alpha}$. Therefore, $(y,x) \in \overline{G \alpha}$, as was to be shown.
+\end{proof}
+
+\begin{lemma}
+    \label{lemma_rp_basics_invariant}
+    \lean{RPisInvariant}
+    \leanok{}
+    Let $X$ be an $S$-system.  The relation $\RP$ is $S$-invariant.
 \end{lemma}
 
 \begin{proof}
 \uses{lemma_intersection_of_invariant}
-    \begin{itemize}
-        \item Symmetric: Denote by $\Phi: X^2 \to X^2$ the map $\Phi(x,y) = (y,x)$. Let $(x,y) \in \RP$ and $\alpha \subseteq X^2$ be an entourage. By the definition of a uniform space, $\Phi \alpha$ is an entourage (sometimes called $\alpha^{-1}$). Since $(x,y) \in \RP$, $(x,y) \in \overline{G \Phi \alpha}$. But $\overline{G \Phi \alpha} = \Phi \overline{G \alpha}$. Therefore, $(y,x) \in \overline{G \alpha}$, as was to be shown.
-
-        \item Invariant: The set $G\alpha$ is clearly $G$-invariant.  Since $G$ acts by continuous maps,
+    The set $G\alpha$ is clearly $G$-invariant.  Since $G$ acts by continuous maps,
         \[g \overline{G\alpha} \subseteq \overline{gG \alpha} \subseteq \overline{G \alpha},\]
         whereby $\overline{G\alpha}$ is $G$-invariant.  Finally, by \cref{lemma_intersection_of_invariant}, an arbitrary intersection of $G$-invariant sets is $G$-invariant, so $\RP$ is $G$-invariant.
+\end{proof}
 
-        \item Closed: an arbitrary intersection of closed sets is closed.
-    \end{itemize}   
+\begin{lemma}
+\label{lemma_rp_basics_closed}
+\lean{RPisClosed}
+\leanok{}
+    Let $X$ be an $S$-system.  The relation $\RP$ is closed.
+\end{lemma}
+
+\begin{proof}
+    An arbitrary intersection of closed sets is closed. 
 \end{proof}
 
 \begin{lemma}
 \label{lemma_rp_reflexive}
+\lean{RPisReflexiveIfNondegen}
+\leanok{}
     Let $X$ be an $S$-system.  If $\overline{SX} = X$, then $\RP$ is reflexive.
 \end{lemma}
 
@@ -1722,6 +1784,12 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \label{def_diag_limit_pt_set}
     Let $S$ be a semigroup and $X$ be an $S$-system. For $(x, y) \in X^2$ and $A \subseteq S$, define
     \[\Omega_A(x,y) = \{w \in X : \exists \ \text{net } (a_n, b_n, s_n) \in X^2 \times A, \ \lim_{n \to \infty} (a_n, b_n, s_n a_n, s_n b_n) = (w, w, x, y) \}.\]
+    Alternatively:
+    \[\Omega_A \defeq (\Delta(X) \times X^2) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}}\]
+    (where notice that $\overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}}$ is the graph of the $S$-action on $X^2$)
+    so that
+    \[\Omega_A(x,y) = \pi_1 (\Omega_A \cap (X^2 \times \{(x,y)\})).\]
+    \[\Omega_A(x,y) = (\Delta(X) \times \{(x,y)\}) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}}.\]
 \end{definition}
 
 \begin{lemma}
@@ -1778,6 +1846,7 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
     \label{lemma_set_of_ws_is_closed}
     Let $S$ be a semigroup and $X$ be an $S$-system. For all $A \subseteq S$,
     \[\Delta(\Omega_A(x,y)) = \Delta(X) \cap \bigcap_{\text{open } U \ni (x,y)} \overline{A^{-1} U}.\]
+    \[\pi_{12}\big((\Delta(X) \times \{(x,y)\}) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}} \big) = \Delta(X) \cap \bigcap_{\text{open } U \ni (x,y)} \overline{A^{-1} U}.\]
 \end{lemma}
 
 \begin{proof}
@@ -1855,12 +1924,14 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
 
 \begin{lemma}[{cf. \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993}}]
     \label{lemma_rp_functorial_property}
-    Let $X$ be a $G$-system and $\pi: X \to Y$ be a factor.  Then $(\pi \times \pi) \RP_X \subseteq \RP_Y$.
+    \lean{imageOfRPIsInRP}
+    \leanok{}
+    Let $X$ be a $S$-system and $\pi: X \to Y$ be a factor.  Then $(\pi \times \pi) \RP_X \subseteq \RP_Y$.
 \end{lemma}
 
 \begin{proof}
     Let $\beta \subseteq Y^2$ be an entourage.  Since $\pi: X \to Y$ is continuous and $X$ is compact, it is uniformly continuous.  In particular, there exists $\alpha \subseteq X^2$ an entourage such that $(\pi \otimes \pi) \alpha \subseteq \beta$.  We see then that
-    \[(\pi \times \pi) \RP_X \subseteq (\pi \otimes \pi) \overline{G \alpha} = \overline{(\pi \otimes \pi) G \alpha} = \overline{G(\pi \otimes \pi) \alpha} \subseteq \overline{G \beta},\]
+    \[(\pi \times \pi) \RP_X \subseteq (\pi \otimes \pi) \overline{S \alpha} = \overline{(\pi \otimes \pi) S \alpha} = \overline{S(\pi \otimes \pi) \alpha} \subseteq \overline{S \beta},\]
     as was to be shown.
 \end{proof}
 
@@ -1870,6 +1941,8 @@ The following lemma is shown in \cite[V. 2.12 and 2.14, pg. 416]{devries_book_19
 
 \begin{lemma}
     \label{lemma_rp_functorial_property_minimal}
+    \lean{commMinRPIsInImageOfRP}
+    \leanok{}
     Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, and let $\pi: X \to Y$ be a factor map of $S$-systems.  Then $\RP_Y = (\pi \times \pi) \RP_X$.
 \end{lemma}
 
@@ -1910,11 +1983,15 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 
 \begin{definition}[{Equicontinuous system, cf. 
 \cite[Ch. 4, (2.1)]{devries_book_1993}}]
+    \lean{isEquicontinuousSystem}
+    \leanok{}
     A $G$-system $X$ is \emph{(uniformly) equicontinuous} if the set of maps $\{g: X \to X \mid g \in G\}$ is a (uniformly) equicontinuous family.
 \end{definition}
 
 \begin{lemma}
     \label{lemma_product_of_equi_is_equi}
+    \lean{diagSystemOfEquiSystemsIsEquiSystem}
+    \leanok{}
     Let $S$ be a semigroup.  The product of equicontinuous $S$-systems is an equicontinuous $S$-system.
 \end{lemma}
 
@@ -1925,6 +2002,8 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 
 \begin{lemma}
     \label{lemma_subsys_of_equi_is_equi}
+    \lean{subsystemOfEquicontinuousIsEquicontinuous}
+    \leanok{}
     Let $S$ be a semigroup, and let $X$ be an equicontinuous $S$-system.  All subsystems of $X$ are equicontinuous $S$-systems.
 \end{lemma}
 
@@ -1959,11 +2038,14 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \end{proof}
 
 \begin{definition}[{Equicontinuous ICER, cf. \cite{ellis_ellis_book_2014}}]
+\lean{isEquicontinuousICER}
+\leanok{}
     Let $X$ be a $G$-system.  An ICER $R$ of $X$ is \emph{equicontinuous} if the quotient system (cf. \cref{def_quotient_system}) $X/R$ is equicontinuous.
 \end{definition}
 
 \begin{lemma}[{cf. \cite[pg. 283]{devries_book_1993}}]
     \label{lemma_rp_and_equicontinuity}
+    \lean{equicontinuousIffRPTrivial}
     Let $S$ be a semigroup. An $S$-system $X$ is equicontinuous if and only if $\RP \subseteq \Delta$.
 \end{lemma}
 
@@ -1978,6 +2060,8 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 
 \begin{lemma}
     \label{lemma_rp_characterization_of_equicont}
+    \lean{minimalFactorEquicontinuousIffRPInFactorRelation}
+    \leanok{}
     Let $X$ be a minimal $G$-system.  A factor $\pi: X \to Y$ is equicontinuous if and only if $\RP \subseteq R_\pi$.
 \end{lemma}
     %\dgg{We might only get: if a factor $\pi: X \to Y$ is equicontinuous, then $\RP \subseteq R_\pi$.}
@@ -1990,6 +2074,8 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 
 \begin{lemma}
     \label{lemma_rp_characterization_of_equicont_icer}
+    \lean{minimalICEREquicontinuousIffRPInICER}
+    \leanok{}
     Let $X$ be a minimal $G$-system.  An ICER $Q$ of $X$ is equicontinuous if and only if $\RP \subseteq Q$.
 \end{lemma}
 %\dgg{We might only get: if $Q$ is an equicontinuous ICER, then $\RP \subseteq Q$.}
@@ -2003,15 +2089,17 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \subsection{The equicontinuous structure relation}
 
 \begin{definition}[{cf. \cite[Ch. V, (1.3)]{devries_book_1993}}]
+\label{def_equicontinuous_structure_relation}
+\lean{equiStructureRelation}
+\leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  The \emph{equicontinuous structure relation} on $X$, denoted $\seq(X)$ (or just $\seq$ if $X$ is understood), is the intersection of all equicontinuous ICERS on $X$.  (Note that $X^2$ is always one such ICER, so the intersection is non-empty.)
 \end{definition}
 
-\begin{definition}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  The Kronecker factor of $X$ is the quotient system $X/\seq$ together with the quotient map $\pi: X \to X/\seq$.
-\end{definition}
-
 \begin{theorem}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  The equicontinuous structure relation is an equicontinuous ICER.  In particular, the Kronecker factor is an equicontinuous system.
+\label{thm_equi_structure_relation_is_equi_ICER}
+\lean{equiStructureRelationIsEquiICER}
+\leanok{}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  The equicontinuous structure relation is an equicontinuous ICER.
 \end{theorem}
 
 \begin{proof}
@@ -2022,6 +2110,23 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
     
     Let $R$ be an equicontinuous ICER.  We must show that $\RP \subseteq R$.  This follows by \cref{lemma_rp_characterization_of_equicont_icer}.
 \end{proof}
+
+\begin{definition}
+\label{def_kronecker_factor}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  The Kronecker factor of $X$ is the quotient system $X/\seq$ together with the quotient map $\pi: X \to X/\seq$.
+\end{definition}
+
+\begin{theorem}
+    \label{thm_kronecker_is_equicontinuous_system}
+    The Kronecker factor is an equicontinuous system.
+\end{theorem}
+
+\begin{proof}
+\uses{thm_equi_structure_relation_is_equi_ICER}
+    Should follow immediately from \cref{thm_equi_structure_relation_is_equi_ICER} and the definition of Kronecker factor.
+\end{proof}
+
+\dgg{Do we use the following theorem anywhere?  Will wait to build into Lean.}
 
 \begin{theorem}
     Let $S$ be a semigroup and $X$ be an $S$-system.  Let $\pi: X \to K$ be the Kronecker factor.  For all factors $\sigma: X \to Z$ of $S$-systems with $Z$ equicontinuous, there exists a continuous surjection $\xi: K \to Z$ such that $\sigma = \xi \circ \pi$.  In particular, the Kronecker factor is the largest equicontinuous factor of $X$.
@@ -2094,10 +2199,13 @@ Contains:
 
 
 \begin{theorem}[{\cite[Thm 2.5]{hindman_strauss_book_2012}}]
+\lean{compactT2RTSemigroupContainsIdempotent}
+\leanok{}
     A compact, Hausdorff right topological semigroup contains an idempotent.
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     This is \verb|exists_idempotent_of_compact_t2_of_continuous_mul_left|.
 \end{proof}
 
@@ -2105,6 +2213,8 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{lemma}[Principal ideals are closed]
 \label{lemma_principal_ideal_is_compact}
+\lean{principalLeftIdealClosed}
+\leanok{}
     Let $S$ be a compact, Hausdorff right-topological semigroup, and let $t \in S$.  The set $St$ is closed.
 \end{lemma}
 
@@ -2114,6 +2224,8 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{lemma}[Left ideal contains a closed left ideal]
 \label{lemma_left_ideal_contains_closed_left_ideal}
+\lean{leftIdealContainsClosedLeftIdeal}
+\leanok{}
     Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal contains a closed left ideal.
 \end{lemma}
 
@@ -2124,6 +2236,8 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{lemma}[Minimal left ideals are compact]
 \label{lemma_minimal_left_ideal_compact}
+\lean{minimalLeftIdealCompact}
+\leanok{}
     Let $S$ be a compact, right-topological semigroup.  Minimal left ideals of $S$ are compact.
 \end{lemma}
 
@@ -2135,25 +2249,33 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{lemma}
 \label{lemma_exists_minimal_left_ideal}
+\label{thm_every_left_contains_minimal_left}
+\lean{leftIdealContainsMinLeftIdeal}
+\leanok{}
     Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal of $S$ contains a minimal left ideal.
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_intersection_of_ideals_is_ideal}
-    Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is non-empty and compact since $S$ is Hausdorff, and which is an ideal by \cref{lemma_intersection_of_ideals_is_ideal}.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
+\uses{lemma_principal_ideal_is_compact,lemma_intersection_of_ideals_is_ideal}
+    Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see by \cref{lemma_principal_ideal_is_compact} that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is non-empty and compact since $S$ is Hausdorff, and which is an ideal by \cref{lemma_intersection_of_ideals_is_ideal}.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
 \end{proof}
 
 \begin{theorem}
     \label{exists_idempotent_in_compact_subsemigroup}
-    Let $S$ be a compact, Hausdorff right-topological semigroup.  Every compact subsemigroup of $S$ contains an idempotent.
+    \lean{compactSubsemigroupContainsIdempotent}
+    \leanok{}
+    Let $S$ be a compact, Hausdorff right-topological semigroup.  Every non-empty, compact subsemigroup of $S$ contains an idempotent.
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     This is precisely  \verb|exists_idempotent_in_compact_subsemigroup| in mathlib.
 \end{proof}
 
 \begin{lemma}
 \label{lemma_left_ideal_contains_idempotent}
+\lean{leftIdealContainsIdempotent}
+\leanok{}
     Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal of $S$ contains an idempotent element.
 \end{lemma}
 
@@ -2287,6 +2409,8 @@ Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \b
 
 \begin{definition}[Minimal ultrafilter]
 \label{def_minimal_ultrafilter}
+\lean{isMinimalUltrafilter}
+\leanok{}
 An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta S$.
 \end{definition}
 
@@ -2312,6 +2436,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{theorem}[{cf. \cite[Thms 4.1 and 4.4, pg. 88]{hindman_strauss_book_2012}}]
 \label{thm_ultra_right_mult_continuous}
+\lean{rightMultUltraContinuous}
+\leanok{}
     Let $S$ be a semigroup.  For all $p \in \beta S$, right multiplication by $p$ as a map $\beta S \to \beta S$ is continuous.
 \end{theorem}
 
@@ -2321,6 +2447,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{theorem}[{cf. \cite[Thms 4.1 and 4.4, pg. 88]{hindman_strauss_book_2012}}]
 \label{lemma_left_multiplication_is_continuous}
+\lean{leftMultPrincipalUltraContinuous}
+\leanok{}
     Let $S$ be a semigroup.  For all $s \in S$, left multiplication by the principal ultrafilter at $s$ as a map $\beta S \to \beta S$ is continuous.
 \end{theorem}
 
@@ -2341,19 +2469,12 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
     That $\beta S$ is compact, Hausdorff is established, already in Lean, too.  That right multiplication is continuous is also established: see \cref{thm_ultra_right_mult_continuous} above.
 \end{proof}
 
-\begin{theorem}
-    \label{thm_every_left_contains_minimal_left}
-    Let $S$ be a (compact?) right topological semigroup.  Every left ideal of $S$ contains a minimal left ideal.
-\end{theorem}
-
-\begin{proof}
-    \dgg{Sorry.}
-\end{proof}
-
 \begin{lemma}
 \label{lemma_exists_idempotent_in_left_ideals}
     Let $S$ be a semigroup.  Every left ideal in $\beta S$ contains a idempotent.
 \end{lemma}
+
+\dgg{Wait to formulate in lean.  May just be able to quote \cref{lemma_left_ideal_contains_idempotent} and rely on typeclass inference to pick up the hypotheses.}
 
 \begin{proof}
 \uses{thm_ultrafilters_are_compact_right_top,lemma_left_ideal_contains_idempotent}
@@ -2362,6 +2483,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{lemma}
 \label{lemma_exists_minimal_idempotent_in_left_ideals}
+\lean{leftIdealInBetaSContainsMinIdempotent}
+\leanok{}
     Let $S$ be a semigroup.  Every left ideal in $\beta S$ contains a minimal idempotent.
 \end{lemma}
 
@@ -2374,6 +2497,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{theorem}
     \label{thm_ultrafilters_as_system}
+    \lean{ultrafilterSystem}
+    \leanok{}
     Let $S$ be a semigroup.  With left multiplication by elements of $S$ (via principal ultrafilters) and the topology described above, $\beta S$ is an $S$-system.
 \end{theorem}
 
@@ -2384,6 +2509,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{theorem}[Subsystems in $\beta S$]
 \label{thm_beta_S_subsystem_characterization}
+\lean{ultraSubsystemIffClosedLeftIdeal}
+\leanok{}
     Let $S$ be a semigroup.  The $S$-subsystems of $\beta S$ are precisely the closed left ideals of $\beta S$.
 \end{theorem}
 
@@ -2398,6 +2525,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{theorem}[Minimal subsystems in $\beta S$]
 \label{thm_minimal_beta_S_subsystem_characterization}
+\lean{ultraMinSubsystemIffMinLeftIdeal}
+\leanok{}
     Let $S$ be a semigroup.  The minimal $S$-subsystems of $\beta S$ are precisely the minimal left ideals of $\beta S$.
 \end{theorem}
 
@@ -2410,6 +2539,8 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 
 \begin{theorem}[{cf. \cite[Lemma 19.6]{hindman_strauss_book_2012}}]
 \label{thm_minimal_ultrafilter_iff_unif_rec}
+\lean{ultrafilterMinimalIffUnifRec}
+\leanok{}
     Let $S$ be a semigroup.  An ultrafilter is minimal if and only if it is $S$-uniformly recurrent.
 \end{theorem}
 
@@ -2442,17 +2573,22 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 In this section, for $f: S \to X$, recall that $\tilde f: \beta S \to X$ is the unique continuous extension of $f$ to $\beta S$.
 
 \begin{definition}[$p-\lim$]
+\lean{ultraLim}
+\leanok{}
     Let $S$ be a set, $X$ a compact Hausdorff space, and $f: S \to X$.  We write $p-\lim_{s \in S} f(s)$ to mean $\tilde f (p)$.  (Alternative: equivalently, $p-\lim_{s \in S} f(s)$ is the point $x \in X$ with the property that for all non-empty, open $U \ni x$, $\{s \in S : f(s) \in U\} \in p$.)
 \end{definition}
 
 \begin{theorem}[$(pq)-\lim$ description]
 \label{thm_pq_lim_is_plim_qlim}
+\lean{iteratedUltraLims}
+\leanok{}
     Let $S$ be a semigroup, $X$ a compact Hausdorff space, and $f: S \to X$.  For all $p, q \in \beta S$,
     \[(pq)-\lim_s f(s) = p-\lim_s (q-\lim_t f(st)).\]
 \end{theorem}
 
 \begin{proof}
 \uses{lemma_left_multiplication_is_continuous,thm_ultra_right_mult_continuous}
+\leanok{}
     \dgg{These steps are broken into separate results in the lean miniproject on this topic.}
     
     Step 1: for $s \in S$ and $f: S \to X$,
@@ -2466,6 +2602,8 @@ In this section, for $f: S \to X$, recall that $\tilde f: \beta S \to X$ is the 
 
 \begin{theorem}[Continuous function and $p-\lim$]
 \label{thm_continuity_and_plim}
+\lean{ultraLimContinuousComp}
+\leanok{}
     Let $S$ be a semigroup, $X, Y$ compact Hausdorff spaces, $f: S \to X$, and $\pi: X \to Y$ continuous.  For all $p \in \beta S$, $p-\lim_{s \in S} \pi (f (s)) = \pi (p-\lim_{s \in S} f (s))$.
 \end{theorem}
 
@@ -2477,11 +2615,14 @@ Notation: For $p \in \beta S$ and $x \in X$, write $px$ for $p-\lim_{s \in S} sx
 
 \begin{theorem}[Ultrafilter semigroup action theorem]
 \label{thm_ultra_semigroup_action}
+\lean{ultraAction}
+\leanok{}
     Let $S$ be a semigroup. Let $X$ be an $S$-system.  The map $\beta S \times X \to X$ given by $(p,x) \mapsto p-\lim_{s \in S} sx$ yields an action of $\beta S$ on $X$.
 \end{theorem}
 
 \begin{proof}
 \uses{thm_pq_lim_is_plim_qlim,thm_continuity_and_plim}
+\leanok{}
     For $p, q \in \beta S$ and $x \in X$, we want to show that 
     \[(pq) x = p(qx).\]
     To see this, we get by \cref{thm_pq_lim_is_plim_qlim} and using that acting on the left by $s$ is a continuous map $X \to X$(\cref{thm_continuity_and_plim}), we see
@@ -2497,6 +2638,8 @@ Notation: For $p \in \beta S$ and $x \in X$, write $px$ for $p-\lim_{s \in S} sx
 
 \begin{theorem}
     \label{thm_ultrafilter_action_with_fixed_x_is_continuous}
+    \lean{ultraActionWithFixedxIsContinuous}
+    \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The map $\beta S \to X$ defined by $p \mapsto px$ is continuous.
 \end{theorem}
 
@@ -2516,6 +2659,8 @@ Notation: For $p \in \beta S$ and $x \in X$, write $px$ for $p-\lim_{s \in S} sx
 
 \begin{theorem}
     \label{thm_ultra_point_in_orb_closure}
+    \lean{ultraActionInOrbitClosure}
+    \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $p \in \beta S$. Then $px \in \overline{Sx}$.
 \end{theorem}
 
@@ -2525,6 +2670,8 @@ Notation: For $p \in \beta S$ and $x \in X$, write $px$ for $p-\lim_{s \in S} sx
 
 \begin{theorem}[Ultrafilter action through factors]
 \label{thm_ultra_semigroup_action_thru_factor}
+\lean{ultraActionIntertwinesWithFactor}
+\leanok{}
     Let $X$ and $Y$ be $S$-systems, and let $\pi: X \to Y$ be a factor map.  For all $p \in \beta S$, $p \pi = \pi p$ as maps from $X \to Y$.
 \end{theorem}
 
@@ -2537,19 +2684,21 @@ Notation: For $p \in \beta S$ and $x \in X$, write $px$ for $p-\lim_{s \in S} sx
 
 \begin{theorem}
 \label{lemma_plim_in_open_set_return_time}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  Let $x \in X$, $U \subseteq X$ be open, and $p \in \beta S$.
-    \begin{enumerate}
-        \item If $px \in U$, then $R(x,U) \in p$.
-        \item If $R(x,U) \in p$, then $px \in \overline{U}$.
-    \end{enumerate}
+\lean{visitTimeSetBelongsToUltrafilter}
+\leanok{}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  Let $x \in X$, $U \subseteq X$ be open, and $p \in \beta S$.  If $px \in U$, then $R(x,U) \in p$.
 \end{theorem}
 
 \begin{proof}
-    Both of these statements follow immediately from the definition of the filter limit.
+    This statement follows immediately from the definition of the filter limit.
 \end{proof}
+
+We have also that: ``If $R(x,U) \in p$, then $px \in \overline{U}$.''  We can prove it if we need it.
 
 \begin{lemma}[Surjectivity lemma]
 \label{lemma_ultrafilter_surjective_action}
+\lean{minLeftIdealSurjectsOntoMinSystem}
+\leanok{}
 Let $X$ be a minimal $S$-system and $L \subseteq \beta S$ be a minimal left ideal.  For all $x, y \in X$, there exists $p \in L$ such that $px = y$.
 \end{lemma}
 
@@ -2560,6 +2709,8 @@ Let $X$ be a minimal $S$-system and $L \subseteq \beta S$ be a minimal left idea
 
 \begin{lemma}[Idempotent ultrafilter lemma]
 \label{lemma_exists_idempotent_px_is_x}
+\lean{everyPointInMinFixedBySomeIdempotentUltrafilter}
+\leanok{}
 Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta S$ be a minimal left ideal.  For all $x \in X$, there exists an idempotent $p \in L$ such that $px = x$.
 \end{lemma}
 
@@ -2570,6 +2721,8 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 
 \begin{lemma}[Points $x$ and $px$ are proximal]
     \label{lemma_idempotent_implies_proximal}
+    \lean{pointAndUltraImageAreProximal}
+    \leanok{}
     Let $X$ be an $S$-system, $x \in X$, and $p \in \beta S$ an idempotent ultrafilter.  The points $x$ and $px$ are proximal.
 \end{lemma}
 
@@ -2582,6 +2735,8 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 
 \begin{lemma}[$px$ is uniformly recurrent]
     \label{lemma_minimal_implies_uniformly_recurrent}
+    \lean{minUltraImageIsUniformlyRecurrent}
+    \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $p \in \beta S$ be a minimal ultrafilter.  The point $px$ is $S$-uniformly recurrent.
 \end{lemma}
 
@@ -2596,6 +2751,8 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 
 \begin{lemma}[Technical idempotent lifting lemma]
 \label{lemma_ultrafilter_idempotent_lift}
+\lean{idempotentProductLifting}
+\leanok{}
     Let $X$ be a minimal $S$-system and $x \in X$.  Let $L \subseteq \beta S$ be a minimal left ideal and $p \in L$.  If $p x = x$, there exists $q \in L$ such that $q x = x$ and $pq$ is idempotent.
 \end{lemma}
 
@@ -2652,20 +2809,28 @@ Contains:
 \subsection{Syndetic and thick sets}
 
 \begin{definition}
-Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
-\begin{enumerate}
-    \item The set $A$ is syndetic if there exists a finite set $F \subseteq S$ such that $S = \cup_{f \in F} f^{-1} A$.
+\label{def_syndetic}
+\lean{isSyndetic}
+\leanok{}
+Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.  The set $A$ is syndetic if there exists a finite set $F \subseteq S$ such that $S = \cup_{f \in F} f^{-1} A$.
+\end{definition}
 
-    \item The set $A$ is thick if for all finite $F \subseteq S$, there exists $s \in S$ such that $Fs \subseteq A$.
-\end{enumerate}
+\begin{definition}
+\label{def_thick}
+\lean{isThick}
+\leanok{}
+Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is thick if for all finite $F \subseteq S$, there exists $s \in S$ such that $Fs \subseteq A$.
 \end{definition}
 
 \begin{lemma}
     \label{lemma_synd_thick_dual}
+    \lean{dualSyndeticThick}
+    \leanok{}
     $\syndetic = \thick^*$
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Easy from definitions.
 \end{proof}
 
@@ -2682,6 +2847,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 
 \begin{lemma}
     \label{lemma_image_of_syndetic}
+    \lean{surjImgOfSyndeticIsSyndetic}
+    \leanok{}
     If $\varphi: G \to H$ is a surjective semigroup homomorphism and $A \subseteq G$ is syndetic in $G$, then $\varphi A$ is syndetic in $H$.
 \end{lemma}
 
@@ -2693,6 +2860,9 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 
 \begin{lemma}
     \label{lemma_thick_inverse_shift_intersections}
+    \label{lemma_preimage_intersection_of_thick_is_thick}
+    \lean{inverseDilateCapOfThickIsThick}
+    \leanok{}
     Let $S$ be a semigroup and $H \subseteq S$ be thick.  For all finite $K \subseteq S$, the set $\cap_{k \in K} k^{-1} H$ is thick.
 \end{lemma}
 
@@ -2700,21 +2870,14 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     Let $K \subseteq S$ be finite.  To see that $\cap_{k \in K} k^{-1} H$ is thick, let $F \subseteq S$ be finite.  The set $KF$ is finite, so there is $s \in S$ such that $KFs \subseteq H$. We see $Fs \subseteq \cap_{k \in K} k^{-1} H$, as desired.
 \end{proof}
 
-% \begin{lemma}
-%     \label{lemma_thick_shift_intersections}
-%     Let $S$ be a group \dgg{semigroup?} and $H \subseteq S$ be thick. For all finite $F \subseteq S$, the set $\cap_{s \in F} sH$ is thick.
-% \end{lemma}
-
-% \begin{proof}
-%     Let $F \subseteq S$ be finite.  To see that $\cap_{s \in F} sH$ is thick, let $K \subseteq S$ finite.  The set $\cup_{s \in F} s^{-1} K$ is finite.  There exists $t \in S$ such that $(\cup_{s \in F} s^{-1} K) t \subseteq H$.  Thus, for all $s \in F$, $K t \subseteq sH$.  That is, $Kt \subseteq \cap_{s \in F} sH$, as was to be shown.
-% \end{proof}
-
 \begin{lemma}
     \label{lemma_thick_shift_intersections}
+    \lean{commDilateCapOfThickIsThick}
+    \leanok{}
     Let $S$ be a commutative semigroup and $H \subseteq S$ be thick. For all finite $K \subseteq S$, the set $\cap_{k \in K} kH$ is thick.
 \end{lemma}
 
-\dgg{An older version of this lemma for groups is in the comments.}
+\dgg{We may not use this?}
 
 \begin{proof}
 \uses{lemma_thick_inverse_shift_intersections}
@@ -2722,7 +2885,7 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     
     To see that $\cap_{k \in F} kH$ is thick, let $F \subseteq S$ finite.  Since $\cap_{k \in K} p_k^{-1} H$ is thick, there exists $s \in S$ such that $Fs \subseteq \cap_{k \in K} p_k^{-1} H$.  Therefore,
     \[Fps = p F s \subseteq p \cap_{k \in K} p_k^{-1} H \subseteq \cap_{k \in K} p p_k^{-1} H \subseteq \cap_{k \in K} k H,\]
-    as was to be shown.
+    as was to be shown. \anh{This proof requires $S$ to be a monoid. Otherwise, $p_k$ may not be defined if $|K| \leq 1$.}
 \end{proof}
 
 \begin{lemma}
@@ -2764,26 +2927,19 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
     which means that $\cap_{f \in F} f^{-1} H \in p$, as desired.
 \end{proof}
 
-\begin{lemma}
-\label{lemma_preimage_intersection_of_thick_is_thick}
-    Let $S$ be a commutative semigroup and $B \subseteq S$ be thick.  For all finite $K \subseteq S$, the set
-    \[\bigcap_{k \in K} k^{-1} B\]
-    is thick.
-\end{lemma}
-
-\begin{proof}
-    Let $K \subseteq S$ be finite.  Let $F \subseteq S$ be finite.  The set $\cup_{k \in K} kF$ is finite.  Since $B$ is thick, there exists $s \in S$ such that $(\cup_{k \in K} kF)s \subseteq B$.  Therefore, for all $k \in K$, $kFs \subseteq B$.  That is: $F s \subseteq k^{-1}B$.  In other words, $F s \subseteq \cap_{k \in K}$, as was to be shown.
-\end{proof}
-
 \subsection{Delta sets}
 
 \begin{definition}
+\lean{isDeltaZero}
+\leanok{}
 Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
-\begin{enumerate}
-    \item The set $A$ is a $\Delta$ set (Hindman-Strauss call this more generally a $Q$-set, where $Q$ is for quotient) if there exists a sequence $(s_n)_n \subseteq S$ such that for all $1 \leq m < n$, $s_n \in s_m A$.
+The set $A$ is a $\Delta_0$ set if for all $N \in \N$, there exists a sequence $(s_n)_{n=1}^N \subseteq S$ such that for all $1 \leq m < n \leq N$, $s_n \in s_m A$.
+\end{definition}
 
-    \item The set $A$ is a $\Delta_0$ set if for all $N \in \N$, there exists a sequence $(s_n)_{n=1}^N \subseteq S$ such that for all $1 \leq m < n \leq N$, $s_n \in s_m A$.
-\end{enumerate}
+\begin{definition}
+\lean{isDelta}
+\leanok{}
+Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is a $\Delta$ set (Hindman-Strauss call this more generally a $Q$-set, where $Q$ is for quotient) if there exists a sequence $(s_n)_n \subseteq S$ such that for all $1 \leq m < n$, $s_n \in s_m A$.
 \end{definition}
 
 \begin{theorem}
@@ -2800,16 +2956,23 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 \dgg{In the definition below, we require the system to be minimal.  We can drop that assumption if all points are uniformly recurrent for an equicontinuous semigroup action.  This is true for group actions, but may not be true any longer for semigroup actions.}
 
 \begin{definition}
-Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
-\begin{enumerate}
-    \item The set $A$ is a $\dcsyndeticbohr$ set if there exists a minimal equicontinuous $S$-system $X$, a point $x \in X$, and a non-empty, open set $U \subseteq X$ such that $R(x,U) \subseteq A$.
+\label{def_dcsyndeticbohr}
+\lean{bohrZeroFamily}
+\leanok{}
+Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is a $\dcsyndeticbohr$ set if there exists a minimal equicontinuous $S$-system $X$, a point $x \in X$, and a non-empty, open set $U \subseteq X$ such that $R(x,U) \subseteq A$.
+\end{definition}
 
-    \item The set $A$ is a $\dcthickbohr$ set (that is, a set of Bohr recurrence for $S$ actions) if for all minimal equicontinuous $S$-systems $X$, all $x \in X$, and all $U \subseteq X$ containing $x$, $A \cap R(x,U) \neq \emptyset$.
-\end{enumerate}
+\begin{definition}
+\label{def_dcthickbohr}
+\lean{setOfBohrRecurrenceFamily}
+\leanok{}
+Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is a $\dcthickbohr$ set (that is, a set of Bohr recurrence for $S$ actions) if for all minimal equicontinuous $S$-systems $X$, all $x \in X$, and all $U \subseteq X$ containing $x$, $A \cap R(x,U) \neq \emptyset$.
 \end{definition}
 
 \begin{lemma}
     \label{lemma_dcsyndeticbohr_dcthickbohr_dual}
+    \lean{dualBohrZeroSetsOfBohrRecurrence}
+    \leanok{}
     $\dcsyndeticbohr = \dcthickbohr^*$.
 \end{lemma}
 
@@ -2819,6 +2982,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 
 \begin{lemma}
     \label{lemma_dcsyndeticbohr_is_filter}
+    \lean{commBohrZeroFamilyIsFilter}
+    \leanok{}
     Suppose $S$ is commutative. $\dcsyndeticbohr$ is a filter.
 \end{lemma}
 
@@ -2831,6 +2996,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 
 \begin{lemma}
     \label{lemma_dcthickbohr_is_pr}
+    \lean{commSetOfBohrRecurrenceFamilyIsPR}
+    \leanok{}
     $\dcthickbohr$ is partition regular.
 \end{lemma}
 
@@ -2841,6 +3008,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$.
 
 \begin{theorem}
     \label{thm_delta_zero_set_of_bohr_rec}
+    \label{commDeltaZeroImpliesSetOfBohrRecurrence}
+    \leanok{}
     For $S$ a commutative semigroup, $\Delta_0 \subseteq \dcthickbohr$.
 \end{theorem}
 
@@ -2902,6 +3071,9 @@ Let $S$ be a commutative semigroup and $X$ be an $S$-system.  For $s, t \in S$, 
 \end{align*}
 
 \begin{lemma}[Action of $S^2$ on $X^3$]
+\label{lemma_S2_action_on_X3}
+\lean{cornerSystem3}
+\leanok{}
     The map $S^2 \times X^3 \to X^3$ given by
     \[(s,t)(x,y,z) = T_{L,s}T_{R,t}(x,y,z) = (sx,sty,tz)\]
     makes $X^3$ an $S^2$-system.
@@ -2922,6 +3094,8 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 
 \begin{lemma}[Action of $S^2$ on $X^2$]
 \label{lemma_S2_action_on_X2}
+\lean{cornerSystem2}
+\leanok{}
     The map $S^2 \times X^2 \to X^2$ given by
     \[(s,t)(x,y) = T_{L,s}T_{R,t}(x,y) = (sx,sty)\]
     makes $X^2$ an $S^2$ system.
@@ -2933,6 +3107,8 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 
 \begin{lemma}
     \label{lemma_x3_to_x2_is_S2_factor_map}
+    \lean{pi12FromCorner3ToCorner2IsFactor}
+    \leanok{}
     The map $\pi_{12}: X^3 \to X^2$ is a factor map of $S^2$-systems.
 \end{lemma}
 
@@ -2944,6 +3120,8 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 
 \begin{lemma}
     \label{lem_minimal_h_from_g}
+    \lean{minimalSystemImpliesMinimalcornerSystem2}
+    \leanok{}
     Let $X$ be a minimal $S$-system. The $S^2$-system $X^2$ is minimal.
 \end{lemma}
 
@@ -2963,6 +3141,8 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 
 \begin{lemma}
     \label{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2}
+    \lean{liftTo3Right}
+    \leanok{}
     Let $X$ be a $S$-system and $x, y, z \in X$.  If $(x,y,z)$ is $S^2$-uniformly recurrent, then
     \[\overline{S (x,y)} \times \{z\} \subseteq \overline{S^2(x,y,z)}.\]
 \end{lemma}
@@ -2975,6 +3155,8 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 
 \begin{lemma}
     \label{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}
+    \lean{liftTo3Left}
+    \leanok{}
     Let $X$ be a $S$-system and $x, y, z \in X$.  If $(x,y,z)$ is $S^2$-uniformly recurrent, then
     \[\{x\} \times \overline{S (y,z)} \subseteq \overline{S^2(x,y,z)}.\]
 \end{lemma}
@@ -3006,6 +3188,8 @@ We define an action of $S^2$ on $X$ via
 
 \begin{lemma}[Action of $S^2$ on $X$]
     \label{lemma_S2_action_on_X}
+    \lean{cornerSystem1}
+    \leanok{}
     The map $S^2 \times X \to X$ given by
     \[(s,t)z = T_{L,s}T_{R,t}z = tz\]
     makes $X$ an $S^2$ system.
@@ -3017,6 +3201,8 @@ We define an action of $S^2$ on $X$ via
 
 \begin{lemma}
     \label{lemma_x3_to_x_is_S2_factor_map}
+    \lean{pi3FromCorner3ToCorner1IsFactor}
+    \leanok{}
     The map $\pi_3: X^3 \to X$ is a factor map of $S^2$-systems.
 \end{lemma}
 
@@ -3028,6 +3214,8 @@ We define an action of $S^2$ on $X$ via
 
 \begin{lemma}
     \label{lemma_prox_in_h_implies_in_g}
+    \lean{cornerProxImpliesProx}
+    \leanok{}
     Let $S$ be a semigroup and $X$ be a minimal $S$-system. If two points $x, y \in X$ are $S^2$-proximal, then they are $S$-proximal.
 \end{lemma}
 
@@ -3042,6 +3230,8 @@ We showed above that $X^3$, $X^2$, and $X$ are all $S^2$-systems.  By \cref{thm_
 
 \begin{lemma}
 \label{lemma_ultrafilter_action_on_X3}
+\lean{ultraActionOnX3}
+\leanok{}
     For all $p \in \beta S^2$ and all $(x,y,z) \in X^3$,
     \begin{align}
     \label{eqn_ultrafilter_action_on_X3}
@@ -3058,6 +3248,8 @@ We showed above that $X^3$, $X^2$, and $X$ are all $S^2$-systems.  By \cref{thm_
 
 \begin{theorem}
 \label{thm_xxx_is_trtl_unif_rec_v3}
+\lean{xyyUniformlyRecurrent}
+\leanok{}
     Let $X$ be a minimal $S$-system and $x, y \in X$.  The points $(x,y,y)$ and $(y,y,x)$ are $S^2$-uniformly recurrent.
 \end{theorem}
 
@@ -3076,6 +3268,8 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \begin{theorem}
 \label{thm_rp_implies_same_minimal_component}
 \label{theorem_cube_space_orbit_implies_rp}
+\lean{xyInRPIffxyyInyyyOrbClosure}
+\leanok{}
     Let $X$ be a minimal $S$-system and $x, y \in X$. Consider $X^3$ as an $S^2$-system as described above. The point $(x,y) \in \RP$ if and only if $(x,y,y) \in \overline{S^2(y,y,y)}$.
 \end{theorem}
 
@@ -3121,6 +3315,8 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 
 \begin{theorem}
 \label{theorem_rp_is_transitive}
+\lean{minimalImpliesRPisTrans}
+\leanok{}
     Let $S$ be a commutative semigroup, and let $X$ be a minimal $S$-system.  The $\RP$ relation is transitive.
 \end{theorem}
 
@@ -3142,16 +3338,20 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 
 \begin{theorem}
 \label{theorem_rp_is_ICER}
+\lean{RPisICER}
+\leanok{}
     Let $X$ be a minimal $S$-system.  The $\RP$ relation is an ICER.
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_basics,lemma_rp_reflexive,theorem_rp_is_transitive}
-    Combine \cref{lemma_rp_basics}, \cref{lemma_rp_reflexive}, and \cref{theorem_rp_is_transitive}.
+\uses{lemma_rp_basics_symmetric,lemma_rp_basics_invariant,lemma_rp_basics_closed,lemma_rp_reflexive,theorem_rp_is_transitive}
+    Combine \cref{lemma_rp_basics_symmetric}, \cref{lemma_rp_basics_invariant}, \cref{lemma_rp_basics_closed}, \cref{lemma_rp_reflexive}, and \cref{theorem_rp_is_transitive}.
 \end{proof}
 
 \begin{theorem}
 \label{thm_rp_equals_s}
+\lean{RPisEquiStructureRelation}
+\leanok{}
     Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system.  The equicontinuous structure relation $\seq$ is equal to $\RP$.
 \end{theorem}
 
@@ -3166,14 +3366,16 @@ Here is another application of the material in this section. The theorem below i
 
 \begin{theorem}
 \label{thm_delta_set_builder_prestep}
+\lean{xyInRPImpliesSyndeticVisitTimeIntersection}
+\leanok{}
     Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, and let $x, y \in X$.  If $(x,y) \in \RP$, then for all non-empty, open $U, V \subseteq X$ with $y \in V$, we have that
     \[R(x,U) \cap R(V,U)\]
     is syndetic.
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_basics,thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,lemma_return_time_algebra_three,lemma_image_of_syndetic}
-    Let $U, V \subseteq X$ be non-empty, open with $y \in V$.  Let $z \in U$.  By \cref{lemma_rp_basics}, $\RP$ is symmetric, so $(y,x) \in \RP$.  By \cref{thm_rp_implies_same_minimal_component}, $(y,x,x) \in \overline{S^2 (x,x,x)}$. By minimality, $(z,z) \in \overline{S(x,x)}$.  Since $(x,x,x)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,z,z) \in \overline{S^2(y,x,x)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), $(y,z,z) \in \overline{S^2 (x,x,x)}$.
+\uses{lemma_rp_basics_symmetric,thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,lemma_return_time_algebra_three,lemma_image_of_syndetic}
+    Let $U, V \subseteq X$ be non-empty, open with $y \in V$.  Let $z \in U$.  By \cref{lemma_rp_basics_symmetric}, $\RP$ is symmetric, so $(y,x) \in \RP$.  By \cref{thm_rp_implies_same_minimal_component}, $(y,x,x) \in \overline{S^2 (x,x,x)}$. By minimality, $(z,z) \in \overline{S(x,x)}$.  Since $(x,x,x)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,z,z) \in \overline{S^2(y,x,x)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), $(y,z,z) \in \overline{S^2 (x,x,x)}$.
     
     By \cref{thm_xxx_is_trtl_unif_rec_v3}, the point $(x,x,x)$ is $S^2$-uniformly recurrent.  Since $V \times U \times U$ is an open neighborhood of $(y,z,z)$ and $(y,z,z) \in \overline{S^2 (x,x,x)}$, we get that $R_{S^2}((x,x,x), V \times U \times U)$ is syndetic. This is the set of pairs $(g,r) \in S^2$ such that $T_{L,g} T_{R,r} (x,x,x) \in V \times U \times U$ -- that is, such that $r \in R(x,U)$, $g \in R(x,V)$, $rg \in R(x,U)$.  For each such pair $(g,r) \in S^2$, we see by \cref{lemma_return_time_algebra_three} that
     \[r \in R(x,U) \cap (R(x,U) R(x,V)^{-1}) = R(x,U) \cap R(V,U).\]
@@ -3195,17 +3397,24 @@ Contains:
 
 \subsection{Reduction to dynamically syndetic sets}
 
-% \dgg{I've opted to replace ``uniformly recurrent set'' with the clunkier ``CRTURP'' (see definition below) since that will shorten the verification by cutting out a step (namely, we won't have to prove that $B$ is CRTURP implies $1_B$ uniformly recurrent).}
+% \dgg{I've opted to replace ``uniformly recurrent set'' with the clunkier ``CRT'' (see definition below) since that will shorten the verification by cutting out a step (namely, we won't have to prove that $B$ is CRT implies $1_B$ uniformly recurrent).}
 
 \begin{definition}
-    Let $S$ be a semigroup. A set $A \subseteq S$ is called a \emph{clopen return-time set of a uniformly recurrent point (CRTURP)} if there exists an $S$-system $X$, an $S$-uniformly recurrent point $x \in X$, and a clopen set $U \subseteq X$ such that $A = R(x,U)$.
+\lean{isCRTSet}
+\leanok{}
+    Let $S$ be a semigroup. A set $A \subseteq S$ is called a \emph{clopen return-time set of a uniformly recurrent point (CRT)} if there exists an $S$-system $X$, an $S$-uniformly recurrent point $x \in X$, and a clopen set $U \subseteq X$ such that $A = R(x,U)$.
 \end{definition}
 
 \begin{definition}[Symbolic system]
 \label{def_symbolic_system}
     Let $S$ be a semigroup.  The symbolic system on $S$ is set $X = \{0,1\}^S$ with the product topology (so that it is compact and Hausdorff) together with the action of $S$ on $X$ given for $s \in S$ and $\omega \in X$ by
-    \[\forall \ t \in S, \ (s \omega)(t) = \omega(st).\]
+    \[\forall \ t \in S, \ (s \omega)(t) = \omega(ts).\]
 \end{definition}
+
+\dgg{I had to switch the definition of the shift in the symbolic system.  The original definition yielded an anti-action, oops!  But this allowed me to remove the ``commutative'' assumption in a couple of lemmas below.  Proceed with caution.}
+
+Action check: $s_1(s_2w) = (s_1s_2)w$?
+\[(s_1(s_2w))(t) = (s_2w)(ts_1) = w(ts_1s_2) = (s_1s_2 w)(t).\]
 
 \begin{definition}[Cylinder set]
     Let $S$ be a set, $s \in S$, and $a \in \{0,1\}$. The cylinder set $[a]_s$ is defined as
@@ -3213,19 +3422,21 @@ Contains:
 \end{definition}
 
 \begin{lemma}
-    \label{lemma_unif_rec_implies_CRTURP}
-    Let $S$ be a semigroup, and let $A \subseteq S$.  If $1_A \in \{0,1\}^S$ is $S$-uniformly recurrent, then $A$ is a CRTURP.
+    \label{lemma_unif_rec_implies_CRT}
+    \lean{unifRecPtsInSymbolicSpaceAreCRTSets}
+    \leanok{}
+    Let $S$ be a semigroup, and let $A \subseteq S$.  If $1_A \in \{0,1\}^S$ is $S$-uniformly recurrent, then $A$ is a CRT.
 \end{lemma}
 
 \begin{proof}[Proof outline]
 \uses{def_symbolic_system,def_hom_system}
-    If $S$ has an identity, this is easy: $A = R(1_A, [1]_{e_S})$. Indeed, note that $s \in R(1_A, [1]_{e_S})$ iff $s1_A \in [1]_{e_S}$ iff $(s 1_A)(e_S) = 1$ iff $1_A(s e_S) = 1$ iff $1_A (s) = 1$ iff $s \in A$.
+    If $S$ has an identity, this is easy: $A = R(1_A, [1]_{e_S})$. Indeed, note that $s \in R(1_A, [1]_{e_S})$ iff $s1_A \in [1]_{e_S}$ iff $(s 1_A)(e_S) = 1$ iff $1_A(e_Ss) = 1$ iff $1_A (s) = 1$ iff $s \in A$.
 
     But we don't want to assume that $S$ has an identity.  Thus, here is the outline for the proof in that case.
     \begin{enumerate}
         \item Let $S$ be a semigroup, $T$ be a semigroup with identity $e_T$, and $i: S \to T$ be an injective homomorphism of semigroups.  Suppose that $e_T$ is not in the range of $i$. (This is a strange technical condition that our setting will satisfy.) From \cref{def_symbolic_system}, $T$ acts on $\{0,1\}^T$.  Via the homomorphism $i$, we have by \cref{def_hom_system} that $\{0,1\}^T$ is an $S$-system. Thus, for $\omega \in \{0,1\}^T$, we have
         \[
-            \forall \ t \in T, \ (s \omega)(t) = \omega ((is)t).
+            \forall \ t \in T, \ (s \omega)(t) = \omega (t(is)).
         \]
         
         
@@ -3277,7 +3488,7 @@ Contains:
         To show $1_{A_1}$ is uniformly recurrent in $\{0, 1\}^T$, let $u$ be any finite subword of $1_{A_1}$. We will show $u$ appears syndetically in $1_{A_1}$. We have $u$ is a $\{0, 1\}$-valued function on a finite set $F_u \subseteq T$. Without loss of generality, assume $F_u \supseteq F_w$. Let $u' \in \{0, 1\}^T$ be the word that differs from $u$ only at $e_T$ (so $u(e_T) = 1$ and $u'(e_T) = 0$). Since $u|_{F_u \setminus \{e_T\}} = u'_{F_u \setminus \{e_T\}}$ is a subword of $1_A$, it appears syndetically in $1_A$. Thus $u$ or $u'$ appears infinitely many times in $1_{A}$. But as $u'$ contains $w$ as a subword, $u'$ does not appear in $1_A$. It follows that $u$ appears syndetically in $1_A$ and so in $1_{A_1}$. We are done.
 
         \item Let $i \in \{0, 1\}$ be such that $1_{A_i}$ is uniformly recurrent in $\{0, 1\}^T$ and $A' = A_i$. 
-        Then $A = R_S(1_{A'}, [1]_{e_T})$. Indeed: $s \in R_S(1_{A'}, [1]_{e_T})$ iff $s1_{A'} \in [1]_{e_T}$ iff $(s 1_{A'})(e_T) = 1$ iff $1_{A'}((is) e_T) = 1$ iff $1_{A'} (is) = 1$ iff $s \in A$ (since $i$ is injective and $e_T$ not in the range of $i$).
+        Then $A = R_S(1_{A'}, [1]_{e_T})$. Indeed: $s \in R_S(1_{A'}, [1]_{e_T})$ iff $s1_{A'} \in [1]_{e_T}$ iff $(s 1_{A'})(e_T) = 1$ iff $1_{A'}(e_T (is)) = 1$ iff $1_{A'} (is) = 1$ iff $s \in A$ (since $i$ is injective and $e_T$ not in the range of $i$).
         
     \end{enumerate}
 \end{proof}
@@ -3285,12 +3496,14 @@ Contains:
 
 \begin{lemma}
 \label{lem:auslander-ellis}
-Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq S$ be a thick set. There exists a CRTURP set $B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
+\lean{syndSetIsCRTOnThickSet}
+\leanok{}
+Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq S$ be a thick set. There exists a CRT set $B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
 \end{lemma}
 
 \begin{proof}
-\uses{lemma_thick_closure_contains_strong_ultrafilter,lemma_minimal_implies_uniformly_recurrent,lemma_unif_rec_implies_CRTURP,lemma_plim_in_open_set_return_time}
-    Since $H$ is thick, by \cref{lemma_thick_closure_contains_strong_ultrafilter}, there exists a minimal, idempotent ultrafilter $p \in \overline{H} \subseteq \beta S$ such that for all finite $F \subseteq S$, $\cap_{f \in F} f^{-1} H \in p$. Let $1_B = p 1_{A \cap H}$.  It follows from \cref{lemma_minimal_implies_uniformly_recurrent} that $1_B$ is $S$-uniformly recurrent.  By \cref{lemma_unif_rec_implies_CRTURP}, $B$ is a CRTURP set.  Define $T = \{g \in S \mid 1_B(g) = 1_{A \cap H}(g) \}$.
+\uses{lemma_thick_closure_contains_strong_ultrafilter,lemma_minimal_implies_uniformly_recurrent,lemma_unif_rec_implies_CRT,lemma_plim_in_open_set_return_time}
+    Since $H$ is thick, by \cref{lemma_thick_closure_contains_strong_ultrafilter}, there exists a minimal, idempotent ultrafilter $p \in \overline{H} \subseteq \beta S$ such that for all finite $F \subseteq S$, $\cap_{f \in F} f^{-1} H \in p$. Let $1_B = p 1_{A \cap H}$.  It follows from \cref{lemma_minimal_implies_uniformly_recurrent} that $1_B$ is $S$-uniformly recurrent.  By \cref{lemma_unif_rec_implies_CRT}, $B$ is a CRT set.  Define $T = \{g \in S \mid 1_B(g) = 1_{A \cap H}(g) \}$.
     
     We claim that the set $H \cap T$ is thick.  Indeed, let $F \subseteq S$ be finite. The set
     \[U \defeq \{(\alpha, \beta) \in (\{0,1\}^S)^2 \mid \forall f \in F, \ \alpha(f) = \beta (f)\} \subseteq (\{0,1\}^S)^2\]
@@ -3298,8 +3511,8 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
     \[p 1_B = p p 1_{A \cap H} = p 1_{A \cap H},\]
     we see by \cref{lemma_plim_in_open_set_return_time} that $R_S((1_B,1_{A \cap H}), U) \in p$ in the product space $(\{0,1\}^S)^2$ under the diagonal action.  By the property of $p$, we see that $\bigcap_{f \in F} f^{-1} H \in p$.  Since $p$ is a filter,
     \[\bigcap_{f \in F} f^{-1} H \cap R_S((1_B,1_{A \cap H}), U) \in p.\]
-    Choose $g$ in this set.  We see for all $f \in F$, by commutativity, $gf = fg \in H$ and
-    \[1_B(gf) = (g1_B)(f) = (g1_{A \cap H})(f) = 1_{A \cap H}(gf).\]
+    Choose $g$ in this set.  We see for all $f \in F$, $fg \in H$ and
+    \[1_B(fg) = (g1_B)(f) = (g1_{A \cap H})(f) = 1_{A \cap H}(fg).\]
     Therefore, $Fg \subseteq H \cap T$, as desired.
     
     Set $H' = H \cap T$.  Then $H' \subseteq H$ is thick and $1_B$ and $1_{A \cap H}$ agree on $H'$, that is, $A \cap H' = B \cap H'$, as desired.
@@ -3307,7 +3520,8 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 
 \begin{theorem}
 \label{thm_lspwf_upgrade}
-    Let $S$ be a commutative semigroup. Let $\family$ and $\familytwo$ be families of subsets of $S$. Suppose that for all CRTURP sets $B \subseteq S$ and all thick $H \subseteq S$, if $B \cap H \in \family$, then $B \cap H \in \familytwo$.  Then we have
+\lean{crtContainmentSufficesForFamilyContainment}
+    Let $S$ be a semigroup. Let $\family$ and $\familytwo$ be families of subsets of $S$. Suppose that for all CRT sets $B \subseteq S$ and all thick $H \subseteq S$, if $B \cap H \in \family$, then $B \cap H \in \familytwo$.  Then we have
     \[\syndetic \classcapdual \family \subseteq \syndetic \classcapdual \familytwo.\]
 \end{theorem}
 
@@ -3320,11 +3534,11 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 
     \item By \cref{thm_classcapdual_contained_in_intersection}, $\syndetic \classcapdual \family \subseteq \syndetic$, so $A \in \syndetic$.
 
-    \item By \cref{lem:auslander-ellis}, there exists a thick set $H' \subseteq H$ and a CRTURP set $B$ such that $A \cap H' = B \cap H'$.
+    \item By \cref{lem:auslander-ellis}, there exists a thick set $H' \subseteq H$ and a CRT set $B$ such that $A \cap H' = B \cap H'$.
 
     \item Since $A \in \syndetic \classcapdual \family$ and $H' \in \thick$, we have $A \cap H' \in \family$ (this holds by the definition of $\classcapdual$, even if $\family = \mathcal{P}(S)$), and so $B \cap H' \in \family$. 
 
-    \item Since $B$ is CRTURP, by our assumption, $B \cap H' \in \familytwo$.
+    \item Since $B$ is CRT, by our assumption, $B \cap H' \in \familytwo$.
 
     \item Thus $A \cap H' \in \familytwo$.
 
@@ -3336,11 +3550,14 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 
 \begin{theorem}
 \label{thm_delta_from_kronecker}
-    Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, $(x, y) \in \RP$, and $V \subseteq X$ an open neighborhood of $y$.  For all thick $B \subseteq S$, the set $R(x,V) \cap B \in \Delta$.
+\lean{commVisitTimeSetForRPPairIsDelta}
+\leanok{}
+    Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, $(x, y) \in \RP$, and $V \subseteq X$ an open neighborhood of $y$.  For all thick $H \subseteq S$, the set $R(x,V) \cap H \in \Delta$.
 \end{theorem}
 
 \begin{proof}
 \uses{thm_delta_set_builder_prestep,lemma_synd_thick_dual,lemma_minimal_comm_action_implies_surjective,lemma_return_time_algebra_one,lemma_return_to_intersection,lemma_preimage_intersection_of_thick_is_thick}
+    \dgg{I swapped $H$'s for $B$'s in this proof for some reason.}
     Let $B \subseteq S$ be thick. Put $U_1 = V$ and $B_1 = B$.
 
     \begin{enumerate}
@@ -3426,24 +3643,26 @@ Let $S$ be a commutative semigroup.  Let $A \subseteq S$ be a syndetic set and $
 % \[t_1 \in R(V,V) = R(x,V)R(x,V)^{-1},\]
 % so there exists $s_1 \in R(x,V)$ such that $s_2 \defeq s_1 t_1 \in R(x,V)$.
 
-\subsection{Equivalences for dynamically syndetic sets}
+\subsection{Dynamical sets of Bohr recurrence are Delta}
 
 A version of the following theorem can be found (for $\Z$-actions, or more generally?) in \cite{huang_shao_ye_2016}.
 
 \begin{theorem}
 \label{thm_dcthickbohr_is_delta_for_rxu}
-    Let $G$ be a commutative semigroup, and let $B \subseteq G$ be CRTURP.  If $B \in \dcthickbohr$, then for all thick $H \subseteq G$, the set $R(x,U) \cap H \in \Delta$.
+\leanok{}
+    \lean{commCRTSetsOfBohrRecurrenceAreDelta}
+    Let $S$ be a commutative semigroup, and let $B \subseteq S$ be CRT.  If $B \in \dcthickbohr$, then for all thick $H \subseteq S$, the set $B \cap H \in \Delta$.
 \end{theorem}
 
 \begin{proof}
 \uses{lemma_pr_family_concentration,lemma_dcthickbohr_is_pr,lemma_dcsyndeticbohr_dcthickbohr_dual,thm_rp_equals_s,thm_delta_from_kronecker}
-    Since $B$ is a CRTURP set, there exists $X$ be a minimal $G$-system, $x \in X$, and $U \subseteq X$ clopen so that $B = R(x,U)$.  Assume $B \in \dcthickbohr$.
+    Since $B$ is a CRT set, there exists $X$ be a minimal $S$-system, $x \in X$, and $U \subseteq X$ clopen so that $B = R(x,U)$.  Assume $B \in \dcthickbohr$.
 
     Since $R(x,U) \in \dcthickbohr$, by \cref{lemma_pr_family_concentration}, \cref{lemma_dcthickbohr_is_pr}, and the fact that $U$ is closed, there exists $y \in U$ such that for all non-empty, open $U' \ni y$, the set $R(x,U') \in \dcthickbohr$.
     
-    Let $\pi: X \to K$ be any equicontinuous factor of $X$.  We will show that $\pi x = \pi y$ by showing that for all open neighborhoods $V$ of $\pi x$ and $W$ of $\pi y$, $V \cap W \neq \emptyset$.  Let $V$ and $W$ be open neighborhoods of $\pi x$ and $\pi y$ respectively.  Since $K$ is equicontinuous and $V \ni \pi x$, $R(\pi x, V) \in \dcsyndeticbohr$. Since $\pi^{-1} W \ni y$ and $R(\pi x, V) \in \dcsyndeticbohr$, we have by \cref{lemma_dcsyndeticbohr_dcthickbohr_dual} that $R(x,\pi^{-1} W) \cap R(\pi x, V) \neq \emptyset$.  Therefore, there exists $g \in G$ such that $gx \in \pi^{-1} W$ and $g \pi x \in V$.  Thus, $\pi g x = g \pi x \in W$ and $g \pi x \in V$, so $V \cap W \neq \emptyset$, as desired.
+    Let $\pi: X \to K$ be any equicontinuous factor of $X$.  We will show that $\pi x = \pi y$ by showing that for all open neighborhoods $V$ of $\pi x$ and $W$ of $\pi y$, $V \cap W \neq \emptyset$.  Let $V$ and $W$ be open neighborhoods of $\pi x$ and $\pi y$ respectively.  Since $K$ is equicontinuous and $V \ni \pi x$, $R(\pi x, V) \in \dcsyndeticbohr$. Since $\pi^{-1} W \ni y$ and $R(\pi x, V) \in \dcsyndeticbohr$, we have by \cref{lemma_dcsyndeticbohr_dcthickbohr_dual} that $R(x,\pi^{-1} W) \cap R(\pi x, V) \neq \emptyset$.  Therefore, there exists $s \in S$ such that $sx \in \pi^{-1} W$ and $s \pi x \in V$.  Thus, $\pi s x = s \pi x \in W$ and $s \pi x \in V$, so $V \cap W \neq \emptyset$, as desired.
 
-    We conclude by showing that for all thick $H \subseteq G$, the set $R(x,U) \cap H \in \Delta$. Let $\pi: X \to K$ be the maximal equicontinuous factor of $X$.  We showed in the previous paragraph that $y \in U$ is such that $\pi x = \pi y$.  Therefore, $(x,y) \in \seq$.  By \cref{thm_rp_equals_s}, $\seq = \RP$, so $(x,y) \in \RP$.  Therefore, by \cref{thm_delta_from_kronecker}, $R(x,U) \cap H \in \Delta$.
+    We conclude by showing that for all thick $H \subseteq S$, the set $R(x,U) \cap H \in \Delta$. Let $\pi: X \to K$ be the maximal equicontinuous factor of $X$.  We showed in the previous paragraph that $y \in U$ is such that $\pi x = \pi y$.  Therefore, $(x,y) \in \seq$.  By \cref{thm_rp_equals_s}, $\seq = \RP$, so $(x,y) \in \RP$.  Therefore, by \cref{thm_delta_from_kronecker}, $R(x,U) \cap H \in \Delta$.
 \end{proof}
 
 % \dgg{The more robust version of \cref{thm_dcthickbohr_is_delta_for_rxu} can be found in the older version of this section at the bottom of this file.}
@@ -3455,19 +3674,34 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 
 \begin{theorem}
 \label{thm_bfw_dual_abelian}
+\lean{commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence}
     In a commutative semigroup $S$,
-    \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0 = \syndetic \classcapdual \dcthickbohr.\]
+    \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \dcthickbohr.\]
 \end{theorem}
 
 \begin{proof}
 \uses{thm_delta_in_deltazero,thm_delta_zero_set_of_bohr_rec,thm_classcapdual_is_monotonic,thm_lspwf_upgrade,thm_classcapdual_contained_in_intersection,thm_dcthickbohr_is_delta_for_rxu}
     That
-    \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr.\]
+    \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \syndetic \classcapdual \Delta.\]
-    According to \cref{thm_lspwf_upgrade}, it suffices to show this inclusion for CRTURP sets.  Let $B \in \syndetic \classcapdual \dcthickbohr$ be a CRTURP set.  From \cref{thm_classcapdual_contained_in_intersection}, we have that
+    According to \cref{thm_lspwf_upgrade}, it suffices to show this inclusion for CRT sets.  Let $B \in \syndetic \classcapdual \dcthickbohr$ be a CRT set.  From \cref{thm_classcapdual_contained_in_intersection}, we have that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \dcthickbohr,\]
     whence $B \in \dcthickbohr$.  We have from \cref{thm_dcthickbohr_is_delta_for_rxu} that since $B \in \dcthickbohr$, $B \in \syndetic \classcapdual \Delta$, as desired.
+\end{proof}
+
+\begin{theorem}
+\label{thm_bfw_dual_abelian_v2}
+\lean{commSyndFamMeetDeltaIsSnydFamMeetDeltaZero}
+    In a commutative semigroup $S$,
+    \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0.\]
+\end{theorem}
+
+\begin{proof}
+\uses{thm_delta_in_deltazero,thm_delta_zero_set_of_bohr_rec,thm_classcapdual_is_monotonic,thm_bfw_dual_abelian}
+    That
+    \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
+    follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}).  By \cref{thm_bfw_dual_abelian}, $\syndetic \classcapdual \Delta = \syndetic \classcapdual \dcthickbohr$, so $\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0$, as desired.
 \end{proof}
 
 \begin{theorem}
