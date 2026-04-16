@@ -581,12 +581,21 @@ def quotientDynamicalSystem
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 (dSystem : DynamicalSystem S X)
 {I : Set (X × X)} (hI : isICER dSystem I) :
-let _ : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   nonemptyQuotient X hI.2.2
-let _ : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
-DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) :=
-by sorry
+DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) := by
+have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  nonemptyQuotient X hI.2.2
+have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+exact
+{
+  map := by sorry
+  mapMult := by sorry
+  mapCont := by sorry
+}
 
 -- (hT2 := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2)
 -- (hNonempty := nonemptyQuotient X hI.2.2)
@@ -1145,9 +1154,9 @@ def isEquicontinuousICER
 {I : Set (X × X)} (hI : isICER dSystem I) :
 Prop :=
 by
-  letI : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   nonemptyQuotient X hI.2.2
-  letI : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
   exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
 
