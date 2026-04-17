@@ -119,8 +119,9 @@ isFactorMap (dSystemX := cornerSystem3 (dSystem := dSystem))
 by sorry
 
 /-- If `S` acts minimally on `X`, then `cornerSystem2` is minimal -/
-theorem minimalSystemImpliesMinimalcornerSystem2 :
-isMinimalSystem dSystem → isMinimalSystem (cornerSystem2 (dSystem := dSystem)) :=
+theorem minimalSystemImpliesMinimalcornerSystem2
+(hMin : isMinimalSystem dSystem) :
+isMinimalSystem (cornerSystem2 (dSystem := dSystem)) :=
 by sorry
 
 /-- If `(x,y,z)` is uniformly recurrent under `S^2`, then the cartesian product of
@@ -209,7 +210,13 @@ section RP_and_corner_dynamics
 theorem xyyUniformlyRecurrent
 (hMin : isMinimalSystem dSystem) (x y : X) :
 isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,y⟩ :=
-by sorry
+by
+  have corner2IsMin := minimalSystemImpliesMinimalcornerSystem2 hMin
+  rcases (rightTopSemigroupContainsMinLeftIdeal (S := Ultrafilter (S × S))) with ⟨L,LMin⟩
+  rcases (everyPointInMinFixedBySomeIdempotentUltrafilter cornerSystem2 corner2IsMin LMin (x,x))
+    with ⟨p,pInL,pIdemp,pFixesxx⟩
+  have imageOfpxxx := ultraActionOnX3 (dSystem := dSystem) p x x x
+  sorry
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
 `(x,x,y)` is uniformly recurrent in `cornerSystem3` -/
@@ -236,6 +243,7 @@ theorem minimalImpliesRPisTransitive
 (hMin : isMinimalSystem dSystem) :
 isTransitive (RP dSystem) :=
 by
+  #check (minimalIffDenseOrbits dSystem).mp hMin
   unfold isTransitive
   unfold setToRelation
   exact {
@@ -246,10 +254,14 @@ by
           (xyInRPIffxyyInyyyOrbClosure hMin y z).mp yzInRP
       have yyInOrbitCloszz :
         (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
-          by sorry
+          diagonalOrbitVisits z y
+            ((subset_of_eq (minimalImpliesFullOrbitClosure hMin z).symm) (Set.mem_univ z))
       have yyyInyTimesOrbitCloszz :
         (y,y,y) ∈ ({y} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨z,z⟩) :=
-          by sorry
+          by
+            constructor
+            · simp only [Set.mem_singleton_iff]
+            · exact yyInOrbitCloszz
       have yyyInOrbitClosyzz :
         (y,y,y) ∈ orbitClosure cornerSystem3 (y,z,z) :=
           (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
@@ -258,10 +270,14 @@ by
           (xyInRPIffxyyInyyyOrbClosure hMin x y).mp xyInRP
       have zzInOrbitClosyy :
         (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
-          by sorry
+          diagonalOrbitVisits y z
+            ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
       have xzzInxTimesOrbitClosyy :
         (x,z,z) ∈ ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,y⟩) :=
-          by sorry
+          by
+            constructor
+            · simp only [Set.mem_singleton_iff]
+            · exact zzInOrbitClosyy
       have xzzInOrbitClosxyy :
         (x,z,z) ∈ orbitClosure cornerSystem3 (x,y,y) :=
           (liftTo3Left x (xyyUniformlyRecurrent hMin x y)) xzzInxTimesOrbitClosyy

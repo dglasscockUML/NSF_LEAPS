@@ -268,6 +268,35 @@ by
   · exact orbClosIsInv
 
 
+/-- If `y` is in the orbit closure of `x`, then `(y,y)` is in
+the orbit closure of `(x,x)` under the diagonal action -/
+lemma diagonalOrbitVisits
+{dSystem : DynamicalSystem S X} (x y : X) (hy : y ∈ orbitClosure dSystem x) :
+(y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (x,x) :=
+by
+  unfold orbitClosure
+  unfold orbitClosure at hy
+  simp only [mem_closure_iff]
+  simp only [mem_closure_iff] at hy
+  intro U UOpen yyInU
+  have symmNhd : ∃ V, IsOpen V ∧ y ∈ V ∧ V ×ˢ V ⊆ U :=
+    exists_nhds_square (UOpen.mem_nhds yyInU)
+  rcases symmNhd with ⟨V,VOpen,yInV,prodVInU⟩
+  have orbitOfxVisitsV1 := hy V VOpen yInV
+  rcases orbitOfxVisitsV1 with ⟨z,zInV,zInOrbit⟩
+  have zzInU : (z,z) ∈ U := prodVInU ⟨zInV,zInV⟩
+  have zzInOrbitxx : (z,z) ∈ orbit (diagDynamicalSystem dSystem dSystem) (x,x) :=
+    by
+      unfold orbit at zInOrbit
+      rcases zInOrbit with ⟨s,sxIsz⟩
+      use s
+      unfold diagDynamicalSystem
+      simp only [Prod.map_apply, Prod.mk.injEq, and_self]
+      exact sxIsz
+      --exact ⟨sxIsz,sxIsz⟩
+  refine ⟨(z,z),?_⟩
+  exact ⟨zzInU,zzInOrbitxx⟩
+
 end Orbits
 
 section Subsystems
@@ -798,6 +827,13 @@ by
     simp only [dense_iff_closure_eq] at hDense
     rewrite [hDense z] at orbitClosInZ
     exact Set.Subset.antisymm (Set.subset_univ Z) orbitClosInZ
+
+/-- A useful corollary of `minimalIffDenseOrbits`: in a minimal system, the orbit
+closure of every point is the whole space `X` -/
+lemma minimalImpliesFullOrbitClosure
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) (x : X) :
+orbitClosure dSystem x = Set.univ :=
+dense_iff_closure_eq.mp ((minimalIffDenseOrbits dSystem).mp hMin x)
 
 /-- A factor of a minimal system is a minimal system -/
 theorem factorOfMinimalIsMinimal

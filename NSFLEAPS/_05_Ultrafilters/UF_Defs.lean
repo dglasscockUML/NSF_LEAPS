@@ -44,6 +44,11 @@ theorem leftIdealContainsMinLeftIdeal
 ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L :=
 by sorry
 
+/-- Compact, right-topological semigroups contain minimal left ideals -/
+theorem rightTopSemigroupContainsMinLeftIdeal :
+∃ (L : Set S), isMinLeftIdeal L :=
+by sorry -- Just apply leftIdealContainsMinLeftIdeal with left ideal S
+
 omit [Nonempty S] [CompactSpace S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, a compact
 subsemigroup contains and idempotent element -/
