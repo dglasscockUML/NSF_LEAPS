@@ -63,8 +63,11 @@ by
 
 #check thm_equiv_dual_formulation
 
+/-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
+    thm_equiv_dual_formulation (F)
+  rw [dualEquivForm]-/
 theorem thm_dual_is_involution (F : Family α) : F** = F := by
-  /- ext A
+  ext A
   constructor
   -- F** ⊆ F
   · intro h
@@ -72,27 +75,28 @@ theorem thm_dual_is_involution (F : Family α) : F** = F := by
       intro hAc
       have hAc' : Aᶜ ∈ {A | Aᶜ ∉ F} := by
         rw [←thm_equiv_dual_formulation]
-        exact
-
-         -- need to get rid of this sorry
+        exact hAc
       have hAc'' : (Aᶜ)ᶜ ∉ F := by
         rw [Set.mem_setOf] at hAc'
         exact hAc'
-        sorry --exact hAc'' h
+      have : (Aᶜ)ᶜ = A := by
+        exact Set.compl_compl_eq_self A
+      rw [this] at hAc''
+      exact hAc'' h
     -- Use characterization of F*: Aᶜ ∉ F* ↔ (Aᶜ)ᶜ = A ∈ F
     by_contra hA
     have h2 : Aᶜ ∈ (F* : Set (Set α)) := by
-      simp [←thm_equiv_dual_formulation]
-      sorry -/
-    sorry --exact h1 h2
+      sorry
+      --exact hA
+    exact h1 h2
 
 
   --F ⊆ F**
-  /- · intro hA
+  · intro hA
     have h1 : Aᶜ ∉ (F* : Set (Set α)) := by
       intro hAc
       sorry
-    sorry -/
+    sorry
  -- F** ⊆ F
  -- F ⊆ F**
 
@@ -122,7 +126,11 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
   -- prove by contradiction
   intro hAcinG
   -- F ⊆ G means if Aᶜ ∈ F then Aᶜ ∈ G, so contrapositive: if Aᶜ ∉ G then Aᶜ ∉ F
-  sorry
+  have hAcinF_not : Aᶜ ∉ F := by
+    intro hAcinF'
+    have hAcinG' : Aᶜ ∈ G := h hAcinF'
+    contradiction
+  exact hAcinF_not sorry
 
 theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔ partitionRegularTwoSets (P.sets) :=
  by sorry
