@@ -125,19 +125,21 @@ by sorry
 
 /-- If `(x,y,z)` is uniformly recurrent under `S^2`, then the cartesian product of
 the closure of `S(x,y)` with `{z}` is contained in the closure of `S^2 (x,y,z)` -/
-theorem liftTo3Right (x y z : X) :
-isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩ →
+theorem liftTo3Right
+(x y z : X) :
+isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ →
 (Equiv.prodAssoc X X X) ''
-(orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨x, y⟩) ×ˢ ({z} : Set X) ⊆
-orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩ :=
+(orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩) ×ˢ ({z} : Set X) ⊆
+orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
 by sorry
 
 /-- If `(x,y,z)` is uniformly recurrent under `S^2`, then the cartesian product of
 `{x}` with the closure of `S(y,z)` is contained in the closure of `S^2 (x,y,z)` -/
-theorem liftTo3Left (x y z : X) :
-isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩ →
-({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y, z⟩) ⊆
-orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩ :=
+theorem liftTo3Left
+(x : X) {y z : X}
+(hUR : isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩) :
+({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,z⟩) ⊆
+orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
 by sorry
 
 end Corner_System_2
@@ -204,22 +206,22 @@ section RP_and_corner_dynamics
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
 `(x,y,y)` is uniformly recurrent in `cornerSystem3` -/
-theorem xyyUniformlyRecurrent (x y : X) :
-isMinimalSystem dSystem →
-isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, y, y⟩ :=
+theorem xyyUniformlyRecurrent
+(hMin : isMinimalSystem dSystem) (x y : X) :
+isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,y⟩ :=
 by sorry
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
 `(x,x,y)` is uniformly recurrent in `cornerSystem3` -/
-theorem xxyUniformlyRecurrent (x y : X) :
-isMinimalSystem dSystem →
-isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, x, y⟩ :=
+theorem xxyUniformlyRecurrent
+(hMin : isMinimalSystem dSystem) (x y : X) :
+isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,x,y⟩ :=
 by sorry
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
 `(x,y) ∈ RP` if and only if `(x,y,y)` is in the `S^2` orbit closure of `(y,y,y)` -/
-theorem xyInRPIffxyyInyyyOrbClosure (x y : X) :
-isMinimalSystem dSystem →
+theorem xyInRPIffxyyInyyyOrbClosure
+(hMin : isMinimalSystem dSystem) (x y : X) :
 (x,y) ∈ RP dSystem ↔
 (x,y,y) ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨y,y,y⟩ :=
 by sorry
@@ -230,23 +232,81 @@ end RP_and_corner_dynamics
 section RP_is_EQ_relation
 
 /-- If `S` acts minimally on `X`, then the regionally proximal relation is transitive -/
-theorem minimalImpliesRPisTransitive :
-isMinimalSystem dSystem → isTransitive (RP dSystem) :=
-by sorry
+theorem minimalImpliesRPisTransitive
+(hMin : isMinimalSystem dSystem) :
+isTransitive (RP dSystem) :=
+by
+  unfold isTransitive
+  unfold setToRelation
+  exact {
+    trans := by
+      intro x y z xyInRP yzInRP
+      have yzzInOrbitCloszzz :
+        (y,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
+          (xyInRPIffxyyInyyyOrbClosure hMin y z).mp yzInRP
+      have yyInOrbitCloszz :
+        (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
+          by sorry
+      have yyyInyTimesOrbitCloszz :
+        (y,y,y) ∈ ({y} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨z,z⟩) :=
+          by sorry
+      have yyyInOrbitClosyzz :
+        (y,y,y) ∈ orbitClosure cornerSystem3 (y,z,z) :=
+          (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
+      have xyyInOrbitClosyyy :
+        (x,y,y) ∈ orbitClosure cornerSystem3 (y,y,y) :=
+          (xyInRPIffxyyInyyyOrbClosure hMin x y).mp xyInRP
+      have zzInOrbitClosyy :
+        (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
+          by sorry
+      have xzzInxTimesOrbitClosyy :
+        (x,z,z) ∈ ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,y⟩) :=
+          by sorry
+      have xzzInOrbitClosxyy :
+        (x,z,z) ∈ orbitClosure cornerSystem3 (x,y,y) :=
+          (liftTo3Left x (xyyUniformlyRecurrent hMin x y)) xzzInxTimesOrbitClosyy
+      have xzzInOrbitCloszzz :
+        (x,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
+          orbitTransitivity (orbitTransitivity (orbitTransitivity yzzInOrbitCloszzz yyyInOrbitClosyzz) xyyInOrbitClosyyy) xzzInOrbitClosxyy
+      exact (xyInRPIffxyyInyyyOrbClosure hMin x z).symm.mp xzzInOrbitCloszzz
+  }
 
 /-- The regionally proximal relation of a minimal dynamical system
 is an ICER -/
 theorem RPisICER
 (hMin : isMinimalSystem dSystem) :
 isICER dSystem (RP dSystem) :=
-by sorry
+by
+  unfold isICER
+  unfold isEquivalenceRelation
+  simp only [(equivalenceRelationSetForm (RP dSystem))]
+  refine ⟨?_,?_,?_,?_,?_⟩
+  · exact RPisInvariant dSystem
+  · exact RPisClosed dSystem
+  · exact RPisReflexiveIfNondegen dSystem (minimalImpliesNondegen hMin)
+  · exact RPisSymmetric dSystem
+  · exact minimalImpliesRPisTransitive hMin
 
 /-- The regionally proximal relation of a minimal dynamical system
 is the equicontinuous structure relation -/
 theorem RPisEquiStructureRelation
 (hMin : isMinimalSystem dSystem) :
 RP dSystem = equiStructureRelation dSystem :=
-by sorry
+by
+  ext x
+  constructor
+  · intro hx
+    exact (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).mp
+      (equiStructureRelationIsEquiICER dSystem) hx
+  · intro hx
+    have RPisEquiICER : isEquicontinuousICER dSystem (RPisICER hMin) :=
+      (minimalICEREquicontinuousIffRPInICER hMin (RPisICER hMin)).symm.mp subset_rfl
+    have RPinSetOfEquiICERS : RP dSystem ∈ setOfEquicontinuousICERS dSystem := by
+      unfold setOfEquicontinuousICERS
+      use RPisICER hMin
+    unfold equiStructureRelation at hx
+    simp only [Set.mem_sInter] at hx
+    exact hx (RP dSystem) RPinSetOfEquiICERS
 
 end RP_is_EQ_relation
 

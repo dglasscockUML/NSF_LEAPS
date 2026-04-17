@@ -97,36 +97,30 @@ def rightMult
 S → S :=
   (· * s)
 
--- Was: ultra_semigroup
-/- This instance makes the semigroup structure on βS "canonical" by
-making it available to typeclass inference. -/
+/-- This instance makes the semigroup structure on βS "canonical" by
+making it available to typeclass inference -/
 instance
 {S : Type*} [Semigroup S] : Semigroup (Ultrafilter S) :=
   Ultrafilter.semigroup
 
--- Was: ultra_alt_prod_desc
 /-- An equivalent, alternative description of the ultrafilter product -/
 theorem ultraProductDescription
 {S : Type*} [Semigroup S] (p q : Ultrafilter S) (A : Set S) :
 A ∈ p * q ↔ {s : S | {t : S | s * t ∈ A} ∈ q} ∈ p :=
   Iff.rfl
 
--- Was: ultra_left_mult
 /-- `leftMultUltra q : βS → βS` is left multiplication by `q` -/
 def leftMultUltra
 {S : Type*} [Semigroup S] (q : Ultrafilter S) :
 Ultrafilter S → Ultrafilter S :=
   (q * ·)
 
--- Was: ultra_right_mult
 /-- `rightMultUltra q : βS → βS` is right multiplication by `q` -/
 def rightMultUltra
 {S : Type*} [Semigroup S] (q : Ultrafilter S) :
 Ultrafilter S → Ultrafilter S :=
 (· * q)
 
--- Was: pure_is_hom (s t : S)
--- Was: (pure s : Ultrafilter S) * (pure t : Ultrafilter S) = pure (s * t)
 /-- The canonical injection pure : S → βS is a semigroup homomorphism -/
 theorem pureIsHom
 {S : Type*} [Semigroup S] :
@@ -135,6 +129,31 @@ by
   unfold isSemigroupHom
   intro s t
   constructor
+
+/-- Given `s ∈ S`, `B ⊆ S`, and `p ∈ βS`, `B ∈ sp` iff `s⁻¹B ∈ p` -/
+theorem membershipInLeftMultByPrincipal
+{S : Type*} [Semigroup S]
+(s : S) (B : Set S) (p : Ultrafilter S) :
+B ∈ leftMultUltra (pure s) p ↔ (leftMult s) ⁻¹' B ∈ p :=
+by sorry
+
+/-- Given `s ∈ S` and `B ⊆ S`, `closure(s⁻¹B) = s⁻¹closure(B)` -/
+theorem preimageClosureDescription
+{S : Type*} [Semigroup S]
+(s : S) (B : Set S) :
+closure ((pure : S → Ultrafilter S) '' ((leftMult s) ⁻¹' B)) =
+(leftMultUltra (pure s)) ⁻¹' (closure ((pure : S → Ultrafilter S) '' B)):=
+by sorry
+
+/-- Given a minimal left ideal `L ⊆ βS` and an idempotent `u ∈ L`,
+for all `p ∈ L`, `pu = p` -/
+theorem minimalIdempotentsAreLeftIdentites
+{S : Type*} [Semigroup S]
+(L : Set (Ultrafilter S)) {hL : isMinLeftIdeal L}
+(u : Ultrafilter S) {huL : u ∈ L} {huIdempotent : u * u = u}
+(p : Ultrafilter S) :
+p ∈ L → p * u = p :=
+by sorry
 
 /-- The predicate that the ultrafilter p on S is minimal, that is, belongs to
 some minimal left ideal -/

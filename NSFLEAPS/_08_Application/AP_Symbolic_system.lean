@@ -22,10 +22,17 @@ DynamicalSystem S (S → Bool) := {
     mapCont := by sorry
 }
 
-/-- indicator A gives the indicator function of A -/
+/-- indicator `A` gives the indicator function of `A` -/
 noncomputable
 def indicator
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 S → Bool := by
 classical
 exact fun s => decide (s ∈ A)
+
+/-- For a set `S`, a boolean value val, and `s ∈ S`, the cylinder set
+`[value]_s` is the set of functions `S → Bool` whose value at `s` is `val` -/
+def cylinderSet
+{S : Type*} (val : Bool) (s : S) :
+Set (S → Bool) :=
+{f : S → Bool | f s = val}

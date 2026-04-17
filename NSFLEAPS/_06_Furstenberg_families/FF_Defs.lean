@@ -1,6 +1,21 @@
-import NSFLEAPS._03_Family_algebra.FA_Theorems -- Family_algebra has two files.
-                                              -- We need to import the later one.
-import NSFLEAPS._04_Dynamical_systems.DS_Defs
+import NSFLEAPS._03_Family_algebra.FA_Theorems                                              -- We need to import the later one.
+import NSFLEAPS._05_Ultrafilters.UF_Defs
+
+section Abstract_results
+
+/-- If `R(x,U) ∈ F` and `F` is a partition regular family, then there exists
+`y ∈ U` such that for all neighborhoods `V ∋ y`, `R(x,V) ∈ F` -/
+theorem visitTimeConcentrationForPRFamily
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+(x : X) (U : Set X) {hU : IsClosed U}
+(F : Family S) {hF : isPRFamily F} :
+visitTimeSet dSystem x U ∈ F →
+∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) :=
+by sorry
+
+end Abstract_results
 
 section Syndetic_and_thick_sets
 
@@ -205,6 +220,31 @@ have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
   rw [hb_rewrite]
 -- finishing the proof
 simpa [Set.mem_iInter] using goal_redefined
+
+/-- This instance makes the semigroup structure on βS "canonical" by
+making it available to typeclass inference -/
+instance
+{S : Type*} [Semigroup S] : Semigroup (Ultrafilter S) :=
+  Ultrafilter.semigroup
+
+/-- The ultrafilter closure of a thick subset of a semigroup
+contains a minimal left ideal -/
+theorem thickClosureContainsIdeal
+{S : Type*} [Semigroup S] [Nonempty S]
+(H : Set S) {hH : isThick H} :
+∃ (L : Set (Ultrafilter S)),
+isMinLeftIdeal L ∧ L ⊆ closure ((pure : S → Ultrafilter S) '' H) :=
+by sorry
+
+/-- If `H ⊆ S` is thick, there exists a minimal idempotent `p ∈ βS` such that
+for all finite `F ⊆ S`, `∩ f ∈ F, f⁻¹H ∈ p` -/
+theorem minIdempotentWitnessesShiftIntersectionLargeness
+{S : Type*} [Semigroup S] [Nonempty S]
+(H : Set S) {hH : isThick H} :
+∃ (p : Ultrafilter S), isMinimalUltrafilter p ∧ p * p = p ∧
+∀ (F : Set S), F.Finite → (⋂ f ∈ F, (leftMult f) ⁻¹' H) ∈ p :=
+by sorry
+
 
 end Syndetic_and_thick_sets
 

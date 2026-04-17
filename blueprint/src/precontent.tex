@@ -1,4 +1,3 @@
-
 \section{Topology}
 \label{sec_topology}
 
@@ -1173,14 +1172,14 @@ Contains:
 \end{leanrmk}
 
 \begin{definition}[Semigroup action]
-\lean{DS.SemigroupAction}
+\lean{SemigroupAction}
 \leanok{}
 Let $S$ be a semigroup and $X$ be a set.  An action of $S$ on $X$ is a map $f: S \to X \to X$ such that for all $s, t \in S$,
 \[(f s) \circ (f t) = f (s*t).\]
 \end{definition}
 
 \begin{definition}[Topological dynamical system]
-\lean{DS.DynamicalSystem}
+\lean{DynamicalSystem}
 \leanok{}
     Let $S$ be a non-empty semigroup and $X$ be a non-empty, compact Hausdorff space. An \emph{$S$-system} is an action of $S$ on $X$ such that for all $s \in S$, $f s$ is continuous.
 \end{definition}
@@ -1197,7 +1196,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \end{enumerate}
 
 \begin{definition}[Orbit]
-\lean{DS.orbit}
+\lean{orbit}
 \leanok{}
     Let $X$ be an $S$-system and $x \in X$.  The $S$-orbit of $x$ is $Sx$.  The $S$-orbit closure of $x$ is $\overline{Sx}$.
 \end{definition}
@@ -1243,6 +1242,8 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{definition}[System via homomorphism]
 \label{def_hom_system}
+\lean{homDynamicalSystem}
+\leanok{}
     Let $S$ be a semigroup.  Let $X$ be an $S$-system.  Let $\varphi: T \to S$ be a semigroup homomorphism.  Then $X$ is a $T$-system via the homomorphism $\varphi$ as follows: $tx = (\varphi t)x$.
 \end{definition}
 
@@ -1264,7 +1265,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
 \label{lemma_closure_of_inv_is_inv}
-\lean{DS.closureOfInvIsInv}
+\lean{closureOfInvIsInv}
 \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $A \subseteq X$.  If $A$ is $S$-invariant, then $\overline{A}$ is $S$-invariant.
 \end{lemma}
@@ -1275,7 +1276,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
     \label{lemma_orb_closure_is_invariant}
-    \lean{DS.orbClosIsInv}
+    \lean{orbClosIsInv}
     \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The $S$-orbit closure of $x$, $\overline{Sx}$, is an $S$-invariant subset of $X$.
 \end{lemma}
@@ -1286,7 +1287,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
     \label{lemma_orb_closure_is_subsystem}
-    \lean{DS.orbitClosureIsSubDynamicalSystem}
+    \lean{orbitClosureIsSubDynamicalSystem}
     \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The $S$-orbit closure of $x$, $\overline{Sx}$, is an $S$-subsystem of $X$.
 \end{lemma}
@@ -1298,7 +1299,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{lemma}
     \label{lemma_intersection_of_invariant}
-    \lean{DS.InterOfInvIsInv}
+    \lean{InterOfInvIsInv}
     \leanok{}
     Let $S$ be a semigroup and $X$ be a $S$-system.  If $Y_i$, $i \in I$, is a collection of $S$-invariant subsets of $X$, then $\cap_i Y_i$ is $S$-invariant.
 \end{lemma}
@@ -1311,7 +1312,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \subsection{Factor maps and ICERS}
 
 \begin{definition}[Factor]
-\lean{DS.isFactor}
+\lean{isFactor}
     \leanok{}
 \anh{[My first Lean code. Please check]}
 Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together with a continuous surjection $X \to Y$ that intertwines the action of $G$.
@@ -1357,6 +1358,7 @@ Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together wi
 \begin{theorem}
 \label{theorem_quotient_map_is_factor_map}
 \lean{quotientMapIsFactorMap}
+\leanok{}
     The quotient map $\pi: X \to X/R$ is a factor map of $S$-systems.
 \end{theorem}
 
@@ -1383,6 +1385,8 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}
     \label{lemma_img_of_inv_is_inv}
+    \lean{imageOfSubsystemIsSubsystem}
+    \leanok{}
     Let $S$ be a semigroup, and let $\pi: X \to Y$ be an $S$-equivariant continuous map (eg. a factor map satisfies this).  If $A \subseteq X$ is an $S$-subsystem of $X$, then $\pi A$ is an $S$-subsystem of $Y$.
 \end{lemma}
 
@@ -1395,7 +1399,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{definition}[Point visit time sets]
 \label{def_point_visit_time_set}
-\lean{DS.returnTimeSet}
+\lean{visitTimeSet}
 \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{visit time set of $x$ to $U$} is defined as
     \begin{align*}
@@ -1405,7 +1409,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{definition}[Set visit time sets]
 \label{def_set_visit_time_set}
-\lean{DS.setReturnTimeSet}
+\lean{setVisitTimeSet}
 \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, $x \in X$, and $U, V \subseteq X$.  The \emph{visit time set of $V$ to $U$} is defined as
     \begin{align*}
@@ -1419,7 +1423,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}[Visits to preimages]
 \label{lemma_return_time_algebra_one}
-\lean{DS.visitsToPreimages}
+\lean{visitsToPreimages}
 \leanok{}
     Suppose $G$ is a semigroup.  Let $X$ be a $G$-system, $x \in X$, $U \subseteq X$, and $g \in G$.
     \[g^{-1}R(x,U) = R(x,g^{-1}U).\]
@@ -1454,7 +1458,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}[Set visits as quotient of point visits]
 \label{lemma_return_time_algebra_three}
-\lean{DS.setVisitsAsQuotientSet}
+\lean{setVisitsAsQuotientSet}
 \leanok{}
     Suppose $S$ is a semigroup, $X$ be a minimal $S$-system, $U, V \subseteq X$, and $x \in X$.
     \[R(x,V)R(x,U)^{-1} = R(U,V).\]
@@ -1482,7 +1486,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}
     \label{lemma_return_to_intersection}
-    \lean{DS.visitToInter}
+    \lean{visitToInter}
     \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  For all $x \in X$ and $U_1, \ldots, U_k \subseteq X$,
     \[R\left(x, \bigcap_{i=1}^k U_i \right) = \bigcap_{i=1}^k R(x,U_i).\]
@@ -1494,7 +1498,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}
     \label{lemma_return_to_union}
-    \lean{DS.visitToUnion}
+    \lean{visitToUnion}
     \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  For all $x \in X$ and $U_1, \ldots, U_k \subseteq X$,
     \[R\left(x, \bigcup_{i=1}^k U_i \right) = \bigcup_{i=1}^k R(x,U_i).\]
@@ -1506,7 +1510,7 @@ The following lemma describes the bijection between factors of a given system an
 
 \begin{lemma}[Monotonicty of return-time sets]
 \label{lemma_monotonicity_of_rts}
-\lean{DS.visitTimesMono}
+\lean{visitTimesMono}
 \leanok{}
 Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
 \[R(x,U_1) \subseteq R(x,U_2).\]
@@ -1518,7 +1522,8 @@ Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
 
 \begin{lemma}[Visit times for product actions]
 \label{lemma_return_time_sets_in_prod_system}
-\lean{DS.visitsToProd}
+\lean{visitsToProductsUnderDiagonal}
+\leanok{}
 Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, $y \in Y$, $U \subseteq X$, and $V \subseteq Y$, considering the product system,
 \[R((x,y), U \times V) = R(x, U) \cap R(y,V).\]
 \end{lemma}
@@ -1540,14 +1545,14 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{definition}[Minimal system]
     \label{def_minimal_system}
-    \lean{DS.isMinimal}
+    \lean{isMinimal}
     \leanok{}
     An $S$-system $X$ is \emph{minimal} if the only non-empty, closed, $S$-invariant subset of $X$ is $X$.
 \end{definition}
 
 \begin{theorem}[Every system has a minimal subsystem]
 \label{thm_every_system_has_minimal_subsystem}
-\lean{DS.existsMinimalSubsystem}
+\lean{existsMinimalSubsystem}
 \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  There exists a non-empty, closed, $S$-invariant subset $Z \subseteq X$ (that is, an $S$-subsystem $Z$ of $X$) such that the $S$-system $Z$ is minimal.
 \end{theorem}
@@ -1599,14 +1604,14 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{definition}[Uniformly recurrent point]
 \label{def_uniformly_recurrent}
-\lean{DS.isUniformlyRecurrent}
+\lean{isUniformlyRecurrent}
 \leanok{}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x \in X$.  The point $x$ is $S$-uniformly recurrent if for all non-empty, open $U \ni x$, the set $R(x,U)$ is syndetic.
 \end{definition}
 
 \begin{lemma}[All points in a minimal system are uniformly recurrent]
     \label{lemma_pts_in_minimal_are_ur}
-    \lean{DS.minimalImpliesUniformlyRecurrent}
+    \lean{minimalImpliesUniformlyRecurrent}
     \leanok{}
     Let $S$ be a semigroup and $X$ be a minimal $S$-system. For all $x \in X$, $x$ is $S$-uniformly recurrent.
 \end{lemma}
@@ -1676,14 +1681,15 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{definition}[{Proximal, cf. \cite[Ch. 4, (2.11)]{devries_book_1993}}]
 \label{def_proximal}
-\lean{DS.proximal}
+\lean{proximal}
 \leanok{}
     Let $X$ be an $S$-system and $x, y \in X$.  The point $x$ is \emph{proximal to $y$} if for all $\alpha$ in the uniform structure on $X$, there exists $s \in S$ such that $(sx,sy) \in \alpha$.
 \end{definition}
 
 \begin{theorem}
 \label{theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal}
-\lean{DS.minSystemOrbitClosProxPairContainsDiag}
+\lean{minSystemOrbitClosProxPairContainsDiag}
+\leanok{}
     Let $S$ be a semigroup, $X$ be a minimal $S$-system, and $x, y \in X$.  If $x$ and $y$ are $S$-proximal, then $\Delta(X)$ is contained in the $S$-orbit-closure of $(x,y)$.
 \end{theorem}
 
@@ -2016,6 +2022,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \begin{lemma}[{cf. \cite[pg. 283]{devries_book_1993}}]
     \label{lemma_rp_and_equicontinuity}
     \lean{equicontinuousIffRPTrivial}
+    \leanok{}
     Let $S$ be a semigroup. An $S$-system $X$ is equicontinuous if and only if $\RP \subseteq \Delta$.
 \end{lemma}
 
@@ -2095,6 +2102,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \dgg{Do we use the following theorem anywhere?  Will wait to build into Lean.}
 
 \begin{theorem}
+\label{thm_kronecker_factor_description}
     Let $S$ be a semigroup and $X$ be an $S$-system.  Let $\pi: X \to K$ be the Kronecker factor.  For all factors $\sigma: X \to Z$ of $S$-systems with $Z$ equicontinuous, there exists a continuous surjection $\xi: K \to Z$ such that $\sigma = \xi \circ \pi$.  In particular, the Kronecker factor is the largest equicontinuous factor of $X$.
 \end{theorem}
 
@@ -2281,6 +2289,8 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \end{leanrmk}
 
 \begin{definition}[Topology on $\beta S$]
+\label{def_cmpt_hausdorff_top_on_ultra}
+\mathlibok
     There is a compact, Hausdorff topology on $\beta S$ in which $S$ (realized as the set of principal ultrafilters on $S$) is a dense subset.  
 \end{definition}
 
@@ -2289,6 +2299,8 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \end{leanrmk}
 
 \begin{theorem}
+\label{thm_cts_extend}
+\mathlibok
     Let $S$ be a semigroup, $X$ be a compact, Hausdorff space, and $f: S \to X$.  There is a unique continuous function $\tilde f: \beta S \to X$ that extends $f$, in the sense that $\tilde f (\delta_s) = f(s)$ for all $s \in S$.
 \end{theorem}
 
@@ -2308,6 +2320,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{definition}[Semigroup structure on $\beta S$]
 \label{def_ultrafilter_multiplication}
+\mathlibok
     Let $S$ be a semigroup.  For $p, q \in \beta S$, define
     \[pq = \{A \subseteq S : \{s \in S : \{t \in S : st \in A\} \in q \} \in p \}.\]
 \end{definition}
@@ -2324,7 +2337,9 @@ Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \b
 
 \begin{lemma}
 \label{lemma_ultrafilter_mult_with_one_principal}
-    Let $S$ be a semigroup, $s \in S$, and $B \subseteq S$. Then $B \in \delta_s p$ if and only if $s^{-1} B \in p$.
+\lean{membershipInLeftMultByPrincipal}
+\leanok{}
+    Let $S$ be a semigroup, $s \in S$, $B \subseteq S$, and $p \in \beta S$. Then $B \in \delta_s p$ if and only if $s^{-1} B \in p$.
 \end{lemma}
 
 \begin{proof}
@@ -2340,6 +2355,8 @@ Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \b
 
 \begin{lemma}
 \label{lemma_pull_out_inverse_mult_in_basis_set}
+\lean{preimageClosureDescription}
+\leanok{}
     Let $S$ be a semigroup, $s \in S$, and $B \subseteq S$. Then $\overline{s^{-1} B} = \delta_s^{-1} \overline{B}$.
 \end{lemma}
 
@@ -2359,6 +2376,8 @@ Let $S$ be a semigroup and $s \in S$.  Define $\lambda_s, \rho_s: \beta S \to \b
 
 \begin{lemma}
     \label{lemma_ru_is_r_for_idempotent}
+    \lean{minimalIdempotentsAreLeftIdentites}
+    \leanok{}
     Let $L \subseteq \beta S$ be a minimal left ideal, and let $u \in L$  be idempotent.  For all $p \in L$, $pu = p$.
 \end{lemma}
 
@@ -2412,6 +2431,7 @@ An ultrafilter is \emph{minimal} if it belongs to a minimal left ideal of $\beta
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     Denote left multiplication by $s$ by $\lambda_s: \beta S \to \beta S$.  It follows from \cref{lemma_pull_out_inverse_mult_in_basis_set} that for all $A \subseteq S$,
     \[\lambda_s^{-1} \overline{A} = \overline{s^{-1} A}.\]
     This suffices to show that $\lambda_s$ is continuous by the definition of the topology on $S$.
@@ -2725,7 +2745,7 @@ Let $S$ be a semigroup and $X$ be a minimal $S$-system.  Let $L \subseteq \beta 
 \section{Furstenberg families}
 \label{sec_furstenberg_families}
 
-Needs: \cref{sec_topological_dynamical_systems,sec_family_algebra}
+Needs: \cref{sec_ultrafilters,sec_family_algebra}
 
 Contains:
 \begin{itemize}
@@ -2736,6 +2756,8 @@ Contains:
 
 \begin{lemma}
 \label{lemma_pr_family_concentration}
+\lean{visitTimeConcentrationForPRFamily}
+\leanok{}
     Let $X$ be an $S$-system, $x \in X$, and $U \subseteq X$ be closed.  Let $\family$ be a partition regular family of subsets of $S$. If $R(x,U) \in \family$, then there exists $y \in U$ such that for all non-empty, open $V \ni y$ open and non-empty, $R(x,V) \in \family$.
 \end{lemma}
 
@@ -2831,6 +2853,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is thick if for 
 
 \begin{lemma}
     \label{lemma_thick_closure_contains_ideal}
+    \lean{thickClosureContainsIdeal}
+    \leanok{}
     Let $S$ be a semigroup and $H \subseteq S$ be thick.  The set $\overline{H}$ contains a minimal left ideal.
 \end{lemma}
 
@@ -2854,6 +2878,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is thick if for 
 
 \begin{lemma}
     \label{lemma_thick_closure_contains_strong_ultrafilter}
+    \lean{minIdempotentWitnessesShiftIntersectionLargeness}
+    \leanok{}
     Let $S$ be a semigroup and $H \subseteq S$ be thick. There exists a minimal idempotent $p \in \overline{H}$ such that for all finite $F \subseteq S$, the set $\cap_{f \in F} f^{-1} H \in p$.
 \end{lemma}
 
@@ -2883,10 +2909,13 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is a $\Delta$ se
 
 \begin{theorem}
     \label{thm_delta_in_deltazero}
+    \lean{deltaFamilyContainedInDeltaZeroFamily}
+    \leanok{}
     Let $S$ be a semigroup.  $\Delta \subseteq \Delta_0$
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     This is immediate from the definitions.
 \end{proof}
 
@@ -3273,6 +3302,7 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     Combine \cref{lemma_rp_basics_symmetric}, \cref{lemma_rp_basics_invariant}, \cref{lemma_rp_basics_closed}, \cref{lemma_rp_reflexive}, and \cref{theorem_rp_is_transitive}.
 \end{proof}
 
@@ -3284,7 +3314,8 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 \end{theorem}
 
 \begin{proof}
-    By \cref{theorem_rp_is_ICER}, $\RP$ is an ICER.  It follows from \cref{lemma_rp_characterization_of_equicont_icer} that $\RP$ is an equicontinuous ICER so that by the definition of $\seq$, $\seq \subseteq \RP$.  Since $\seq$ is an equicontinuous ICER, it follows from \cref{lemma_rp_characterization_of_equicont_icer} that $\RP \subseteq \seq$.  Therefore, $\RP = \seq$.
+\leanok{}
+    By \cref{theorem_rp_is_ICER}, $\RP$ is an ICER.  It follows from \cref{lemma_rp_characterization_of_equicont_icer} that $\RP$ is an equicontinuous ICER so that by the definition of $\seq$, $\seq \subseteq \RP$.  Since $\seq$ is an equicontinuous ICER (\cref{thm_equi_structure_relation_is_equi_ICER}), it follows from \cref{lemma_rp_characterization_of_equicont_icer} that $\RP \subseteq \seq$.  Therefore, $\RP = \seq$.
 \end{proof}
 
 \subsection{A set recurrence corollary}
@@ -3333,6 +3364,8 @@ Contains:
 
 \begin{definition}[Symbolic system]
 \label{def_symbolic_system}
+\lean{symbolicSystem}
+\leanok{}
     Let $S$ be a semigroup.  The symbolic system on $S$ is set $X = \{0,1\}^S$ with the product topology (so that it is compact and Hausdorff) together with the action of $S$ on $X$ given for $s \in S$ and $\omega \in X$ by
     \[\forall \ t \in S, \ (s \omega)(t) = \omega(ts).\]
 \end{definition}
@@ -3343,6 +3376,9 @@ Action check: $s_1(s_2w) = (s_1s_2)w$?
 \[(s_1(s_2w))(t) = (s_2w)(ts_1) = w(ts_1s_2) = (s_1s_2 w)(t).\]
 
 \begin{definition}[Cylinder set]
+\label{def_cylinder_set}
+\lean{cylinderSet}
+\leanok{}
     Let $S$ be a set, $s \in S$, and $a \in \{0,1\}$. The cylinder set $[a]_s$ is defined as
     \[\{\omega \in \{0,1\}^{S} : \omega(s) = a\}.\]
 \end{definition}
@@ -3625,6 +3661,8 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 
 \begin{theorem}
 \label{thm_delta_star_locally_bohr}
+\lean{commDeltaStarImpliesLocallyBohrZero}
+\leanok{}
     Let $S$ be a commutative semigroup. Delta star sets are locally Bohr.  Actually:
     \[\Delta^* \subseteq \syndetic \classcapdual (\thick \classcap \dcsyndeticbohr).\]
 \end{theorem}
