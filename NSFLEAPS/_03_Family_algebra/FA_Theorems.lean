@@ -10,7 +10,7 @@ variable (α : Type _) (J K L : Set (Set α))
 #check J
 #check K
 
-theorem thm_equiv_dual_formulation {α} (F : Family α) :
+theorem famDualAlt {α} (F : Family α) :
 F* = {A : Set α | Aᶜ ∉ F} :=
   by
   -- {A | ∀ B ∈ F.sets, (A ∩ B).Nonempty} = {A | Aᶜ ∉ F.sets}
@@ -61,12 +61,42 @@ lemma dual_sets (F : Family α) :
 by
   simpa using thm_equiv_dual_formulation (F := F) -/
 
-#check thm_equiv_dual_formulation
-
+#check famDualAlt
 /-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
     thm_equiv_dual_formulation (F)
   rw [dualEquivForm]-/
+@[simp]
+theorem Family.coe_sets (F : Family α) :
+    (↑F : Set (Set α)) = F.sets :=
+  rfl
+
 theorem thm_dual_is_involution (F : Family α) : F** = F := by
+ext A
+constructor
+-- F** ⊆ F
+· intro h
+  by_contra hA
+  have h1 : Aᶜ ∉ F* := by
+    simp [famDualAlt] at h
+    sorry
+  have h2 : Aᶜ ∈ F* := by
+    have : (Aᶜ)ᶜ ∉ F := by
+      simpa [compl_compl] using hA
+    sorry
+  exact h1 h2
+
+-- F ⊆ F**
+· intro hA
+  by_contra h
+  have h1 : Aᶜ ∈ F* := by
+    sorry
+  have h2 : Aᶜ ∉ F* := by
+    intro hAc
+    have : A ∉ F := by
+      sorry
+    exact sorry
+  exact h2 h1
+/- theorem thm_dual_is_involution (F : Family α) : F** = F := by
   ext A
   constructor
   -- F** ⊆ F
@@ -74,29 +104,41 @@ theorem thm_dual_is_involution (F : Family α) : F** = F := by
     have h1 : Aᶜ ∉ (F*) := by
       intro hAc
       have hAc' : Aᶜ ∈ {A | Aᶜ ∉ F} := by
-        rw [←thm_equiv_dual_formulation]
+        rw [←famDualAlt]
         exact hAc
       have hAc'' : (Aᶜ)ᶜ ∉ F := by
         rw [Set.mem_setOf] at hAc'
         exact hAc'
       have : (Aᶜ)ᶜ = A := by
-        exact Set.compl_compl_eq_self A
+        simp only [compl_compl]
       rw [this] at hAc''
-      exact hAc'' h
-    -- Use characterization of F*: Aᶜ ∉ F* ↔ (Aᶜ)ᶜ = A ∈ F
-    by_contra hA
-    have h2 : Aᶜ ∈ (F* : Set (Set α)) := by
-      sorry
-      --exact hA
-    exact h1 h2
-
+      have : Aᶜ ∈ (F* : Set (Set α)) := by
+        have : (Aᶜ)ᶜ ∉ F := by
+          simpa [compl_compl] using hAc''
+        simpa [←famDualAlt]
+          using this
+      contradiction
+  · intro h3
+    have h1 : Aᶜ ∉ F := by
+      intro hAc
+      have hAc' : Aᶜ ∈ {A | Aᶜ ∉ F} := by
+        rw [←famDualAlt]
+        exact hAc
+      have hAc'' : (Aᶜ)ᶜ ∉ F := by
+        rw [Set.mem_setOf] at hAc'
+        exact hAc'
+      have : (Aᶜ)ᶜ = A := by
+        simp only [compl_compl]
+      rw [this] at hAc''
+      have : Aᶜ ∈ (F* : Set (Set α)) := by
+        have : (Aᶜ)ᶜ ∉ F := by
+          simpa [compl_compl] using hAc''
+        simpa [←famDualAlt]
+      contradiction
+ -/
 
   --F ⊆ F**
-  · intro hA
-    have h1 : Aᶜ ∉ (F* : Set (Set α)) := by
-      intro hAc
-      sorry
-    sorry
+
  -- F** ⊆ F
  -- F ⊆ F**
 
@@ -120,9 +162,9 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
  by
   intro h A hAinF
   -- rewrite F* membership using characterization
-  rw [thm_equiv_dual_formulation] at hAinF
+  rw [famDualAlt] at hAinF
   -- want: A ∈ G* ↔ Aᶜ ∉ G
-  rw [thm_equiv_dual_formulation]
+  rw [famDualAlt]
   -- prove by contradiction
   intro hAcinG
   -- F ⊆ G means if Aᶜ ∈ F then Aᶜ ∈ G, so contrapositive: if Aᶜ ∉ G then Aᶜ ∉ F
@@ -214,7 +256,26 @@ theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) �
 --thm_family_classcapdual_dual_is_filter
 theorem thm_family_classcapdual_dual_is_filter (F : Family α) : isFilterFamily (F ⋏ F*) :=
   by sorry
+-- F ⋏ F = F ↔ isPRFamily F
+theorem thm_classcapdual_idempotent_at_pr_families (F : Family α) :
+  F ⋏ F = F ↔ isPRFamily F := by sorry
+--
+--thm_combo_algebra_statement_one
+theorem thm_combo_algebra_statement_one (F G H : Family α) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
+by
+  classical
+  constructor
+  · intro h A hAG
+    -- goal: A ∩ B ∈ H
+    have h1 : A ∈ F ⋏ G := hAG
+    -- unfold definition of F ⋏ G
+    have h2 : ∀ C ∈ F*, A ∩ C ∈ G := sorry
+    -- now use assumption h on H*
+    -- need to show A ∩ B ∈ H* unfolding dual definition
+    -- finish depending on definition of *
+    sorry
 
---thm_classcapdual_idempotent_at_pr_families
-
---H* ⊆ F ⋏ (F* ⋎ G*) if and only if F ⋏ G ⊆ F ⋏ H. **
+  · intro h A hA
+    -- goal: A ∩ B ∈ H*
+    -- unfold H* membership and use inclusion h
+    sorry

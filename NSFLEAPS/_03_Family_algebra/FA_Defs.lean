@@ -21,8 +21,8 @@ class HasFamMeet (T : Type _) where
 
 --operators
 postfix:max "*" => HasFamDual.famDual
-infixr:50 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
-infixr:50 "⋏" => HasFamMeet.famMeet
+infixr:80 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
+infixr:80 "⋏" => HasFamMeet.famMeet
 
 def upwardClosed (F : Set (Set α)) : Prop :=
   ∀ (A B : Set α), A ∈ F → A ⊆ B → B ∈ F
