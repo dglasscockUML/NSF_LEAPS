@@ -239,7 +239,12 @@ by
         unfold orbitClosure
         simp only [mem_closure_iff]
         intro W WisOpen WcontainsPt
-        sorry
+        use w
+        constructor
+        · rw [←wdesc] at WcontainsPt
+          exact WcontainsPt
+        · rw [wdesc]
+          sorry -- Oops, this is the wrong approach.  see the overleaf file.
   have applyClosure := closure_mono goalWithoutClosure
   have closureSimp :
   closure (⇑(Equiv.prodAssoc X X X) '' orbit (diagDynamicalSystem dSystem dSystem) (x, y) ×ˢ {z}) =
