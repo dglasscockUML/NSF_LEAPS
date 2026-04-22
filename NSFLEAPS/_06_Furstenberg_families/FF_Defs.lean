@@ -104,7 +104,7 @@ theorem dualSyndeticThick
 by
   ext A
   have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
-    thm_equiv_dual_formulation (syndeticFamily S)
+    famDualAlt (syndeticFamily S)
   rw [dualEquivForm]
   change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
   unfold syndeticFamily
@@ -440,7 +440,7 @@ theorem dualBohrZeroSetsOfBohrRecurrence
 by
   ext A
   have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=
-    thm_equiv_dual_formulation (bohrZeroFamily S)
+    famDualAlt (bohrZeroFamily S)
   rw [dualEquivForm]
   change A ∈ {A | Aᶜ ∉ (bohrZeroFamily S).sets} ↔ A ∈ (setOfBohrRecurrenceFamily S).sets
   unfold bohrZeroFamily
