@@ -32,5 +32,6 @@ import Mathlib.Topology.Algebra.Semigroup
 import Mathlib.Combinatorics.Hindman
 
 import Mathlib.Algebra.Group.Defs
+import Mathlib.Algebra.Group.WithOne.Defs
 import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic

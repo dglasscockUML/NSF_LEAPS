@@ -221,11 +221,30 @@ by
   have goalWithoutClosure : (Equiv.prodAssoc X X X) ''
     (orbit (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩) ×ˢ ({z} : Set X) ⊆
     orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
-      by sorry
+      by
+        intro w hw
+        unfold Set.image at hw
+        --unfold Equiv.prodAssoc at hw
+        rcases hw with ⟨⟨a,b⟩,hb,hb2⟩
+        rcases hb with ⟨ha,hb⟩
+        simp only at hb
+        simp only [Set.mem_singleton_iff] at hb
+        unfold orbit at ha
+        simp only at ha
+        rcases ha with ⟨s,hs⟩
+        unfold diagDynamicalSystem Prod.map at hs
+        simp only at hs
+        have wdesc : w = ⟨dSystem.map s x, dSystem.map s y, z⟩ := by sorry
+        rw [wdesc]
+        unfold orbitClosure
+        simp only [mem_closure_iff]
+        intro W WisOpen WcontainsPt
+        sorry
   have applyClosure := closure_mono goalWithoutClosure
-  have closureSimp : closure (⇑(Equiv.prodAssoc X X X) '' orbit (diagDynamicalSystem dSystem dSystem) (x, y) ×ˢ {z}) =
-  (Equiv.prodAssoc X X X) '' (closure (orbit (diagDynamicalSystem dSystem dSystem) (x, y)) ×ˢ {z}) :=
-    by sorry
+  have closureSimp :
+  closure (⇑(Equiv.prodAssoc X X X) '' orbit (diagDynamicalSystem dSystem dSystem) (x, y) ×ˢ {z}) =
+    (Equiv.prodAssoc X X X) '' (closure (orbit (diagDynamicalSystem dSystem dSystem) (x, y)) ×ˢ {z}) :=
+      by sorry
   simp only [closureSimp] at applyClosure
   unfold orbitClosure at applyClosure
   unfold orbitClosure
@@ -550,7 +569,6 @@ by
     unfold equiStructureRelation at hx
     simp only [Set.mem_sInter] at hx
     exact hx (RP dSystem) RPinSetOfEquiICERS
-
 end RP_is_EQ_relation
 
 section Set_recurrence_corollary

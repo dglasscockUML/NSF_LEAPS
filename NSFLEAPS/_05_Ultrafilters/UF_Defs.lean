@@ -71,7 +71,6 @@ section Semigroup_stuff
 
 -- There is some basic semigroup stuff here that might be better in SG_Defs
 
--- Was: semigroup_action
 /-- `SemigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
 `st: X → X` is the composition of `s: X → X` and `t: X → X` -/
 structure SemigroupAction
