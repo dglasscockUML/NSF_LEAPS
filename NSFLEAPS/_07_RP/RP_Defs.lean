@@ -183,8 +183,10 @@ by
         intro U UisOpen UisNonempty
         rcases UisNonempty with ⟨⟨u1, u2⟩, hxy⟩
         rcases (isOpen_prod_iff.mp UisOpen) u1 u2 hxy with ⟨V, W, hVopen, hWopen, hxV, hyW, hVW⟩
-        rcases (minimalImpliesNonemptySetVisits hMin x.1 hVopen) with ⟨s, hs⟩
-        rcases (minimalImpliesNonemptySetVisits hMin (dSystem.map s x.2) hWopen) with ⟨t, ht⟩
+        rcases (minimalImpliesNonemptySetVisits hMin x.1 hVopen (Set.nonempty_of_mem hxV))
+          with ⟨s, hs⟩
+        rcases (minimalImpliesNonemptySetVisits hMin (dSystem.map s x.2) hWopen (Set.nonempty_of_mem hyW))
+          with ⟨t, ht⟩
         have stxInVtimesW : (cornerSystem2 (dSystem := dSystem)).map ⟨s,t⟩ x ∈ V ×ˢ W :=
           by
             unfold cornerSystem2
@@ -214,7 +216,21 @@ isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ →
 (Equiv.prodAssoc X X X) ''
 (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩) ×ˢ ({z} : Set X) ⊆
 orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
-by sorry
+by
+  intro hUR
+  have goalWithoutClosure : (Equiv.prodAssoc X X X) ''
+    (orbit (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩) ×ˢ ({z} : Set X) ⊆
+    orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
+      by sorry
+  have applyClosure := closure_mono goalWithoutClosure
+  have closureSimp : closure (⇑(Equiv.prodAssoc X X X) '' orbit (diagDynamicalSystem dSystem dSystem) (x, y) ×ˢ {z}) =
+  (Equiv.prodAssoc X X X) '' (closure (orbit (diagDynamicalSystem dSystem dSystem) (x, y)) ×ˢ {z}) :=
+    by sorry
+  simp only [closureSimp] at applyClosure
+  unfold orbitClosure at applyClosure
+  unfold orbitClosure
+  simp only [closure_closure] at applyClosure
+  exact applyClosure
 
 /-- If `(x,y,z)` is uniformly recurrent under `S^2`, then the cartesian product of
 `{x}` with the closure of `S(y,z)` is contained in the closure of `S^2 (x,y,z)` -/
@@ -260,7 +276,13 @@ DynamicalSystem (S × S) X :=
   map := fun ((s,t) : S × S)
     ↦ (fun (w : X)
     ↦ leftMap1 s (rightMap1 (dSystem := dSystem) t w))
-  mapMult := by sorry
+  mapMult := by
+    intro s t x
+    simp only
+    unfold leftMap1
+    unfold rightMap1
+    simp only [dSystem.mapMult]
+    exact rfl
   mapCont := by
     intro s
     simp only
@@ -271,12 +293,40 @@ DynamicalSystem (S × S) X :=
 theorem pi3FromCorner3ToCorner1IsFactor :
 isFactorMap (dSystemX := cornerSystem3 (dSystem := dSystem))
   (cornerSystem1 (dSystem := dSystem)) π3 :=
-by sorry
+by
+  unfold isFactorMap
+  unfold π3
+  refine ⟨?_,?_,?_⟩
+  · exact Continuous.comp continuous_snd continuous_snd
+  · unfold Function.Surjective
+    intro w
+    use ⟨w,w,w⟩
+  · unfold isEquivariant
+    intro ⟨s,t⟩
+    unfold cornerSystem1
+    unfold cornerSystem3
+    unfold leftMap1
+    unfold rightMap1
+    unfold leftMap3
+    unfold rightMap3
+    simp only
+    exact Eq.symm (Function.Semiconj.comp_eq (congrFun rfl))
 
 /-- If `x` and `y` are proximal in `cornerSystem1`, then they are proximal in `dSystem` -/
 theorem cornerProxImpliesProx (x y : X) :
 proximal (cornerSystem1 (dSystem := dSystem)) x y → proximal dSystem x y :=
-by sorry
+by
+  intro hProx
+  unfold proximal
+  intro α αNbhd
+  specialize hProx α αNbhd
+  rcases hProx with ⟨s,sProp⟩
+  unfold cornerSystem1 at sProp
+  unfold leftMap1 at sProp
+  unfold rightMap1 at sProp
+  unfold id at sProp
+  simp only at sProp
+  use s.2
 
 end Corner_System_1
 
@@ -287,8 +337,39 @@ theorem ultraActionOnX3
 (p : Ultrafilter (S × S)) (x y z : X) :
 (ultraAction (cornerSystem3 (dSystem := dSystem))).map p ⟨x,y,z⟩ =
   i21 ⟨(ultraAction (cornerSystem2 (dSystem := dSystem))).map p ⟨x,y⟩,
-    (ultraAction (cornerSystem1 (dSystem := dSystem))).map p x⟩ :=
-by sorry
+    (ultraAction (cornerSystem1 (dSystem := dSystem))).map p z⟩ :=
+by
+  let xyz : X × X × X := ⟨x,y,z⟩
+  let xy : X × X := ⟨x,y⟩
+  let pxyz : X × X × X := (ultraAction (cornerSystem3 (dSystem := dSystem))).map p ⟨x,y,z⟩
+  let pxy : X × X := (ultraAction (cornerSystem2 (dSystem := dSystem))).map p ⟨x,y⟩
+  let pz : X := (ultraAction (cornerSystem1 (dSystem := dSystem))).map p z
+  have π12pxyzIspxy : π12 pxyz = pxy :=
+    by
+      have pCommutesWithπ12 :=
+        (congr_fun (ultraActionIntertwinesWithFactor
+          (cornerSystem3 (dSystem := dSystem))
+          (cornerSystem2) (pi12FromCorner3ToCorner2IsFactor) p) xyz).symm
+      unfold Function.comp at pCommutesWithπ12
+      exact pCommutesWithπ12
+  have π3pxyzIspz : π3 pxyz = pz :=
+    by
+      have pCommutesWithπ3 :=
+        (congr_fun (ultraActionIntertwinesWithFactor
+          (cornerSystem3 (dSystem := dSystem))
+          (cornerSystem1) (pi3FromCorner3ToCorner1IsFactor) p) xyz).symm
+      unfold Function.comp at pCommutesWithπ3
+      exact pCommutesWithπ3
+  have pxyzIsπ12π3 (w : X × X × X) : w = i21 ⟨π12 w, π3 w⟩ :=
+    by
+      unfold i21 π12 π3
+      simp only
+  specialize pxyzIsπ12π3 pxyz
+  simp only [π12pxyzIspxy] at pxyzIsπ12π3
+  simp only [π3pxyzIspz] at pxyzIsπ12π3
+  unfold pxy at pxyzIsπ12π3
+  unfold pz at pxyzIsπ12π3
+  exact pxyzIsπ12π3
 
 end Ultrafilters_and_the_corner_space
 
