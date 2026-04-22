@@ -27,7 +27,13 @@ X × X × X → X × X × X := by
 /-- `leftMap3` is continuous -/
 theorem leftMap3Continuous (s : S) :
 Continuous (leftMap3 s (dSystem := dSystem)) :=
-  by sorry
+  by
+    unfold leftMap3
+    simp only [continuous_prodMk]
+    refine ⟨?_,?_,?_⟩
+    · exact Continuous.comp (dSystem.mapCont s) continuous_fst
+    · exact (Continuous.comp (dSystem.mapCont s) (Continuous.comp continuous_fst continuous_snd))
+    · exact (Continuous.comp continuous_snd continuous_snd)
 
 /-- Given an action of `S` on `X`, `rightMap3: X × X × X → X × X × X` is
 defined by `s (x,y,z) = (x, sy, sz)` -/
@@ -40,7 +46,13 @@ X × X × X → X × X × X :=  by
 /-- `rightMap3` is continuous -/
 theorem rightMap3Continuous (s : S) :
 Continuous (rightMap3 s (dSystem := dSystem)) :=
-  by sorry
+  by
+    unfold rightMap3
+    simp only [continuous_prodMk]
+    refine ⟨?_,?_,?_⟩
+    · exact continuous_fst
+    · exact (Continuous.comp (dSystem.mapCont s) (Continuous.comp continuous_fst continuous_snd))
+    · exact (Continuous.comp (dSystem.mapCont s) (Continuous.comp continuous_snd continuous_snd))
 
 /-- Given an action of `S` on `X`, cornerSystem3 is an action of `S^2`
 on `X^3` given by `(s,t)(x,y,z) = (sx,sty,tz)` -/
@@ -83,7 +95,12 @@ X × X → X × X := by
 /-- `leftMap2` is continuous -/
 theorem leftMap2Continuous (s : S) :
 Continuous (leftMap2 s (dSystem := dSystem)) :=
-  by sorry
+  by
+    unfold leftMap2
+    simp only [continuous_prodMk]
+    refine ⟨?_,?_⟩
+    · exact Continuous.comp (dSystem.mapCont s) continuous_fst
+    · exact Continuous.comp (dSystem.mapCont s) continuous_snd
 
 /-- Given an action of `S` on `X`, `rightMap2: X × X → X × X` is
 defined by `s (x,y,z) = (x, sy)` -/
@@ -95,7 +112,12 @@ X × X → X × X :=  by
 /-- `rightMap2` is continuous -/
 theorem rightMap2Continuous (s : S) :
 Continuous (rightMap2 s (dSystem := dSystem)) :=
-  by sorry
+  by
+    unfold rightMap2
+    simp only [continuous_prodMk]
+    refine ⟨?_,?_⟩
+    · exact continuous_fst
+    · exact Continuous.comp (dSystem.mapCont s) continuous_snd
 
 /-- Given an action of `S` on `X`, `cornerSystem2` is an action of `S^2`
 on `X^2` given by `(s,t)(x,y,z) = (sx,sty,tz)` -/
@@ -105,7 +127,17 @@ DynamicalSystem (S × S) (X × X) :=
   map := fun ((s,t) : S × S)
     ↦ (fun (w : X × X)
     ↦ leftMap2 (dSystem := dSystem) s (rightMap2 (dSystem := dSystem) t w))
-  mapMult := by sorry
+  mapMult := by
+    intro s t x
+    simp only
+    unfold leftMap2
+    unfold rightMap2
+    simp only
+    simp only [←dSystem.mapMult]
+    nth_rw 1 [mul_assoc]
+    nth_rw 2 [← mul_assoc]
+    nth_rw 4 [← mul_comm]
+    nth_rw 1 [mul_assoc]
   mapCont := by
     intro s
     simp only
@@ -116,13 +148,63 @@ DynamicalSystem (S × S) (X × X) :=
 theorem pi12FromCorner3ToCorner2IsFactor :
 isFactorMap (dSystemX := cornerSystem3 (dSystem := dSystem))
   (cornerSystem2 (dSystem := dSystem)) π12 :=
-by sorry
+by
+  unfold isFactorMap
+  unfold π12
+  refine ⟨?_,?_,?_⟩
+  · simp only [continuous_prodMk]
+    refine ⟨?_,?_,⟩
+    · exact continuous_fst
+    · exact Continuous.comp continuous_fst continuous_snd
+  · unfold Function.Surjective
+    intro ⟨w,z⟩
+    use ⟨w,z,z⟩
+  · unfold isEquivariant
+    intro ⟨s,t⟩
+    unfold cornerSystem2
+    unfold cornerSystem3
+    unfold leftMap2
+    unfold rightMap2
+    unfold leftMap3
+    unfold rightMap3
+    simp only
+    exact Eq.symm (Function.Semiconj.comp_eq (congrFun rfl))
 
 /-- If `S` acts minimally on `X`, then `cornerSystem2` is minimal -/
 theorem minimalSystemImpliesMinimalcornerSystem2
 (hMin : isMinimalSystem dSystem) :
 isMinimalSystem (cornerSystem2 (dSystem := dSystem)) :=
-by sorry
+by
+  have allPtsHaveDenseOrbit :
+    ∀ (x : X × X), Dense (orbit (cornerSystem2 (dSystem := dSystem)) x) :=
+      by
+        intro x
+        simp only [dense_iff_inter_open]
+        intro U UisOpen UisNonempty
+        rcases UisNonempty with ⟨⟨u1, u2⟩, hxy⟩
+        rcases (isOpen_prod_iff.mp UisOpen) u1 u2 hxy with ⟨V, W, hVopen, hWopen, hxV, hyW, hVW⟩
+        rcases (minimalImpliesNonemptySetVisits hMin x.1 hVopen) with ⟨s, hs⟩
+        rcases (minimalImpliesNonemptySetVisits hMin (dSystem.map s x.2) hWopen) with ⟨t, ht⟩
+        have stxInVtimesW : (cornerSystem2 (dSystem := dSystem)).map ⟨s,t⟩ x ∈ V ×ˢ W :=
+          by
+            unfold cornerSystem2
+            simp only
+            unfold leftMap2
+            unfold rightMap2
+            simp only
+            constructor
+            · simp only
+              exact hs
+            · simp only
+              simp only [← dSystem.mapMult]
+              nth_rw 1 [← mul_comm]
+              simp only [dSystem.mapMult]
+              exact ht
+        use (cornerSystem2 (dSystem := dSystem)).map ⟨s,t⟩ x
+        constructor
+        · exact hVW stxInVtimesW
+        · use ⟨s,t⟩
+  exact (minimalIffDenseOrbits cornerSystem2).mpr allPtsHaveDenseOrbit
 
 /-- If `(x,y,z)` is uniformly recurrent under `S^2`, then the cartesian product of
 the closure of `S(x,y)` with `{z}` is contained in the closure of `S^2 (x,y,z)` -/
@@ -150,17 +232,25 @@ section Corner_System_1
 /-- Given an action of `S` on `X`, `leftMap1: X → X` is defined by `s z = z` -/
 def leftMap1 (s : S) : X → X := id
 
-theorem leftMap1Continuous (s : S) :
+/-- `leftMap1 : X → X` is continuous -/
+theorem leftMap1Continuous
+(s : S) :
 Continuous (leftMap1 s (X := X)) :=
-  by sorry
+  by
+    unfold leftMap1
+    exact continuous_id
 
 /-- Given an action of `S` on `X`, `rightMap1: X → X` is defined by `s z = sz` -/
 def rightMap1 (s : S) :
 X → X := dSystem.map s
 
-theorem rightMap1Continuous (s : S) :
+/-- `rightMap1 : X → X` is continuous -/
+theorem rightMap1Continuous
+(s : S) :
 Continuous (rightMap1 s (dSystem := dSystem)) :=
-  by sorry
+  by
+    unfold rightMap1
+    exact dSystem.mapCont s
 
 /-- Given an action of `S` on `X`, cornerSystem1 is an action of `S^2`
 on `X` given by `(s,t)z = tz` -/
@@ -212,11 +302,68 @@ theorem xyyUniformlyRecurrent
 isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,y⟩ :=
 by
   have corner2IsMin := minimalSystemImpliesMinimalcornerSystem2 hMin
+  let xxx : X × X × X := ⟨x,x,x⟩
+  let xyy : X × X × X := ⟨x,y,y⟩
+  let xx: X × X := ⟨x,x⟩
   rcases (rightTopSemigroupContainsMinLeftIdeal (S := Ultrafilter (S × S))) with ⟨L,LMin⟩
-  rcases (everyPointInMinFixedBySomeIdempotentUltrafilter cornerSystem2 corner2IsMin LMin (x,x))
+  rcases (everyPointInMinFixedBySomeIdempotentUltrafilter cornerSystem2 corner2IsMin LMin xx)
     with ⟨p,pInL,pIdemp,pFixesxx⟩
+  let px := (ultraAction (cornerSystem1 (dSystem := dSystem))).map p x
+  let xpx : X × X := ⟨x,px⟩
+  let xxpx : X × X × X := ⟨x,x,px⟩
+  have pIsMin : isMinimalUltrafilter p := by use L
   have imageOfpxxx := ultraActionOnX3 (dSystem := dSystem) p x x x
-  sorry
+  have xxxpxxxAreProx := pointAndUltraImageAreProximal (cornerSystem3 (dSystem := dSystem)) xxx p
+  have imagesAreProxpre := imageOfProxByFactorIsProx pi3FromCorner3ToCorner1IsFactor xxxpxxxAreProx
+  have imagesAreProx : proximal dSystem x px :=
+    by
+      unfold xxx at imagesAreProxpre
+      simp only [imageOfpxxx] at imagesAreProxpre
+      unfold π3 at imagesAreProxpre
+      unfold i21 at imagesAreProxpre
+      simp only at imagesAreProxpre
+      exact (cornerProxImpliesProx x px) imagesAreProxpre
+  have xxInOrbClospx :=
+    (minSystemOrbitClosProxPairContainsDiag hMin imagesAreProx) (Set.mem_diagonal x)
+  have xxpxIsURpre :=
+    minUltraImageIsUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) xxx pIsMin
+  have xxpxIsUR : isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) xxpx :=
+    by
+      unfold xxx at xxpxIsURpre
+      simp only [imageOfpxxx] at xxpxIsURpre
+      unfold xx at pFixesxx
+      simp only [pFixesxx] at xxpxIsURpre
+      unfold i21 at xxpxIsURpre
+      simp only at xxpxIsURpre
+      exact xxpxIsURpre
+  have xxxInOrbClosxxpx :
+    xxx ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) xxpx :=
+      by
+        have xTimesOrbClosxpxInOrbClosxxx := liftTo3Left x xxpxIsUR
+        have xxxInxTimesOrbClosxpx :
+          xxx ∈ {x} ×ˢ orbitClosure (diagDynamicalSystem dSystem dSystem) (x, px) :=
+            by
+              constructor
+              · unfold xxx
+                simp only [Set.mem_singleton_iff]
+              · exact xxInOrbClospx
+        exact xTimesOrbClosxpxInOrbClosxxx xxxInxTimesOrbClosxpx
+  have xxxIsUR :=
+    inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem)) xxpxIsUR xxxInOrbClosxxpx
+  have yyInOrbitClosxx :
+    (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) xx :=
+      diagonalOrbitVisits x y
+        ((subset_of_eq (minimalImpliesFullOrbitClosure hMin x).symm) (Set.mem_univ x))
+  have xOrbClosxxInOrbClosxxx:= liftTo3Left x xxxIsUR
+  have xyyInxOrbClosxx :
+    xyy ∈ {x} ×ˢ orbitClosure (diagDynamicalSystem dSystem dSystem) xx :=
+      by
+        constructor
+        · unfold xyy
+          simp only [Set.mem_singleton_iff]
+        · exact yyInOrbitClosxx
+  have xyyInOrbClosxxx := xOrbClosxxInOrbClosxxx xyyInxOrbClosxx
+  exact inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem)) xxxIsUR xyyInOrbClosxxx
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
 `(x,x,y)` is uniformly recurrent in `cornerSystem3` -/
@@ -243,7 +390,6 @@ theorem minimalImpliesRPisTransitive
 (hMin : isMinimalSystem dSystem) :
 isTransitive (RP dSystem) :=
 by
-  #check (minimalIffDenseOrbits dSystem).mp hMin
   unfold isTransitive
   unfold setToRelation
   exact {

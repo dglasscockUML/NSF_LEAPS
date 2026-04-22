@@ -835,6 +835,29 @@ lemma minimalImpliesFullOrbitClosure
 orbitClosure dSystem x = Set.univ :=
 dense_iff_closure_eq.mp ((minimalIffDenseOrbits dSystem).mp hMin x)
 
+/-- A useful corollary of `minimalIffDenseOrbits`: in a minimal system, for
+all points `x ∈ X` and all non-empty, open sets `U ⊆ X`, there exists `s ∈ S`
+such that `sx ∈ U` -/
+lemma minimalImpliesNonemptySetVisits
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
+(x : X) {U : Set X} (UOpen : IsOpen U) (UNonempty : U.Nonempty) :
+(visitTimeSet dSystem x U).Nonempty :=
+by
+  have xHasDenseOrbit := (minimalIffDenseOrbits dSystem).mp hMin x
+  simp only [dense_iff_closure_eq] at xHasDenseOrbit
+  rcases UNonempty with ⟨u,hu⟩
+  apply superset_of_eq at xHasDenseOrbit
+  have uinClosure := xHasDenseOrbit (Set.mem_univ u)
+  simp only [mem_closure_iff] at uinClosure
+  have orbitVisitsU := uinClosure U UOpen hu
+  rcases orbitVisitsU with ⟨w,hw1,hw2⟩
+  rcases hw2 with ⟨s,hs⟩
+  simp only at hs
+  use s
+  unfold visitTimeSet
+  simp only [← hs] at hw1
+  exact hw1
+
 /-- A factor of a minimal system is a minimal system -/
 theorem factorOfMinimalIsMinimal
 {dSystemX : DynamicalSystem S X} (hXMin : isMinimalSystem dSystemX)
@@ -1089,7 +1112,16 @@ by
     exact Set.nonempty_of_mem ⟨orbwVisitsW, orbwinOrb⟩
   exact orbitTransitivity hw.2 diagInOrbofw
 
-
+/-- If `π : X → Y` is a factor map of `S`-systems and `(x,y)` is a proximal
+pair in `X`, then `(π x, π y)` is a proximal pair in `Y` -/
+theorem imageOfProxByFactorIsProx
+{dSystem : DynamicalSystem S X}
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y}
+{π : X → Y} (hπ : isFactorMap dSystem dSystemY π)
+{x y : X} (hProx : proximal dSystem x y) :
+proximal dSystemY (π x) (π y) :=
+by sorry
 
 end Proximality
 
