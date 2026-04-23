@@ -15,7 +15,7 @@ continuous map `f` is the closure of the image of `A` -/
 theorem imageClosureIsClosureImage
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
-(f : X → Y) {fc : Continuous f} (A : Set X) :
+{f : X → Y} (fc : Continuous f) (A : Set X) :
 f '' (closure A) = closure (f '' A) := by
 have h1 : IsProperMap f := by apply Continuous.isProperMap fc
 have h2 : IsClosedMap f := by apply IsProperMap.isClosedMap h1

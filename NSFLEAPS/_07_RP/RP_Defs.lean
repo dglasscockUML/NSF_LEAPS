@@ -185,8 +185,8 @@ by
         rcases (isOpen_prod_iff.mp UisOpen) u1 u2 hxy with ⟨V, W, hVopen, hWopen, hxV, hyW, hVW⟩
         rcases (minimalImpliesNonemptySetVisits hMin x.1 hVopen (Set.nonempty_of_mem hxV))
           with ⟨s, hs⟩
-        rcases (minimalImpliesNonemptySetVisits hMin (dSystem.map s x.2) hWopen (Set.nonempty_of_mem hyW))
-          with ⟨t, ht⟩
+        rcases (minimalImpliesNonemptySetVisits hMin (dSystem.map s x.2)
+          hWopen (Set.nonempty_of_mem hyW)) with ⟨t, ht⟩
         have stxInVtimesW : (cornerSystem2 (dSystem := dSystem)).map ⟨s,t⟩ x ∈ V ×ˢ W :=
           by
             unfold cornerSystem2
@@ -211,20 +211,18 @@ by
 /-- If `(x,y,z)` is uniformly recurrent under `S^2`, then the cartesian product of
 the closure of `S(x,y)` with `{z}` is contained in the closure of `S^2 (x,y,z)` -/
 theorem liftTo3Right
-(x y z : X) :
-isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ →
+{x y : X} (z : X)
+(hUR : isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩) :
 (Equiv.prodAssoc X X X) ''
 (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩) ×ˢ ({z} : Set X) ⊆
 orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
 by
-  intro hUR
   have goalWithoutClosure : (Equiv.prodAssoc X X X) ''
     (orbit (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩) ×ˢ ({z} : Set X) ⊆
     orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
       by
         intro w hw
         unfold Set.image at hw
-        --unfold Equiv.prodAssoc at hw
         rcases hw with ⟨⟨a,b⟩,hb,hb2⟩
         rcases hb with ⟨ha,hb⟩
         simp only at hb
@@ -234,22 +232,57 @@ by
         rcases ha with ⟨s,hs⟩
         unfold diagDynamicalSystem Prod.map at hs
         simp only at hs
-        have wdesc : w = ⟨dSystem.map s x, dSystem.map s y, z⟩ := by sorry
+        have wdesc : w = ⟨dSystem.map s x, dSystem.map s y, z⟩ :=
+          by
+            rw [←hs] at hb2
+            rw [hb] at hb2
+            exact
+              Prod.ext (congrArg Prod.fst (id (Eq.symm hb2)))
+                (congrArg Prod.snd (id (Eq.symm hb2)))
         rw [wdesc]
         unfold orbitClosure
         simp only [mem_closure_iff]
         intro W WisOpen WcontainsPt
-        use w
+        have leftmapprimageofWIsNhdOfxyz :
+          (leftMap3 (dSystem := dSystem) s) ⁻¹' W ∈ nhds ⟨x,y,z⟩ :=
+            by
+              simp only [mem_nhds_iff]
+              use (leftMap3 (dSystem := dSystem) s) ⁻¹' W
+              refine ⟨?_,?_,?_⟩
+              · rfl
+              · exact WisOpen.preimage (leftMap3Continuous s)
+              · simp only [Set.mem_preimage]
+                unfold leftMap3
+                simp only
+                exact WcontainsPt
+        specialize hUR ((leftMap3 (dSystem := dSystem) s) ⁻¹' W) leftmapprimageofWIsNhdOfxyz
+        rcases hUR with ⟨F,hF,hF2⟩
+        rcases (inferInstance : Nonempty (S × S)) with ⟨t⟩
+        specialize hF2 t
+        rcases hF2 with ⟨f,hf,hf2⟩
+        unfold visitTimeSet at hf2
+        simp only [Set.mem_preimage] at hf2
+        use (leftMap3 (dSystem := dSystem)) s ((cornerSystem3 (dSystem := dSystem)).map
+          (f * t) (x, y, z))
         constructor
-        · rw [←wdesc] at WcontainsPt
-          exact WcontainsPt
-        · rw [wdesc]
-          sorry -- Oops, this is the wrong approach.  see the overleaf file.
+        · exact hf2
+        · use ⟨s * f.1 * t.1, f.2 * t.2⟩
+          unfold cornerSystem3 leftMap3 rightMap3
+          simp only
+          simp [←dSystem.mapMult]
+          simp [mul_assoc]
   have applyClosure := closure_mono goalWithoutClosure
+  have lem (A : Set (X × X)) (B : Set X) :
+    closure ((Equiv.prodAssoc X X X) '' A ×ˢ B) = (Equiv.prodAssoc X X X) '' (closure (A ×ˢ B)) :=
+      (imageClosureIsClosureImage (Homeomorph.prodAssoc X X X).continuous (A ×ˢ B)).symm
   have closureSimp :
-  closure (⇑(Equiv.prodAssoc X X X) '' orbit (diagDynamicalSystem dSystem dSystem) (x, y) ×ˢ {z}) =
-    (Equiv.prodAssoc X X X) '' (closure (orbit (diagDynamicalSystem dSystem dSystem) (x, y)) ×ˢ {z}) :=
-      by sorry
+  closure ((Equiv.prodAssoc X X X) '' orbit (diagDynamicalSystem dSystem dSystem) (x, y) ×ˢ {z}) =
+    (Equiv.prodAssoc X X X) ''
+      (closure (orbit (diagDynamicalSystem dSystem dSystem) (x, y)) ×ˢ {z}) :=
+      by
+        simp only [lem (orbit (diagDynamicalSystem dSystem dSystem) (x, y)) ({z})]
+        simp only [closure_prod_eq]
+        simp only [isClosed_singleton.closure_eq]
   simp only [closureSimp] at applyClosure
   unfold orbitClosure at applyClosure
   unfold orbitClosure
@@ -263,7 +296,68 @@ theorem liftTo3Left
 (hUR : isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x, y, z⟩) :
 ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,z⟩) ⊆
 orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
-by sorry
+by
+  have goalWithoutClosure :
+  ({x} : Set X) ×ˢ (orbit (diagDynamicalSystem dSystem dSystem) ⟨y,z⟩) ⊆
+    orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,y,z⟩ :=
+      by
+        intro ⟨b,a⟩ hw
+        rcases hw with ⟨hb,ha⟩
+        simp only at hb
+        simp only [Set.mem_singleton_iff] at hb
+        unfold orbit at ha
+        simp only at ha
+        rcases ha with ⟨s,hs⟩
+        unfold diagDynamicalSystem Prod.map at hs
+        simp only at hs
+        rw [hb]
+        rw [←hs]
+        unfold orbitClosure
+        simp only [mem_closure_iff]
+        intro W WisOpen WcontainsPt
+        have rightmapprimageofWIsNhdOfxyz :
+          (rightMap3 (dSystem := dSystem) s) ⁻¹' W ∈ nhds ⟨x,y,z⟩ :=
+            by
+              simp only [mem_nhds_iff]
+              use (rightMap3 (dSystem := dSystem) s) ⁻¹' W
+              refine ⟨?_,?_,?_⟩
+              · rfl
+              · exact WisOpen.preimage (rightMap3Continuous s)
+              · simp only [Set.mem_preimage]
+                unfold rightMap3
+                simp only
+                exact WcontainsPt
+        specialize hUR ((rightMap3 (dSystem := dSystem) s) ⁻¹' W) rightmapprimageofWIsNhdOfxyz
+        rcases hUR with ⟨F,hF,hF2⟩
+        rcases (inferInstance : Nonempty (S × S)) with ⟨t⟩
+        specialize hF2 t
+        rcases hF2 with ⟨f,hf,hf2⟩
+        unfold visitTimeSet at hf2
+        simp only [Set.mem_preimage] at hf2
+        use (rightMap3 (dSystem := dSystem)) s ((cornerSystem3 (dSystem := dSystem)).map
+          (f * t) (x, y, z))
+        constructor
+        · exact hf2
+        · use ⟨f.1 * t.1, f.2 * t.2 * s⟩
+          unfold cornerSystem3 leftMap3 rightMap3
+          simp only
+          simp only [←dSystem.mapMult]
+          simp only [Prod.mk.injEq, true_and]
+          simp only [mul_assoc]
+          constructor
+          · nth_rw 5 [← mul_comm]
+            nth_rw 3 [← mul_assoc]
+            nth_rw 2 [← mul_assoc]
+            nth_rw 1 [← mul_assoc]
+          · nth_rw 3 [mul_comm]
+            nth_rw 1 [← mul_assoc]
+  have applyClosure := closure_mono goalWithoutClosure
+  simp only [closure_prod_eq] at applyClosure
+  simp only [isClosed_singleton.closure_eq] at applyClosure
+  unfold orbitClosure at applyClosure
+  unfold orbitClosure
+  simp only [closure_closure] at applyClosure
+  exact applyClosure
 
 end Corner_System_2
 
@@ -401,14 +495,13 @@ end Ultrafilters_and_the_corner_space
 section RP_and_corner_dynamics
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
-`(x,y,y)` is uniformly recurrent in `cornerSystem3` -/
-theorem xyyUniformlyRecurrent
-(hMin : isMinimalSystem dSystem) (x y : X) :
-isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,y⟩ :=
+`(x,x,x)` is uniformly recurrent in `cornerSystem3` -/
+theorem xxxUniformlyRecurrent
+(hMin : isMinimalSystem dSystem) (x : X) :
+isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ :=
 by
   have corner2IsMin := minimalSystemImpliesMinimalcornerSystem2 hMin
   let xxx : X × X × X := ⟨x,x,x⟩
-  let xyy : X × X × X := ⟨x,y,y⟩
   let xx: X × X := ⟨x,x⟩
   rcases (rightTopSemigroupContainsMinLeftIdeal (S := Ultrafilter (S × S))) with ⟨L,LMin⟩
   rcases (everyPointInMinFixedBySomeIdempotentUltrafilter cornerSystem2 corner2IsMin LMin xx)
@@ -455,6 +548,18 @@ by
         exact xTimesOrbClosxpxInOrbClosxxx xxxInxTimesOrbClosxpx
   have xxxIsUR :=
     inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem)) xxpxIsUR xxxInOrbClosxxpx
+  exact xxxIsUR
+
+
+/-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
+`(x,y,y)` is uniformly recurrent in `cornerSystem3` -/
+theorem xyyUniformlyRecurrent
+(hMin : isMinimalSystem dSystem) (x y : X) :
+isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,y,y⟩ :=
+by
+  have xxxIsUR := xxxUniformlyRecurrent hMin x
+  let xx: X × X := ⟨x,x⟩
+  let xyy : X × X × X := ⟨x,y,y⟩
   have yyInOrbitClosxx :
     (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) xx :=
       diagonalOrbitVisits x y
@@ -475,7 +580,26 @@ by
 theorem xxyUniformlyRecurrent
 (hMin : isMinimalSystem dSystem) (x y : X) :
 isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨x,x,y⟩ :=
-by sorry
+by
+  have yyyIsUR := xxxUniformlyRecurrent hMin y
+  let yy: X × X := ⟨y,y⟩
+  let xxy : X × X × X := ⟨x,x,y⟩
+  have xxInOrbitClosyy :
+    (x,x) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) yy :=
+      diagonalOrbitVisits y x
+        ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
+  have OrbClosyyThenyInOrbClosyyy := liftTo3Right y yyyIsUR
+  have xxyInOrbClosyyTheny :
+    xxy ∈ (Equiv.prodAssoc X X X) '' (orbitClosure (diagDynamicalSystem dSystem dSystem) yy ×ˢ {y}) :=
+      by
+        unfold xxy
+        unfold yy
+        simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Set.mem_singleton_iff,
+          Prod.mk.injEq, Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right,
+          exists_eq_right]
+        exact xxInOrbitClosyy
+  have xxyInOrbClosyyy := OrbClosyyThenyInOrbClosyyy xxyInOrbClosyyTheny
+  exact inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem)) yyyIsUR xxyInOrbClosyyy
 
 /-- If `S` acts minimally on `X`, then for all `x, y ∈ X`, the point
 `(x,y) ∈ RP` if and only if `(x,y,y)` is in the `S^2` orbit closure of `(y,y,y)` -/
