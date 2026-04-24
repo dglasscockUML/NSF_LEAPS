@@ -34,9 +34,9 @@ def partitionRegularTwoSets (F : Set (Set α)) : Prop :=
 structure Family (α : Type*) where
   sets : Set (Set α)
   upward_closed : upwardClosed sets
+instance : Coe (Family α) (Set (Set α)) :=
+  ⟨Family.sets⟩
 
--- instance {α} : Coe (Family α) (Set (Set α)) where
---   coe F := F.sets
 instance {α} : SetLike (Family α) (Set α) where
   coe F := F.sets
   coe_injective' := by
@@ -111,6 +111,9 @@ def Family.famDual (fam : Family α) : Family α :=
     rcases hAint with ⟨x, hxA, hxC⟩
     exact ⟨x, hAB hxA, hxC⟩
 }
+lemma mem_famDual (F : Set (Set α)) (A : Set α) :
+  A ∈ famDual F ↔ ∀ B ∈ F, (A ∩ B).Nonempty := by rfl
+  
 def isPRTwoSets (F : Family α) : Prop :=
   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
 /- def PRFamily.famDual (fam : PRFamily α) : PRFamily α :=
