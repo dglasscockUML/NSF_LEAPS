@@ -885,7 +885,7 @@ Prop :=
 /-- In a minimal system, for all `x ∈ X` and all non-empty, open `U ⊆ X`
 the set of visit times `R(x,U)` is syndetic -/
 theorem minimalImpliesSyndeticVisits
-(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
 ∀ x : X, ∀ U : Set X, U.Nonempty → IsOpen U →
 isSyndetic (visitTimeSet dSystem x U) :=
 by
@@ -962,8 +962,17 @@ by
   rcases Unbhd with ⟨V, VinU, Vopen, Vhasx⟩
   have Vnonempty : V.Nonempty := Set.nonempty_of_mem Vhasx
   have goalforV : isSyndetic (visitTimeSet dSystem x V) :=
-    minimalImpliesSyndeticVisits (hMin := hMin) dSystem x V Vnonempty Vopen
+    minimalImpliesSyndeticVisits hMin x V Vnonempty Vopen
   exact syndeticIsMonotone goalforV (visitTimesMono dSystem x VinU)
+
+/-- If a uniformly recurrent point visits a non-empty open set, then it
+visits that set syndetically -/
+lemma nonemptyVisitsOfURPointImpliesSyndetic
+(dSystem : DynamicalSystem S X) {x : X} (xIsUR : isUniformlyRecurrent dSystem x)
+{U : Set X} {UNonempty : U.Nonempty} {UOpen : IsOpen U}
+(hNonemptyVisit : (visitTimeSet dSystem x U).Nonempty) :
+isSyndetic (visitTimeSet dSystem x U) :=
+by sorry
 
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset

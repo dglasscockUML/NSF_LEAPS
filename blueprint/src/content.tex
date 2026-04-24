@@ -506,11 +506,13 @@ Throughout this section, $S$ is a fixed set, and all families are families of su
 
 \begin{theorem}
     \label{thm_equiv_fam_dual_formulation}
+    \leanok{}
     \lean{famDualAlt}
     For all families $\family$, $\family^* = \{A \subseteq S \mid S \setminus A \not\in \family\}$
 \end{theorem}
 
 \begin{proof}
+\leanok{}
 In the following list, each statement is equivalent to the one that follows it.
     \begin{enumerate}
         \item $A \in \family^*$
@@ -539,6 +541,7 @@ In the following list, each statement is equivalent to the one that follows it.
 
 \begin{theorem}
     \label{thm_dual_is_involution_on_fams}
+    \lean{dualIsInvolutionOnFamilies}
     $*$ is an involution on the set families: $(\family^*)^* = \family$
 \end{theorem}
 
@@ -569,6 +572,7 @@ In the following list, each statement is equivalent to the one that follows it.
 
 \begin{theorem}
     \label{thm_dual_is_bijection_on_fams}
+    \lean{dualIsBijectionOnFamilies}
     $\cdot^*: \families{S} \to \families{S}$ is a bijection
 \end{theorem}
 
@@ -582,6 +586,7 @@ In the following list, each statement is equivalent to the one that follows it.
 
 \begin{theorem}[Dual is antitone]
     \label{thm_dual_is_antitone}
+    \lean{dualIsAntitone}
     For all collections $\family, \familytwo \in \collections{S}$, if $\family \subseteq \familytwo$, then $\familytwo^* \subseteq \family^*$.
 \end{theorem}
 
@@ -612,6 +617,7 @@ In the following list, each statement is equivalent to the one that follows it.
 \begin{theorem}
     \label{thm_pr_iff_dual_is_filter}
     \label{thm_family_pr_iff_dual_is_filter}
+    \lean{familyIsPRIffDualIsFilter}
     $\family$ is a partition regular family if and only if $\family^*$ is a filter
 \end{theorem}
 
@@ -669,6 +675,7 @@ In the following list, each statement is equivalent to the one that follows it.
 
 \begin{theorem}[Set DeMorgan 1]
     \label{thm_de_morgan_union_v1}
+    \lean{familySetDeMorganLaw1}
     For all collections $\family$, $\familytwo$, $(\family \cup \familytwo)^* = \family^* \cap \familytwo^*$.
 \end{theorem}
 
@@ -701,6 +708,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}[Set DeMorgan 2]
     \label{thm_de_morgan_union_v2}
+    \lean{familySetDeMorganLaw2}
     For all collections $\family$, $\familytwo$, $(\family \cap \familytwo)^* = \family^* \cup \familytwo^*$.
 \end{theorem}
 
@@ -713,6 +721,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
 \label{thm_family_classcap_is_family}
+% Does this already have a name in lean?
     If $\family$ and $\familytwo$ are families, then $\family \classcap \familytwo$ is a family.
 \end{theorem}
 
@@ -742,6 +751,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_classcap_contains_union}
+    \lean{familyJoinContainsUnion}
     $\family \cup \familytwo \subseteq \family \classcap \familytwo$
 \end{theorem}
 
@@ -757,6 +767,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}[$\classcap$ is commutative]
     \label{thm_classcap_commutative}
+    \lean{familyJoinIsCommutative}
     For all $\family, \familytwo \in \collections{S}$,
     \[\family \classcap \familytwo = \familytwo \classcap \family.\]
 \end{theorem}
@@ -779,6 +790,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}[$\classcap$ is associative]
     \label{thm_classcap_associative}
+    \lean{familyJoinIsAssociative}
     For all $\family, \familytwo, \familythree \in \collections{S}$,
     \[(\family \classcap \familytwo) \classcap \familythree = \family \classcap (\familytwo \classcap \familythree).\]
 \end{theorem}
@@ -807,6 +819,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}[$\classcap$ is monotone]
     \label{thm_classcap_monotone}
+    \lean{familyJoinIsMonotone}
     For all $\family_1, \family_2, \familytwo_1, \familytwo_2 \in \collections{S}$, if $\family_1 \subseteq \family_2$ and $\familytwo_1 \subseteq \familytwo_2$, then $\family_1 \classcap \familytwo_1 \subseteq \family_2 \classcap \familytwo_2$.
 \end{theorem}
 
@@ -830,6 +843,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_family_classcap_dual_is_partition_regular}
+    \lean{joinOfFamilyAndDualIsPR}
     $\family \classcap \family^*$ is partition regular
 \end{theorem}
 
@@ -840,6 +854,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_classcap_idempotent_at_filters}
+    \lean{familyIsIdempotentForJoinIffFilter}
     For all families $\family$, $\family \classcap \family = \family$ if and only if $\family$ is a filter.
 \end{theorem}
 
@@ -869,6 +884,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
 \label{thm_family_classcapdual_is_family}
+% Does this already have a name in lean?
     If $\family$ and $\familytwo$ are families, then $\family \classcapdual \familytwo$ is a family.
 \end{theorem}
 
@@ -883,6 +899,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_classcapdual_contained_in_intersection}
+    \lean{familyMeetContainedInIntersection}
     For all families $\family$ and $\familytwo$, $\family \classcapdual \familytwo \subseteq \family \cap \familytwo$.
 \end{theorem}
 
@@ -893,6 +910,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_classcapdual_commutative}
+    \lean{familyMeetIsCommutative}
     $\classcapdual$ is commutative
 \end{theorem}
 
@@ -910,6 +928,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_classcapdual_associative}
+    \lean{familyMeetIsAssociative}
     $\classcapdual$ is associative
 \end{theorem}
 
@@ -920,6 +939,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 \begin{theorem}
     \label{thm_classcapdual_monotone}
     \label{thm_classcapdual_is_monotonic}
+    \lean{familyMeetIsMonotonic}
     $\classcapdual$ is monotone
 \end{theorem}
 
@@ -929,6 +949,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_family_classcapdual_dual_is_filter}
+    \lean{meetOfFamilyAndDualIsFilter}
     $\family \classcapdual \family^*$ is a filter
 \end{theorem}
 
@@ -945,6 +966,8 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_classcapdual_idempotent_at_pr_families}
+    \lean{familyIsIdempotentForMeetIffPR}
+    \leanok{}
     For all families $\family$, $\family \classcapdual \family = \family$ if and only if $\family$ is partition regular.
 \end{theorem}
 
@@ -957,6 +980,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_de_morgan_v1}
+    \lean{familyDeMorgan1}
     For all collections $\family$, $\familytwo$, $(\family \classcap \familytwo)^* = \family^* \classcapdual \familytwo^*$
 \end{theorem}
 
@@ -999,6 +1023,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
     \label{thm_de_morgan_v1_dual}
+    \lean{familyDeMorgan2}
     For all families / collections (see note immediately following), $(\family \classcapdual \familytwo)^* = \family^* \classcap \familytwo^*$
 \end{theorem}
 
@@ -1017,6 +1042,8 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}
 \label{thm_combo_algebra_statement_one}
+\lean{familyLocalImplicationEquivalence}
+\leanok{}
     For all families (collections?) $\family, \familytwo, \familythree$,
     \[\familythree^* \subseteq \family \classcapdual (\family^* \classcap \familytwo^*) \text{ if and only if } \family \classcapdual \familytwo \subseteq \family \classcapdual \familythree.\]
 \end{theorem}
@@ -1728,6 +1755,17 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
     Because $R(x,V)$ is syndetic and $R((x,y),\alpha)$ is thick, there is $s \in R((x,y), \alpha) \cap R(x,V)$.  By the property of $\alpha$, we have that $(sx,sy) \in V \times V$.  Since $V$ was arbitrary, we have that $(w,w)$ is in $\overline{S(x,y)}$, as was to be shown.
 \end{proof}
 
+\begin{theorem}
+    \label{lemma_prox_pair_under_factor_map_is_prox}
+    \lean{imageOfProxByFactorIsProx}
+    \leanok{}
+    Let $\pi: X \to Y$ be a factor map of $S$-systems.  If $x, y \in X$ are proximal, then $\pi x, \pi y \in Y$ are proximal.
+\end{theorem}
+
+\begin{proof}
+    This is easy to check from the definitions.
+\end{proof}
+
 \subsection{Regional proximality}
 
 \begin{definition}[{Regionally proximal relation, cf. \cite[Ch. 5, Section 1]{devries_book_1993}}]
@@ -2256,7 +2294,6 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 
 \begin{lemma}
-\label{lemma_exists_minimal_left_ideal}
 \label{thm_every_left_contains_minimal_left}
 \lean{leftIdealContainsMinLeftIdeal}
 \leanok{}
@@ -2266,6 +2303,18 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \begin{proof}
 \uses{lemma_principal_ideal_is_compact,lemma_intersection_of_ideals_is_ideal}
     Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see by \cref{lemma_principal_ideal_is_compact} that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is non-empty and compact since $S$ is Hausdorff, and which is an ideal by \cref{lemma_intersection_of_ideals_is_ideal}.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
+\end{proof}
+
+\begin{lemma}
+\label{lemma_exists_minimal_left_ideal}
+\lean{rightTopSemigroupContainsMinLeftIdeal}
+\leanok{}
+    Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal of $S$ contains a minimal left ideal.
+\end{lemma}
+
+\begin{proof}
+\uses{thm_every_left_contains_minimal_left}
+    The semigroup $S$ is a left ideal of $S$, so by \cref{thm_every_left_contains_minimal_left}, $S$ contains a minimal left ideal of $S$.
 \end{proof}
 
 \begin{theorem}
@@ -2874,7 +2923,8 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is thick if for 
     If $\varphi: G \to H$ is a surjective semigroup homomorphism and $A \subseteq G$ is syndetic in $G$, then $\varphi A$ is syndetic in $H$.
 \end{lemma}
 
-\begin{proof}[Proof sketch]
+\begin{proof}
+\leanok{}
     Since $A \subseteq G$ is syndetic, there exists a finite set $F \subseteq G$ such that for all $g \in G$, there exists $f \in F$ such that $fg \in A$.
 
     We claim that $\varphi F$ has the property that for all $h \in H$, there exists $f \in F$ such that $\varphi(f)h \in \varphi A$.  Indeed, let $h \in H$.  Write $h = \varphi g$ for some $g \in G$.  There is $f \in F$ such that $fg \in A$.  Apply $\varphi$ to see that $\varphi(f) h \in \varphi A$, as desired.
@@ -3109,6 +3159,7 @@ Let $S$ be a commutative semigroup and $X$ be an $S$-system.  For $s, t \in S$, 
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     This follows easily by the commutativity of $S$.
 \end{proof}
 
@@ -3131,6 +3182,7 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     This follows easily by the commutativity of $S$.
 \end{proof}
 
@@ -3143,6 +3195,7 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 
 \begin{proof}
 \uses{lemma_S2_action_on_X2}
+\leanok{}
     By \cref{lemma_S2_action_on_X2}, both $X^3$ and $X^2$ are $S^2$-systems.  We need only show that for all $(s,t) \in S^2$, $(s,t) \pi_{12} = \pi_{12} (s,t)$.  Let $(s,t) \in S^2$ and $(x,y,z) \in X^3$.  Then
     \[(s,t) \pi_{12} (x,y,z) = (s,t)(x,y) = (sx,sty) = \pi_{12} (s,t) (x,y,z).\]
 \end{proof}
@@ -3155,6 +3208,7 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     We will show that every point in $X^2$ has a dense $S^2$-orbit.  Let $(x,y) \in X^2$, $U \subseteq X$, and $V \subseteq X$.  Since $X$ is a minimal $S$-system, there exists $s \in R_S(x,U)$ so that $(sx,sy) \in U \times X$.  Since $X$ is a minimal $S$-system, there exists $t \in R_S(sy,V)$ so that
     \[(s,t) (x,y) = (sx,tsy) \in U \times V.\]
 \end{proof}
@@ -3179,6 +3233,7 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 \dgg{We can strengthen this by replacing ``uniformly recurrent'' with ``recurrent,'' but we don't have an application for that, and we've not defined recurrent.}
 
 \begin{proof}
+\leanok{}
     We will show that for all $s \in S$, $(sx,sy,z) \in \overline{S^2(x,y,z)}$.  Let $s \in S$, and let $W \subseteq X^3$ be open and contain $(sx,sy,z)$.  The map $T_{L,s}: X^3 \to X^3$ is continuous, so $T_{L,s}^{-1}W$ is an open neighborhood of $(x,y,z)$. Since $(x,y,z)$ is uniformly recurrent, there is $(a,b) \in S^2$ such that $(a,b)(x,y,z) \in T_{L,s}^{-1}W$.  Therefore, $(as,b)(x,y,z) \in W$.  Therefore, $W \cap \overline{S^2(x,y,z)} \neq \emptyset$.  Since $W$ was arbitrary, we see that $(sx,sy,z) \in \overline{S^2(x,y,z)}$.
 \end{proof}
 
@@ -3191,6 +3246,7 @@ Overloading notation, for $s, t \in S$, we define maps $T_{L,s}, T_{R,s}: X^2 \t
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     We will show that for all $s \in S$, $(x,sy,sz) \in \overline{S^2(x,y,z)}$.  Let $s \in S$, and let $W \subseteq X^3$ be open and contain $(x,sy,sz)$.  The map $T_{R,s}: X^3 \to X^3$ is continuous, so $T_{R,s}^{-1}W$ is an open neighborhood of $(x,y,z)$. Since $(x,y,z)$ is uniformly recurrent, there is $(a,b) \in S^2$ such that $(a,b)(x,y,z) \in T_{R,s}^{-1}W$.  Therefore, $(a,bs)(x,y,z) \in W$.  Therefore, $W \cap \overline{S^2(x,y,z)} \neq \emptyset$.  Since $W$ was arbitrary, we see that $(x,sy,sz) \in \overline{S^2(x,y,z)}$.
 \end{proof}
 
@@ -3225,6 +3281,7 @@ We define an action of $S^2$ on $X$ via
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     This follows easily by the commutativity of $S$.
 \end{proof}
 
@@ -3237,6 +3294,7 @@ We define an action of $S^2$ on $X$ via
 
 \begin{proof}
 \uses{lemma_S2_action_on_X}
+\leanok{}
     By \cref{lemma_S2_action_on_X}, both $X^3$ and $X$ are $S^2$-systems.  We need only show that for all $(s,t) \in S^2$, $(s,t) \pi_{3} = \pi_{3} (s,t)$. Let $(s,t) \in S^2$ and $(x,y,z) \in X^3$.  Then
     \[(s,t) \pi_{3} (x,y,z) = (s,t)z = tz) = \pi_{3} (s,t) (x,y,z).\]
 \end{proof}
@@ -3249,6 +3307,7 @@ We define an action of $S^2$ on $X$ via
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Suppose $x, y$ are $S^2$-proximal.  Let $\alpha \subseteq X^2$ be an entourage.  There exists $(s,t) \in S^2$ such that $((s,t)x,(s,t)y) \in \alpha$.  But $((s,t)x,(s,t)y) = (tx,ty) = t(x,y)$, meaning the $S$-orbit of $(x,y)$ under the diagonal action intersects $\alpha$. Since $\alpha$ was arbitrary, this shows that $x$ and $y$ are $S$-proximal.
 \end{proof}
 
@@ -3270,6 +3329,7 @@ We showed above that $X^3$, $X^2$, and $X$ are all $S^2$-systems.  By \cref{thm_
 
 \begin{proof}
 \uses{lemma_x3_to_x2_is_S2_factor_map,lemma_x3_to_x_is_S2_factor_map,thm_ultra_semigroup_action_thru_factor}
+\leanok{}
     Since $\pi_{12}: X^3 \to X^2$ and $\pi_3: X^3 \to X$ are factor maps of $S^2$-systems (\cref{lemma_x3_to_x2_is_S2_factor_map} and \cref{lemma_x3_to_x_is_S2_factor_map}), by \cref{thm_ultra_semigroup_action_thru_factor}, we get that $\pi_{12} p (x,y,z) = p \pi_{12} (x,y,z) = p(x,y)$ and $\pi_3 p (x,y,z) = p \pi_3 (x,y,z) = pz$.
 \end{proof}
 
@@ -3277,22 +3337,46 @@ We showed above that $X^3$, $X^2$, and $X$ are all $S^2$-systems.  By \cref{thm_
 
 \begin{theorem}
 \label{thm_xxx_is_trtl_unif_rec_v3}
-\lean{xyyUniformlyRecurrent}
+\lean{xxxUniformlyRecurrent}
 \leanok{}
-    Let $X$ be a minimal $S$-system and $x, y \in X$.  The points $(x,y,y)$ and $(y,y,x)$ are $S^2$-uniformly recurrent.
+    Let $X$ be a minimal $S$-system and $x \in X$.  The point $(x,x,x)$ is $S^2$-uniformly recurrent.
 \end{theorem}
 
 \begin{proof}
-\uses{lem_minimal_h_from_g,lemma_exists_idempotent_px_is_x,lemma_ultrafilter_action_on_X3,lemma_minimal_implies_uniformly_recurrent,lemma_idempotent_implies_proximal,lemma_prox_in_h_implies_in_g,theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,lemma_in_orb_clos_of_ur_implies_ur,lemma_S_orb_closure_contained_in_S2_orbit_closure_v2}
-Since $X$ is a minimal $S$-system, by \cref{lem_minimal_h_from_g}, $X^2$ is a minimal $S^2$-system.  By \cref{lemma_exists_idempotent_px_is_x}, there exists a minimal, idempotent $p \in \beta S^2$ such that $p(x,x) = (x,x)$.  We see by \cref{lemma_ultrafilter_action_on_X3} that $p(x,x,x) = (x,x,p x)$.
+\uses{lem_minimal_h_from_g,lemma_exists_minimal_left_ideal,lemma_exists_idempotent_px_is_x,lemma_ultrafilter_action_on_X3,lemma_minimal_implies_uniformly_recurrent,lemma_idempotent_implies_proximal,lemma_x3_to_x_is_S2_factor_map,lemma_prox_pair_under_factor_map_is_prox,lemma_prox_in_h_implies_in_g,theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,lemma_in_orb_clos_of_ur_implies_ur}
+    \leanok{}
+Since $X$ is a minimal $S$-system, by \cref{lem_minimal_h_from_g}, $X^2$ is a minimal $S^2$-system.  By \cref{lemma_exists_minimal_left_ideal}, $S$ contains a minimal left ideal $L$. By \cref{lemma_exists_idempotent_px_is_x}, there exists a minimal, idempotent $p \in L$ such that $p(x,x) = (x,x)$.  We see by \cref{lemma_ultrafilter_action_on_X3} that $p(x,x,x) = (x,x,p x)$.
 
-Since $p$ is minimal, by \cref{lemma_minimal_implies_uniformly_recurrent}, the point $p(x,x,x) = (x,x,px)$ is $S^2$-uniformly recurrent.  Since $p$ is idempotent, by \cref{lemma_idempotent_implies_proximal}, the points $x$ and $px$ are $S^2$-proximal.
+Since $p$ is minimal, by \cref{lemma_minimal_implies_uniformly_recurrent}, the point $p(x,x,x) = (x,x,px)$ is $S^2$-uniformly recurrent.  Since $p$ is idempotent, the points $(x,x,x)$ and $(x,x,px)$ are $S^2$-proximal by \cref{lemma_idempotent_implies_proximal}.  By \cref{lemma_x3_to_x_is_S2_factor_map}, the map $\pi_3$ is a factor map of $S^2$-systems.  By \cref{lemma_prox_pair_under_factor_map_is_prox}, the points $x$ and $px$ are $S^2$-proximal.
 
 By \cref{lemma_prox_in_h_implies_in_g}, the points $x$ and $px$ are $S$-proximal.  It follows by \cref{theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal} that $(x,x) \in \overline{S(x,px)}$. By \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(x,x,x) \in \overline{S^2(x,x,px)}$.  By \cref{lemma_in_orb_clos_of_ur_implies_ur}, all points in $\overline{S^2(x,x,px)}$ are $S^2$-uniformly recurrent, whereby $(x,x,x)$ is $S^2$-uniformly recurrent.
+\end{proof}
 
-Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2$-uniformly recurrent, it follows by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2} and \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3} that $(y,y,x)$ and $(x,y,y)$ belong to $\overline{S^2(x,x,x)}$. By \cref{lemma_in_orb_clos_of_ur_implies_ur}, all points in $\overline{S^2(x,x,x)}$ are $S^2$-uniformly recurrent, whereby $(y,y,x)$ and $(x,y,y)$ are $S^2$-uniformly recurrent, as desired.
+\begin{theorem}
+\label{thm_xyy_is_trtl_unif_rec_v3}
+\lean{xyyUniformlyRecurrent}
+\leanok{}
+    Let $X$ be a minimal $S$-system and $x, y \in X$.  The point $(x,y,y)$ is $S^2$-uniformly recurrent.
+\end{theorem}
+
+\begin{proof}
+\uses{thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,lemma_in_orb_clos_of_ur_implies_ur}
+\leanok{}
+Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. By \cref{thm_xxx_is_trtl_unif_rec_v3}, $(x,x,x)$ is $S^2$-uniformly recurrent, it follows by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3} that $(x,y,y)$ belongs to $\overline{S^2(x,x,x)}$. By \cref{lemma_in_orb_clos_of_ur_implies_ur}, all points in $\overline{S^2(x,x,x)}$ are $S^2$-uniformly recurrent, whereby $(x,y,y)$ is $S^2$-uniformly recurrent, as desired.
 \end{proof}
 %By \cref{lemma_orb_closure_of_ur_is_minimal}, $\overline{S^2(x,x,px)}$ is a minimal $S$-system, and hence, by \cref{lemma_pts_in_minimal_are_ur}, that all points of $\overline{S^2(x,x,px)}$ are $S$-uniformly recurrent.
+
+\begin{theorem}
+\lean{xxyUniformlyRecurrent}
+\leanok{}
+    Let $X$ be a minimal $S$-system and $x, y \in X$.  The point $(x,x,y)$ is $S^2$-uniformly recurrent.
+\end{theorem}
+
+\begin{proof}
+\uses{thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v2,lemma_in_orb_clos_of_ur_implies_ur}
+\leanok{}
+Since $X$ is $S$-minimal, $(x,x) \in \overline{S(y,y)}$. By \cref{thm_xxx_is_trtl_unif_rec_v3}, $(y,y,y)$ is $S^2$-uniformly recurrent, it follows by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2} that $(x,x,y)$ belongs to $\overline{S^2(y,y,y)}$. By \cref{lemma_in_orb_clos_of_ur_implies_ur}, all points in $\overline{S^2(y,y,y)}$ are $S^2$-uniformly recurrent, whereby $(x,x,y)$ is $S^2$-uniformly recurrent, as desired.
+\end{proof}
 
 \begin{theorem}
 \label{thm_rp_implies_same_minimal_component}
@@ -3351,6 +3435,7 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. Since $(x,x,x)$ is $S^2
 
 \begin{proof}
 \uses{thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,theorem_cube_space_orbit_implies_rp}
+\leanok{}
     Let $(x,y), (y,z) \in \RP$.  Since $(x,y) \in \RP$, by \cref{thm_rp_implies_same_minimal_component}, we have that $(x,y,y) \in \overline{S^2(y,y,y)}$.  By minimality, $(z,z) \in \overline{S(y,y)}$.  Since $(x,y,y)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(x,z,z) \in \overline{S^2(x,y,y)}$.  Since $(y,z) \in \RP$, by \cref{thm_rp_implies_same_minimal_component}, we have that $(y,z,z) \in \overline{S^2(z,z,z)}$.  By minimality, $(y,y) \in \overline{S(z,z)}$.  Since $(y,z,z)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,y,y) \in \overline{S^2(y,z,z)}$.
     
     Recapping the conclusions from the previous paragraph:
@@ -3406,6 +3491,7 @@ Here is another application of the material in this section. The theorem below i
 
 \begin{proof}
 \uses{lemma_rp_basics_symmetric,thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,lemma_return_time_algebra_three,lemma_image_of_syndetic}
+\leanok{}
     Let $U, V \subseteq X$ be non-empty, open with $y \in V$.  Let $z \in U$.  By \cref{lemma_rp_basics_symmetric}, $\RP$ is symmetric, so $(y,x) \in \RP$.  By \cref{thm_rp_implies_same_minimal_component}, $(y,x,x) \in \overline{S^2 (x,x,x)}$. By minimality, $(z,z) \in \overline{S(x,x)}$.  Since $(x,x,x)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,z,z) \in \overline{S^2(y,x,x)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), $(y,z,z) \in \overline{S^2 (x,x,x)}$.
     
     By \cref{thm_xxx_is_trtl_unif_rec_v3}, the point $(x,x,x)$ is $S^2$-uniformly recurrent.  Since $V \times U \times U$ is an open neighborhood of $(y,z,z)$ and $(y,z,z) \in \overline{S^2 (x,x,x)}$, we get that $R_{S^2}((x,x,x), V \times U \times U)$ is syndetic. This is the set of pairs $(g,r) \in S^2$ such that $T_{L,g} T_{R,r} (x,x,x) \in V \times U \times U$ -- that is, such that $r \in R(x,U)$, $g \in R(x,V)$, $rg \in R(x,U)$.  For each such pair $(g,r) \in S^2$, we see by \cref{lemma_return_time_algebra_three} that
@@ -3430,15 +3516,22 @@ Contains:
 
 % \dgg{I've opted to replace ``uniformly recurrent set'' with the clunkier ``CRT'' (see definition below) since that will shorten the verification by cutting out a step (namely, we won't have to prove that $B$ is CRT implies $1_B$ uniformly recurrent).}
 
+% \begin{definition}
+% \lean{isCRTSet}
+% \leanok{}
+%     Let $S$ be a semigroup. A set $A \subseteq S$ is called a \emph{clopen return-time set of a uniformly recurrent point (CRT)} if there exists an $S$-system $X$, an $S$-uniformly recurrent point $x \in X$, and a clopen set $U \subseteq X$ such that $A = R(x,U)$.
+% \end{definition}
+
 \begin{definition}
-\lean{isCRTSet}
-\leanok{}
-    Let $S$ be a semigroup. A set $A \subseteq S$ is called a \emph{clopen return-time set of a uniformly recurrent point (CRT)} if there exists an $S$-system $X$, an $S$-uniformly recurrent point $x \in X$, and a clopen set $U \subseteq X$ such that $A = R(x,U)$.
+    \label{def_ur_set}
+    \lean{isURSet}
+    \leanok{}
+    Let $S$ be a semigroup.  A set $A \subseteq S$ is a UR set if $1_A \in \{0,1\}^S$ is $S$-uniformly recurrent.
 \end{definition}
 
 \begin{definition}[Symbolic system]
 \label{def_symbolic_system}
-\lean{symbolicSystem}
+\lean{selfSymbolicSystem}
 \leanok{}
     Let $S$ be a semigroup.  The symbolic system on $S$ is set $X = \{0,1\}^S$ with the product topology (so that it is compact and Hausdorff) together with the action of $S$ on $X$ given for $s \in S$ and $\omega \in X$ by
     \[\forall \ t \in S, \ (s \omega)(t) = \omega(ts).\]
@@ -3457,12 +3550,24 @@ Action check: $s_1(s_2w) = (s_1s_2)w$?
     \[\{\omega \in \{0,1\}^{S} : \omega(s) = a\}.\]
 \end{definition}
 
+\begin{definition}[Monoid extension]
+    For any semigroup $S$, there exists a \emph{monoid extension} $M_S$.  In lean: \verb|WithOne.instMonoid|.  Define the $S$-action on $M_S$ by for $s \in S$ and $m \in M_S$ by $s(m) = m * s$.
+\end{definition}
+
 \begin{lemma}
-    \label{lemma_unif_rec_implies_CRT}
-    \lean{unifRecPtsInSymbolicSpaceAreCRTSets}
+    \label{lemma_unif_rec_implies_UR}
+    \lean{urSetIsRxU}
     \leanok{}
-    Let $S$ be a semigroup, and let $A \subseteq S$.  If $1_A \in \{0,1\}^S$ is $S$-uniformly recurrent, then $A$ is a CRT.
+    Let $S$ be a semigroup, and let $A \subseteq S$.  If $A$ is an UR set, then there exists $x \in \{0, 1\}^{M_S}$ which is $S$-uniformly recurrent and a clopen set $U \subseteq \{0,1\}^{M_S}$ such that $A = R(x,U)$.
 \end{lemma}
+
+
+% \begin{lemma}
+%     \label{lemma_unif_rec_implies_CRT}
+%     \lean{unifRecPtsInSymbolicSpaceAreCRTSets}
+%     \leanok{}
+%     Let $S$ be a semigroup, and let $A \subseteq S$.  If $1_A \in \{0,1\}^S$ is $S$-uniformly recurrent, then $A$ is a CRT set.
+% \end{lemma}
 
 \begin{proof}[Proof outline]
 \uses{def_symbolic_system,def_hom_system}
@@ -3532,14 +3637,16 @@ Action check: $s_1(s_2w) = (s_1s_2)w$?
 
 \begin{lemma}
 \label{lem:auslander-ellis}
-\lean{syndSetIsCRTOnThickSet}
+\lean{syndSetIsUROnThickSet}
 \leanok{}
-Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq S$ be a thick set. There exists a CRT set $B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
+Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq S$ be a thick set. There exists an UR set $B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
 \end{lemma}
 
 \begin{proof}
 \uses{lemma_thick_closure_contains_strong_ultrafilter,lemma_minimal_implies_uniformly_recurrent,lemma_unif_rec_implies_CRT,lemma_plim_in_open_set_return_time}
-    Since $H$ is thick, by \cref{lemma_thick_closure_contains_strong_ultrafilter}, there exists a minimal, idempotent ultrafilter $p \in \overline{H} \subseteq \beta S$ such that for all finite $F \subseteq S$, $\cap_{f \in F} f^{-1} H \in p$. Let $1_B = p 1_{A \cap H}$.  It follows from \cref{lemma_minimal_implies_uniformly_recurrent} that $1_B$ is $S$-uniformly recurrent.  By \cref{lemma_unif_rec_implies_CRT}, $B$ is a CRT set.  Define $T = \{g \in S \mid 1_B(g) = 1_{A \cap H}(g) \}$.
+    Since $H$ is thick, by \cref{lemma_thick_closure_contains_strong_ultrafilter}, there exists a minimal, idempotent ultrafilter $p \in \overline{H} \subseteq \beta S$ such that for all finite $F \subseteq S$, $\cap_{f \in F} f^{-1} H \in p$. Let $1_B = p 1_{A \cap H}$.  It follows from \cref{lemma_minimal_implies_uniformly_recurrent} that $1_B$ is $S$-uniformly recurrent.
+    %By \cref{lemma_unif_rec_implies_CRT}, $B$ is a CRT set.
+    Define $T = \{g \in S \mid 1_B(g) = 1_{A \cap H}(g) \}$.
     
     We claim that the set $H \cap T$ is thick.  Indeed, let $F \subseteq S$ be finite. The set
     \[U \defeq \{(\alpha, \beta) \in (\{0,1\}^S)^2 \mid \forall f \in F, \ \alpha(f) = \beta (f)\} \subseteq (\{0,1\}^S)^2\]
@@ -3557,7 +3664,7 @@ Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq 
 \begin{theorem}
 \label{thm_lspwf_upgrade}
 \lean{crtContainmentSufficesForFamilyContainment}
-    Let $S$ be a semigroup. Let $\family$ and $\familytwo$ be families of subsets of $S$. Suppose that for all CRT sets $B \subseteq S$ and all thick $H \subseteq S$, if $B \cap H \in \family$, then $B \cap H \in \familytwo$.  Then we have
+    Let $S$ be a semigroup. Let $\family$ and $\familytwo$ be families of subsets of $S$. Suppose that for all UR set $B \subseteq S$ and all thick $H \subseteq S$, if $B \cap H \in \family$, then $B \cap H \in \familytwo$.  Then we have
     \[\syndetic \classcapdual \family \subseteq \syndetic \classcapdual \familytwo.\]
 \end{theorem}
 
@@ -3570,11 +3677,11 @@ Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq 
 
     \item By \cref{thm_classcapdual_contained_in_intersection}, $\syndetic \classcapdual \family \subseteq \syndetic$, so $A \in \syndetic$.
 
-    \item By \cref{lem:auslander-ellis}, there exists a thick set $H' \subseteq H$ and a CRT set $B$ such that $A \cap H' = B \cap H'$.
+    \item By \cref{lem:auslander-ellis}, there exists a thick set $H' \subseteq H$ and UR set $B$ such that $A \cap H' = B \cap H'$.
 
     \item Since $A \in \syndetic \classcapdual \family$ and $H' \in \thick$, we have $A \cap H' \in \family$ (this holds by the definition of $\classcapdual$, even if $\family = \mathcal{P}(S)$), and so $B \cap H' \in \family$. 
 
-    \item Since $B$ is CRT, by our assumption, $B \cap H' \in \familytwo$.
+    \item Since $B$ is UR set, by our assumption, $B \cap H' \in \familytwo$.
 
     \item Thus $A \cap H' \in \familytwo$.
 
@@ -3686,13 +3793,13 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 \begin{theorem}
 \label{thm_dcthickbohr_is_delta_for_rxu}
 \leanok{}
-    \lean{commCRTSetsOfBohrRecurrenceAreDelta}
-    Let $S$ be a commutative semigroup, and let $B \subseteq S$ be CRT.  If $B \in \dcthickbohr$, then for all thick $H \subseteq S$, the set $B \cap H \in \Delta$.
+    \lean{commURSetsOfBohrRecurrenceAreDelta}
+    Let $S$ be a commutative semigroup, and let $B \subseteq S$ be an UR set.  If $B \in \dcthickbohr$, then for all thick $H \subseteq S$, the set $B \cap H \in \Delta$.
 \end{theorem}
 
 \begin{proof}
 \uses{lemma_pr_family_concentration,lemma_dcthickbohr_is_pr,lemma_dcsyndeticbohr_dcthickbohr_dual,thm_rp_equals_s,thm_delta_from_kronecker}
-    Since $B$ is a CRT set, there exists $X$ be a minimal $S$-system, $x \in X$, and $U \subseteq X$ clopen so that $B = R(x,U)$.  Assume $B \in \dcthickbohr$.
+    Since $B$ is such that $1_B$ is $S$-uniformly recurrent, there exists $x \in \{0,1\}^{M_S}$, and $U \subseteq \{0,1\}^{M_S}$ clopen so that $B = R(x,U)$.  Assume $B \in \dcthickbohr$.
 
     Since $R(x,U) \in \dcthickbohr$, by \cref{lemma_pr_family_concentration}, \cref{lemma_dcthickbohr_is_pr}, and the fact that $U$ is closed, there exists $y \in U$ such that for all non-empty, open $U' \ni y$, the set $R(x,U') \in \dcthickbohr$.
     
@@ -3721,7 +3828,7 @@ If you only care about the combinatorics, the following is a weaker, but purely 
     \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \syndetic \classcapdual \Delta.\]
-    According to \cref{thm_lspwf_upgrade}, it suffices to show this inclusion for CRT sets.  Let $B \in \syndetic \classcapdual \dcthickbohr$ be a CRT set.  From \cref{thm_classcapdual_contained_in_intersection}, we have that
+    According to \cref{thm_lspwf_upgrade}, it suffices to show this inclusion for sets whose indicators are $S$-uniformly recurrent.  Let $B \in \syndetic \classcapdual \dcthickbohr$ be such that $1_B$ is $S$-uniformly recurrent.  From \cref{thm_classcapdual_contained_in_intersection}, we have that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \dcthickbohr,\]
     whence $B \in \dcthickbohr$.  We have from \cref{thm_dcthickbohr_is_delta_for_rxu} that since $B \in \dcthickbohr$, $B \in \syndetic \classcapdual \Delta$, as desired.
 \end{proof}

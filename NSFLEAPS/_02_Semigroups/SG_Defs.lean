@@ -119,3 +119,27 @@ class SemigroupHom
 (X : Type*) [Nonempty X] where
   toFun : S → X → X
   map_mult' : ∀ s₁ s₂ x, toFun (s₁ * s₂) x = toFun s₁ (toFun s₂ x)-/
+
+/-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
+theorem surjImgOfSyndeticIsSyndetic
+{S} [Semigroup S] [Nonempty S]
+{T} [Semigroup T] [Nonempty T]
+(φ : S → T) [hSemiHom : SemigroupHom φ] (hSurj : Function.Surjective φ)
+{A : Set S} (hA : isSyndetic A) :
+isSyndetic (φ '' A) := by
+obtain ⟨F, hF1, hF2⟩ := hA
+use φ '' F
+constructor
+· apply hF1.image φ
+intro t
+obtain ⟨s, hs⟩ := hSurj t
+specialize hF2 s
+obtain ⟨e, he1, he2⟩ := hF2
+use φ (e)
+constructor
+· simp only [Set.mem_image]
+  · use e
+rw [<- hs]
+rw [<- hSemiHom.hom_prop]
+simp only [Set.mem_image]
+use e * s

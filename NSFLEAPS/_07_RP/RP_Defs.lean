@@ -702,12 +702,119 @@ end RP_is_EQ_relation
 
 section Set_recurrence_corollary
 
-/-- In a minimal system, for (x,y) ∈ RP and U, V ⊆ X open with y ∈ V,
-the intersection R(x,U) ∩ R(V,U) is syndetic -/
-theorem xyInRPImpliesSyndeticVisitTimeIntersection (x y : X) :
-isMinimalSystem dSystem → (x,y) ∈ RP dSystem →
+/-- In a minimal system, for `(x,y) ∈ RP` and `U, V ⊆ X` open with `y ∈ V`,
+the intersection `R(x,U) ∩ R(V,U)` is a syndetic subset of `S` -/
+theorem xyInRPImpliesSyndeticVisitTimeIntersection
+(hMin : isMinimalSystem dSystem) {x y : X} (hxyInRP : (x, y) ∈ RP dSystem) :
 ∀ (U V : Set X), IsOpen U → IsOpen V → U.Nonempty → y ∈ V →
 isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)) :=
-by sorry
+by
+  intro U V UIsOpen VIsOpen UIsNonempty yinV
+  let ϕ : S × S → S := Prod.snd
+  have imageOfVisitsIsSyndetic :
+    isSyndetic (ϕ '' visitTimeSet (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ (V ×ˢ U ×ˢ U)) :=
+    by
+      rcases UIsNonempty with ⟨z,hz⟩
+      have yxInRP : (y,x) ∈ RP dSystem :=
+        by
+          have := RPisSymmetric dSystem
+          unfold isSymmetric at this
+          unfold setToRelation at this
+          exact SetRel.symm (RP dSystem) hxyInRP
+      have yxxInOrbClosxxx :
+        ⟨y,x,x⟩ ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ :=
+          (xyInRPIffxyyInyyyOrbClosure hMin y x).mp yxInRP
+      have yxxIsUR : isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨y,x,x⟩ :=
+        inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem))
+          (xxxUniformlyRecurrent hMin x) yxxInOrbClosxxx
+      let xx: X × X := ⟨x,x⟩
+      let zz: X × X := ⟨z,z⟩
+      let yzz : X × X × X := ⟨y,z,z⟩
+      have zzInOrbitClosxx :
+        (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) xx :=
+          diagonalOrbitVisits x z
+            ((subset_of_eq (minimalImpliesFullOrbitClosure hMin x).symm) (Set.mem_univ x))
+      have yzzInyOrbClosxx :
+        yzz ∈ {y} ×ˢ orbitClosure (diagDynamicalSystem dSystem dSystem) xx :=
+          by
+            constructor
+            · unfold yzz
+              simp only [Set.mem_singleton_iff]
+            · exact zzInOrbitClosxx
+      have yzzInOrbClosyxx :
+        yzz ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨y,x,x⟩ :=
+          liftTo3Left y yxxIsUR yzzInyOrbClosxx
+      have yzzInOrbClosxxx := orbitTransitivity yxxInOrbClosxxx yzzInOrbClosyxx
+      have xxxIsUR := xxxUniformlyRecurrent hMin x
+      let VUU := V ×ˢ U ×ˢ U
+      have VUUIsOpen : IsOpen VUU :=
+        by
+          refine IsOpen.prod VIsOpen ?_
+          exact IsOpen.prod UIsOpen UIsOpen
+      have xxxVisitsVUU :
+        (visitTimeSet (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ VUU).Nonempty :=
+          by
+            have VUUnhdOfyzz : yzz ∈ VUU :=
+              by
+                unfold yzz VUU
+                simp only [Set.mem_prod, and_self]
+                exact ⟨yinV,hz⟩
+            have orbitVisitsVUU : (VUU ∩ (orbit (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩)).Nonempty :=
+              (mem_closure_iff.mp yzzInOrbClosxxx) VUU VUUIsOpen VUUnhdOfyzz
+            unfold visitTimeSet
+            rcases orbitVisitsVUU with ⟨u,hu,hu2⟩
+            unfold orbit at hu2
+            simp only [Set.mem_range, Prod.exists] at hu2
+            rcases hu2 with ⟨s1,s2,hs12⟩
+            use ⟨s1,s2⟩
+            simp only [Set.mem_preimage]
+            rw [hs12]
+            exact hu
+      have VUUIsNonempty : VUU.Nonempty :=
+        by
+          unfold VUU
+          simp only [Set.prod_nonempty_iff, and_self]
+          exact ⟨Set.nonempty_of_mem yinV,Set.nonempty_of_mem hz⟩
+      have xxxVisitsVUUSyndetically :=
+        nonemptyVisitsOfURPointImpliesSyndetic (cornerSystem3 (dSystem := dSystem))
+          xxxIsUR xxxVisitsVUU (UOpen := VUUIsOpen) (UNonempty := VUUIsNonempty)
+      have ϕsurj : Function.Surjective ϕ :=
+        by
+          unfold ϕ
+          intro y
+          exact ⟨(Classical.arbitrary S, y), rfl⟩
+      letI : SemigroupHom ϕ :=
+        {
+          hom_prop :=
+            by
+              intro s1 s2
+              unfold ϕ
+              simp only [Prod.snd_mul]
+        }
+      exact surjImgOfSyndeticIsSyndetic ϕ ϕsurj xxxVisitsVUUSyndetically
+  have imageOfVisitsIsContainedInTarget :
+    ϕ '' visitTimeSet (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ (V ×ˢ U ×ˢ U) ⊆
+      (visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U) :=
+        by
+          intro s rInSet
+          simp only [Set.mem_image] at rInSet
+          rcases rInSet with ⟨⟨g,r⟩,hg,hg2⟩
+          unfold visitTimeSet cornerSystem3 leftMap3 rightMap3 at hg
+          simp only at hg
+          simp only [Set.mem_preimage, Set.mem_prod, ←dSystem.mapMult, mul_comm g r] at hg
+          have gInRxV : g ∈ visitTimeSet dSystem x V := hg.1
+          have rInRxU : r ∈ visitTimeSet dSystem x U := hg.2.2
+          have rgInRxU : r * g ∈ visitTimeSet dSystem x U := hg.2.1
+          have rInRVUpre : r ∈ ⋃ a ∈ visitTimeSet dSystem x V,
+            ((· * a) ⁻¹' (visitTimeSet dSystem x U)) :=
+            by
+              simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop]
+              use g
+          rw [← setVisitsAsQuotientSet x V U] at rInRVUpre
+          unfold ϕ at hg2
+          simp only at hg2
+          rw [← hg2]
+          exact ⟨rInRxU,rInRVUpre⟩
+  exact syndeticIsMonotone imageOfVisitsIsSyndetic imageOfVisitsIsContainedInTarget
 
 end Set_recurrence_corollary
