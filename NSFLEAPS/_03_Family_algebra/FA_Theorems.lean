@@ -144,7 +144,7 @@ constructor
 
 --maybe funky
 theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
-  (h : ∀ (F: Family α), dual (dual F) = F) : Function.Bijective dual :=
+  (h : ∀ (F : Family α), dual (dual F) = F) : Function.Bijective dual :=
   by
   constructor
   · -- injective

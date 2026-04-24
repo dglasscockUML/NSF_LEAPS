@@ -1,5 +1,4 @@
 import NSFLEAPS._00_Imports.IM_Base
-
 /- These imports have been moved to _00_Imports.IM_Base
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Lattice
@@ -70,8 +69,20 @@ def PartitionRegular (F : Family α): Prop := --rewrite this to not use ℕ **
   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
 
 def isPRFamily (F : Family α) : Prop :=
-  sorry --∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+  ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
 
+-- def infiniteSets (α : Type*) : Family α where
+--   sets := {s | s.Infinite}
+--   upward_closed := by
+--     intro A B hA hAB
+--     exact hA.mono hAB
+
+-- theorem infinite_is_PR (α : Type*) [Infinite α] :
+--   isPRFamily (infiniteSets α) := by
+--   intro A hA n c
+--   -- at least one color must appear infinitely often
+--   simp [infiniteSets]
+--   exact Finite.exists_infinite_fiber A c hA
 
 structure PRFamily (α : Type) extends Family α where
   partition_regular : partitionRegularTwoSets sets
@@ -113,7 +124,7 @@ def Family.famDual (fam : Family α) : Family α :=
 }
 lemma mem_famDual (F : Set (Set α)) (A : Set α) :
   A ∈ famDual F ↔ ∀ B ∈ F, (A ∩ B).Nonempty := by rfl
-  
+
 def isPRTwoSets (F : Family α) : Prop :=
   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
 /- def PRFamily.famDual (fam : PRFamily α) : PRFamily α :=
