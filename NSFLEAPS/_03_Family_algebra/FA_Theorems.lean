@@ -65,82 +65,36 @@ by
 /-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
     thm_equiv_dual_formulation (F)
   rw [dualEquivForm]-/
-@[simp]
+/- @[simp]
 theorem Family.coe_sets (F : Family α) :
     (↑F : Set (Set α)) = F.sets :=
   rfl
-
+ -/
+variable (F : Family α)
+#check F**
 theorem thm_dual_is_involution (F : Family α) : F** = F := by
+have coerce: ↑F** = (F**).sets := by
+  exact Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1
+have coerce2: ↑F* = (F*).sets := by
+  exact Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1
 ext A
 constructor
 -- F** ⊆ F
-· intro h
-  by_contra hA
-  have h1 : Aᶜ ∉ F* := by
-    simp [famDualAlt] at h
-    sorry
-  have h2 : Aᶜ ∈ F* := by
-    have : (Aᶜ)ᶜ ∉ F := by
-      simpa [compl_compl] using hA
-    sorry
-  exact h1 h2
-
+· rw [←coerce]
+  rw [famDualAlt F*]
+  intro h
+  have h1 : Aᶜ ∉ (F*).sets := by
+    exact h
+  rw [←coerce2] at h1
+  rw [famDualAlt F] at h1
+  simp only [Set.mem_setOf_eq, compl_compl, not_not] at h1
+  exact h1
 -- F ⊆ F**
-· intro hA
-  by_contra h
-  have h1 : Aᶜ ∈ F* := by
-    sorry
-  have h2 : Aᶜ ∉ F* := by
-    intro hAc
-    have : A ∉ F := by
-      sorry
-    exact sorry
-  exact h2 h1
-/- theorem thm_dual_is_involution (F : Family α) : F** = F := by
-  ext A
-  constructor
-  -- F** ⊆ F
-  · intro h
-    have h1 : Aᶜ ∉ (F*) := by
-      intro hAc
-      have hAc' : Aᶜ ∈ {A | Aᶜ ∉ F} := by
-        rw [←famDualAlt]
-        exact hAc
-      have hAc'' : (Aᶜ)ᶜ ∉ F := by
-        rw [Set.mem_setOf] at hAc'
-        exact hAc'
-      have : (Aᶜ)ᶜ = A := by
-        simp only [compl_compl]
-      rw [this] at hAc''
-      have : Aᶜ ∈ (F* : Set (Set α)) := by
-        have : (Aᶜ)ᶜ ∉ F := by
-          simpa [compl_compl] using hAc''
-        simpa [←famDualAlt]
-          using this
-      contradiction
-  · intro h3
-    have h1 : Aᶜ ∉ F := by
-      intro hAc
-      have hAc' : Aᶜ ∈ {A | Aᶜ ∉ F} := by
-        rw [←famDualAlt]
-        exact hAc
-      have hAc'' : (Aᶜ)ᶜ ∉ F := by
-        rw [Set.mem_setOf] at hAc'
-        exact hAc'
-      have : (Aᶜ)ᶜ = A := by
-        simp only [compl_compl]
-      rw [this] at hAc''
-      have : Aᶜ ∈ (F* : Set (Set α)) := by
-        have : (Aᶜ)ᶜ ∉ F := by
-          simpa [compl_compl] using hAc''
-        simpa [←famDualAlt]
-      contradiction
- -/
+· intro hA B hB
+  specialize hB A hA
+  exact Set.inter_nonempty_iff_exists_right.mpr hB
 
-  --F ⊆ F**
 
- -- F** ⊆ F
- -- F ⊆ F**
 
 --maybe funky
 theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
@@ -174,7 +128,8 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
     contradiction
   exact hAcinF_not sorry
 
-theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔ partitionRegularTwoSets (P.sets) :=
+theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔
+  partitionRegularTwoSets (P.sets) :=
  by sorry
 
 --thm_family_equal_to_dual_iff_ultrafilter
