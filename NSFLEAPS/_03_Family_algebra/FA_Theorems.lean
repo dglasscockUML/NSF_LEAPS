@@ -184,7 +184,6 @@ theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets
 --thm_de_morgan_union_v1
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
-    ext A
     sorry
     /- constructor
     · intro h
@@ -263,19 +262,31 @@ theorem thm_classcapdual_idempotent_at_pr_families (F : Family α) :
 --thm_combo_algebra_statement_one
 theorem thm_combo_algebra_statement_one (F G H : Family α) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
 by
-  classical
+  sorry
+  /- classical
   constructor
-  · intro h A hAG
-    -- goal: A ∩ B ∈ H
-    have h1 : A ∈ F ⋏ G := hAG
-    -- unfold definition of F ⋏ G
-    have h2 : ∀ C ∈ F*, A ∩ C ∈ G := sorry
-    -- now use assumption h on H*
-    -- need to show A ∩ B ∈ H* unfolding dual definition
-    -- finish depending on definition of *
-    sorry
-
-  · intro h A hA
-    -- goal: A ∩ B ∈ H*
-    -- unfold H* membership and use inclusion h
-    sorry
+  · intro h A hAinFG
+    rw [famDualAlt] at h
+    have h1 : A ∈ F ⋏ G := by
+      exact hAinFG
+    have h2 : A ∈ F := by
+      exact h1.left
+    have h3 : A ∈ G := by
+      exact h1.right
+    have h4 : A ∈ F* ⋎ G* := by
+      constructor
+      · intro hFstar
+        exact Or.inl hFstar
+      · intro hGstar
+        exact Or.inr hGstar
+    have h5 : A ∈ F ⋏ (F* ⋎ G*) := by
+      constructor
+      · exact h2
+      · exact h4
+    have h6 : Aᶜ ∉ H := by
+      intro hHstar
+      have : A ∈ H* := by
+        rw [famDualAlt]
+        exact hHstar
+      exact h this
+    exact sorry -/
