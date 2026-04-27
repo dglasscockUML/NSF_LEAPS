@@ -692,10 +692,6 @@ by sorry
 
 end Factor_maps_and_ICERS
 
-
-
-
-
 section Return_time_sets
 
 variable {S : Type*} [Semigroup S] [Nonempty S]
@@ -747,14 +743,6 @@ have h2 : visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) ⊆
     exact hr2
   apply hr4
 exact subset_antisymm h1 h2
-
-/-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
-to `R(x,V) R(x,U)^{-1}` -/
-theorem setVisitsAsQuotientSet
-{dSystem : DynamicalSystem S X} (x : X) (U V : Set X) :
-setVisitTimeSet dSystem U V = ⋃ s ∈ visitTimeSet dSystem x U,
-((· * s) ⁻¹' (visitTimeSet dSystem x V)) :=
-by sorry
 
 /-- The set `R(x,∩_i U_i)` is equal to `∩_i R(x,U_i)` -/
 theorem visitToInter
@@ -894,6 +882,41 @@ theorem factorOfMinimalIsMinimal
 {dSystemY : DynamicalSystem S Y} (hFactor : isFactor dSystemY dSystemX) :
 isMinimalSystem dSystemY :=
 by sorry
+
+/-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
+to `R(x,V) R(x,U)^{-1}` in minimal systems -/
+theorem setVisitsAsQuotientSet
+{dSystem : DynamicalSystem S X} (hMinimal : isMinimalSystem dSystem) (x : X) (U V : Set X) :
+setVisitTimeSet dSystem U V = ⋃ s ∈ visitTimeSet dSystem x U,
+((· * s) ⁻¹' (visitTimeSet dSystem x V)) := by
+have h1 : setVisitTimeSet dSystem U V ⊆ ⋃ s ∈ visitTimeSet dSystem x U,
+((· * s) ⁻¹' (visitTimeSet dSystem x V)) := by
+  intro r hr
+  have hr1 : (dSystem.map r '' U ∩ V).Nonempty := by
+    unfold setVisitTimeSet at hr
+    simpa using hr
+  sorry
+have h2 : ⋃ s ∈ visitTimeSet dSystem x U, ((· * s) ⁻¹' (visitTimeSet dSystem x V))
+⊆ setVisitTimeSet dSystem U V := by
+  intro r hr
+  simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop] at hr
+  obtain ⟨s, hs1, hs2⟩ := hr
+  have hs1a: dSystem.map s x ∈ U := by
+    exact hs1
+  have hs2a : dSystem.map (r * s) x ∈ V := by
+    exact hs2
+  have hs3 : dSystem.map (r * s) x ∈ dSystem.map r '' U := by
+    have hs31 : dSystem.map r (dSystem.map s x) ∈ dSystem.map r '' U := by
+      refine ⟨dSystem.map s x, hs1a, rfl⟩
+    have hs32 : dSystem.map r (dSystem.map s x) = dSystem.map (r * s) x := by
+      simp only [dSystem.mapMult]
+    rw [<- hs32]
+    exact hs31
+  have h4 : (dSystem.map r '' U ∩ V).Nonempty := by
+    exact ⟨dSystem.map (r * s) x, hs3, hs2a⟩
+  unfold setVisitTimeSet
+  exact h4
+exact subset_antisymm h1 h2
 
 end Minimality
 
