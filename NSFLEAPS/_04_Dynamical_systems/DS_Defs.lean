@@ -694,6 +694,8 @@ end Factor_maps_and_ICERS
 
 
 
+
+
 section Return_time_sets
 
 variable {S : Type*} [Semigroup S] [Nonempty S]
@@ -716,8 +718,35 @@ Set S :=
 theorem visitsToPreimages
 (dSystem : DynamicalSystem S X) (x : X) (U : Set X) (s : S) :
 (s * ·) ⁻¹' (visitTimeSet dSystem x U) =
-visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) :=
-by sorry
+visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) := by
+have h1 : (s * ·) ⁻¹' (visitTimeSet dSystem x U)
+⊆ visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) := by
+  intro r hr
+  have hr1 : s * r ∈ visitTimeSet dSystem x U := by
+    simpa
+  have hr2 : dSystem.map (s * r) x ∈ U := by
+    simpa
+  have hr21 : dSystem.map s (dSystem.map r x) = dSystem.map (s * r) x := by
+    simp only [dSystem.mapMult s r x]
+  have hr3 : dSystem.map r x ∈ dSystem.map s ⁻¹' U := by
+    simp only [Set.mem_preimage]
+    rw [hr21]
+    apply hr2
+  simpa
+have h2 : visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) ⊆
+(s * ·) ⁻¹' (visitTimeSet dSystem x U) := by
+  intro r hr
+  have hr1 : dSystem.map r x ∈ (dSystem.map s ⁻¹' U) := by
+    simpa
+  have hr2 : dSystem.map s (dSystem.map r x) ∈ U := by
+    simpa
+  have hr3 : dSystem.map s (dSystem.map r x) = dSystem.map (s * r) x := by
+    simp only [dSystem.mapMult s r x]
+  have hr4 : dSystem.map (s*r) x ∈ U := by
+    rw [<- hr3]
+    exact hr2
+  apply hr4
+exact subset_antisymm h1 h2
 
 /-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
 to `R(x,V) R(x,U)^{-1}` -/
