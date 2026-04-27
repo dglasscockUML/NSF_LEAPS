@@ -252,7 +252,6 @@ apply closureOfInvIsInv
 apply h2
 
 
-
 /-- The `S`-orbit closure of a point `x` is a sub dynamical system of `DynamicalSystem S X` -/
 theorem orbitClosureIsNonemptyCompactT2InvariantSubset
 (dSystem : DynamicalSystem S X) (x : X) :
@@ -932,8 +931,72 @@ theorem factorOfMinimalIsMinimal
 {dSystemX : DynamicalSystem S X} (hXMin : isMinimalSystem dSystemX)
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 {dSystemY : DynamicalSystem S Y} (hFactor : isFactor dSystemY dSystemX) :
-isMinimalSystem dSystemY :=
-by sorry
+isMinimalSystem dSystemY := by
+have hY1 : ∀ y : Y, Dense (orbit dSystemY y) := by
+  intro y
+  obtain ⟨π, hπ1, hπ2, hπ3⟩ := hFactor
+  have hY11 : ∃ x : X, π x = y := by
+    apply hπ2
+  obtain ⟨x, hx⟩ := hY11
+  have hY2 : π '' (orbit dSystemX x) = orbit dSystemY y := by
+    have hY21 : π '' (orbit dSystemX x) ⊆ orbit dSystemY y := by
+      intro z hz
+      have h7 : ∃ w ∈ orbit dSystemX x, π w = z:= by
+        simpa [Set.image_eq] using hz
+      obtain ⟨w, h1, hw2⟩ := h7
+      have h8 : ∃ s : S, dSystemX.map s x = w:= by
+        simpa using h1
+      obtain ⟨s, hs⟩ := h8
+      have h9 : π (dSystemX.map s x) = π w := by
+        simp only [hs]
+      rw [<- hw2, <- h9]
+      have h10 : π (dSystemX.map s x) = (dSystemY.map s) (π x) := by
+        specialize hπ3 s
+        have h5 : ((dSystemY.map s) ∘ π) x = (π ∘ (dSystemX.map s)) x := by
+          exact congrArg (fun f => f x) hπ3
+        have h6 : dSystemY.map s (π x) = π (dSystemX.map s x) := by
+          exact h5
+        rw [h6]
+      rw [<- hx, h10]
+      unfold orbit
+      simp
+    have hY22 : orbit dSystemY y ⊆ π '' (orbit dSystemX x) := by
+      intro z hz
+      have hY221 : ∃ s : S, dSystemY.map s y = z := by
+        unfold orbit at hz
+        simpa
+      obtain ⟨s, hs⟩ := hY221
+      rw [<- hx] at hs
+      have h4 : z = π (dSystemX.map s x) := by
+        specialize hπ3 s
+        have h5 : ((dSystemY.map s) ∘ π) x = (π ∘ (dSystemX.map s)) x := by
+          exact congrArg (fun f => f x) hπ3
+        have h6 : dSystemY.map s (π x) = π (dSystemX.map s x) := by
+          exact h5
+        rw [<- hs]
+        apply h6
+      simp only [Set.mem_image]
+      use dSystemX.map s x
+      constructor
+      · unfold orbit
+        simp
+      rw [h4]
+    apply subset_antisymm hY21 hY22
+  have hY3 : Dense (orbit dSystemX x) := by
+    have hY4 : ∀ (x : X), Dense (orbit dSystemX x) := by
+      let dSystemZ := dSystemX
+      apply minimalIffDenseOrbits at dSystemZ
+      apply dSystemZ.mp
+      exact hXMin
+    specialize hY4 x
+    exact hY4
+  rw [<- hY2]
+  apply DenseRange.dense_image
+  · apply Function.Surjective.denseRange hπ2
+  · apply hπ1
+  apply hY3
+simp only [minimalIffDenseOrbits]
+exact hY1
 
 /-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
 to `R(x,V) R(x,U)^{-1}` in minimal systems -/
