@@ -778,25 +778,56 @@ theorem visitToUnion
 {dSystem : DynamicalSystem S X}
 (x : X) {I} (f : I → Set X) :
 visitTimeSet dSystem x (⋃ i : I, f i) =
-⋃ i : I, (visitTimeSet dSystem x (f i)) :=
-by sorry
+⋃ i : I, (visitTimeSet dSystem x (f i)) := by
+have h1 : visitTimeSet dSystem x (⋃ i : I, f i) ⊆
+⋃ i : I, (visitTimeSet dSystem x (f i)) := by
+  intro s hs
+  have h11 : dSystem.map s x ∈ (⋃ i : I, f i) := by
+    exact hs
+  have h12 : ∃ i : I, dSystem.map s x ∈ f i := by
+    simpa using h11
+  simp only [Set.mem_iUnion]
+  apply h12
+have h2 : ⋃ i : I, (visitTimeSet dSystem x (f i)) ⊆
+visitTimeSet dSystem x (⋃ i : I, f i) := by
+  intro s hs
+  have h21 : ∃ i : I, s ∈ visitTimeSet dSystem x (f i) := by
+    simpa using hs
+  have h22 : ∃ i : I, dSystem.map s x ∈ f i := by
+    apply h21
+  have h23 : dSystem.map s x ∈ (⋃ i : I, f i) := by
+    simpa using h22
+  simpa
+exact subset_antisymm h1 h2
 
 /-- Given `U1 ⊆ U2`, `R(x,U1) ⊆ R(x,U2)` -/
 theorem visitTimesMono
 (dSystem : DynamicalSystem S X)
 (x : X) {U V : Set X} (hMono : U ⊆ V) :
-visitTimeSet dSystem x U ⊆ visitTimeSet dSystem x V :=
-by sorry
+visitTimeSet dSystem x U ⊆ visitTimeSet dSystem x V := by
+intro s hs
+have h1 : dSystem.map s x ∈ U := by
+  simpa using hs
+have h2 : dSystem.map s x ∈ V := by
+  apply hMono h1
+simpa
 
 /-- The time of visits of a point `(x,y)` to `U × V` under the diagonal action is
-the intersection of `R(x,U)` and `R(y,V)`  -/
+the intersection of `R(x,U)` and `R(y,V)` -/
 theorem visitsToProductsUnderDiagonal
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemX : DynamicalSystem S X) (x : X) (U : Set X)
 (dSystemY : DynamicalSystem S Y) (y : Y) (V : Set Y) :
 visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) =
-(visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) :=
-by sorry
+(visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) := by
+have h1 : visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) ⊆
+(visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) := by
+  intro s hs
+  simpa
+have h2 : (visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) ⊆
+visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) := by
+  simpa
+exact subset_antisymm h1 h2
 
 end Return_time_sets
 
