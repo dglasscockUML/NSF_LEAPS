@@ -749,8 +749,29 @@ theorem visitToInter
 {dSystem : DynamicalSystem S X}
 (x : X) {I} (f : I → Set X) :
 visitTimeSet dSystem x (⋂ i : I, f i) =
-⋂ i : I, (visitTimeSet dSystem x (f i)) :=
-by sorry
+⋂ i : I, (visitTimeSet dSystem x (f i)) := by
+have h1 : visitTimeSet dSystem x (⋂ i : I, f i) ⊆
+⋂ i : I, (visitTimeSet dSystem x (f i)) := by
+  intro s hs
+  have h11 : dSystem.map s x ∈ (⋂ i : I, f i) := by
+    exact hs
+  have h12 : ∀ i : I, dSystem.map s x ∈ f i := by
+    intro i
+    apply h11
+    simp
+  simp only [Set.mem_iInter]
+  apply h12
+have h2 : ⋂ i : I, (visitTimeSet dSystem x (f i)) ⊆
+visitTimeSet dSystem x (⋂ i : I, f i) := by
+  intro s hs
+  have h21 : ∀ i : I, s ∈ visitTimeSet dSystem x (f i) := by
+    simpa using hs
+  have h22 : ∀ i : I, dSystem.map s x ∈ f i := by
+    apply h21
+  have h23 : dSystem.map s x ∈ (⋂ i : I, f i) := by
+    simpa using h22
+  simpa
+exact subset_antisymm h1 h2
 
 /-- The set `R(x,∪_i U_i)` is equal to `∪_i R(x,U_i)` -/
 theorem visitToUnion
