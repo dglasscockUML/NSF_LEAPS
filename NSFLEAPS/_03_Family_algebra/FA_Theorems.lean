@@ -65,14 +65,10 @@ by
 /-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
     thm_equiv_dual_formulation (F)
   rw [dualEquivForm]-/
-/- @[simp]
-theorem Family.coe_sets (F : Family α) :
-    (↑F : Set (Set α)) = F.sets :=
-  rfl
- -/
+
 variable (F : Family α)
 #check F**
-theorem thm_dual_is_involution (F : Family α) : F** = F := by
+theorem dualIsInvolutionOnFamilies (F : Family α) : F** = F := by
 have coerce: ↑F** = (F**).sets := by
   exact Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1
 have coerce2: ↑F* = (F*).sets := by
