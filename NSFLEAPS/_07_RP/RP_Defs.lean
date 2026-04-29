@@ -860,7 +860,7 @@ by
         exact Filter.mem_of_superset hV2 hslice
     rcases mem_nhds_iff.mp βSliceIsNhdOfy with ⟨W,WinβSlice,WOpen,yInW⟩
     let UβSlice := (Equiv.prodAssoc X X X) '' U ×ˢ βSlice
-    have : UβSlice ∈ nhds ⟨x,y,y⟩ :=
+    have UβSliceIsnhdOfxyy : UβSlice ∈ nhds ⟨x,y,y⟩ :=
       by
         unfold UβSlice
         apply mem_nhds_iff.mpr
@@ -869,28 +869,65 @@ by
         · apply Set.image_mono
           exact Set.prod_mono (fun ⦃a⦄ a_1 ↦ a_1) WinβSlice
         · constructor
-          · sorry -- image of open is open under (Equiv.prodAssoc X X X)
+          · have UWOpen : IsOpen (U ×ˢ W) :=
+              by
+                exact IsOpen.prod UOpen WOpen
+            exact (Homeomorph.prodAssoc X X X).isOpenMap (U ×ˢ W) UWOpen
           · simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq,
             Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right]
             exact ⟨xyInU,yInW⟩
     have orbitPtLandsInUβSlice :
       ∃ (s : S × S), (cornerSystem3 (dSystem := dSystem)).map s ⟨y,y,y⟩ ∈ UβSlice :=
-        by sorry
-        -- use xxyInOrbClosyyy: (x, y, y) ∈ orbitClosure cornerSystem3 (y, y, y)
-        -- together with the fact that UβSlice ∈ nhds ⟨x,y,y⟩
+        by
+          rcases mem_nhds_iff.mp UβSliceIsnhdOfxyy with ⟨V,VinUβSlice,VOpen,xyyInV⟩
+          unfold orbitClosure at xxyInOrbClosyyy
+          simp only [mem_closure_iff] at xxyInOrbClosyyy
+          specialize xxyInOrbClosyyy V VOpen xyyInV
+          rcases xxyInOrbClosyyy with ⟨pt,hpt1,hpt2⟩
+          unfold orbit at hpt2
+          simp only [Set.range] at hpt2
+          rcases hpt2 with ⟨s7,hs7⟩
+          use s7
+          rw [hs7]
+          exact VinUβSlice hpt1
     rcases orbitPtLandsInUβSlice with ⟨s, hs⟩
-    have ys2yInβ : ⟨y,dSystem.map s.2 y⟩ ∈ β := by sorry
-      -- s (y, y, y) ∈ UβSlice implies that s.2 y ∈ βSlice
-      -- which implies by the definition of βSlice that ⟨y, s.2 y⟩ ∈ β
+    have ys2yInβ : ⟨y,dSystem.map s.2 y⟩ ∈ β :=
+      by
+        unfold UβSlice cornerSystem3 leftMap3 rightMap3 at hs
+        simp only at hs
+        simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq, Prod.exists,
+          ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
+        rcases hs with ⟨hs1,hs2⟩
+        unfold βSlice at hs2
+        exact hs2
     have s1ToPairInU :
       (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ ∈ U :=
-        by sorry
-        -- s (y, y, y) ∈ UβSlice implies that s.1 ⟨y, s.2 y⟩ ∈ U
-        -- by the definition of UβSlice and the definition of the action
+        by
+          unfold UβSlice cornerSystem3 leftMap3 rightMap3 at hs
+          simp only at hs
+          simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq, Prod.exists,
+            ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
+          rcases hs with ⟨hs1,hs2⟩
+          unfold diagDynamicalSystem Prod.map
+          simp only
+          exact hs1
     have s1ToPairInOrbit :
       (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ ∈
         setOrbit (diagDynamicalSystem dSystem dSystem) β :=
-          by sorry
+          by
+            have applyDiags1 :=
+              Set.mem_image_of_mem ((diagDynamicalSystem dSystem dSystem).map s.1) ys2yInβ
+            have diags1βInβOrbit :
+              (diagDynamicalSystem dSystem dSystem).map s.1 '' β ⊆
+                setOrbit (diagDynamicalSystem dSystem dSystem) β :=
+                  by
+                    intro xpt hxpt
+                    unfold setOrbit Set.range
+                    simp only
+                    simp only [Set.mem_image] at hxpt
+                    rcases hxpt with ⟨bpt,hbpt1,hbpt2⟩
+                    use ⟨s.1,bpt,hbpt1⟩
+            exact diags1βInβOrbit applyDiags1
           -- ys2yInβ : ⟨y,dSystem.map s.2 y⟩ in β
           -- hit with (diagDynamicalSystem dSystem dSystem).map s.1 to see that
           -- (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ in
@@ -1101,7 +1138,7 @@ by
             by
               simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop]
               use g
-          rw [← setVisitsAsQuotientSet x V U] at rInRVUpre
+          rw [← setVisitsAsQuotientSet hMin x V U] at rInRVUpre
           unfold ϕ at hg2
           simp only at hg2
           rw [← hg2]
