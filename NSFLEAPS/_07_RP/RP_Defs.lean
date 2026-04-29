@@ -1105,7 +1105,7 @@ by
           exact ⟨Set.nonempty_of_mem yinV,Set.nonempty_of_mem hz⟩
       have xxxVisitsVUUSyndetically :=
         nonemptyVisitsOfURPointImpliesSyndetic (cornerSystem3 (dSystem := dSystem))
-          xxxIsUR xxxVisitsVUU (UOpen := VUUIsOpen) (UNonempty := VUUIsNonempty)
+          xxxIsUR xxxVisitsVUU (UOpen := VUUIsOpen)
       have ϕsurj : Function.Surjective ϕ :=
         by
           unfold ϕ

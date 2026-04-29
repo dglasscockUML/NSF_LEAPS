@@ -1001,7 +1001,8 @@ exact hY1
 /-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
 to `R(x,V) R(x,U)^{-1}` in minimal systems -/
 theorem setVisitsAsQuotientSet
-{dSystem : DynamicalSystem S X} (hMinimal : isMinimalSystem dSystem) (x : X) (U V : Set X) :
+{dSystem : DynamicalSystem S X} (hMinimal : isMinimalSystem dSystem) (x : X) (U V : Set X)
+(hUOpen : IsOpen U) (hVOpen : IsOpen V) :
 setVisitTimeSet dSystem U V = ⋃ s ∈ visitTimeSet dSystem x U,
 ((· * s) ⁻¹' (visitTimeSet dSystem x V)) := by
 have h1 : setVisitTimeSet dSystem U V ⊆ ⋃ s ∈ visitTimeSet dSystem x U,
@@ -1010,7 +1011,39 @@ have h1 : setVisitTimeSet dSystem U V ⊆ ⋃ s ∈ visitTimeSet dSystem x U,
   have hr1 : (dSystem.map r '' U ∩ V).Nonempty := by
     unfold setVisitTimeSet at hr
     simpa using hr
-  sorry
+  have hr2 : (U ∩ dSystem.map r ⁻¹' V).Nonempty := by
+    obtain ⟨v, hv1, hv2⟩ := hr1
+    simp only [Set.mem_image] at hv1
+    obtain ⟨u, hu1, hu2⟩ := hv1
+    have hr3: u ∈ U ∩ dSystem.map r ⁻¹' V := by
+      simp only [Set.mem_inter_iff, Set.mem_preimage]
+      constructor
+      · exact hu1
+      rw [hu2]
+      exact hv2
+    use u
+  have hr3 : IsOpen (U ∩ dSystem.map r ⁻¹' V) := by
+    have hr4: IsOpen (dSystem.map r ⁻¹' V) := by
+      apply IsOpen.preimage (dSystem.mapCont r)
+      exact hVOpen
+    apply IsOpen.inter hUOpen hr4
+  have hr4 : ∃ h : S, h ∈ visitTimeSet dSystem x (U ∩ (dSystem.map r) ⁻¹' V) := by
+    apply minimalImpliesNonemptySetVisits hMinimal
+    · apply hr3
+    apply hr2
+  obtain ⟨h, hh⟩ := hr4
+  have hr5: h ∈ (visitTimeSet dSystem x U) ∩ (visitTimeSet dSystem x (dSystem.map r ⁻¹' V)) := by
+    simpa only [visitToInter, hh]
+  have hr6 : h ∈ (r * ·) ⁻¹' (visitTimeSet dSystem x V) := by
+    simp only [visitsToPreimages]
+    apply hr5.2
+  have hr7 : r ∈ (· * h) ⁻¹' visitTimeSet dSystem x V := by
+    simpa
+  simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop]
+  use h
+  constructor
+  · apply hr5.1
+  apply hr7
 have h2 : ⋃ s ∈ visitTimeSet dSystem x U, ((· * s) ⁻¹' (visitTimeSet dSystem x V))
 ⊆ setVisitTimeSet dSystem U V := by
   intro r hr
