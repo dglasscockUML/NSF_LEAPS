@@ -33,7 +33,7 @@ by sorry
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every minimal left
 ideal is compact -/
 theorem minimalLeftIdealCompact
-(L : Set S) {hL : isMinLeftIdeal L} :
+{L : Set S} (hL : isMinLeftIdeal L) :
 IsCompact L :=
 by sorry
 
@@ -437,7 +437,7 @@ by sorry
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, `p ∈ βS`, and a
 point `x ∈ X`, the points `x` and `px` are proximal -/
 theorem pointAndUltraImageAreProximal
-(x : X) (p : Ultrafilter S) :
+(x : X) {p : Ultrafilter S} (pIdempotent : p * p = p) :
 proximal dSystem x ((ultraAction dSystem).map p x) :=
 by sorry
 

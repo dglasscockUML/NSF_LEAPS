@@ -1194,6 +1194,17 @@ by
     have xOrbitInSetOrbit : orbit dSystem x ⊆ setOrbit dSystem Set.univ := by sorry
     sorry
 
+/-- A point `(x,y)` belongs to `RP` iff there exists `w ∈ X` and an ultrafilter `F` on
+`X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
+theorem xyInRPIffUltraToSomewwxy
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (x y : X) :
+⟨x,y⟩ ∈ RP dSystem ↔ ∃ (w : X) (F : Ultrafilter ((X × X) × S)),
+    Filter.Tendsto (fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a))
+      F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) :=
+by sorry
+
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
 theorem imageOfRPIsInRP
 {S : Type*} [Semigroup S] [Nonempty S]
