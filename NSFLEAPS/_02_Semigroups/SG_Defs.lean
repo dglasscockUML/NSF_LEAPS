@@ -149,4 +149,23 @@ lemma shiftSyndeticIsSyndetic
 {S} [Semigroup S] [Nonempty S]
 {A : Set S} (hA : isSyndetic A)
 {s : S} : isSyndetic ((s * · ) '' A) := by
-sorry
+obtain ⟨F, hF1, hF2⟩ := hA
+unfold isSyndetic
+let E :=  (s * ·) '' F
+use E
+constructor
+· apply Set.Finite.image
+  apply hF1
+intro r
+specialize hF2 r
+obtain ⟨f, hf1, hf2⟩ := hF2
+use s * f
+constructor
+· unfold E
+  simp only [Set.mem_image]
+  use f
+simp only [Set.mem_image]
+use f * r
+constructor
+· exact hf2
+simp only [mul_assoc]
