@@ -1,4 +1,4 @@
-import NSFLEAPS._03_Family_algebra.FA_Theorems                                              -- We need to import the later one.
+import NSFLEAPS._03_Family_algebra.FA_Theorems
 import NSFLEAPS._05_Ultrafilters.UF_Defs
 
 section Abstract_results

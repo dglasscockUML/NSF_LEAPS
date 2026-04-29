@@ -1201,7 +1201,7 @@ by sorry
 
 end Uniform_recurrence
 
-section temp_minimality_with_S_commutative
+section Minimality_and_UR_with_commutivity
 
 /-- If a commutative semigroup `S` acts minimally, then it acts surjectively -/
 theorem minimalCommActionIsSurjective
@@ -1250,7 +1250,7 @@ theorem inMinCommSystemURPairsDense
 Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} :=
 by sorry
 
-end temp_minimality_with_S_commutative
+end Minimality_and_UR_with_commutivity
 
 section Proximality
 
