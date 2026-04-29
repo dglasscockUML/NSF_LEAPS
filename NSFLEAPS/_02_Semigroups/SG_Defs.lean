@@ -143,3 +143,10 @@ rw [<- hs]
 rw [<- hSemiHom.hom_prop]
 simp only [Set.mem_image]
 use e * s
+
+/-- Shift of a syndetic set is syndetic -/
+lemma shiftSyndeticIsSyndetic
+{S} [Semigroup S] [Nonempty S]
+{A : Set S} (hA : isSyndetic A)
+{s : S} : isSyndetic ((s * · ) '' A) := by
+sorry

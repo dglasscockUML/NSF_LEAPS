@@ -1136,10 +1136,52 @@ by
 visits that set syndetically -/
 lemma nonemptyVisitsOfURPointImpliesSyndetic
 (dSystem : DynamicalSystem S X) {x : X} (xIsUR : isUniformlyRecurrent dSystem x)
-{U : Set X} {UNonempty : U.Nonempty} {UOpen : IsOpen U}
+{U : Set X} {UOpen : IsOpen U}
 (hNonemptyVisit : (visitTimeSet dSystem x U).Nonempty) :
-isSyndetic (visitTimeSet dSystem x U) :=
-by sorry
+isSyndetic (visitTimeSet dSystem x U) := by
+have h1 : ∃ s : S, dSystem.map s x ∈ U := by
+  obtain ⟨s, hs⟩ := hNonemptyVisit
+  use s
+  unfold visitTimeSet at hs
+  simpa
+obtain ⟨s, hs⟩ := h1
+have h2 : x ∈ (dSystem.map s) ⁻¹' U := by
+  simpa using hs
+let V := (dSystem.map s) ⁻¹' U
+have h3 : IsOpen V := by
+  have h31 : Continuous (dSystem.map s) := by
+    apply dSystem.mapCont
+  apply h31.isOpen_preimage U UOpen
+have h4 : V ∈ nhds x := by
+  unfold V
+  apply h3.mem_nhds h2
+have h5 : isSyndetic (visitTimeSet dSystem x V) := by
+  unfold isUniformlyRecurrent at xIsUR
+  specialize xIsUR V h4
+  apply xIsUR
+have h6 : (s * ·) '' visitTimeSet dSystem x V ⊆ visitTimeSet dSystem x U := by
+  intro r hr
+  have h61 : ∃ t : S, dSystem.map t x ∈ V ∧ r = s * t := by
+    simp only [Set.mem_image] at hr
+    obtain ⟨t, ht1, ht2⟩ := hr
+    use t
+    constructor
+    · apply ht1
+    rw [<- ht2]
+  obtain ⟨t, ht⟩ := h61
+  have h62 : dSystem.map r x ∈ U := by
+    have h63 : dSystem.map r x = dSystem.map s (dSystem.map t x) := by
+      rw [ht.2]
+      simp only [dSystem.mapMult]
+    have h64 : dSystem.map s (dSystem.map t x) ∈ U := by
+      simpa using ht.1
+    rw [h63]
+    apply h64
+  simpa using h62
+have h7 : isSyndetic ((s * ·) '' visitTimeSet dSystem x V) := by
+  apply shiftSyndeticIsSyndetic
+  apply h5
+apply syndeticIsMonotone h7 h6
 
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset
