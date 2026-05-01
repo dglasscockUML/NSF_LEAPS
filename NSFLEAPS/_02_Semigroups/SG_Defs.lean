@@ -169,3 +169,12 @@ use f * r
 constructor
 · exact hf2
 simp only [mul_assoc]
+
+/-- A syndetic set in a semigroup is not empty -/
+lemma syndeticSetIsNonEmpty {S} [Semigroup S] [hSNonempty : Nonempty S]
+{A : Set S} (hA : isSyndetic A) : A.Nonempty := by
+  rcases hSNonempty with ⟨s⟩
+  obtain ⟨F, hF1, hF2⟩ := hA
+  specialize hF2 s
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  exact ⟨f * s, hf2⟩

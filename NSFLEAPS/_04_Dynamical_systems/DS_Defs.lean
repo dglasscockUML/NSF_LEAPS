@@ -1220,8 +1220,30 @@ apply syndeticIsMonotone h7 h6
 theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x) :
-isMinimalSubset dSystem (orbitClosure dSystem x) :=
-by sorry
+isMinimalSubset dSystem (orbitClosure dSystem x) := by
+have h1 : ∀ U ∈ nhds x, (U ∩ orbit dSystem x).Nonempty := by
+  intro U hU
+  have h4 := xisUR U hU
+  have h2 : (visitTimeSet dSystem x U).Nonempty := by
+    apply syndeticSetIsNonEmpty
+    exact h4
+  rcases h2 with ⟨s, hs⟩
+  have h3 : dSystem.map s x ∈ U := by
+    exact hs
+  have h5 : dSystem.map s x ∈ orbit dSystem x := by
+    unfold orbit
+    simp
+  exact ⟨dSystem.map s x, h3, h5⟩
+have h6 : x ∈ orbitClosure dSystem x := by
+  apply mem_closure_iff.2
+  intro U hU1 hU2
+  have h61 : U ∈ nhds x := by
+    apply IsOpen.mem_nhds hU1 hU2
+  have h62 := h1 U h61
+  exact h62
+sorry
+-- Still working on this. There is a subtle issue
+-- in the relation between minimal set and minimal system
 
 /-- If `y` is in the orbit closure of a uniformly recurrent point `x`, then
 `y` is uniformly recurrent -/
