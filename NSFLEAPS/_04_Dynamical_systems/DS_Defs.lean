@@ -1241,6 +1241,30 @@ have h6 : x ∈ orbitClosure dSystem x := by
     apply IsOpen.mem_nhds hU1 hU2
   have h62 := h1 U h61
   exact h62
+
+let Y := orbitClosure dSystem x
+
+have Y_def : Y = orbitClosure dSystem x := by
+  rfl
+
+have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
+  apply orbitClosureIsNonemptyCompactT2InvariantSubset
+
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
+
+have : CompactSpace Y := by
+  apply isCompact_iff_compactSpace.mp
+  exact hY.2.1
+have : Nonempty Y := by
+  apply hY.1.to_subtype
+have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
+  sorry
+
+have hYMinimal : isMinimalSystem dSystemY := by
+  simp only [minimalIffDenseOrbits]
+  exact hYDenseOrbit
+
+rw [<- Y_def]
 sorry
 -- Still working on this. There is a subtle issue
 -- in the relation between minimal set and minimal system
@@ -1251,8 +1275,64 @@ theorem inOrbitClosOfURPointImpliesUR
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x)
 {y : X} (yinOrbClos : y ∈ orbitClosure dSystem x) :
-isUniformlyRecurrent dSystem y :=
-by sorry
+isUniformlyRecurrent dSystem y := by
+let Y := orbitClosure dSystem x
+have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
+  apply orbitClosureIsNonemptyCompactT2InvariantSubset
+have hYMinimal : isMinimalSubset dSystem Y := by
+  apply orbitClosureOfURPointIsMinimalSubset
+  exact xisUR
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
+have : CompactSpace Y := by
+  apply isCompact_iff_compactSpace.mp
+  exact hY.2.1
+have : Nonempty Y := by
+  apply hY.1.to_subtype
+have hdSystemY_Minimal : isMinimalSystem dSystemY := by
+  apply minimalSubsetIsMinimalSystem
+  exact hYMinimal
+unfold isUniformlyRecurrent
+intro U hU
+let V := U ∩ Y
+have hyY: y ∈ Y := by
+  unfold Y
+  exact yinOrbClos
+have hVY : V ⊆ Y := by
+  unfold V
+  simp
+let V' := {y : Y | (y : X) ∈ V}
+have hyV' : ⟨y, hyY⟩ ∈ V' := by
+  sorry
+have hSynd1 : isSyndetic (visitTimeSet dSystemY ⟨y, hyY⟩ V' ) := by
+  apply minimalImpliesSyndeticVisits
+  apply hdSystemY_Minimal
+  exact ⟨⟨y, hyY⟩, hyV'⟩
+  sorry
+have hSyndetic : isSyndetic (visitTimeSet dSystem y V) := by
+  sorry
+obtain ⟨F, hF1, hF2⟩ := hSyndetic
+unfold isSyndetic
+use F
+constructor
+· apply hF1
+intro s
+have hF22 := hF2 s
+obtain ⟨f, hf1, hf2⟩ := hF22
+use f
+constructor
+· apply hf1
+have hUV : V ⊆ U := by
+  unfold V
+  simp
+unfold visitTimeSet
+simp
+have hV3 : dSystem.map (f * s) y ∈ V := by
+  unfold visitTimeSet at hf2
+  simp at hf2
+  exact hf2
+apply hUV
+exact hV3
+-- still working on this. There's an issue with passing back and forth between system and subsystem
 
 end Uniform_recurrence
 
