@@ -1292,24 +1292,47 @@ have hdSystemY_Minimal : isMinimalSystem dSystemY := by
   apply minimalSubsetIsMinimalSystem
   exact hYMinimal
 unfold isUniformlyRecurrent
-intro U hU
+intro U' hU'
+rw [mem_nhds_iff] at hU'
+obtain ⟨U, hU, hU2, hyU⟩ := hU'
 let V := U ∩ Y
 have hyY: y ∈ Y := by
   unfold Y
   exact yinOrbClos
+have hyV : y ∈ V := by
+  unfold V
+  exact ⟨hyU, hyY⟩
 have hVY : V ⊆ Y := by
   unfold V
   simp
 let V' := {y : Y | (y : X) ∈ V}
+have hV'U : V' = (Subtype.val ⁻¹' U) := by
+  unfold V' V Subtype.val
+  simp
+  rfl
+have hV'open : IsOpen V' := by
+  rw [hV'U]
+  simpa using hU2.preimage continuous_subtype_val
 have hyV' : ⟨y, hyY⟩ ∈ V' := by
-  sorry
+  exact hyV
 have hSynd1 : isSyndetic (visitTimeSet dSystemY ⟨y, hyY⟩ V' ) := by
   apply minimalImpliesSyndeticVisits
-  apply hdSystemY_Minimal
-  exact ⟨⟨y, hyY⟩, hyV'⟩
-  sorry
+  · apply hdSystemY_Minimal
+  · exact ⟨⟨y, hyY⟩, hyV'⟩
+  exact hV'open
 have hSyndetic : isSyndetic (visitTimeSet dSystem y V) := by
-  sorry
+  obtain ⟨F, hF1, hF2⟩ := hSynd1
+  unfold isSyndetic
+  use F
+  constructor
+  · exact hF1
+  intro s
+  specialize hF2 s
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  use f
+  constructor
+  · exact hf1
+  simpa
 obtain ⟨F, hF1, hF2⟩ := hSyndetic
 unfold isSyndetic
 use F
@@ -1325,14 +1348,14 @@ have hUV : V ⊆ U := by
   unfold V
   simp
 unfold visitTimeSet
-simp
+simp only [Set.mem_preimage]
 have hV3 : dSystem.map (f * s) y ∈ V := by
   unfold visitTimeSet at hf2
-  simp at hf2
+  simp only [Set.mem_preimage] at hf2
   exact hf2
+apply hU
 apply hUV
 exact hV3
--- still working on this. There's an issue with passing back and forth between system and subsystem
 
 end Uniform_recurrence
 
