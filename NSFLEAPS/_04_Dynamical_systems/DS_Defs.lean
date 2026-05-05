@@ -1241,17 +1241,12 @@ have h6 : x ∈ orbitClosure dSystem x := by
     apply IsOpen.mem_nhds hU1 hU2
   have h62 := h1 U h61
   exact h62
-
 let Y := orbitClosure dSystem x
-
 have Y_def : Y = orbitClosure dSystem x := by
   rfl
-
 have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
   apply orbitClosureIsNonemptyCompactT2InvariantSubset
-
 let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
-
 have : CompactSpace Y := by
   apply isCompact_iff_compactSpace.mp
   exact hY.2.1
@@ -1259,11 +1254,9 @@ have : Nonempty Y := by
   apply hY.1.to_subtype
 have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
   sorry
-
 have hYMinimal : isMinimalSystem dSystemY := by
   simp only [minimalIffDenseOrbits]
   exact hYDenseOrbit
-
 rw [<- Y_def]
 sorry
 -- Still working on this. There is a subtle issue
