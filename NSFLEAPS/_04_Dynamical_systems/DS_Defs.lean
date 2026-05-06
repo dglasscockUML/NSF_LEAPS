@@ -1268,9 +1268,8 @@ have hYMinimal : isMinimalSystem dSystemY := by
   simp only [minimalIffDenseOrbits]
   exact hYDenseOrbit
 rw [<- Y_def]
-sorry
--- Still working on this. There is a subtle issue
--- in the relation between minimal set and minimal system
+rw [minimalSubsetIffMinimalSubsystem]
+exact hYMinimal
 
 /-- If `y` is in the orbit closure of a uniformly recurrent point `x`, then
 `y` is uniformly recurrent -/
