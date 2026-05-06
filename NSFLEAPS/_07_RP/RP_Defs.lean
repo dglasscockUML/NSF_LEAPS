@@ -1139,10 +1139,13 @@ by
               simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop]
               use g
           rw [← setVisitsAsQuotientSet hMin x V U] at rInRVUpre
-          unfold ϕ at hg2
-          simp only at hg2
-          rw [← hg2]
-          exact ⟨rInRxU,rInRVUpre⟩
+          · unfold ϕ at hg2
+            simp only at hg2
+            rw [← hg2]
+            exact ⟨rInRxU,rInRVUpre⟩
+          · exact VIsOpen
+          · exact UIsOpen
+
   exact syndeticIsMonotone imageOfVisitsIsSyndetic imageOfVisitsIsContainedInTarget
 
 end Set_recurrence_corollary
