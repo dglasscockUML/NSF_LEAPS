@@ -1292,7 +1292,7 @@ have : CompactSpace Y := by
 have : Nonempty Y := by
   apply hY.1.to_subtype
 have hdSystemY_Minimal : isMinimalSystem dSystemY := by
-  apply minimalSubsetIsMinimalSystem
+  rw [<- minimalSubsetIffMinimalSubsystem]
   exact hYMinimal
 unfold isUniformlyRecurrent
 intro U' hU'
