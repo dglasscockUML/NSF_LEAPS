@@ -858,12 +858,22 @@ theorem existsMinimalSubset
 ∃ Y : Set X, isMinimalSubset dSystem Y :=
 by sorry
 
+/- Depracated in favor of minimalSubsetIffMinimalSubsystem
 /-- A minimal set, when made into a system, is a minimal system -/
 theorem minimalSubsetIsMinimalSystem
 (dSystem : DynamicalSystem S X)
 {Y : Set X} [CompactSpace Y] [Nonempty Y]
 (hMinSubset : isMinimalSubset dSystem Y) :
 isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1)) :=
+by sorry -- UNHAPPY, WAIT TO TOUCH -/
+
+/-- A minimal set, when made into a system, is a minimal system -/
+theorem minimalSubsetIffMinimalSubsystem
+(dSystem : DynamicalSystem S X)
+{Y : Set X} [CompactSpace Y] [Nonempty Y]
+(preSubSystem : isNonemptyCompactT2InvariantSubset dSystem Y) :
+isMinimalSubset dSystem Y ↔
+  isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem) :=
 by sorry -- UNHAPPY, WAIT TO TOUCH
 
 /-- A system is minimal if and only if for all points `x ∈ X`,
