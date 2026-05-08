@@ -1145,7 +1145,6 @@ by
             exact ⟨rInRxU,rInRVUpre⟩
           · exact VIsOpen
           · exact UIsOpen
-
   exact syndeticIsMonotone imageOfVisitsIsSyndetic imageOfVisitsIsContainedInTarget
 
 end Set_recurrence_corollary
