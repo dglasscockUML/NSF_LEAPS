@@ -143,3 +143,38 @@ rw [<- hs]
 rw [<- hSemiHom.hom_prop]
 simp only [Set.mem_image]
 use e * s
+
+/-- Shift of a syndetic set is syndetic -/
+lemma shiftSyndeticIsSyndetic
+{S} [Semigroup S] [Nonempty S]
+{A : Set S} (hA : isSyndetic A)
+{s : S} : isSyndetic ((s * · ) '' A) := by
+obtain ⟨F, hF1, hF2⟩ := hA
+unfold isSyndetic
+let E :=  (s * ·) '' F
+use E
+constructor
+· apply Set.Finite.image
+  apply hF1
+intro r
+specialize hF2 r
+obtain ⟨f, hf1, hf2⟩ := hF2
+use s * f
+constructor
+· unfold E
+  simp only [Set.mem_image]
+  use f
+simp only [Set.mem_image]
+use f * r
+constructor
+· exact hf2
+simp only [mul_assoc]
+
+/-- A syndetic set in a semigroup is not empty -/
+lemma syndeticSetIsNonEmpty {S} [Semigroup S] [hSNonempty : Nonempty S]
+{A : Set S} (hA : isSyndetic A) : A.Nonempty := by
+  rcases hSNonempty with ⟨s⟩
+  obtain ⟨F, hF1, hF2⟩ := hA
+  specialize hF2 s
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  exact ⟨f * s, hf2⟩

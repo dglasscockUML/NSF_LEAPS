@@ -545,6 +545,7 @@ In the following list, each statement is equivalent to the one that follows it.
 \end{theorem}
 
 \begin{proof}
+    \leanok{}
     By \cref{thm_dual_of_fam_is_fam}, it suffices to show that for all $\family \in \families{S}$, $(\family^*)^* = \family$.
     In the following list, each statement is equivalent to the one that follows it.
     \begin{enumerate}
@@ -1457,6 +1458,7 @@ The following lemma describes the bijection between factors of a given system an
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Each line is equivalent to the one that follows it.
     \begin{enumerate}
         \item $h \in R(x,g^{-1}U)$
@@ -1487,21 +1489,22 @@ The following lemma describes the bijection between factors of a given system an
 \label{lemma_return_time_algebra_three}
 \lean{setVisitsAsQuotientSet}
 \leanok{}
-    Suppose $S$ is a semigroup, $X$ be a minimal $S$-system, $U, V \subseteq X$, and $x \in X$.
+    Suppose $S$ is a semigroup, $X$ be a minimal $S$-system, $U, V \subseteq X$ open, and $x \in X$.
     \[R(x,V)R(x,U)^{-1} = R(U,V).\]
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Each line is equivalent to the one that follows it.
     \begin{enumerate}
         \item $g \in R(U,V)$
-        \item $gU \cap V$ is non-empty and open
+        \item $gU \cap V$ is non-empty
         \begin{enumerate}
             \item there exists $u \in U$ such that $gu \in V$
             \item there exists $u \in U$ such that $u \in g^{-1} V$
         \end{enumerate}
         \item $U \cap g^{-1} V$ is non-empty and open
-        \item there exists $h \in G$ such that $hx \in U \cap g^{-1}V$
+        \item there exists $h \in G$ such that $h \in R(x, U \cap g^{-1}V)$
         \item there exists $h \in G$ such that $h \in R(x,U) \cap R(x,g^{-1}V)$
         \item there exists $h \in G$ such that $h \in R(x,U) \cap g^{-1} R(x,V)$
         \item there exists $h \in R(x,U)$ such that $h \in g^{-1} R(x,V)$
@@ -1520,6 +1523,7 @@ The following lemma describes the bijection between factors of a given system an
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Standard: re-write as the set theoretic statement, ``preimage splits over intersections''
 \end{proof}
 
@@ -1532,6 +1536,7 @@ The following lemma describes the bijection between factors of a given system an
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Standard: re-write as the set theoretic statement, ``preimage splits over unions''
 \end{proof}
 
@@ -1544,6 +1549,7 @@ Let $X$ be an $S$-system, $x \in X$.  For all $U_1 \subseteq U_2 \subseteq X$,
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Immediate from the definitions.
 \end{proof}
 
@@ -1556,6 +1562,7 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Immediate from the definitions.
 \end{proof}
 
@@ -1612,6 +1619,7 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Let $Z \subseteq Y$ be a non-empty, closed, $S$-invariant subset of $Y$.  Then $\pi^{-1} Z$ is a non-empty, closed, $S$-invariant subset of $X$.  By the minimality of $X$, $\pi^{-1} Z = X$.  Since $\pi$ is surjective, $Z = Y$, as desired.
 \end{proof}
 
@@ -1804,11 +1812,11 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
     Let $S$ be a semigroup and $X$ be an $S$-system. For $(x, y) \in X^2$ and $A \subseteq S$, define
     \[\Omega_A(x,y) = \{w \in X : \exists \ \text{net } (a_n, b_n, s_n) \in X^2 \times A, \ \lim_{n \to \infty} (a_n, b_n, s_n a_n, s_n b_n) = (w, w, x, y) \}.\]
     Alternatively:
-    \[\Omega_A \defeq (\Delta(X) \times X^2) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}}\]
+    \[\Omega_A \defeq (\Delta(X) \times X^2) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in A\}}\]
     (where notice that $\overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}}$ is the graph of the $S$-action on $X^2$)
     so that
     \[\Omega_A(x,y) = \pi_1 (\Omega_A \cap (X^2 \times \{(x,y)\})).\]
-    \[\Omega_A(x,y) = (\Delta(X) \times \{(x,y)\}) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}}.\]
+    \[\Omega_A(x,y) = \pi_1 \big( (\Delta(X) \times \{(x,y)\}) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}} \big).\]
 \end{definition}
 
 \begin{lemma}
@@ -1821,10 +1829,21 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{proof}
 
 \begin{lemma}
+\label{lemma_rp_implies_ultra}
+\lean{xyInRPIffUltraToSomewwxy}
+\leanok{}
+    Let $S$ be a semigroup, $X$ be an $S$-system, and $x, y \in X$. The point $(x,y) \in \RP$ if and only if there exists $w \in X$ and an ultrafilter $F$ on $X^2 \times S$ such that $\lim F = (w,w,x,y)$.
+\end{lemma}
+
+\begin{proof}
+    \dgg{TBD}
+\end{proof}
+
+\begin{lemma}
 \label{lemma_rp_implies_net_iff}
     Let $S$ be a semigroup, $X$ be an $S$-system, and $x, y \in X$. For all $A \subseteq S$,
-    \[\bigcap_{\alpha} \overline{A \alpha} = \{(x,y) \in X^2 : \Omega_A(x,y) \neq \emptyset\}.\]
-    In particular, setting $A = S$, we see that $(x,y) \in \RP$ if and only if there exists $w \in X$ and a net $(a_n, b_n, g_n)_n \subseteq X \times X \times S$ such that
+    \[\bigcap_{\alpha} \overline{A \alpha} = \{(x,y) \in X^2 : \Omega_A(x,y) \neq \emptyset\} = \pi_{34} \Omega_A.\]
+    In particular, setting $A = S$, we see that $(x,y) \in \RP$ if and only if there exists $w \in X$ \dgg{so that $(w,w,x,y) \in \Gamma_S$} and a net $(a_n, b_n, g_n)_n \subseteq X \times X \times S$ such that
     \begin{align*}
         \lim_{n \to \infty} (a_n, b_n, g_n a_n, g_n b_n) &= (w, w, x, y).
     \end{align*}
@@ -1865,7 +1884,7 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
     \label{lemma_set_of_ws_is_closed}
     Let $S$ be a semigroup and $X$ be an $S$-system. For all $A \subseteq S$,
     \[\Delta(\Omega_A(x,y)) = \Delta(X) \cap \bigcap_{\text{open } U \ni (x,y)} \overline{A^{-1} U}.\]
-    \[\pi_{12}\big((\Delta(X) \times \{(x,y)\}) \cap \overline{ \{(a,b,sa,sb) : a, b \in X, \ s \in S\}} \big) = \Delta(X) \cap \bigcap_{\text{open } U \ni (x,y)} \overline{A^{-1} U}.\]
+    \[\pi_{12}\big((\Delta(X) \times \{(x,y)\}) \cap \Gamma_A \big) = \Delta(X) \cap \bigcap_{\text{open } U \ni (x,y)} \overline{A^{-1} U}.\]
 \end{lemma}
 
 \begin{proof}
@@ -1909,7 +1928,7 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
     \[(x,y) \in \RP = \bigcap_{\alpha} \overline{St \alpha}.\]
     By \cref{lemma_diag_limit_pt_set}, we have that $\Omega_{St}(x,y) \neq \emptyset$.
 
-    Next we claim that for all $t \in S$, $t \Omega_{St}(x,y) \subseteq S$. Let $t \in S$ and $w \in \Omega_{St}(x,y)$.  Thus, there exists a net $(a_n, b_n, s_n t)_n \subseteq X^2 \times S$ such that
+    Next we claim that for all $t \in S$, $t \Omega_{St}(x,y) \subseteq \Omega_S(x,y)$. Let $t \in S$ and $w \in \Omega_{St}(x,y)$.  Thus, there exists a net $(a_n, b_n, s_n t)_n \subseteq X^2 \times S$ such that
     \begin{align*}
         \lim_{n \to \infty} (a_n, b_n, s_n t a_n, s_n t b_n) &= (w, w, x, y).
     \end{align*}
@@ -1917,9 +1936,9 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
     \[\lim_{n \to \infty} (t a_n, t b_n, s_n t a_n, s_n t b_n) = (t w, t w, x, y).\]
     Therefore, $tw \in \Omega_S(x,y)$, as desired.
 
-    Now we will show that $\Omega_S$ is dense in $X$. Let $U \subseteq X$ be open and non-empty.  By minimality, there exists $F \subseteq S$ finite such that $F^{-1} U = X$.  Let $t$ be the product of the elements of $F$.  By the paragraph above, there exists $w \in \Omega_{St}$.  By minimality, there exists $f \in F$ such that $fw \in U$.  Since $St \subseteq Sf$, $w \in \Omega_{St} \subseteq \Omega_{Sf}$ (by \cref{lemma_diag_limit_pt_set}).  By the paragraph above, $f \Omega_{Sf} \subseteq \Omega_S$, so $fw \in \Omega_S$.  Therefore, $\Omega_S \cap U \neq \emptyset$, as was to be shown.
+    Now we will show that $\Omega_S(x,y)$ is dense in $X$. Let $U \subseteq X$ be open and non-empty.  By minimality, there exists $F \subseteq S$ finite such that $F^{-1} U = X$.  Let $t$ be the product of the elements of $F$.  By the paragraph above, there exists $w \in \Omega_{St}(x,y)$.  By minimality, there exists $f \in F$ such that $fw \in U$.  Since $St \subseteq Sf$, $w \in \Omega_{St}(x,y) \subseteq \Omega_{Sf}(x,y)$ (by \cref{lemma_diag_limit_pt_set}).  By the paragraph above, $f \Omega_{Sf}(x,y) \subseteq \Omega_S$, so $fw \in \Omega_S(x,y)$.  Therefore, $\Omega_S(x,y) \cap U \neq \emptyset$, as was to be shown.
     
-    Finally, by the description of $\Omega_S(x,y)$ in \cref{lemma_set_of_ws_is_closed}, we see that $\Omega_S$ is closed.  Since it is a closed and dense subset of $X$, we get that $\Omega_S = X$, as desired.
+    Finally, by the description of $\Omega_S(x,y)$ in \cref{lemma_set_of_ws_is_closed}, we see that $\Omega_S(x,y)$ is closed.  Since it is a closed and dense subset of $X$, we get that $\Omega_S(x,y) = X$, as desired.
 \end{proof}
 
 \begin{lemma}
@@ -1954,6 +1973,8 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
 
 
 The following lemma is shown in \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993} for group actions.  Our semigroup version is considerably more involved since our semigroup maps are not necessarily open.
+
+\dgg{Start by re-writing the proof of \cref{lemma_rp_functorial_property_minimal} using ultrafilters.  Trace the changes upstream to figure out the best way to write the previous stuff using ultrafilters.}
 
 \begin{lemma}
     \label{lemma_rp_functorial_property_minimal}
@@ -2270,7 +2291,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \label{lemma_exists_minimal_left_ideal}
 \lean{rightTopSemigroupContainsMinLeftIdeal}
 \leanok{}
-    Let $S$ be a compact, Hausdorff right-topological semigroup.  Every left ideal of $S$ contains a minimal left ideal.
+    Let $S$ be a compact, Hausdorff right-topological semigroup.  The semigroup $S$ contains a minimal left ideal.
 \end{lemma}
 
 \begin{proof}
@@ -3296,6 +3317,7 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. By \cref{thm_xxx_is_trt
 %By \cref{lemma_orb_closure_of_ur_is_minimal}, $\overline{S^2(x,x,px)}$ is a minimal $S$-system, and hence, by \cref{lemma_pts_in_minimal_are_ur}, that all points of $\overline{S^2(x,x,px)}$ are $S$-uniformly recurrent.
 
 \begin{theorem}
+\label{thm_xxy_is_trtl_unif_rec_v3}
 \lean{xxyUniformlyRecurrent}
 \leanok{}
     Let $X$ be a minimal $S$-system and $x, y \in X$.  The point $(x,x,y)$ is $S^2$-uniformly recurrent.
@@ -3306,6 +3328,8 @@ Since $X$ is $S$-minimal, $(y,y) \in \overline{S(x,x)}$. By \cref{thm_xxx_is_trt
 Since $X$ is $S$-minimal, $(x,x) \in \overline{S(y,y)}$. By \cref{thm_xxx_is_trtl_unif_rec_v3}, $(y,y,y)$ is $S^2$-uniformly recurrent, it follows by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2} that $(x,x,y)$ belongs to $\overline{S^2(y,y,y)}$. By \cref{lemma_in_orb_clos_of_ur_implies_ur}, all points in $\overline{S^2(y,y,y)}$ are $S^2$-uniformly recurrent, whereby $(x,x,y)$ is $S^2$-uniformly recurrent, as desired.
 \end{proof}
 
+The proof of \cref{thm_rp_implies_same_minimal_component} below uses ultrafilters (in two ways!) to avoid nets.  The old net proof is commented out.
+
 \begin{theorem}
 \label{thm_rp_implies_same_minimal_component}
 \label{theorem_cube_space_orbit_implies_rp}
@@ -3315,41 +3339,98 @@ Since $X$ is $S$-minimal, $(x,x) \in \overline{S(y,y)}$. By \cref{thm_xxx_is_trt
 \end{theorem}
 
 \begin{proof}
-    Suppose $(x,y) \in \RP$. By \cref{lemma_rp_implies_net_iff}, there exists $w \in X$ and a net $(a_n, b_n, s_n)_n \subseteq X \times X \times S$ such that
-    \[(a_n, b_n, s_n a_n, s_n b_n) \to (w, w, x, y).\]
+    Suppose $(x,y) \in \RP$. By \dgg{an ultrafilter version of} \cref{lemma_rp_implies_net_iff}, there exists $w \in X$ and an ultrafilter $\family$ on $X \times X \times S$ such that the image of $\family$ under the map $\varphi_1: (a,b,s) \mapsto (a,b,sa,sb)$ converges to $(w,w,x,y)$:
+    \[\varphi_1 \family \to (w,w,x,y).\]
 
-    Fix a minimal left ideal $L \subseteq \beta S^2$.  Since $X^2$ is a minimal $S^2$-system, by \cref{lemma_ultrafilter_surjective_action}, there exists $p_n \in L$ such that $p_n (w,w) = (a_n, b_n)$.  By \cref{lemma_ultrafilter_action_on_X3}, $p_n (w,w,y) = (a_n, b_n, p_n y)$.
+    By \cref{lemma_exists_minimal_left_ideal}, $\beta S^2$ contains a minimal left ideal $L$.  Since $X^2$ is a minimal $S^2$-system, by \cref{lemma_ultrafilter_surjective_action}, for $(a,b,s) \in X \times X \times S$, there exists $p_{(a,b)} \in L$ such that $p_{(a,b)}(w,w) = (a,b)$.  Note that by \cref{lemma_ultrafilter_action_on_X3}, $p_{(a,b)} (w,w,y) = (a, b, p_{(a,b)} y)$. Thus we get a map $\varphi_2: X \times X \times S \to \beta S^2$ with image in $L$. Now $\varphi_2 \family$ is an ultrafilter on $\beta S^2$ and hence converges to some $p$:
+    \[\varphi_2 \family \to p.\]
+    Since $L$ is closed and $\varphi_2$ has image in $L$, $p \in L$.
     
-    Since $L$ is compact, the net $(p_n)_n$ in $L$ has an accumulation point $p \in L$.  Pass to a convergent subnet so that
-    \[(a_m, b_m, s_m a_m, s_m b_m, p_m) \to (w, w, x, y, p).\]
-    By \cref{thm_ultrafilter_action_with_fixed_x_is_continuous}, the map $\beta S^2 \to X^2$ given by $q \mapsto q(w,w)$ is continuous.  Since $p_m \to p$, we have that $p_m(w,w) \to p(w,w)$.  But $p_n(w,w) = (a_n,b_n)$ and $(a_n,b_n) \to (w,w)$, so we see that $p (w,w) = (w,w)$.
+    By \cref{thm_ultrafilter_action_with_fixed_x_is_continuous}, the map $\varphi_3: \beta S^2 \to X^2$ given by $q \mapsto q(w,w)$ is continuous. Consider the composition $\varphi_3 \circ \varphi_2: X^2 \times S \to X^2$.  On the one hand, by the definitions, $\varphi_3 \circ \varphi_2 = \pi_{12} = \pi_{12} \circ \varphi_1$. We see from the fact that
+    \[\varphi_1 \family \to (w,w,x,y)\]
+    and the fact that $\pi_{12}$ is continuous that
+    \[(\varphi_3 \circ \varphi_2) \family = (\pi_{12} \circ \varphi_1) \family \to \pi_{12} (w,w,x,y) = (w,w).\]
+    On the other hand, $\varphi_3$ is continuous, so
+    \[(\varphi_3 \circ \varphi_2) \family \to \varphi_3 (\text{limit of } \varphi_2 \family).\]
+    Since $\varphi_2 \family \to p$, we see that
+    \[(\varphi_3 \circ \varphi_2) \family \to \varphi_3 p = p(w,w).\]
+    Therefore $p(w,w) = (w,w)$.
 
-    By \cref{lemma_ultrafilter_idempotent_lift}, there exists $q \in L$ such that $q (w,w) = (w,w)$ and $pq$ is idempotent.  Since the map $\beta S^2 \to X$ given by $r \mapsto rqy$ is continuous (\cref{thm_ultrafilter_action_with_fixed_x_is_continuous}) and $p_m \to p$, we see that $p_m q y \to p q y$. Consequently:
-    \begin{align}
-        \label{eqn_orb_closure_eqn_1}
-        T_{L,s_m} p_m q (w,w,y) = T_{L,g_m} p_m (w,w, q y) = (s_ma_m, s_mb_m, p_m q y) \to (x, y, p q y).
-    \end{align}
-    Since $p_mq \in L \subseteq \beta S^2$, we have by \cref{thm_ultra_point_in_orb_closure} that $(a_m, b_m, p_m q y) \in \overline{S^2 (w,w,y)}$.
-    Since $(w,w,y)$ is $S^2$-uniformly recurrent (by \cref{thm_xxx_is_trtl_unif_rec_v3}) and $(s_ma_m, s_mb_m) \in \overline{S(a_m,b_m)}$, we have by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2} that $(s_ma_m, s_mb_m, p_m q y) \in \overline{S^2 (a_m,b_m,p_mqy)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), we get that
-    \[(s_ma_m, s_mb_m, p_m q y) \in \overline{S^2 (w,w,y)}.\]
-    Since $\overline{S^2 (w,w,y)}$ is closed, we conclude from \cref{eqn_orb_closure_eqn_1} that $(x, y, p q y) \in \overline{S^2 (w,w,y)}$.
+abcde
+
+    By \cref{lemma_ultrafilter_idempotent_lift}, there exists $q \in L$ such that $q (w,w) = (w,w)$ and $pq$ is idempotent. Consider the map $\varphi_4: X^2 \times S \to X^3$ given by
+    \[(a,b,s) \mapsto (sa,sb,p_{(a,b)}qy).\]
+    We make two claims.
+    \begin{itemize}
+        \item Claim 1: $\varphi_4 \family$ converges to $(x,y,pqy)$.  This is easy since the first two coordinates converge to $(x,y)$ by $\varphi_1 \family \to (w,w,x,y)$ and the third coordinate converges to $pqy$ by the continuity of $r \mapsto rqy$ and the fact that $\varphi_2 \family \to p$.
+        
+        \item Claim 2: the image of $\varphi_4$ is contained in $\overline{S^2 (w,w,y)}$.  Indeed, let $(a,b,s) \in X^2 \times S$, and note that
+        \[\varphi_4 (a,b,s) = (sa,sb,p_{(a,b)} q y) = T_{L,s} p_{(a,b)} q (w,w,y).\]
+        This follows since $q(w,w) = (w,w)$ and $p_{(a,b)}(w,w) = (a,b)$.
+        
+        Since $p_{(a,b)}q \in L \subseteq \beta S^2$, we have by \cref{thm_ultra_point_in_orb_closure} that
+    \[p_{(a,b)} q (w,w,y) \in \overline{S^2 (w,w,y)}.\]
+    Applying $T_{L,s}$, we see
+    \[\varphi_4 (a,b,s) = T_{L,s} p_{(a,b)} q (w,w,y) \in T_{L,s} \overline{S^2 (w,w,y)} \subseteq \overline{S^2 (w,w,y)},\]
+    as was to be shown.
+    \end{itemize}
+% \[(sa,sb,p_{(a,b)}qy) = T_{L,s} p_{(a,b)} q (w,w,y).\]
+%      Thus, it suffices to show that $T_{L,s} p_{(a,b)} q (w,w,y) \in \overline{S^2 (w,w,y)}$. 
+%     Since $(w,w,y)$ is $S^2$-uniformly recurrent (by \cref{thm_xxy_is_trtl_unif_rec_v3}) and $(sa, sb) \in \overline{S(a,b)}$, we have by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2} that $(sa, sb, p_{(a,b)} q y) \in \overline{S^2 (a,b,p_{(a,b)}qy)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), we get that
+%     \[(sa, sb, p_{(a,b)} q y) \in \overline{S^2 (w,w,y)}.\]
+    Combining the claims with the fact that $\overline{S^2 (w,w,y)}$ is closed, we get that $(x,y,pqy) \in \overline{S^2 (w,w,y)}$.
     
     Since $X$ is a minimal $S$-system, by the definition of minimal and the diagonal action, $(w,w) \in \overline{S(y,y)}$.  Since $(y,y,y)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2}, we have that $(w,w,y) \in \overline{S^2(y,y,y)}$. By transitivity (\cref{theorem_orbit_closure_transitivity}), we get that
     \[(x, y, pq y) \in \overline{S^2(y,y,y)}.\]
     Note that since $(y,y,y)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_in_orb_clos_of_ur_implies_ur}, we have that $(x,y, pq y)$ is $S^2$-uniformly recurrent.
     
-    Since $pq \in L \subseteq \beta S^2$ is idempotent, the point $pq y$ is $S^2$-proximal to $y$. By \cref{lemma_prox_in_h_implies_in_g}, the points $pq y$ and $y$ are $S$-proximal. It follows that $(y,y) \in \overline{S(y,pqy)}$. Since $(x,y, pq y)$ is $S^2$-uniformly recurrent, by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(x, y, y) \in \overline{S^2 (x, y, pq y)}$. By transitivity (\cref{theorem_orbit_closure_transitivity}), we have that
+    Since $pq \in L \subseteq \beta S^2$ is idempotent, by \cref{lemma_idempotent_implies_proximal}, the point $pq y$ is $S^2$-proximal to $y$. By \cref{lemma_prox_in_h_implies_in_g}, the points $pq y$ and $y$ are $S$-proximal. It follows by \cref{theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal} that $(y,y) \in \overline{S(y,pqy)}$. Since $(x,y, pq y)$ is $S^2$-uniformly recurrent, by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(x, y, y) \in \overline{S^2 (x, y, pq y)}$. By transitivity (\cref{theorem_orbit_closure_transitivity}), we have that
     \[(x, y, y) \in \overline{S^2 (y,y,y)},\]
-    as was to be shown.
-        
-    % By \cref{thm_xxx_is_trtl_unif_rec_v3}, the point $(y,y,y)$ is $S^2$-uniformly recurrent. Therefore, by \cref{lemma_in_orb_clos_of_ur_implies_ur}, the point $(x, y, pq y)$ is $S^2$-uniformly recurrent.
-    
-    %  Since $(x, y, pq y)$ is $S^2$-uniformly recurrent, we get by \cref{lemma_in_orb_clos_of_ur_implies_ur} that $(x,y,y)$ is $S^2$-uniformly recurrent and in the same minimal component as $(x, y, pq y)$.  Combined with the previous paragraph, we conclude that $(x,y,y)$ is in the same $S^2$-minimal component as $(y,y,y)$, as desired.
+    as was to be shown.\\
 
     Conversely, suppose $(x,y,y) \in \overline{S^2 (y,y,y)}$. To show that $(x,y) \in \RP$, we will show that for all entourages $\alpha \subseteq X^2$, all open $W \subseteq X^2$ containing $(x,y)$, $W \cap S \alpha \neq \emptyset$.
     
-    Let $\alpha \subseteq X^2$ be an entourage and let $W \ni (x,y)$. Consider the neighborhood $W \times \alpha[y]$ of the point $(x,y,y)$.  By assumption, $(x,y,y) \in \overline{S^2 (y,y,y)}$, so there exists $(s,t) \in S^2$ so that $(s,t)(y,y,y) = (sy,sty,ty) \in W \times \alpha[y]$. That is: $(y,ty) \in \alpha$ and $s(y,ty) = (sy,sty) \in W$.  Therefore, $W \cap \overline{S \alpha} \neq \emptyset$, as desired.
+    Let $\alpha \subseteq X^2$ be an entourage and let $W \ni (x,y)$. Consider the neighborhood $W \times \alpha[y]$ of the point $(x,y,y)$.  \dgg{Is $\alpha[y] = $} By assumption, $(x,y,y) \in \overline{S^2 (y,y,y)}$, so there exists $(s,t) \in S^2$ so that $(s,t)(y,y,y) = (sy,sty,ty) \in W \times \alpha[y]$. That is: $(y,ty) \in \alpha$ and $s(y,ty) = (sy,sty) \in W$.  Therefore, $W \cap S \alpha \neq \emptyset$, as desired.
 \end{proof}
+
+% OLD PROOF USING NETS.  SAVE FOR POSTERITY.
+% \begin{proof}
+%     Suppose $(x,y) \in \RP$. By \cref{lemma_rp_implies_net_iff}, there exists $w \in X$ and a net $(a_n, b_n, s_n)_n \subseteq X \times X \times S$ such that
+%     \[(a_n, b_n, s_n a_n, s_n b_n) \to (w, w, x, y).\]
+
+%     By \cref{lemma_exists_minimal_left_ideal}, $\beta S^2$ contains a minimal left ideal $L$.  Since $X^2$ is a minimal $S^2$-system, by \cref{lemma_ultrafilter_surjective_action}, there exists $p_n \in L$ such that $p_n (w,w) = (a_n, b_n)$. By \cref{lemma_ultrafilter_action_on_X3}, $p_n (w,w,y) = (a_n, b_n, p_n y)$.
+    
+%     Since $L$ is compact, the net $(p_n)_n$ in $L$ has an accumulation point $p \in L$.  Pass to a convergent subnet so that
+%     \[(a_m, b_m, s_m a_m, s_m b_m, p_m) \to (w, w, x, y, p).\]
+    
+%     By \cref{thm_ultrafilter_action_with_fixed_x_is_continuous}, the map $\beta S^2 \to X^2$ given by $q \mapsto q(w,w)$ is continuous.  Since $p_m \to p$, we have that $p_m(w,w) \to p(w,w)$.  But $p_n(w,w) = (a_n,b_n)$ and $(a_n,b_n) \to (w,w)$, so we see that $p (w,w) = (w,w)$.
+
+%     By \cref{lemma_ultrafilter_idempotent_lift}, there exists $q \in L$ such that $q (w,w) = (w,w)$ and $pq$ is idempotent.  Since the map $\beta S^2 \to X$ given by $r \mapsto rqy$ is continuous (\cref{thm_ultrafilter_action_with_fixed_x_is_continuous}) and $p_m \to p$, we see that $p_m q y \to p q y$. Consequently:
+%     \begin{align}
+%         \label{eqn_orb_closure_eqn_1}
+%         T_{L,s_m} p_m q (w,w,y) = T_{L,g_m} p_m (w,w, q y) = (s_ma_m, s_mb_m, p_m q y) \to (x, y, p q y).
+%     \end{align}
+%     Since $p_mq \in L \subseteq \beta S^2$, we have by \cref{thm_ultra_point_in_orb_closure} that $(a_m, b_m, p_m q y) \in \overline{S^2 (w,w,y)}$.
+%     Since $(w,w,y)$ is $S^2$-uniformly recurrent (by \cref{thm_xxx_is_trtl_unif_rec_v3}) and $(s_ma_m, s_mb_m) \in \overline{S(a_m,b_m)}$, we have by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2} that $(s_ma_m, s_mb_m, p_m q y) \in \overline{S^2 (a_m,b_m,p_mqy)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), we get that
+%     \[(s_ma_m, s_mb_m, p_m q y) \in \overline{S^2 (w,w,y)}.\]
+%     Since $\overline{S^2 (w,w,y)}$ is closed, we conclude from \cref{eqn_orb_closure_eqn_1} that $(x, y, p q y) \in \overline{S^2 (w,w,y)}$.
+    
+%     Since $X$ is a minimal $S$-system, by the definition of minimal and the diagonal action, $(w,w) \in \overline{S(y,y)}$.  Since $(y,y,y)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v2}, we have that $(w,w,y) \in \overline{S^2(y,y,y)}$. By transitivity (\cref{theorem_orbit_closure_transitivity}), we get that
+%     \[(x, y, pq y) \in \overline{S^2(y,y,y)}.\]
+%     Note that since $(y,y,y)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_in_orb_clos_of_ur_implies_ur}, we have that $(x,y, pq y)$ is $S^2$-uniformly recurrent.
+    
+%     Since $pq \in L \subseteq \beta S^2$ is idempotent, the point $pq y$ is $S^2$-proximal to $y$. By \cref{lemma_prox_in_h_implies_in_g}, the points $pq y$ and $y$ are $S$-proximal. It follows that $(y,y) \in \overline{S(y,pqy)}$. Since $(x,y, pq y)$ is $S^2$-uniformly recurrent, by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(x, y, y) \in \overline{S^2 (x, y, pq y)}$. By transitivity (\cref{theorem_orbit_closure_transitivity}), we have that
+%     \[(x, y, y) \in \overline{S^2 (y,y,y)},\]
+%     as was to be shown.
+        
+%     % By \cref{thm_xxx_is_trtl_unif_rec_v3}, the point $(y,y,y)$ is $S^2$-uniformly recurrent. Therefore, by \cref{lemma_in_orb_clos_of_ur_implies_ur}, the point $(x, y, pq y)$ is $S^2$-uniformly recurrent.
+    
+%     %  Since $(x, y, pq y)$ is $S^2$-uniformly recurrent, we get by \cref{lemma_in_orb_clos_of_ur_implies_ur} that $(x,y,y)$ is $S^2$-uniformly recurrent and in the same minimal component as $(x, y, pq y)$.  Combined with the previous paragraph, we conclude that $(x,y,y)$ is in the same $S^2$-minimal component as $(y,y,y)$, as desired.
+
+%     Conversely, suppose $(x,y,y) \in \overline{S^2 (y,y,y)}$. To show that $(x,y) \in \RP$, we will show that for all entourages $\alpha \subseteq X^2$, all open $W \subseteq X^2$ containing $(x,y)$, $W \cap S \alpha \neq \emptyset$.
+    
+%     Let $\alpha \subseteq X^2$ be an entourage and let $W \ni (x,y)$. Consider the neighborhood $W \times \alpha[y]$ of the point $(x,y,y)$.  By assumption, $(x,y,y) \in \overline{S^2 (y,y,y)}$, so there exists $(s,t) \in S^2$ so that $(s,t)(y,y,y) = (sy,sty,ty) \in W \times \alpha[y]$. That is: $(y,ty) \in \alpha$ and $s(y,ty) = (sy,sty) \in W$.  Therefore, $W \cap \overline{S \alpha} \neq \emptyset$, as desired.
+% \end{proof}
 
 \subsection{RP is an equivalence relation}
 
@@ -3759,7 +3840,8 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 
 \begin{proof}
     That
-    \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
+    \[\syndetic \classcapdual \Delta \subse
+    teq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}).  By \cref{thm_bfw_dual_abelian}, $\syndetic \classcapdual \Delta = \syndetic \classcapdual \dcthickbohr$, so $\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0$, as desired.
 \end{proof}
 

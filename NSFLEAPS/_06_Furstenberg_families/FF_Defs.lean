@@ -1,4 +1,4 @@
-import NSFLEAPS._03_Family_algebra.FA_Theorems                                              -- We need to import the later one.
+import NSFLEAPS._03_Family_algebra.FA_Theorems
 import NSFLEAPS._05_Ultrafilters.UF_Defs
 
 section Abstract_results
@@ -12,8 +12,33 @@ theorem visitTimeConcentrationForPRFamily
 (x : X) (U : Set X) {hU : IsClosed U}
 (F : Family S) {hF : isPRFamily F} :
 visitTimeSet dSystem x U ∈ F →
-∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) :=
-by sorry
+∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
+contrapose
+intro h1
+simp at h1
+have hU1 : IsCompact U := by
+  apply hU.isCompact
+have h2 : ∀ y ∈ U, ∃ W : Set X, IsOpen W ∧ y ∈ W ∧ visitTimeSet dSystem x W ∉ F := by
+  intro y hy
+  specialize h1 y hy
+  obtain ⟨V, hV1, hV2⟩ := h1
+  rcases (mem_nhds_iff.mp hV1) with ⟨W, hUsub, hUopen, hyU⟩
+  use W
+  constructor
+  · exact hUopen
+  constructor
+  · exact hyU
+  by_contra h
+  have hUV_visitTime : visitTimeSet dSystem x W ⊆ visitTimeSet dSystem x V := by
+    apply visitTimesMono
+    exact hUsub
+  have hV3 : visitTimeSet dSystem x V ∈ F := by
+    apply F.upward_closed (visitTimeSet dSystem x W)
+    apply h
+    apply hUV_visitTime
+  exact hV2 hV3
+choose f hf using h2
+sorry
 
 end Abstract_results
 

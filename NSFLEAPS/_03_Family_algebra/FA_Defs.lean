@@ -192,6 +192,10 @@ noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
       exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
 
+lemma mem_famJoin (F G : Set (Set α)) (A : Set α) :
+  A ∈ famJoin F G ↔ (F = ∅ → A ∈ G) ∧ (G = ∅ → A ∈ F) ∧
+    (F ≠ ∅ → G ≠ ∅ → ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) :=
+by sorry
 noncomputable instance : HasFamJoin (Set (Set α))  where
   famJoin := _root_.famJoin
 noncomputable instance : HasFamJoin (Family α) where
@@ -220,7 +224,10 @@ noncomputable def Family.famMeet (famA famB : Family α) : Family α := {
         (Set.inter_subset_inter hAB (Set.Subset.refl C))
       exact hBCmem
 }
-
+lemma mem_famMeet (F G : Set (Set α)) (A : Set α) :
+  A ∈ famMeet F G ↔ (F = fullCollection α → A ∈ G) ∧
+    (F ≠ fullCollection α → ∀ B ∈ F*, A ∩ B ∈ G) :=
+by sorry
 instance : HasFamMeet (Set (Set α))  where
   famMeet := _root_.famMeet
 noncomputable instance : HasFamMeet (Family α) where

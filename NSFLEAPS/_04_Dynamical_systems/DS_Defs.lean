@@ -252,7 +252,6 @@ apply closureOfInvIsInv
 apply h2
 
 
-
 /-- The `S`-orbit closure of a point `x` is a sub dynamical system of `DynamicalSystem S X` -/
 theorem orbitClosureIsNonemptyCompactT2InvariantSubset
 (dSystem : DynamicalSystem S X) (x : X) :
@@ -692,8 +691,6 @@ by sorry
 
 end Factor_maps_and_ICERS
 
-
-
 section Return_time_sets
 
 variable {S : Type*} [Semigroup S] [Nonempty S]
@@ -716,49 +713,120 @@ Set S :=
 theorem visitsToPreimages
 (dSystem : DynamicalSystem S X) (x : X) (U : Set X) (s : S) :
 (s * ·) ⁻¹' (visitTimeSet dSystem x U) =
-visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) :=
-by sorry
-
-/-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
-to `R(x,V) R(x,U)^{-1}` -/
-theorem setVisitsAsQuotientSet
-{dSystem : DynamicalSystem S X} (x : X) (U V : Set X) :
-setVisitTimeSet dSystem U V = ⋃ s ∈ visitTimeSet dSystem x U,
-((· * s) ⁻¹' (visitTimeSet dSystem x V)) :=
-by sorry
+visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) := by
+have h1 : (s * ·) ⁻¹' (visitTimeSet dSystem x U)
+⊆ visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) := by
+  intro r hr
+  have hr1 : s * r ∈ visitTimeSet dSystem x U := by
+    simpa
+  have hr2 : dSystem.map (s * r) x ∈ U := by
+    simpa
+  have hr21 : dSystem.map s (dSystem.map r x) = dSystem.map (s * r) x := by
+    simp only [dSystem.mapMult s r x]
+  have hr3 : dSystem.map r x ∈ dSystem.map s ⁻¹' U := by
+    simp only [Set.mem_preimage]
+    rw [hr21]
+    apply hr2
+  simpa
+have h2 : visitTimeSet dSystem x ((dSystem.map s) ⁻¹' U) ⊆
+(s * ·) ⁻¹' (visitTimeSet dSystem x U) := by
+  intro r hr
+  have hr1 : dSystem.map r x ∈ (dSystem.map s ⁻¹' U) := by
+    simpa
+  have hr2 : dSystem.map s (dSystem.map r x) ∈ U := by
+    simpa
+  have hr3 : dSystem.map s (dSystem.map r x) = dSystem.map (s * r) x := by
+    simp only [dSystem.mapMult s r x]
+  have hr4 : dSystem.map (s*r) x ∈ U := by
+    rw [<- hr3]
+    exact hr2
+  apply hr4
+exact subset_antisymm h1 h2
 
 /-- The set `R(x,∩_i U_i)` is equal to `∩_i R(x,U_i)` -/
 theorem visitToInter
 {dSystem : DynamicalSystem S X}
 (x : X) {I} (f : I → Set X) :
 visitTimeSet dSystem x (⋂ i : I, f i) =
-⋂ i : I, (visitTimeSet dSystem x (f i)) :=
-by sorry
+⋂ i : I, (visitTimeSet dSystem x (f i)) := by
+have h1 : visitTimeSet dSystem x (⋂ i : I, f i) ⊆
+⋂ i : I, (visitTimeSet dSystem x (f i)) := by
+  intro s hs
+  have h11 : dSystem.map s x ∈ (⋂ i : I, f i) := by
+    exact hs
+  have h12 : ∀ i : I, dSystem.map s x ∈ f i := by
+    intro i
+    apply h11
+    simp
+  simp only [Set.mem_iInter]
+  apply h12
+have h2 : ⋂ i : I, (visitTimeSet dSystem x (f i)) ⊆
+visitTimeSet dSystem x (⋂ i : I, f i) := by
+  intro s hs
+  have h21 : ∀ i : I, s ∈ visitTimeSet dSystem x (f i) := by
+    simpa using hs
+  have h22 : ∀ i : I, dSystem.map s x ∈ f i := by
+    apply h21
+  have h23 : dSystem.map s x ∈ (⋂ i : I, f i) := by
+    simpa using h22
+  simpa
+exact subset_antisymm h1 h2
 
 /-- The set `R(x,∪_i U_i)` is equal to `∪_i R(x,U_i)` -/
 theorem visitToUnion
 {dSystem : DynamicalSystem S X}
 (x : X) {I} (f : I → Set X) :
 visitTimeSet dSystem x (⋃ i : I, f i) =
-⋃ i : I, (visitTimeSet dSystem x (f i)) :=
-by sorry
+⋃ i : I, (visitTimeSet dSystem x (f i)) := by
+have h1 : visitTimeSet dSystem x (⋃ i : I, f i) ⊆
+⋃ i : I, (visitTimeSet dSystem x (f i)) := by
+  intro s hs
+  have h11 : dSystem.map s x ∈ (⋃ i : I, f i) := by
+    exact hs
+  have h12 : ∃ i : I, dSystem.map s x ∈ f i := by
+    simpa using h11
+  simp only [Set.mem_iUnion]
+  apply h12
+have h2 : ⋃ i : I, (visitTimeSet dSystem x (f i)) ⊆
+visitTimeSet dSystem x (⋃ i : I, f i) := by
+  intro s hs
+  have h21 : ∃ i : I, s ∈ visitTimeSet dSystem x (f i) := by
+    simpa using hs
+  have h22 : ∃ i : I, dSystem.map s x ∈ f i := by
+    apply h21
+  have h23 : dSystem.map s x ∈ (⋃ i : I, f i) := by
+    simpa using h22
+  simpa
+exact subset_antisymm h1 h2
 
 /-- Given `U1 ⊆ U2`, `R(x,U1) ⊆ R(x,U2)` -/
 theorem visitTimesMono
 (dSystem : DynamicalSystem S X)
 (x : X) {U V : Set X} (hMono : U ⊆ V) :
-visitTimeSet dSystem x U ⊆ visitTimeSet dSystem x V :=
-by sorry
+visitTimeSet dSystem x U ⊆ visitTimeSet dSystem x V := by
+intro s hs
+have h1 : dSystem.map s x ∈ U := by
+  simpa using hs
+have h2 : dSystem.map s x ∈ V := by
+  apply hMono h1
+simpa
 
 /-- The time of visits of a point `(x,y)` to `U × V` under the diagonal action is
-the intersection of `R(x,U)` and `R(y,V)`  -/
+the intersection of `R(x,U)` and `R(y,V)` -/
 theorem visitsToProductsUnderDiagonal
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemX : DynamicalSystem S X) (x : X) (U : Set X)
 (dSystemY : DynamicalSystem S Y) (y : Y) (V : Set Y) :
 visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) =
-(visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) :=
-by sorry
+(visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) := by
+have h1 : visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) ⊆
+(visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) := by
+  intro s hs
+  simpa
+have h2 : (visitTimeSet dSystemX x U) ∩ (visitTimeSet dSystemY y V) ⊆
+visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) := by
+  simpa
+exact subset_antisymm h1 h2
 
 end Return_time_sets
 
@@ -790,13 +858,111 @@ theorem existsMinimalSubset
 ∃ Y : Set X, isMinimalSubset dSystem Y :=
 by sorry
 
+/- Depracated in favor of minimalSubsetIffMinimalSubsystem
 /-- A minimal set, when made into a system, is a minimal system -/
 theorem minimalSubsetIsMinimalSystem
 (dSystem : DynamicalSystem S X)
 {Y : Set X} [CompactSpace Y] [Nonempty Y]
 (hMinSubset : isMinimalSubset dSystem Y) :
 isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1)) :=
-by sorry -- UNHAPPY, WAIT TO TOUCH
+by sorry -- UNHAPPY, WAIT TO TOUCH -/
+
+/-- If Z is a subsystem of Y and Y is a subsystem of X, then Z is a subsystem of X -/
+lemma subSystemOfSubsystem
+(dSystem : DynamicalSystem S X)
+{Y : Set X} [CompactSpace Y] [Nonempty Y]
+(hYX : isNonemptyCompactT2InvariantSubset dSystem Y)
+{Z : Set Y} [CompactSpace Z] [Nonempty Z]
+(hZY : isNonemptyCompactT2InvariantSubset
+(fromNonemptyCompactT2InvariantSubsetToSystem dSystem hYX) Z) :
+isNonemptyCompactT2InvariantSubset dSystem (Subtype.val '' Z) := by
+sorry
+
+/-- A subset of a system X is a minimal subset iff it is a minimal subsystem -/
+theorem minimalSubsetIffMinimalSubsystem
+(dSystem : DynamicalSystem S X)
+{Y : Set X} [CompactSpace Y] [Nonempty Y]
+(preSubSystem : isNonemptyCompactT2InvariantSubset dSystem Y) :
+isMinimalSubset dSystem Y ↔
+  isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem) := by
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem
+have dYDef : dSystemY = fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem := by
+    trivial
+constructor
+· intro h1 Z hZ
+  unfold isMinimalSubset at h1
+  obtain ⟨hY1, hY2⟩ := h1
+  specialize hY2 Z
+  have hZY : Subtype.val '' Z ⊆ Y := by
+    simp
+  have hZY2 : Y = Subtype.val '' Z := by
+    apply hY2
+    · exact hZY
+    rw [<- dYDef] at hZ
+    have : Nonempty Z := by
+      unfold isNonemptyCompactT2InvariantSubset at hZ
+      obtain ⟨hZ1, hZ2, hZ3, hZ4⟩ := hZ
+      obtain ⟨x, hx⟩ := hZ1
+      exact ⟨x, hx⟩
+    have : CompactSpace Z:= by
+      unfold isNonemptyCompactT2InvariantSubset at hZ
+      obtain ⟨hZ1, hZ2, hZ3, hZ4⟩ := hZ
+      apply isCompact_iff_compactSpace.mp
+      exact hZ2
+    apply subSystemOfSubsystem
+    rw [<- dYDef]
+    exact hZ
+  ext y
+  constructor
+  · intro hy
+    trivial
+  intro hy
+  have hy3 : y.val ∈ Subtype.val '' Z := by
+    simp only [<- hZY2, Subtype.coe_prop]
+  obtain ⟨z, hz, hz_eq⟩ := hy3
+  have hy4 : z = y := Subtype.ext hz_eq
+  simpa [hy4] using hz
+rw [<- dYDef]
+intro hY5
+unfold isMinimalSubset
+constructor
+· exact preSubSystem
+intro Z hZ1 hZ2
+unfold isMinimalSystem at hY5
+let Z' := {y : Y | (y : X) ∈ Z}
+specialize hY5 Z'
+have hZ'1 : isNonemptyCompactT2InvariantSubset dSystemY Z' := by
+  obtain ⟨hZ21, hZ22, hZ23, hZ24⟩ := hZ2
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · obtain ⟨z, hz⟩ := hZ21
+    have hzY : z ∈ Y := by
+      exact hZ1 hz
+    refine ⟨⟨z, hzY⟩, ?_⟩
+    exact hz
+  · have hy10 : {y : Y | (y : X) ∈ Z} = Subtype.val ⁻¹' Z := rfl
+    simpa [hy10] using hZ22.preimage_continuous continuous_subtype_val
+  · infer_instance
+  · unfold isInvariantSet
+    intro s
+    specialize hZ24 s
+    intro y hy
+    have hyval : y.val ∈ Z := by
+      simpa
+    specialize hZ24 hyval
+    simpa
+have hZ'2 : Z' = Set.univ := by
+  apply hY5
+  exact hZ'1
+ext y
+constructor
+· intro hy
+  have hy7 : ⟨y, hy⟩ ∈ Z' := by
+    have hy8 : (⟨y, hy⟩ : Y) ∈ Set.univ := by trivial
+    rw [hZ'2]
+    exact hy8
+  exact hy7
+intro hy
+exact hZ1 hy
 
 /-- A system is minimal if and only if for all points `x ∈ X`,
 the `S`-orbit of `x` is dense -/
@@ -863,8 +1029,140 @@ theorem factorOfMinimalIsMinimal
 {dSystemX : DynamicalSystem S X} (hXMin : isMinimalSystem dSystemX)
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 {dSystemY : DynamicalSystem S Y} (hFactor : isFactor dSystemY dSystemX) :
-isMinimalSystem dSystemY :=
-by sorry
+isMinimalSystem dSystemY := by
+have hY1 : ∀ y : Y, Dense (orbit dSystemY y) := by
+  intro y
+  obtain ⟨π, hπ1, hπ2, hπ3⟩ := hFactor
+  have hY11 : ∃ x : X, π x = y := by
+    apply hπ2
+  obtain ⟨x, hx⟩ := hY11
+  have hY2 : π '' (orbit dSystemX x) = orbit dSystemY y := by
+    have hY21 : π '' (orbit dSystemX x) ⊆ orbit dSystemY y := by
+      intro z hz
+      have h7 : ∃ w ∈ orbit dSystemX x, π w = z:= by
+        simpa [Set.image_eq] using hz
+      obtain ⟨w, h1, hw2⟩ := h7
+      have h8 : ∃ s : S, dSystemX.map s x = w:= by
+        simpa using h1
+      obtain ⟨s, hs⟩ := h8
+      have h9 : π (dSystemX.map s x) = π w := by
+        simp only [hs]
+      rw [<- hw2, <- h9]
+      have h10 : π (dSystemX.map s x) = (dSystemY.map s) (π x) := by
+        specialize hπ3 s
+        have h5 : ((dSystemY.map s) ∘ π) x = (π ∘ (dSystemX.map s)) x := by
+          exact congrArg (fun f => f x) hπ3
+        have h6 : dSystemY.map s (π x) = π (dSystemX.map s x) := by
+          exact h5
+        rw [h6]
+      rw [<- hx, h10]
+      unfold orbit
+      simp
+    have hY22 : orbit dSystemY y ⊆ π '' (orbit dSystemX x) := by
+      intro z hz
+      have hY221 : ∃ s : S, dSystemY.map s y = z := by
+        unfold orbit at hz
+        simpa
+      obtain ⟨s, hs⟩ := hY221
+      rw [<- hx] at hs
+      have h4 : z = π (dSystemX.map s x) := by
+        specialize hπ3 s
+        have h5 : ((dSystemY.map s) ∘ π) x = (π ∘ (dSystemX.map s)) x := by
+          exact congrArg (fun f => f x) hπ3
+        have h6 : dSystemY.map s (π x) = π (dSystemX.map s x) := by
+          exact h5
+        rw [<- hs]
+        apply h6
+      simp only [Set.mem_image]
+      use dSystemX.map s x
+      constructor
+      · unfold orbit
+        simp
+      rw [h4]
+    apply subset_antisymm hY21 hY22
+  have hY3 : Dense (orbit dSystemX x) := by
+    have hY4 : ∀ (x : X), Dense (orbit dSystemX x) := by
+      let dSystemZ := dSystemX
+      apply minimalIffDenseOrbits at dSystemZ
+      apply dSystemZ.mp
+      exact hXMin
+    specialize hY4 x
+    exact hY4
+  rw [<- hY2]
+  apply DenseRange.dense_image
+  · apply Function.Surjective.denseRange hπ2
+  · apply hπ1
+  apply hY3
+simp only [minimalIffDenseOrbits]
+exact hY1
+
+/-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
+to `R(x,V) R(x,U)^{-1}` in minimal systems -/
+theorem setVisitsAsQuotientSet
+{dSystem : DynamicalSystem S X} (hMinimal : isMinimalSystem dSystem) (x : X) (U V : Set X)
+(hUOpen : IsOpen U) (hVOpen : IsOpen V) :
+setVisitTimeSet dSystem U V = ⋃ s ∈ visitTimeSet dSystem x U,
+((· * s) ⁻¹' (visitTimeSet dSystem x V)) := by
+have h1 : setVisitTimeSet dSystem U V ⊆ ⋃ s ∈ visitTimeSet dSystem x U,
+((· * s) ⁻¹' (visitTimeSet dSystem x V)) := by
+  intro r hr
+  have hr1 : (dSystem.map r '' U ∩ V).Nonempty := by
+    unfold setVisitTimeSet at hr
+    simpa using hr
+  have hr2 : (U ∩ dSystem.map r ⁻¹' V).Nonempty := by
+    obtain ⟨v, hv1, hv2⟩ := hr1
+    simp only [Set.mem_image] at hv1
+    obtain ⟨u, hu1, hu2⟩ := hv1
+    have hr3: u ∈ U ∩ dSystem.map r ⁻¹' V := by
+      simp only [Set.mem_inter_iff, Set.mem_preimage]
+      constructor
+      · exact hu1
+      rw [hu2]
+      exact hv2
+    use u
+  have hr3 : IsOpen (U ∩ dSystem.map r ⁻¹' V) := by
+    have hr4: IsOpen (dSystem.map r ⁻¹' V) := by
+      apply IsOpen.preimage (dSystem.mapCont r)
+      exact hVOpen
+    apply IsOpen.inter hUOpen hr4
+  have hr4 : ∃ h : S, h ∈ visitTimeSet dSystem x (U ∩ (dSystem.map r) ⁻¹' V) := by
+    apply minimalImpliesNonemptySetVisits hMinimal
+    · apply hr3
+    apply hr2
+  obtain ⟨h, hh⟩ := hr4
+  have hr5: h ∈ (visitTimeSet dSystem x U) ∩ (visitTimeSet dSystem x (dSystem.map r ⁻¹' V)) := by
+    simpa only [visitToInter, hh]
+  have hr6 : h ∈ (r * ·) ⁻¹' (visitTimeSet dSystem x V) := by
+    simp only [visitsToPreimages]
+    apply hr5.2
+  have hr7 : r ∈ (· * h) ⁻¹' visitTimeSet dSystem x V := by
+    simpa
+  simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop]
+  use h
+  constructor
+  · apply hr5.1
+  apply hr7
+have h2 : ⋃ s ∈ visitTimeSet dSystem x U, ((· * s) ⁻¹' (visitTimeSet dSystem x V))
+⊆ setVisitTimeSet dSystem U V := by
+  intro r hr
+  simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop] at hr
+  obtain ⟨s, hs1, hs2⟩ := hr
+  have hs1a: dSystem.map s x ∈ U := by
+    exact hs1
+  have hs2a : dSystem.map (r * s) x ∈ V := by
+    exact hs2
+  have hs3 : dSystem.map (r * s) x ∈ dSystem.map r '' U := by
+    have hs31 : dSystem.map r (dSystem.map s x) ∈ dSystem.map r '' U := by
+      refine ⟨dSystem.map s x, hs1a, rfl⟩
+    have hs32 : dSystem.map r (dSystem.map s x) = dSystem.map (r * s) x := by
+      simp only [dSystem.mapMult]
+    rw [<- hs32]
+    exact hs31
+  have h4 : (dSystem.map r '' U ∩ V).Nonempty := by
+    exact ⟨dSystem.map (r * s) x, hs3, hs2a⟩
+  unfold setVisitTimeSet
+  exact h4
+exact subset_antisymm h1 h2
 
 end Minimality
 
@@ -969,17 +1267,97 @@ by
 visits that set syndetically -/
 lemma nonemptyVisitsOfURPointImpliesSyndetic
 (dSystem : DynamicalSystem S X) {x : X} (xIsUR : isUniformlyRecurrent dSystem x)
-{U : Set X} {UNonempty : U.Nonempty} {UOpen : IsOpen U}
+{U : Set X} {UOpen : IsOpen U}
 (hNonemptyVisit : (visitTimeSet dSystem x U).Nonempty) :
-isSyndetic (visitTimeSet dSystem x U) :=
-by sorry
+isSyndetic (visitTimeSet dSystem x U) := by
+have h1 : ∃ s : S, dSystem.map s x ∈ U := by
+  obtain ⟨s, hs⟩ := hNonemptyVisit
+  use s
+  unfold visitTimeSet at hs
+  simpa
+obtain ⟨s, hs⟩ := h1
+have h2 : x ∈ (dSystem.map s) ⁻¹' U := by
+  simpa using hs
+let V := (dSystem.map s) ⁻¹' U
+have h3 : IsOpen V := by
+  have h31 : Continuous (dSystem.map s) := by
+    apply dSystem.mapCont
+  apply h31.isOpen_preimage U UOpen
+have h4 : V ∈ nhds x := by
+  unfold V
+  apply h3.mem_nhds h2
+have h5 : isSyndetic (visitTimeSet dSystem x V) := by
+  unfold isUniformlyRecurrent at xIsUR
+  specialize xIsUR V h4
+  apply xIsUR
+have h6 : (s * ·) '' visitTimeSet dSystem x V ⊆ visitTimeSet dSystem x U := by
+  intro r hr
+  have h61 : ∃ t : S, dSystem.map t x ∈ V ∧ r = s * t := by
+    simp only [Set.mem_image] at hr
+    obtain ⟨t, ht1, ht2⟩ := hr
+    use t
+    constructor
+    · apply ht1
+    rw [<- ht2]
+  obtain ⟨t, ht⟩ := h61
+  have h62 : dSystem.map r x ∈ U := by
+    have h63 : dSystem.map r x = dSystem.map s (dSystem.map t x) := by
+      rw [ht.2]
+      simp only [dSystem.mapMult]
+    have h64 : dSystem.map s (dSystem.map t x) ∈ U := by
+      simpa using ht.1
+    rw [h63]
+    apply h64
+  simpa using h62
+have h7 : isSyndetic ((s * ·) '' visitTimeSet dSystem x V) := by
+  apply shiftSyndeticIsSyndetic
+  apply h5
+apply syndeticIsMonotone h7 h6
 
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x) :
-isMinimalSubset dSystem (orbitClosure dSystem x) :=
-by sorry
+isMinimalSubset dSystem (orbitClosure dSystem x) := by
+have h1 : ∀ U ∈ nhds x, (U ∩ orbit dSystem x).Nonempty := by
+  intro U hU
+  have h4 := xisUR U hU
+  have h2 : (visitTimeSet dSystem x U).Nonempty := by
+    apply syndeticSetIsNonEmpty
+    exact h4
+  rcases h2 with ⟨s, hs⟩
+  have h3 : dSystem.map s x ∈ U := by
+    exact hs
+  have h5 : dSystem.map s x ∈ orbit dSystem x := by
+    unfold orbit
+    simp
+  exact ⟨dSystem.map s x, h3, h5⟩
+have h6 : x ∈ orbitClosure dSystem x := by
+  apply mem_closure_iff.2
+  intro U hU1 hU2
+  have h61 : U ∈ nhds x := by
+    apply IsOpen.mem_nhds hU1 hU2
+  have h62 := h1 U h61
+  exact h62
+let Y := orbitClosure dSystem x
+have Y_def : Y = orbitClosure dSystem x := by
+  rfl
+have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
+  apply orbitClosureIsNonemptyCompactT2InvariantSubset
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
+have : CompactSpace Y := by
+  apply isCompact_iff_compactSpace.mp
+  exact hY.2.1
+have : Nonempty Y := by
+  apply hY.1.to_subtype
+have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
+  sorry
+have hYMinimal : isMinimalSystem dSystemY := by
+  simp only [minimalIffDenseOrbits]
+  exact hYDenseOrbit
+rw [<- Y_def]
+rw [minimalSubsetIffMinimalSubsystem]
+exact hYMinimal
 
 /-- If `y` is in the orbit closure of a uniformly recurrent point `x`, then
 `y` is uniformly recurrent -/
@@ -987,12 +1365,91 @@ theorem inOrbitClosOfURPointImpliesUR
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x)
 {y : X} (yinOrbClos : y ∈ orbitClosure dSystem x) :
-isUniformlyRecurrent dSystem y :=
-by sorry
+isUniformlyRecurrent dSystem y := by
+let Y := orbitClosure dSystem x
+have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
+  apply orbitClosureIsNonemptyCompactT2InvariantSubset
+have hYMinimal : isMinimalSubset dSystem Y := by
+  apply orbitClosureOfURPointIsMinimalSubset
+  exact xisUR
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
+have : CompactSpace Y := by
+  apply isCompact_iff_compactSpace.mp
+  exact hY.2.1
+have : Nonempty Y := by
+  apply hY.1.to_subtype
+have hdSystemY_Minimal : isMinimalSystem dSystemY := by
+  rw [<- minimalSubsetIffMinimalSubsystem]
+  exact hYMinimal
+unfold isUniformlyRecurrent
+intro U' hU'
+rw [mem_nhds_iff] at hU'
+obtain ⟨U, hU, hU2, hyU⟩ := hU'
+let V := U ∩ Y
+have hyY: y ∈ Y := by
+  unfold Y
+  exact yinOrbClos
+have hyV : y ∈ V := by
+  unfold V
+  exact ⟨hyU, hyY⟩
+have hVY : V ⊆ Y := by
+  unfold V
+  simp
+let V' := {y : Y | (y : X) ∈ V}
+have hV'U : V' = (Subtype.val ⁻¹' U) := by
+  unfold V' V Subtype.val
+  simp
+  rfl
+have hV'open : IsOpen V' := by
+  rw [hV'U]
+  simpa using hU2.preimage continuous_subtype_val
+have hyV' : ⟨y, hyY⟩ ∈ V' := by
+  exact hyV
+have hSynd1 : isSyndetic (visitTimeSet dSystemY ⟨y, hyY⟩ V' ) := by
+  apply minimalImpliesSyndeticVisits
+  · apply hdSystemY_Minimal
+  · exact ⟨⟨y, hyY⟩, hyV'⟩
+  exact hV'open
+have hSyndetic : isSyndetic (visitTimeSet dSystem y V) := by
+  obtain ⟨F, hF1, hF2⟩ := hSynd1
+  unfold isSyndetic
+  use F
+  constructor
+  · exact hF1
+  intro s
+  specialize hF2 s
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  use f
+  constructor
+  · exact hf1
+  simpa
+obtain ⟨F, hF1, hF2⟩ := hSyndetic
+unfold isSyndetic
+use F
+constructor
+· apply hF1
+intro s
+have hF22 := hF2 s
+obtain ⟨f, hf1, hf2⟩ := hF22
+use f
+constructor
+· apply hf1
+have hUV : V ⊆ U := by
+  unfold V
+  simp
+unfold visitTimeSet
+simp only [Set.mem_preimage]
+have hV3 : dSystem.map (f * s) y ∈ V := by
+  unfold visitTimeSet at hf2
+  simp only [Set.mem_preimage] at hf2
+  exact hf2
+apply hU
+apply hUV
+exact hV3
 
 end Uniform_recurrence
 
-section temp_minimality_with_S_commutative
+section Minimality_and_UR_with_commutivity
 
 /-- If a commutative semigroup `S` acts minimally, then it acts surjectively -/
 theorem minimalCommActionIsSurjective
@@ -1041,7 +1498,7 @@ theorem inMinCommSystemURPairsDense
 Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} :=
 by sorry
 
-end temp_minimality_with_S_commutative
+end Minimality_and_UR_with_commutivity
 
 section Proximality
 
@@ -1193,6 +1650,17 @@ by
     have xOrbitAll : closure (orbit dSystem x) = Set.univ := xDenseOrbit.closure_eq
     have xOrbitInSetOrbit : orbit dSystem x ⊆ setOrbit dSystem Set.univ := by sorry
     sorry
+
+/-- A point `(x,y)` belongs to `RP` iff there exists `w ∈ X` and an ultrafilter `F` on
+`X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
+theorem xyInRPIffUltraToSomewwxy
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (x y : X) :
+⟨x,y⟩ ∈ RP dSystem ↔ ∃ (w : X) (F : Ultrafilter ((X × X) × S)),
+    Filter.Tendsto (fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a))
+      F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) :=
+by sorry
 
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
 theorem imageOfRPIsInRP
