@@ -33,14 +33,25 @@ def partitionRegularTwoSets (F : Set (Set α)) : Prop :=
 structure Family (α : Type*) where
   sets : Set (Set α)
   upward_closed : upwardClosed sets
-instance : Coe (Family α) (Set (Set α)) :=
-  ⟨Family.sets⟩
 
+-- instance : Coe (Family α) (Set (Set α)) :=
+--   ⟨Family.sets⟩
 instance {α} : SetLike (Family α) (Set α) where
-  coe F := F.sets
+  coe := Family.sets
   coe_injective' := by
     intro F G h
-    cases F; cases G; cases h; rfl
+    cases F; cases G
+    congr
+
+@[ext]
+lemma Family.ext {α} {F G : Family α} (h : ∀ (A : Set α), A ∈ F ↔ A ∈ G) : F = G :=
+  SetLike.ext h
+
+-- instance {α} : SetLike (Family α) (Set α) where
+--   coe F := F.sets
+--   coe_injective' := by
+--     intro F G h
+--     cases F; cases G; cases h; rfl
 
 instance {α} : HasSubset (Family α) where
   Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
@@ -148,6 +159,8 @@ instance : HasFamDual (Set (Set α)) where
 --instance : HasFamDual (PRFamily α) where
  -- famDual := @PRFamily.famDual α
 -- ⋎ definitions
+lemma mem_dual_star {α : Type*} (F : Family α) (A : Set α) :
+    A ∈ F* ↔ ∀ B ∈ F, (A ∩ B).Nonempty := Iff.rfl
 open Classical in
 noncomputable def famJoin (F G : Set (Set α)) : Set (Set α) :=
   if F = ∅ then G

@@ -47,13 +47,13 @@ F* = {A : Set α | Aᶜ ∉ F} :=
  --complement of A in S not in F}
 
 --added this to get ext A to work, not sure why mine wasn't working but angelina's was
-@[ext]
-lemma Family.ext {α} {F G : Family α}
-  (h : F.sets = G.sets) : F = G := by
-  cases F
-  cases G
-  cases h
-  rfl
+-- @[ext]
+-- lemma Family.ext {α} {F G : Family α}
+--   (h : F.sets = G.sets) : F = G := by
+--   cases F
+--   cases G
+--   cases h
+--   rfl
 
 /- @[simp]
 lemma dual_sets (F : Family α) :
@@ -61,14 +61,38 @@ lemma dual_sets (F : Family α) :
 by
   simpa using thm_equiv_dual_formulation (F := F) -/
 
-#check famDualAlt
+-- #check famDualAlt
 /-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
     thm_equiv_dual_formulation (F)
   rw [dualEquivForm]-/
-@[simp]
-theorem Family.coe_sets (F : Family α) :
-    (↑F : Set (Set α)) = F.sets :=
+-- @[simp]
+-- theorem Family.coe_sets (F : Family α) :
+--     (↑F : Set (Set α)) = F.sets :=
+--   rfl
+
+lemma mem_dual_alt {F : Family α} {A : Set α} : A ∈ F* ↔ Aᶜ ∉ F :=
+  Set.ext_iff.mp (famDualAlt F) A
+
+theorem dual_dual_smth_smth (F : Family α) : F** = F := by
+  ext A
+  rw [mem_dual_alt]      -- 'A ∈ F**'
+  rw [mem_dual_alt]      -- 'Aᶜ ∈ F*' inside the negation
+  rw [compl_compl]
+  push_neg
   rfl
+
+-- theorem dual_dual_smth_smth (F : Family α) : F** = F := by
+-- -- famDualAlt is a set equality lemma and ext requires membership based ones
+--   apply SetLike.coe_injective
+--   rw [famDualAlt (F*)]
+--   ext A
+--   dsimp
+--   have h_inner : ∀ (X : Set α), X ∈ F* ↔ Xᶜ ∉ F := Set.ext_iff.mp (famDualAlt F)
+--   rw [h_inner Aᶜ]
+--   push_neg
+--   rw [compl_compl]
+--   rfl
+
 
 theorem thm_dual_is_involution (F : Family α) : F** = F := by
 ext A
@@ -77,7 +101,7 @@ constructor
 · intro h
   by_contra hA
   have h1 : Aᶜ ∉ F* := by
-    simp [famDualAlt] at h
+    rw [famDualAlt] at h
     sorry
   have h2 : Aᶜ ∈ F* := by
     have : (Aᶜ)ᶜ ∉ F := by
