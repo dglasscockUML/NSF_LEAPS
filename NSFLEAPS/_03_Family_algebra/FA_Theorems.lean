@@ -168,17 +168,16 @@ theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets
 – logic
 5. A ∈ F∗ ∩ G∗
 -/
+--∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
   ext A
   constructor
   · intro h
-    rw [mem_dual_alt] at h
+    change ∀ B, B ∈ (F ⋎ G) → (A ∩ B).Nonempty at h
+    
     sorry
-  · intro h
-    rw [mem_dual_alt]
-    sorry
-
+  · sorry
 --thm_de_morgan_union_v2
 theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
  by sorry
