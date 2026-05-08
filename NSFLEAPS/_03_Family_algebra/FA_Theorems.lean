@@ -44,16 +44,16 @@ F* = {A : Set α | Aᶜ ∉ F} :=
     have : Aᶜ ∈ F.sets :=
       F.upward_closed B Aᶜ BinF hsubset
     exact AcninF this
- --complement of A in S not in F}
+ --complement of A in S not in F
 
 --added this to get ext A to work, not sure why mine wasn't working but angelina's was
-@[ext]
-lemma Family.ext {α} {F G : Family α}
-  (h : F.sets = G.sets) : F = G := by
-  cases F
-  cases G
-  cases h
-  rfl
+-- @[ext]
+-- lemma Family.ext {α} {F G : Family α}
+--   (h : F.sets = G.sets) : F = G := by
+--   cases F
+--   cases G
+--   cases h
+--   rfl
 
 /- @[simp]
 lemma dual_sets (F : Family α) :
@@ -61,30 +61,54 @@ lemma dual_sets (F : Family α) :
 by
   simpa using thm_equiv_dual_formulation (F := F) -/
 
-#check famDualAlt
+-- #check famDualAlt
 /-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
     thm_equiv_dual_formulation (F)
   rw [dualEquivForm]-/
+-- @[simp]
+-- theorem Family.coe_sets (F : Family α) :
+--     (↑F : Set (Set α)) = F.sets :=
+--   rfl
 
-variable (F : Family α)
-#check F**
-theorem dualIsInvolutionOnFamilies (F : Family α) : F** = F := by
-have coerce: ↑F** = (F**).sets := by
-  exact Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1
-have coerce2: ↑F* = (F*).sets := by
-  exact Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1
+lemma mem_dual_alt {F : Family α} {A : Set α} : A ∈ F* ↔ Aᶜ ∉ F :=
+  Set.ext_iff.mp (famDualAlt F) A
+
+theorem dual_dual_smth_smth (F : Family α) : F** = F := by
+  ext A
+  rw [mem_dual_alt]      -- 'A ∈ F**'
+  rw [mem_dual_alt]      -- 'Aᶜ ∈ F*' inside the negation
+  rw [compl_compl]
+  push_neg
+  rfl
+
+-- theorem dual_dual_smth_smth (F : Family α) : F** = F := by
+-- -- famDualAlt is a set equality lemma and ext requires membership based ones
+--   apply SetLike.coe_injective
+--   rw [famDualAlt (F*)]
+--   ext A
+--   dsimp
+--   have h_inner : ∀ (X : Set α), X ∈ F* ↔ Xᶜ ∉ F := Set.ext_iff.mp (famDualAlt F)
+--   rw [h_inner Aᶜ]
+--   push_neg
+--   rw [compl_compl]
+--   rfl
+
+
+theorem thm_dual_is_involution (F : Family α) : F** = F := by
 ext A
 constructor
 -- F** ⊆ F
-· rw [←coerce]
-  rw [famDualAlt F*]
-  intro h
-  have h1 : Aᶜ ∉ (F*).sets := by
-    exact h
-  rw [←coerce2] at h1
-  rw [famDualAlt F] at h1
-  simp only [Set.mem_setOf_eq, compl_compl, not_not] at h1
-  exact h1
+· intro h
+  by_contra hA
+  have h1 : Aᶜ ∉ F* := by
+    --rw [famDualAlt] at h
+    sorry
+  have h2 : Aᶜ ∈ F* := by
+    have : (Aᶜ)ᶜ ∉ F := by
+      simpa [compl_compl] using hA
+    sorry
+  exact h1 h2
+
 -- F ⊆ F**
 · intro hA B hB
   specialize hB A hA
@@ -126,32 +150,34 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
 
 theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔
   partitionRegularTwoSets (P.sets) :=
- by sorry
+  by sorry
+
 
 --thm_family_equal_to_dual_iff_ultrafilter
 --theorem thm_family_equal_to_dual_iff_ultrafilter (F : Family α) : F* = F ↔ UltrafilterFamily F :=
  -- by sorry
 
 --thm_de_morgan_union_v1
+/- A ∈ (F ∪ G)∗
+– definition
+2. for all B ∈ F ∪ G, A ∩ B̸ = ∅
+– logic
+3. for all B ∈ F, A ∩ B̸ = ∅ and for all B ∈ G, A ∩ B̸ = ∅
+– definition
+4. A ∈ F∗ and A ∈ G∗
+– logic
+5. A ∈ F∗ ∩ G∗
+-/
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
+  ext A
+  constructor
+  · intro h
+    rw [mem_dual_alt] at h
     sorry
-    /- constructor
-    · intro h
-    -- want: A ∈ F* ⋏ G* ↔ Aᶜ ∉ F.sets ∧ Aᶜ ∉ G.sets
-      constructor
-      · intro hF
-      -- hF : Aᶜ ∈ F.sets → contradiction with h
-        exact h (Or.inl hF)
-      · intro hG
-        exact h (Or.inr hG)
-    · intro h
-    -- h : ¬Aᶜ ∈ F.sets ∧ ¬Aᶜ ∈ G.sets
-      intro hOr
-      cases hOr with
-      | inl hF => exact h.left hF
-      | inr hG => exact h.right hG
- -/
+  · intro h
+    rw [mem_dual_alt]
+    sorry
 
 --thm_de_morgan_union_v2
 theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=

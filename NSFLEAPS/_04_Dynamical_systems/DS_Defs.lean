@@ -867,14 +867,102 @@ theorem minimalSubsetIsMinimalSystem
 isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1)) :=
 by sorry -- UNHAPPY, WAIT TO TOUCH -/
 
-/-- A minimal set, when made into a system, is a minimal system -/
+/-- If Z is a subsystem of Y and Y is a subsystem of X, then Z is a subsystem of X -/
+lemma subSystemOfSubsystem
+(dSystem : DynamicalSystem S X)
+{Y : Set X} [CompactSpace Y] [Nonempty Y]
+(hYX : isNonemptyCompactT2InvariantSubset dSystem Y)
+{Z : Set Y} [CompactSpace Z] [Nonempty Z]
+(hZY : isNonemptyCompactT2InvariantSubset
+(fromNonemptyCompactT2InvariantSubsetToSystem dSystem hYX) Z) :
+isNonemptyCompactT2InvariantSubset dSystem (Subtype.val '' Z) := by
+sorry
+
+/-- A subset of a system X is a minimal subset iff it is a minimal subsystem -/
 theorem minimalSubsetIffMinimalSubsystem
 (dSystem : DynamicalSystem S X)
 {Y : Set X} [CompactSpace Y] [Nonempty Y]
 (preSubSystem : isNonemptyCompactT2InvariantSubset dSystem Y) :
 isMinimalSubset dSystem Y ↔
-  isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem) :=
-by sorry -- UNHAPPY, WAIT TO TOUCH
+  isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem) := by
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem
+have dYDef : dSystemY = fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem := by
+    trivial
+constructor
+· intro h1 Z hZ
+  unfold isMinimalSubset at h1
+  obtain ⟨hY1, hY2⟩ := h1
+  specialize hY2 Z
+  have hZY : Subtype.val '' Z ⊆ Y := by
+    simp
+  have hZY2 : Y = Subtype.val '' Z := by
+    apply hY2
+    · exact hZY
+    rw [<- dYDef] at hZ
+    have : Nonempty Z := by
+      unfold isNonemptyCompactT2InvariantSubset at hZ
+      obtain ⟨hZ1, hZ2, hZ3, hZ4⟩ := hZ
+      obtain ⟨x, hx⟩ := hZ1
+      exact ⟨x, hx⟩
+    have : CompactSpace Z:= by
+      unfold isNonemptyCompactT2InvariantSubset at hZ
+      obtain ⟨hZ1, hZ2, hZ3, hZ4⟩ := hZ
+      apply isCompact_iff_compactSpace.mp
+      exact hZ2
+    apply subSystemOfSubsystem
+    rw [<- dYDef]
+    exact hZ
+  ext y
+  constructor
+  · intro hy
+    trivial
+  intro hy
+  have hy3 : y.val ∈ Subtype.val '' Z := by
+    simp only [<- hZY2, Subtype.coe_prop]
+  obtain ⟨z, hz, hz_eq⟩ := hy3
+  have hy4 : z = y := Subtype.ext hz_eq
+  simpa [hy4] using hz
+rw [<- dYDef]
+intro hY5
+unfold isMinimalSubset
+constructor
+· exact preSubSystem
+intro Z hZ1 hZ2
+unfold isMinimalSystem at hY5
+let Z' := {y : Y | (y : X) ∈ Z}
+specialize hY5 Z'
+have hZ'1 : isNonemptyCompactT2InvariantSubset dSystemY Z' := by
+  obtain ⟨hZ21, hZ22, hZ23, hZ24⟩ := hZ2
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · obtain ⟨z, hz⟩ := hZ21
+    have hzY : z ∈ Y := by
+      exact hZ1 hz
+    refine ⟨⟨z, hzY⟩, ?_⟩
+    exact hz
+  · have hy10 : {y : Y | (y : X) ∈ Z} = Subtype.val ⁻¹' Z := rfl
+    simpa [hy10] using hZ22.preimage_continuous continuous_subtype_val
+  · infer_instance
+  · unfold isInvariantSet
+    intro s
+    specialize hZ24 s
+    intro y hy
+    have hyval : y.val ∈ Z := by
+      simpa
+    specialize hZ24 hyval
+    simpa
+have hZ'2 : Z' = Set.univ := by
+  apply hY5
+  exact hZ'1
+ext y
+constructor
+· intro hy
+  have hy7 : ⟨y, hy⟩ ∈ Z' := by
+    have hy8 : (⟨y, hy⟩ : Y) ∈ Set.univ := by trivial
+    rw [hZ'2]
+    exact hy8
+  exact hy7
+intro hy
+exact hZ1 hy
 
 /-- A system is minimal if and only if for all points `x ∈ X`,
 the `S`-orbit of `x` is dense -/
