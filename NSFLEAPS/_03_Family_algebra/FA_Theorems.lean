@@ -158,6 +158,39 @@ theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets
  -- by sorry
 
 --thm_de_morgan_union_v1
+
+--∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty
+/-Proof. We consider three cases.
+Case 1: F = ∅. In this case,
+• F ⋎ G = G, by definition
+• F∗ = P(S)
+• F∗ ⋏ G∗ = P(S) ⋏ G∗ = G∗, by definition
+Therefore,
+(F ⋎ G)∗ = G∗ = F∗ ⋏ G∗,
+as desired.
+Case 2: G = ∅. In this case, we follow the analogous argument. (Alternatively, we could
+use the fact that ⋎ and ⋏ are commutative.)
+Case 3: F̸ = ∅ and G̸ = ∅. In the following list, each statement is equivalent to the one
+that follows it.
+1. A ∈ (F ⋎ G)∗
+– definition
+2. for all B ∈ F ⋎ G, A ∩ B̸ = ∅
+– definition
+3. for all C ∈ F and D ∈ G, A ∩ C ∩ D̸ = ∅
+– definition
+4. for all C ∈ F, A ∩ C ∈ G∗
+– definition
+5. A ∈ F∗ ⋏ G∗-/
+theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
+  by
+  ext A
+  constructor
+  · intro h
+    change ∀ B, B ∈ (F ⋎ G) → (A ∩ B).Nonempty at h
+
+    sorry
+  · sorry
+--thm_de_morgan_union_v2
 /- A ∈ (F ∪ G)∗
 – definition
 2. for all B ∈ F ∪ G, A ∩ B̸ = ∅
@@ -168,19 +201,21 @@ theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets
 – logic
 5. A ∈ F∗ ∩ G∗
 -/
---∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty
-theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
-  by
+theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
+ by
   ext A
   constructor
   · intro h
-    change ∀ B, B ∈ (F ⋎ G) → (A ∩ B).Nonempty at h
-    
-    sorry
-  · sorry
---thm_de_morgan_union_v2
-theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
- by sorry
+    have AinFdual : A ∈ F* := by sorry
+    have AinGdual : A ∈ G* := by sorry
+    exact ⟨AinFdual, AinGdual⟩
+  · intro h B BinFuG
+    rcases h with ⟨a, b⟩
+    specialize a B
+    specialize b B
+    rcases BinFuG with i | j
+    · exact a i
+    · exact b j
 
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
