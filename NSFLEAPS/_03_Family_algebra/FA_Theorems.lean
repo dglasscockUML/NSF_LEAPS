@@ -44,7 +44,7 @@ F* = {A : Set α | Aᶜ ∉ F} :=
     have : Aᶜ ∈ F.sets :=
       F.upward_closed B Aᶜ BinF hsubset
     exact AcninF this
- --complement of A in S not in F}
+ --complement of A in S not in F
 
 --added this to get ext A to work, not sure why mine wasn't working but angelina's was
 @[ext]
@@ -55,16 +55,6 @@ lemma Family.ext {α} {F G : Family α}
   cases h
   rfl
 
-/- @[simp]
-lemma dual_sets (F : Family α) :
-  (F* : Set (Set α)) = {A : Set α | Aᶜ ∉ F} :=
-by
-  simpa using thm_equiv_dual_formulation (F := F) -/
-
-#check famDualAlt
-/-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
-    thm_equiv_dual_formulation (F)
-  rw [dualEquivForm]-/
 
 variable (F : Family α)
 #check F**
