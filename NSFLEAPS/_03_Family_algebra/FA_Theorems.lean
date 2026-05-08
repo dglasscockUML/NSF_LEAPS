@@ -101,7 +101,7 @@ constructor
 · intro h
   by_contra hA
   have h1 : Aᶜ ∉ F* := by
-    rw [famDualAlt] at h
+    --rw [famDualAlt] at h
     sorry
   have h2 : Aᶜ ∈ F* := by
     have : (Aᶜ)ᶜ ∉ F := by
@@ -150,32 +150,34 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
 
 theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔
   partitionRegularTwoSets (P.sets) :=
- by sorry
+  by sorry
+
 
 --thm_family_equal_to_dual_iff_ultrafilter
 --theorem thm_family_equal_to_dual_iff_ultrafilter (F : Family α) : F* = F ↔ UltrafilterFamily F :=
  -- by sorry
 
 --thm_de_morgan_union_v1
+/- A ∈ (F ∪ G)∗
+– definition
+2. for all B ∈ F ∪ G, A ∩ B̸ = ∅
+– logic
+3. for all B ∈ F, A ∩ B̸ = ∅ and for all B ∈ G, A ∩ B̸ = ∅
+– definition
+4. A ∈ F∗ and A ∈ G∗
+– logic
+5. A ∈ F∗ ∩ G∗
+-/
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
+  ext A
+  constructor
+  · intro h
+    rw [mem_dual_alt] at h
     sorry
-    /- constructor
-    · intro h
-    -- want: A ∈ F* ⋏ G* ↔ Aᶜ ∉ F.sets ∧ Aᶜ ∉ G.sets
-      constructor
-      · intro hF
-      -- hF : Aᶜ ∈ F.sets → contradiction with h
-        exact h (Or.inl hF)
-      · intro hG
-        exact h (Or.inr hG)
-    · intro h
-    -- h : ¬Aᶜ ∈ F.sets ∧ ¬Aᶜ ∈ G.sets
-      intro hOr
-      cases hOr with
-      | inl hF => exact h.left hF
-      | inr hG => exact h.right hG
- -/
+  · intro h
+    rw [mem_dual_alt]
+    sorry
 
 --thm_de_morgan_union_v2
 theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
