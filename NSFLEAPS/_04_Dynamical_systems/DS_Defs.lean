@@ -876,7 +876,26 @@ lemma subSystemOfSubsystem
 (hZY : isNonemptyCompactT2InvariantSubset
 (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hYX) Z) :
 isNonemptyCompactT2InvariantSubset dSystem (Subtype.val '' Z) := by
-sorry
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hYX
+have dYDef : dSystemY = fromNonemptyCompactT2InvariantSubsetToSystem dSystem hYX := by
+  rfl
+rw [<- dYDef] at hZY
+obtain ⟨h1, h2, h3, h4⟩ := hZY
+refine ⟨?_, ?_, ?_, ?_⟩
+· simp only [Set.image_nonempty]
+  exact h1
+· apply h2.image continuous_subtype_val
+· infer_instance
+· intro s z hz
+  obtain ⟨t, ht1, ht2⟩ := hz
+  specialize h4 s ht1
+  rw [<- ht2]
+  have h20 : ∃ z ∈ Z, dSystemY.map s t = z := by
+    simpa
+  have h21 : dSystem.map s t.val ∈ Subtype.val '' Z := by
+    refine ⟨dSystemY.map s t, h4, ?_⟩
+    rfl
+  exact h21
 
 /-- A subset of a system X is a minimal subset iff it is a minimal subsystem -/
 theorem minimalSubsetIffMinimalSubsystem
