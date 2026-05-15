@@ -437,7 +437,7 @@ isSetOfBohrRecurrence A ↔ ¬(isBohrZero Aᶜ) :=
 /-- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
 theorem dualBohrZeroSetsOfBohrRecurrence
 {S : Type*} [Semigroup S] [Nonempty S] :
-(bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
+((bohrZeroFamily S)*).sets = (setOfBohrRecurrenceFamily S) :=
 by
   ext A
   have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=

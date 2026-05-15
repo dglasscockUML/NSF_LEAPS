@@ -1367,10 +1367,22 @@ let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
 have : CompactSpace Y := by
   apply isCompact_iff_compactSpace.mp
   exact hY.2.1
-have : Nonempty Y := by
+have hYNonempty: Nonempty Y := by
   apply hY.1.to_subtype
-have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
+have hYUreturn : ∀ y : Y, ∀ U : Set Y,
+IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   sorry
+have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
+  intro y
+  apply dense_iff_inter_open.mpr
+  specialize hYUreturn y
+  intro U hU1 hU2
+  specialize hYUreturn U hU1 hU2
+  unfold orbit
+  obtain ⟨s, hs⟩ := hYUreturn
+  have hmore : dSystemY.map s y ∈ Set.range fun s ↦ dSystemY.map s y := by
+    simp
+  exact ⟨dSystemY.map s y, hs, hmore⟩
 have hYMinimal : isMinimalSystem dSystemY := by
   simp only [minimalIffDenseOrbits]
   exact hYDenseOrbit
