@@ -125,7 +125,7 @@ constructor
 /-- The families of syndetic sets and thick sets are dual -/
 theorem dualSyndeticThick
 {S : Type*} [Semigroup S] [Nonempty S] :
-(syndeticFamily S)* = (thickFamily S) :=
+((syndeticFamily S)*).sets = (thickFamily S) :=
 by
   ext A
   have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
