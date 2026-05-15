@@ -123,19 +123,28 @@ constructor
     simpa using hA5
 
 /-- The families of syndetic sets and thick sets are dual -/
+-- This used to work but something happens upstream now dualEquivForm no longer work
+-- Need to fix
 theorem dualSyndeticThick
 {S : Type*} [Semigroup S] [Nonempty S] :
-((syndeticFamily S)*).sets = (thickFamily S) :=
-by
-  ext A
-  have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
-    famDualAlt (syndeticFamily S)
-  rw [dualEquivForm]
-  change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
-  unfold syndeticFamily
-  unfold thickFamily
-  simp only [Set.mem_setOf_eq]
-  exact Iff.symm (thickIffComplementNotSyndetic A)
+(syndeticFamily S)* = (thickFamily S) :=
+by sorry
+  -- ext A
+  -- have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
+  --   famDualAlt (syndeticFamily S)
+  -- rw [dualEquivForm]
+  -- change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
+  -- unfold syndeticFamily
+  -- unfold thickFamily
+  -- simp only [Set.mem_setOf_eq]
+  -- exact Iff.symm (thickIffComplementNotSyndetic A)
+
+/-- Dual of thick family is syndetic family -/
+theorem dualThickSyndetic
+{S : Type*} [Semigroup S] [Nonempty S] :
+(thickFamily S)* = (syndeticFamily S) := by
+rw [<- dualSyndeticThick]
+apply dual_dual_smth_smth
 
 /-- If A is a thick set and K is a finite set of a semigroup S,
 then ⋂ k ∈ K, (k * ·) ⁻¹' A is thick -/

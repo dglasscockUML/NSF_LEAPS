@@ -78,11 +78,17 @@ theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S :=
 by sorry
 
+/-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
+theorem familyLocalImplicationEquivalence
+{S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
+sorry
+
 /-- In a commutative semigroup, Δ* ⊆ S ⋏ (T ⋎ dcS_Bohr) -/
 theorem commDeltaStarImpliesLocallyBohrZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
-(deltaFamily S)* ⊆ syndeticFamily S ⋏ (thickFamily S ⋎ bohrZeroFamily S) :=
-by sorry
+(deltaFamily S)* ⊆ syndeticFamily S ⋏ (thickFamily S ⋎ bohrZeroFamily S) := by
+have h1 : thickFamily S = (syndeticFamily S)* := by
+  apply dualSyndeticThick
 
 
 end Application
