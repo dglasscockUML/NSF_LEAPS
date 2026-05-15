@@ -444,19 +444,21 @@ isSetOfBohrRecurrence A ↔ ¬(isBohrZero Aᶜ) :=
   -- This should be easy logical consequence of the definitions
 
 /-- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
+-- Something happens upstream regarding "dualEquivForm" that the proof no longer work
+-- Need to fix
 theorem dualBohrZeroSetsOfBohrRecurrence
 {S : Type*} [Semigroup S] [Nonempty S] :
-((bohrZeroFamily S)*).sets = (setOfBohrRecurrenceFamily S) :=
-by
-  ext A
-  have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=
-    famDualAlt (bohrZeroFamily S)
-  rw [dualEquivForm]
-  change A ∈ {A | Aᶜ ∉ (bohrZeroFamily S).sets} ↔ A ∈ (setOfBohrRecurrenceFamily S).sets
-  unfold bohrZeroFamily
-  unfold setOfBohrRecurrenceFamily
-  simp only [Set.mem_setOf_eq]
-  exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
+(bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
+by sorry
+  -- ext A
+  -- have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=
+  --   famDualAlt (bohrZeroFamily S)
+  -- rw [dualEquivForm]
+  -- change A ∈ {A | Aᶜ ∉ (bohrZeroFamily S).sets} ↔ A ∈ (setOfBohrRecurrenceFamily S).sets
+  -- unfold bohrZeroFamily
+  -- unfold setOfBohrRecurrenceFamily
+  -- simp only [Set.mem_setOf_eq]
+  -- exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
 /- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
 theorem commBohrZeroFamilyIsFilter

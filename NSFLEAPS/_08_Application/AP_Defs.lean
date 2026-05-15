@@ -87,8 +87,16 @@ sorry
 theorem commDeltaStarImpliesLocallyBohrZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 (deltaFamily S)* ⊆ syndeticFamily S ⋏ (thickFamily S ⋎ bohrZeroFamily S) := by
-have h1 : thickFamily S = (syndeticFamily S)* := by
-  apply dualSyndeticThick
-
+rw [<- dualSyndeticThick]
+have h1 : syndeticFamily S ⋏ (bohrZeroFamily S)* ⊆ syndeticFamily S ⋏ deltaFamily S := by
+  rw [commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence]
+  rw [dualBohrZeroSetsOfBohrRecurrence]
+  intro x hx
+  exact hx
+have h2 : (bohrZeroFamily S)** = bohrZeroFamily S := by
+  apply dual_dual_smth_smth
+rw [<- h2]
+exact (familyLocalImplicationEquivalence (syndeticFamily S)
+(bohrZeroFamily S)* (deltaFamily S)).mpr h1
 
 end Application
