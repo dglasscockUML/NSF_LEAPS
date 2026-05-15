@@ -72,11 +72,28 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFam
 by sorry
 
 
+/-- Familymeet is monotone -/
+-- We will move this theorem to FA_Theorems file later
+theorem familyMeetIsMonotonic
+{S : Type*} (F G H : Family S) (hGH : G ⊆ H): F ⋏ G ⊆ F ⋏ H := by
+sorry
+
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ Δ_0 -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
-syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S :=
-by sorry
+syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := by
+have h1 : syndeticFamily S ⋏ deltaFamily S ⊆ syndeticFamily S ⋏ deltaZeroFamily S := by
+  apply familyMeetIsMonotonic
+  exact deltaFamilyContainedInDeltaZeroFamily
+have h2 : syndeticFamily S ⋏ deltaZeroFamily S ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
+  apply familyMeetIsMonotonic
+  exact commDeltaZeroImpliesSetOfBohrRecurrence
+have h3 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S = syndeticFamily S ⋏ deltaFamily S := by
+  rw [commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence]
+have h4 : syndeticFamily S ⋏ deltaZeroFamily S ⊆ syndeticFamily S ⋏ deltaFamily S := by
+  rw [<- h3]
+  exact h2
+simpa using Set.Subset.antisymm h1 h4
 
 /-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
 theorem familyLocalImplicationEquivalence
