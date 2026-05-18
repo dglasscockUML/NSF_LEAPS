@@ -42,6 +42,8 @@ end Reduction_to_UR_sets
 
 section Delta_builder
 
+/-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
+then for all thick set H, R(x, V) ∩ H is a Delta set -/
 theorem commVisitTimeSetForRPPairIsDelta
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -55,6 +57,8 @@ end Delta_builder
 
 section Dynamical_sets_of_bohr_recurrence
 
+/-- If B is a set of Bohr recurrence and a uniformly recurrent set,
+then for all thick set H, B ∩ H is a Δ set -/
 theorem commURSetsOfBohrRecurrenceAreDelta
 {S : Type*} [CommSemigroup S] [Nonempty S]
 (B : Set S) {hBur : isURSet B} {hBrec : isSetOfBohrRecurrence B} :
@@ -65,18 +69,39 @@ end Dynamical_sets_of_bohr_recurrence
 
 section Application
 
-/-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
-theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:=
-by sorry
-
-
 /-- Familymeet is monotone -/
 -- We will move this theorem to FA_Theorems file later
 theorem familyMeetIsMonotonic
 {S : Type*} (F G H : Family S) (hGH : G ⊆ H): F ⋏ G ⊆ F ⋏ H := by
 sorry
+
+/-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
+theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
+{S : Type*} [CommSemigroup S] [Nonempty S] :
+syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:= by
+have h1 : syndeticFamily S ⋏ deltaFamily S ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
+  apply familyMeetIsMonotonic
+  have h11 : deltaFamily S ⊆ deltaZeroFamily S := by
+    exact deltaFamilyContainedInDeltaZeroFamily
+  have h12 : deltaZeroFamily S ⊆ setOfBohrRecurrenceFamily S := by
+    exact commDeltaZeroImpliesSetOfBohrRecurrence
+  intro x hx
+  exact h12 (h11 hx)
+have h3 : ∀ (B H : Set S), isURSet B → isThick H →
+B ∩ H ∈ setOfBohrRecurrenceFamily S → B ∩ H ∈ deltaFamily S := by
+  intro B H hB hH hBH
+  have h32 : isSetOfBohrRecurrence B := by
+    have h33 : B ∩ H ⊆ B := by
+      simp
+    apply setOfBohrRecurrenceIsMonotone hBH h33
+  apply commURSetsOfBohrRecurrenceAreDelta
+  · exact hB
+  · exact h32
+  exact hH
+have h2 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S ⊆ syndeticFamily S ⋏ deltaFamily S := by
+  apply urContainmentSufficesForFamilyContainment
+  exact h3
+simpa using Set.Subset.antisymm h1 h2
 
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ Δ_0 -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
@@ -96,6 +121,8 @@ have h4 : syndeticFamily S ⋏ deltaZeroFamily S ⊆ syndeticFamily S ⋏ deltaF
 simpa using Set.Subset.antisymm h1 h4
 
 /-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
+-- This theorem should be also in FA_Theorems. I state it here since it's needed for this section
+-- and the corresponding theorem in FA_Theorems is not there yet
 theorem familyLocalImplicationEquivalence
 {S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
 sorry
