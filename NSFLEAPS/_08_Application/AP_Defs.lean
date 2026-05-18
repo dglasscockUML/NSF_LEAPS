@@ -20,14 +20,21 @@ A = visitTimeSet (monoidExtSymbolicSystem S) x U :=
 by sorry
 
 /-- Given a syndetic set `A` and a thick set `H`, there exists a
-CRT set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
+UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
 theorem syndSetIsUROnThickSet
 {S : Type*} [Semigroup S] [Nonempty S]
 (A : Set S) {hA : isSyndetic A}
 (H : Set S) {hH : isThick H} :
-∃ (B : Set S) (hB : isURSet B) (G : Set S) (hG : isThick G),
-A ∩ G = B ∩ G :=
+∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+A ∩ H' = B ∩ H' :=
 by sorry
+
+/-- This lemma helps us unfold the definition of FamilyMeet -/
+-- This may be redundant eventually.
+-- But for now, I am struggling to unfold the definition of FamilyMeet, so I use this lemma
+lemma unfoldFamMeet
+{S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
+  sorry
 
 /-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
 for all sets. -/
@@ -35,8 +42,66 @@ theorem urContainmentSufficesForFamilyContainment
 {S : Type*} [Semigroup S] [Nonempty S]
 (F G : Family S)
 {hFG : ∀ (B H : Set S), isURSet B → isThick H → B ∩ H ∈ F → B ∩ H ∈ G} :
-(syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G :=
-by sorry
+(syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
+intro A hA
+have h0 : isSyndetic A := by
+  have h01 : ∀ H ∈ thickFamily S, (A ∩ H).Nonempty := by
+    intro H hH
+    have h011 : A ∩ H ∈ F := by
+      have h0111 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
+        exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
+      specialize h0111 H
+      rw [dualSyndeticThick] at h0111
+      apply h0111
+      exact hH
+    sorry
+  have h02 : A ∈ syndeticFamily S := by
+    rw [<- dualThickSyndetic]
+    exact (mem_dual_star (thickFamily S) A).mpr h01
+  unfold syndeticFamily at h02
+  exact h02
+have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
+  intro H hH
+  have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H), A ∩ H' = B ∩ H' := by
+    apply syndSetIsUROnThickSet
+    · exact h0
+    exact hH
+  obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
+  have h12 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
+    exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
+  have h13 : A ∩ H' ∈ F := by
+    specialize h12 H'
+    rw [dualSyndeticThick] at h12
+    apply h12
+    exact hH'
+  have h14 : B ∩ H' ∈ F := by
+    rw [<- h2]
+    exact h13
+  have h15 : B ∩ H' ∈ G := by
+    apply hFG
+    · exact hB
+    · exact hH'
+    exact h14
+  have h16 : A ∩ H' ∈ G := by
+    rw [h2]
+    exact h15
+  have h17 : A ∩ H' ⊆ A ∩ H := by
+    apply Set.inter_subset_inter_right
+    exact hHH'
+  apply Family.upward_closed
+  · exact h16
+  exact h17
+simp only [SetLike.mem_coe] at hA
+simp only [SetLike.mem_coe]
+have h2 : (syndeticFamily S)* = (thickFamily S) := by
+  exact dualSyndeticThick
+have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
+  rw [<- dualSyndeticThick]
+  exact (unfoldFamMeet (syndeticFamily S) G A).mpr
+apply h3
+intro H hH2
+specialize h1 H hH2
+exact h1
 
 end Reduction_to_UR_sets
 
@@ -110,7 +175,8 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := b
 have h1 : syndeticFamily S ⋏ deltaFamily S ⊆ syndeticFamily S ⋏ deltaZeroFamily S := by
   apply familyMeetIsMonotonic
   exact deltaFamilyContainedInDeltaZeroFamily
-have h2 : syndeticFamily S ⋏ deltaZeroFamily S ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
+have h2 : syndeticFamily S ⋏ deltaZeroFamily S ⊆
+syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
   apply familyMeetIsMonotonic
   exact commDeltaZeroImpliesSetOfBohrRecurrence
 have h3 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S = syndeticFamily S ⋏ deltaFamily S := by
