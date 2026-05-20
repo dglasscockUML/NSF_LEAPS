@@ -36,6 +36,12 @@ lemma unfoldFamMeet
 {S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
   sorry
 
+/-- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
+-- This theorem will be moved to FA_Theorems later
+theorem familyMeetContainedInIntersection
+{S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
+sorry
+
 /-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
 for all sets. -/
 theorem urContainmentSufficesForFamilyContainment
@@ -45,24 +51,17 @@ theorem urContainmentSufficesForFamilyContainment
 (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
 intro A hA
 have h0 : isSyndetic A := by
-  have h01 : ∀ H ∈ thickFamily S, (A ∩ H).Nonempty := by
-    intro H hH
-    have h011 : A ∩ H ∈ F := by
-      have h0111 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
-        exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
-      specialize h0111 H
-      rw [dualSyndeticThick] at h0111
-      apply h0111
-      exact hH
-    sorry
-  have h02 : A ∈ syndeticFamily S := by
-    rw [<- dualThickSyndetic]
-    exact (mem_dual_star (thickFamily S) A).mpr h01
-  unfold syndeticFamily at h02
-  exact h02
+  have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
+    apply familyMeetContainedInIntersection
+  have h02 : A ∈ syndeticFamily S ∩ F := by
+    exact h01 hA
+  have h03 : A ∈ syndeticFamily S := by
+    exact h02.1
+  simpa
 have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
   intro H hH
-  have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H), A ∩ H' = B ∩ H' := by
+  have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+  A ∩ H' = B ∩ H' := by
     apply syndSetIsUROnThickSet
     · exact h0
     exact hH
