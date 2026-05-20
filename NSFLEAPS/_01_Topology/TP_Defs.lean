@@ -143,3 +143,9 @@ theorem openProductInEntourageImage
 (π : X → Y) {hc : Continuous π} {hs : Function.Surjective π}
 (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
 ∃ (U : Set Y), IsOpen U ∧ ((U ×ˢ U) ⊆ ((Prod.map π π) '' α)) := sorry
+
+lemma existUniformSubset
+{X} [UniformSpace X] (U : Set X) {hUNonempty : U.Nonempty} {hUOpen : IsOpen U} :
+∃ V : Set X, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ α : Set (X × X), α ∈ uniformity X ∧
+∀ a ∈ V, ∀ b : X, (a, b) ∈ α → b ∈ U := by
+sorry

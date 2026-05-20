@@ -1371,7 +1371,12 @@ have hYNonempty: Nonempty Y := by
   apply hY.1.to_subtype
 have hYUreturn : ∀ y : Y, ∀ U : Set Y,
 IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
-  sorry
+  intro y U hUOpen hUNonempty
+  have h0 : UniformSpace Y := by
+    sorry
+  have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ α : Set (Y × Y), α ∈ uniformity Y ∧
+∀ a ∈ V, ∀ b : Y, (a, b) ∈ α → b ∈ U := by
+    sorry
 have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
   intro y
   apply dense_iff_inter_open.mpr
