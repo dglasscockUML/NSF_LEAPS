@@ -2,6 +2,41 @@ import NSFLEAPS._06_Furstenberg_families.FF_Defs
 import NSFLEAPS._07_RP.RP_Defs
 import NSFLEAPS._08_Application.AP_Symbolic_system
 
+
+section Theorems_needed_from_FA_Theorems
+-- This section contains theorems from FA_Theorems which are not stated yet
+-- I state them here to use for theorems in this file
+-- After we state corresponding theorems in FA_Theorems, the statements in this
+-- section will be removed
+
+/-- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
+-- This theorem will be moved to FA_Theorems later
+theorem familyMeetContainedInIntersection
+{S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
+sorry
+
+/-- Familymeet is monotone -/
+-- We will move this theorem to FA_Theorems file later
+theorem familyMeetIsMonotonic
+{S : Type*} (F G H : Family S) (hGH : G ⊆ H): F ⋏ G ⊆ F ⋏ H := by
+sorry
+
+/-- This lemma helps us unfold the definition of FamilyMeet -/
+-- This may be redundant eventually.
+-- But for now, I am struggling to unfold the definition of FamilyMeet, so I use this lemma
+lemma unfoldFamMeet
+{S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
+  sorry
+
+/-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
+-- This theorem should be also in FA_Theorems. I state it here since it's needed for this section
+-- and the corresponding theorem in FA_Theorems is not there yet
+theorem familyLocalImplicationEquivalence
+{S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
+sorry
+
+end Theorems_needed_from_FA_Theorems
+
 section Reduction_to_UR_sets
 
 /-- A set `A ⊆ S` is uniformly recurrent if `1_A` is `S`-uniformly recurrent
@@ -11,13 +46,37 @@ def isURSet
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
-/-- The set corresponding to a uniformly recurrent point in symbolic space is a UR set -/
+/-- An UR set can be written as R(x, U) -/
 theorem urSetIsRxU
 {S : Type*} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
-∃ (x : WithOne S → Bool) (xMin : isUniformlyRecurrent (monoidExtSymbolicSystem S) x)
-(U : Set (WithOne S → Bool)) (UOpen : IsOpen U) (UNonempty : U.Nonempty),
-A = visitTimeSet (monoidExtSymbolicSystem S) x U :=
-by sorry
+∃ (U : Set (WithOne S → Bool)) (UClopen : IsClopen U) (UNonempty : U.Nonempty),
+∃ (x : WithOne S → Bool) (xMin : isUniformlyRecurrent (monoidExtSymbolicSystem S) x),
+A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
+simp
+let U := {x : WithOne S → Bool | x none = true}
+use U
+constructor
+· sorry
+constructor
+· sorry
+let liftSet : Set S → Set (WithOne S) := fun A : Set S ↦ {s : WithOne S | ∃ t ∈ A, some t = s}
+let A_wOne := liftSet A
+classical
+let x0 := fun (s : WithOne S) ↦ if s ∈ A_wOne then true else false
+let x1 := fun (s : WithOne S) ↦ if s ∈ A_wOne ∪ {none} then true else false
+have h1 : isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 ∨ isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 := by
+  sorry
+rcases h1 with hx0 | hx1
+use x0
+use hx0
+ext s
+constructor
+intro hs
+unfold visitTimeSet
+simp
+sorry
+sorry
+sorry
 
 /-- Given a syndetic set `A` and a thick set `H`, there exists a
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
@@ -28,19 +87,6 @@ theorem syndSetIsUROnThickSet
 ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
 A ∩ H' = B ∩ H' :=
 by sorry
-
-/-- This lemma helps us unfold the definition of FamilyMeet -/
--- This may be redundant eventually.
--- But for now, I am struggling to unfold the definition of FamilyMeet, so I use this lemma
-lemma unfoldFamMeet
-{S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
-  sorry
-
-/-- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
--- This theorem will be moved to FA_Theorems later
-theorem familyMeetContainedInIntersection
-{S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
-sorry
 
 /-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
 for all sets. -/
@@ -133,12 +179,6 @@ end Dynamical_sets_of_bohr_recurrence
 
 section Application
 
-/-- Familymeet is monotone -/
--- We will move this theorem to FA_Theorems file later
-theorem familyMeetIsMonotonic
-{S : Type*} (F G H : Family S) (hGH : G ⊆ H): F ⋏ G ⊆ F ⋏ H := by
-sorry
-
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
 {S : Type*} [CommSemigroup S] [Nonempty S] :
@@ -184,13 +224,6 @@ have h4 : syndeticFamily S ⋏ deltaZeroFamily S ⊆ syndeticFamily S ⋏ deltaF
   rw [<- h3]
   exact h2
 simpa using Set.Subset.antisymm h1 h4
-
-/-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
--- This theorem should be also in FA_Theorems. I state it here since it's needed for this section
--- and the corresponding theorem in FA_Theorems is not there yet
-theorem familyLocalImplicationEquivalence
-{S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
-sorry
 
 /-- In a commutative semigroup, Δ* ⊆ S ⋏ (T ⋎ dcS_Bohr) -/
 theorem commDeltaStarImpliesLocallyBohrZero
