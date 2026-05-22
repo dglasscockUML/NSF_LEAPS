@@ -1361,6 +1361,9 @@ have h6 : x ∈ orbitClosure dSystem x := by
 let Y := orbitClosure dSystem x
 have Y_def : Y = orbitClosure dSystem x := by
   rfl
+have xInY : x ∈ Y := by
+  simpa
+let x' : Y := ⟨x, xInY⟩
 have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
   apply orbitClosureIsNonemptyCompactT2InvariantSubset
 let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
@@ -1377,6 +1380,36 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ α : Set (Y × Y), α ∈ uniformity Y ∧
 ∀ a ∈ V, ∀ b : Y, (a, b) ∈ α → b ∈ U := by
     sorry
+  obtain ⟨V, hV1, hV2, hV3,α, hα1, hα2⟩ := h1
+  rcases (isOpen_induced_iff.mp hV3) with ⟨V', hV'_open, hV_eq⟩
+  have h12 : (V' ∩ Y).Nonempty := by
+    sorry
+  have h11 : ∃ t : S, dSystem.map t x ∈ V' := by
+    unfold orbitClosure at Y_def
+    unfold orbit at Y_def
+    rw [Y_def] at h12
+    rcases h12 with ⟨z, hzV, hz_cl⟩
+    have h111 : (V' ∩ orbit dSystem x).Nonempty := by
+      apply mem_closure_iff.mp
+      exact hz_cl
+      exact hV'_open
+      exact hzV
+    rcases h111 with ⟨x1, hx1, hx2⟩
+    unfold orbit at hx2
+    rcases hx2 with ⟨t, ht⟩
+    use t
+    simp [ht]
+    exact hx1
+  have h2 : ∃ t : S, dSystemY.map t x' ∈ V := by
+    rcases h11 with ⟨t, ht⟩
+    use t
+    rw [<- hV_eq]
+    simp
+    exact ht
+  rcases h2 with ⟨t, ht⟩
+  have h3 : x' ∈ (dSystemY.map t) ⁻¹' V := by
+    exact ht
+  sorry
 have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
   intro y
   apply dense_iff_inter_open.mpr
