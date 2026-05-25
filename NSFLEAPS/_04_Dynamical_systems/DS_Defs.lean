@@ -1333,6 +1333,7 @@ have h7 : isSyndetic ((s * ·) '' visitTimeSet dSystem x V) := by
   apply h5
 apply syndeticIsMonotone h7 h6
 
+
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
@@ -1377,10 +1378,10 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   intro y U hUOpen hUNonempty
   have h0 : UniformSpace Y := by
     sorry
-  have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ α : Set (Y × Y), α ∈ uniformity Y ∧
-∀ a ∈ V, ∀ b : Y, (a, b) ∈ α → b ∈ U := by
+  have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (Y × Y), γ ∈ uniformity Y ∧
+∀ a ∈ V, ∀ b : Y, (a, b) ∈ γ → b ∈ U := by
     sorry
-  obtain ⟨V, hV1, hV2, hV3,α, hα1, hα2⟩ := h1
+  obtain ⟨V, hV1, hV2, hV3, γ, hγ1, hγ2⟩ := h1
   rcases (isOpen_induced_iff.mp hV3) with ⟨V', hV'_open, hV_eq⟩
   have h12 : (V' ∩ Y).Nonempty := by
     sorry
@@ -1391,25 +1392,128 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
     rcases h12 with ⟨z, hzV, hz_cl⟩
     have h111 : (V' ∩ orbit dSystem x).Nonempty := by
       apply mem_closure_iff.mp
-      exact hz_cl
-      exact hV'_open
+      · exact hz_cl
+      · exact hV'_open
       exact hzV
     rcases h111 with ⟨x1, hx1, hx2⟩
     unfold orbit at hx2
     rcases hx2 with ⟨t, ht⟩
     use t
-    simp [ht]
+    simp only [ht]
     exact hx1
   have h2 : ∃ t : S, dSystemY.map t x' ∈ V := by
     rcases h11 with ⟨t, ht⟩
     use t
     rw [<- hV_eq]
-    simp
+    simp only [Set.mem_preimage]
     exact ht
   rcases h2 with ⟨t, ht⟩
   have h3 : x' ∈ (dSystemY.map t) ⁻¹' V := by
     exact ht
-  sorry
+  have h4 : isUniformlyRecurrent dSystemY x' := by
+    intro V_Y hV_Y
+    rcases (mem_nhds_iff.mp hV_Y) with ⟨V1_Y, hxV1, hV1_open, hV1_sub⟩
+    rcases (isOpen_induced_iff.mp hV1_open) with ⟨V_X, hV'_open, hV_eq⟩
+    have h4a : visitTimeSet dSystemY x' V1_Y = visitTimeSet dSystem x V_X := by
+      ext s
+      constructor
+      · intro hs
+        rw [<- hV_eq] at hs
+        simpa
+      intro hs
+      have h4b : dSystem.map s x ∈ V_X := by
+        exact hs
+      have h4e :dSystemY.map s x' ∈ V1_Y := by
+        rw [<- hV_eq]
+        exact h4b
+      exact h4e
+    have h4f : isSyndetic (visitTimeSet dSystem x V_X) := by
+      apply xisUR
+      have h4g : Subtype.val '' V1_Y ⊆ V_X := by
+        simp [hV_eq]
+      have h4gg : x = Subtype.val x' := by
+        rfl
+      have h4h : x ∈ V_X := by
+        apply h4g
+        rw [h4gg]
+        simp [hV1_sub]
+      exact IsOpen.mem_nhds hV'_open h4h
+    have h4i : isSyndetic (visitTimeSet dSystemY x' V1_Y) := by
+      rw [h4a]
+      exact h4f
+    have h4j : visitTimeSet dSystemY x' V1_Y ⊆ visitTimeSet dSystemY x' V_Y := by
+      apply visitTimesMono
+      exact hxV1
+    exact syndeticIsMonotone h4i h4j
+  let Vt := dSystemY.map t ⁻¹' V
+  have h42 : IsOpen Vt := by
+    apply IsOpen.preimage
+    · apply dSystemY.mapCont t
+    exact hV3
+  have h5 : isSyndetic (visitTimeSet dSystemY x' Vt) := by
+    apply h4
+    apply IsOpen.mem_nhds
+    · exact h42
+    simpa
+  rcases h5 with ⟨F, hF1, hF2⟩
+  have h6 : ∃ α ∈ uniformity Y, ∀ f ∈ F,
+  (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
+    sorry
+  rcases h6 with ⟨α, hα1, hα2⟩
+  have h61 : ∃ W : Set Y, W ∈ nhds y ∧ IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
+    sorry
+  have h7 : ∃ s : S, (dSystemY.map s x', y) ∈ α := by
+    rcases h61 with ⟨W, hW1, hW2, hW3⟩
+    have h7a : ∃ s : S, (dSystemY.map s x' ∈ W) := by
+      sorry
+    have h7b : W ×ˢ W ⊆ α := by
+      sorry
+    rcases h7a with ⟨s, hs⟩
+    use s
+    have h7c : y ∈ W := by
+      rcases mem_nhds_iff.mp hW1 with ⟨Z, hZ1, hZ2, hZ3⟩
+      apply hZ1
+      exact hZ3
+    have h7d : (dSystemY.map s x', y) ∈ W ×ˢ W := by
+      exact ⟨hs, h7c⟩
+    apply h7b
+    exact h7d
+  rcases h7 with ⟨s, hs⟩
+  have h8 : ∃ f ∈ F, dSystemY.map (t * f * s) x' ∈ V := by
+    specialize hF2 s
+    rcases hF2 with ⟨f, hf1, hf2⟩
+    use f
+    constructor
+    · exact hf1
+    · unfold Vt at hf2
+      unfold visitTimeSet at hf2
+      simp only [dSystemY.mapMult]
+      have h8a : dSystemY.map (f * s) x' ∈ (dSystemY.map t ⁻¹' V) := by
+        exact hf2
+      have h8b : dSystemY.map t (dSystemY.map (f * s) x') ∈ V := by
+        exact h8a
+      have h8c : dSystemY.map t (dSystemY.map (f * s) x')
+      = dSystemY.map t (dSystemY.map f (dSystemY.map s x')):= by
+        simp [dSystemY.mapMult]
+      rw [<- h8c]
+      exact h8b
+  rcases h8 with ⟨f, hf1, hf2⟩
+  have h9 : (dSystemY.map (t * f * s) x', dSystemY.map (t * f) y)
+    = (dSystemY.map (t * f) (dSystemY.map s x'), dSystemY.map (t * f) y) := by
+      simp [dSystemY.mapMult]
+  have h10 : (dSystemY.map (t * f * s) x', dSystemY.map (t * f) y)
+  ∈ (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α := by
+    rw [h9]
+    refine ⟨(dSystemY.map s x', y), hs, ?_⟩
+    rfl
+  have h11 : (dSystemY.map (t * f * s) x', dSystemY.map (t * f) y) ∈ γ := by
+    specialize hα2 f hf1
+    apply hα2
+    exact h10
+  have h12 : dSystemY.map (t * f) y ∈ U := by
+    apply hγ2 (dSystemY.map (t * f * s) x') hf2
+    exact h11
+  use t * f
 have hYDenseOrbit : ∀ y : Y, Dense (orbit dSystemY y) := by
   intro y
   apply dense_iff_inter_open.mpr
