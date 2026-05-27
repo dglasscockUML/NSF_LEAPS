@@ -1339,7 +1339,28 @@ to the closure of A in X -/
 lemma subtype_closure_eq_of_isClosed
 {X : Type*} [TopologicalSpace X] {Y : Set X} {A : Set Y} (hY : IsClosed Y) :
   closure (Subtype.val '' A) = Subtype.val '' (closure A) := by
-  sorry
+  have h1 : Subtype.val '' (closure A) ⊆ closure (Subtype.val '' A) := by
+    apply image_closure_subset_closure_image
+    exact continuous_subtype_val
+  have h2 : IsClosed (Subtype.val '' (closure A)) := by
+    have h2a : IsClosed (closure A) := by
+      simp
+    apply IsClosed.isClosedMap_subtype_val
+    · exact hY
+    exact h2a
+  have h3 : closure (Subtype.val '' (closure A)) = Subtype.val '' (closure A) := by
+    simp
+  have h4 : Subtype.val '' A ⊆ Subtype.val '' (closure A) := by
+    simp only [Set.image_subset_iff, Subtype.val_injective, Set.preimage_image_eq]
+    unfold closure
+    simp
+  have h5 : closure (Subtype.val '' A) ⊆ closure (Subtype.val '' (closure A)) := by
+    apply closure_mono
+    exact h4
+  have h6 : closure (Subtype.val '' A) ⊆ Subtype.val '' (closure A) := by
+    rw [<- h3]
+    exact h5
+  apply Set.Subset.antisymm h6 h1
 
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset
@@ -1383,7 +1404,7 @@ have hYNonempty: Nonempty Y := by
 have hYUreturn : ∀ y : Y, ∀ U : Set Y,
 IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   intro y U hUOpen hUNonempty
-  have h0 : UniformSpace Y := by
+  haveI h0 : UniformSpace Y := by
     sorry
   have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (Y × Y), γ ∈ uniformity Y ∧
 ∀ a ∈ V, ∀ b : Y, (a, b) ∈ γ → b ∈ U := by
@@ -1391,7 +1412,18 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   obtain ⟨V, hV1, hV2, hV3, γ, hγ1, hγ2⟩ := h1
   rcases (isOpen_induced_iff.mp hV3) with ⟨V', hV'_open, hV_eq⟩
   have h12 : (V' ∩ Y).Nonempty := by
-    sorry
+    rcases hV2 with ⟨x, hx⟩
+    have h12a : Subtype.val '' V ⊆ V' := by
+      simp only [Set.image_subset_iff]
+      rw [hV_eq]
+    have h12b : Subtype.val x ∈ V' := by
+      apply h12a
+      simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right, Subtype.coe_eta,
+        Subtype.coe_prop, exists_const]
+      exact hx
+    have h12c : Subtype.val x ∈ V' ∩ Y := by
+      simpa
+    exact ⟨Subtype.val x, h12c⟩
   have h11 : ∃ t : S, dSystem.map t x ∈ V' := by
     unfold orbitClosure at Y_def
     unfold orbit at Y_def
@@ -1463,12 +1495,22 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
     · exact h42
     simpa
   rcases h5 with ⟨F, hF1, hF2⟩
+  have h50 : ∀ f ∈ F, Continuous (dSystemY.map (t * f)) := by
+    intro f hf
+    apply dSystemY.mapCont (t * f)
+  have h51 : ∀ f ∈ F, UniformContinuous (dSystemY.map (t * f)) := by
+    intro f hf
+    specialize h50 f hf
+    have h51a : CompactSpace Y := by
+      infer_instance
+    -- exact CompactSpace.uniformContinuous_of_continuous h50
+    sorry
   have h6 : ∃ α ∈ uniformity Y, ∀ f ∈ F,
   (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
     sorry
   rcases h6 with ⟨α, hα1, hα2⟩
-  have h61 : ∃ W ∈ nhds y, IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
-    --exact openClosureProductInEntourage y α
+  have h61 : ∃ W : Set Y, W ∈ nhds y ∧ IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
+    -- exact openClosureProductInEntourage y α
     sorry
   have h61a : ∀ s : S, dSystem.map s x = Subtype.val (dSystemY.map s x') := by
     intro s

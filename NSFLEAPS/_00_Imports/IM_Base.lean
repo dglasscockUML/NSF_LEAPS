@@ -25,6 +25,7 @@ import Mathlib.Topology.Maps.Proper.Basic
 import Mathlib.Topology.Constructions.SumProd
 import Mathlib.Topology.UniformSpace.Separation
 import Mathlib.Topology.UniformSpace.HeineCantor
+import Mathlib.Topology.UniformSpace.Compact
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Continuous
