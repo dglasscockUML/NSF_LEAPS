@@ -30,6 +30,7 @@ import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Continuous
 import Mathlib.Topology.Compactification.StoneCech
 import Mathlib.Topology.Algebra.Semigroup
+import Mathlib.Topology.Defs.Induced
 
 import Mathlib.Combinatorics.Hindman
 

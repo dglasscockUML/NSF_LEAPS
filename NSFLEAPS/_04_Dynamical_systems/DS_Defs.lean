@@ -1334,6 +1334,13 @@ have h7 : isSyndetic ((s * ·) '' visitTimeSet dSystem x V) := by
 apply syndeticIsMonotone h7 h6
 
 
+/-- If Y is a closed subspace of X and A ⊆ Y, then the closure of A in Y is equal
+to the closure of A in X -/
+lemma subtype_closure_eq_of_isClosed
+{X : Type*} [TopologicalSpace X] {Y : Set X} {A : Set Y} (hY : IsClosed Y) :
+  closure (Subtype.val '' A) = Subtype.val '' (closure A) := by
+  sorry
+
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
@@ -1460,14 +1467,75 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
     sorry
   rcases h6 with ⟨α, hα1, hα2⟩
-  have h61 : ∃ W : Set Y, W ∈ nhds y ∧ IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
+  have h61 : ∃ W ∈ nhds y, IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
+    --exact openClosureProductInEntourage y α
     sorry
+  have h61a : ∀ s : S, dSystem.map s x = Subtype.val (dSystemY.map s x') := by
+    intro s
+    rfl
+  have h61b : orbit dSystem x = Subtype.val '' (orbit dSystemY x') := by
+    ext z
+    constructor
+    · intro hz
+      rcases hz with ⟨s, hs⟩
+      specialize h61a s
+      have h61b1 : dSystem.map s x = z := by
+        exact hs
+      rw [<- h61b1]
+      rw [h61a]
+      simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right, Subtype.coe_eta,
+        Subtype.coe_prop, exists_const]
+      unfold orbit
+      simp
+    intro hz
+    rcases hz with ⟨t, hz2, hz3⟩
+    rcases hz2 with ⟨s, hs⟩
+    rw [<- hz3]
+    rw [<- hs]
+    simp only
+    unfold orbit
+    simp only [Set.mem_range]
+    use s
+    specialize h61a s
+    exact h61a
+  have h61c : closure (orbit dSystem x) = closure (Subtype.val '' (orbit dSystemY x')) := by
+    simp [h61b]
+  have h61d : Y = closure (Subtype.val '' (orbit dSystemY x')) := by
+    rw [<- h61c]
+    exact Y_def
+  have h61e : Y = Subtype.val '' (closure (orbit dSystemY x')) := by
+    simp only [h61d]
+    apply subtype_closure_eq_of_isClosed
+    unfold orbitClosure at Y_def
+    simp [Y_def]
+  have h61f : closure (orbit dSystemY x') = Subtype.val ⁻¹' Y := by
+    simp [h61e]
+  have h62 : Set.univ = closure (orbit dSystemY x') := by
+    simp [h61f]
   have h7 : ∃ s : S, (dSystemY.map s x', y) ∈ α := by
     rcases h61 with ⟨W, hW1, hW2, hW3⟩
+    have h7a1 : Subtype.val y ∈ Y := by
+      simp
+    have h7a2 : (W ∩ orbit dSystemY x').Nonempty := by
+      apply mem_closure_iff_nhds.mp
+      · rw [<- h62]
+        simp
+      exact hW1
     have h7a : ∃ s : S, (dSystemY.map s x' ∈ W) := by
-      sorry
+      rcases h7a2 with ⟨z, hz1, hz2⟩
+      unfold orbit at hz2
+      rcases hz2 with ⟨s, hs⟩
+      use s
+      have h7a3 : dSystemY.map s x' = z := by
+        exact hs
+      rw [h7a3]
+      exact hz1
     have h7b : W ×ˢ W ⊆ α := by
-      sorry
+      have h7b1 : W ⊆ closure W := by
+        exact subset_closure
+      have h7b2 : W ×ˢ W ⊆ closure W ×ˢ closure W := by
+        simpa
+      exact h7b2.trans hW3
     rcases h7a with ⟨s, hs⟩
     use s
     have h7c : y ∈ W := by
