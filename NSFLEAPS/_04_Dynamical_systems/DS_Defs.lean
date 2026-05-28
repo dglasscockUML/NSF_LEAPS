@@ -403,24 +403,27 @@ def setToRelation
 X → X → Prop :=
 fun x y => (x, y) ∈ s
 
+-- We use Std.Refl, Std.Symm, and IsTrans before,
+-- but these classes have been deprecated since March 2026
+-- So I changed to Reflexive, Symmetric, and Transitive
 /-- A set `s : Set (X × X)` is reflexive if for all `x : X`, `(x,x) ∈ s` -/
 def isReflexive
 {X : Type*} (s : Set (X × X)) :
 Prop :=
-Std.Refl (setToRelation s)
+Reflexive (setToRelation s)
 
 /-- A set `s : Set (X × X)` is symmetric if for all `x y : X`, `(x,y) ∈ s → (y,x) ∈ s` -/
 def isSymmetric
 {X : Type*} (s : Set (X × X)) :
 Prop :=
-Std.Symm (setToRelation s)
+Symmetric (setToRelation s)
 
 /-- A set `s : Set (X × X)` is transitive if for all `x y z : X`,
 `(x,y) ∈ s ∧ (y,z) ∈ s → (x,z) ∈ s` -/
 def isTransitive
 {X : Type*} (s : Set (X × X)) :
 Prop :=
-IsTrans X (setToRelation s)
+Transitive (setToRelation s)
 
 /-- A set `s : Set (X × X)` is an equivalence relation if it is reflexive, symmetric,
 and transitive -/
@@ -434,8 +437,28 @@ Equivalence (setToRelation s)
 symmetric, and transitive -/
 theorem equivalenceRelationSetForm
 {X : Type*} (s : Set (X × X)) :
-Equivalence (setToRelation s) ↔ isReflexive s ∧ isSymmetric s ∧ isTransitive s :=
-by sorry
+Equivalence (setToRelation s) ↔ isReflexive s ∧ isSymmetric s ∧ isTransitive s := by
+constructor
+· intro h
+  rcases h with ⟨h1, h2, h3⟩
+  constructor
+  · exact h1
+  constructor
+  · intro x y hxy
+    specialize h2 hxy
+    exact h2
+  intro x y z hxyz1 hxyz2
+  specialize h3 hxyz1 hxyz2
+  exact h3
+intro h
+rcases h with ⟨h1, h2, h3⟩
+constructor
+· exact h1
+· intro x y hxy
+  specialize h2 hxy
+  exact h2
+intro x y z hxyz1 hxyz2
+exact h3 hxyz1 hxyz2
 
 /- The following exists in Mathlib as an instance, but we have some friction
 using that because of our treating relations as sets -/
