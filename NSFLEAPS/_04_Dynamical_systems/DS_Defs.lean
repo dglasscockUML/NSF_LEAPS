@@ -466,8 +466,12 @@ using that because of our treating relations as sets -/
 theorem nonemptyQuotient
 (X : Type*) [Nonempty X]
 {I : Set (X × X)} (hIEquiv : Equivalence (setToRelation I)) :
-Nonempty (Quotient ⟨setToRelation I, hIEquiv⟩) :=
-by sorry
+Nonempty (Quotient ⟨setToRelation I, hIEquiv⟩) := by
+have h1 : ∃ x : X, True := by
+  simp
+rcases h1 with ⟨x, hx⟩
+let y := Quotient.mk ⟨setToRelation I, hIEquiv⟩ x
+exact ⟨y⟩
 
 end Relations_as_sets
 
