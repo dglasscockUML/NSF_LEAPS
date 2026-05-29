@@ -1142,6 +1142,16 @@ have hY1 : ∀ y : Y, Dense (orbit dSystemY y) := by
 simp only [minimalIffDenseOrbits]
 exact hY1
 
+/-- Image of a minimal system is a minimal invariant set -/
+lemma imageOfMinimalSetIsMinimal
+{dSystemX : DynamicalSystem S X}
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y}
+(π : X → Y) (hEquivariant : isEquivariant dSystemX.map dSystemY.map π)
+(Z : Set X) (hZMinimal : isMinimalSubset dSystemX Z) :
+isMinimalSubset dSystemY (π '' Z):= by
+  sorry
+
 /-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
 to `R(x,V) R(x,U)^{-1}` in minimal systems -/
 theorem setVisitsAsQuotientSet
@@ -1294,7 +1304,6 @@ by
     simp only [Set.mem_image, SetLike.mem_coe]
     use y
   use s_chooser y
-
 
 /-- Every point in a minimal system is uniformly recurrent -/
 theorem minimalImpliesUniformlyRecurrent
@@ -1805,8 +1814,176 @@ theorem inMinCommSystemURPairsDense
 {S} [commSemi : CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
-Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} :=
-by sorry
+Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)} := by
+let A := {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)}
+have hDefA : A = {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)}
+  := by
+  rfl
+have hZ : ∃ Z : Set (X × X), isMinimalSubset (diagDynamicalSystem dSystem dSystem) Z := by
+  apply existsMinimalSubset
+have hFactor : isFactorMap (diagDynamicalSystem dSystem dSystem) dSystem Prod.fst := by
+  unfold isFactorMap
+  constructor
+  · exact continuous_fst
+  constructor
+  · intro b
+    have h1 : ∃ x : X, True := by
+      simp
+    rcases h1 with ⟨x, hx⟩
+    use (b, x)
+  unfold isEquivariant
+  intro s
+  ext z
+  simp only [Function.comp_apply]
+  unfold diagDynamicalSystem
+  simp
+rcases hZ with ⟨Z, hZ⟩
+have hZDown : isNonemptyCompactT2InvariantSubset dSystem (Prod.fst '' Z) := by
+  rcases hZ with ⟨hZ1, hZ2⟩
+  apply imageOfSubsystemIsSubsystem (diagDynamicalSystem dSystem dSystem) (dSystem) Prod.fst
+  · exact hZ1
+  · exact continuous_fst
+  rcases hFactor with ⟨hZDown1, hZDown2, hZDown3⟩
+  exact hZDown3
+have hZX : Prod.fst '' Z = Set.univ := by
+  specialize hMin (Prod.fst '' Z) hZDown
+  simp [hMin]
+have hUV : ∀ U V : Set X, IsOpen U → U.Nonempty → IsOpen V → V.Nonempty →
+  ((U ×ˢ V) ∩ A).Nonempty := by
+  intro U V hU1 hU2 hV1 hV2
+  have h2 : ∃ z ∈ Z, z.1 ∈ U := by
+    rcases hU2 with ⟨x, hx⟩
+    have h2a : x ∈ Prod.fst '' Z := by
+      rw [hZX]
+      simp
+    rcases h2a with ⟨z, hz1, hz2⟩
+    use z
+    constructor
+    · exact hz1
+    rw [hz2]
+    exact hx
+  rcases h2 with ⟨z, hz1, hz2⟩
+  have h3 : ∃ s : S, dSystem.map s z.2 ∈ V := by
+    have h3a : Dense (orbit dSystem z.2) := by
+      apply (minimalIffDenseOrbits dSystem).mp hMin
+    have h3b : (V ∩ (orbit dSystem z.2)).Nonempty := by
+      apply dense_iff_inter_open.mp h3a
+      · exact hV1
+      exact hV2
+    rcases h3b with ⟨x, hx1, hx2⟩
+    unfold orbit at hx2
+    rcases hx2 with ⟨s, hs⟩
+    use s
+    have h3c : x = dSystem.map s z.2 := by
+      rw [<- hs]
+    rw [<- h3c]
+    exact hx1
+  rcases h3 with ⟨s, hs⟩
+  have h4 : (z.1, dSystem.map s z.2) ∈ U ×ˢ V := by
+    simp only [Set.mem_prod]
+    constructor
+    · exact hz2
+    exact hs
+  let φ : X × X → X × X := fun (x, y) ↦ (x, dSystem.map s y)
+  have hφEquivariant : isEquivariant (diagDynamicalSystem dSystem dSystem).map
+    (diagDynamicalSystem dSystem dSystem).map φ := by
+    unfold isEquivariant
+    intro t
+    funext w
+    have hφ1: ((diagDynamicalSystem dSystem dSystem).map t ∘ φ) w
+      = ((dSystem.map t w.1), dSystem.map (t * s) w.2) := by
+      simp only [Function.comp_apply]
+      have hφ1a : φ w = (w.1, dSystem.map s w.2) := by
+        rfl
+      rw [hφ1a]
+      have hφ1b: (diagDynamicalSystem dSystem dSystem).map t (w.1, dSystem.map s w.2)
+        = (dSystem.map t w.1, dSystem.map t (dSystem.map s w.2)) := by
+        rfl
+      rw [hφ1b]
+      have hφ1c : dSystem.map t (dSystem.map s w.2) = dSystem.map (t * s) w.2 := by
+        simp [dSystem.mapMult t s w.2]
+      rw [hφ1c]
+    have hφ2: (φ ∘ (diagDynamicalSystem dSystem dSystem).map t) w
+      = ((dSystem.map t w.1), dSystem.map (s * t) w.2) := by
+      simp only [Function.comp_apply]
+      have hφ2a : (diagDynamicalSystem dSystem dSystem).map t w
+        = (dSystem.map t w.1, dSystem.map t w.2) := by
+        rfl
+      rw [hφ2a]
+      have hφ2b : φ (dSystem.map t w.1, dSystem.map t w.2)
+        = (dSystem.map t w.1, dSystem.map s (dSystem.map t w.2)) := by
+        rfl
+      rw [hφ2b]
+      simp [dSystem.mapMult]
+    rw [hφ1, hφ2]
+    have hts : t * s = s * t := by
+      exact commSemi.mul_comm t s
+    rw [hts]
+  have hφContinuous : Continuous φ := by
+    sorry
+  have hI : isNonemptyCompactT2InvariantSubset (diagDynamicalSystem dSystem dSystem) (φ '' Z) := by
+    apply imageOfSubsystemIsSubsystem (diagDynamicalSystem dSystem dSystem)
+      (diagDynamicalSystem dSystem dSystem) φ Z
+    · exact hφContinuous
+    · exact hφEquivariant
+    rcases hZ with ⟨hZ1⟩
+    exact hZ1
+  let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem
+    (diagDynamicalSystem dSystem dSystem) hI
+  have hZCompact : CompactSpace (φ '' Z) := by
+    sorry
+  have hZNonempty : Nonempty (φ '' Z) := by
+    sorry
+  have hYMinimal : isMinimalSystem dSystemY := by
+    sorry
+  have hInclude : (z.1, dSystem.map s z.2) ∈ φ '' Z := by
+    have hInclude1 : φ z = (z.1, dSystem.map s z.2) := by
+      rfl
+    rw [<- hInclude1]
+    simp only [Set.mem_image, Prod.exists]
+    use z.1
+    use z.2
+  have hUR1 : isUniformlyRecurrent dSystemY ⟨(z.1, dSystem.map s z.2), hInclude⟩ := by
+    apply minimalImpliesUniformlyRecurrent
+    exact hYMinimal
+  have hUR2 : isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem)
+    (z.1, dSystem.map s z.2) := by
+    sorry
+  have hFinal : (z.1, dSystem.map s z.2) ∈ A := by
+    exact hUR2
+  have hFinal2 : (z.1, dSystem.map s z.2) ∈ (U ×ˢ V) ∩ A := by
+    exact ⟨h4, hFinal⟩
+  exact ⟨(z.1, dSystem.map s z.2), hFinal2⟩
+have hA : ∀ W : Set (X × X), IsOpen W → W.Nonempty → (W ∩ A).Nonempty := by
+  intro W hW1 hW2
+  have hA1 : ∃ U V : Set X, IsOpen U ∧ U.Nonempty ∧ IsOpen V ∧ V.Nonempty ∧  U ×ˢ V ⊆ W := by
+    have hA1a : ∀ (a b : X), (a, b) ∈ W → ∃ (U V : Set X),
+    IsOpen U ∧ IsOpen V ∧ a ∈ U ∧ b ∈ V ∧ U ×ˢ V ⊆ W := by
+      apply isOpen_prod_iff.mp
+      exact hW1
+    rcases hW2 with ⟨z, hz⟩
+    have hA1b : ∃ a b : X, (a, b) = z := by
+      simp
+    rcases hA1b with ⟨a, b, hab⟩
+    have hA1c : (a, b) ∈ W := by
+      rw [hab]
+      exact hz
+    specialize hA1a a b hA1c
+    rcases hA1a with ⟨U, V, hU1, hV1, hU2, hV2, hUV1⟩
+    have hU1' : U.Nonempty := by
+      exact ⟨a, hU2⟩
+    have hV1' : V.Nonempty := by
+      exact ⟨b, hV2⟩
+    use U
+    use V
+  rcases hA1 with ⟨U, V, hU1, hU2, hV1, hV2, hUV0⟩
+  specialize hUV U V hU1 hU2 hV1 hV2
+  have hA2 : (U ×ˢ V) ∩ A ⊆ W ∩ A := by
+    apply Set.inter_subset_inter_left
+    exact hUV0
+  exact Set.Nonempty.mono hA2 hUV
+rw [<- hDefA]
+exact dense_iff_inter_open.mpr hA
 
 end Minimality_and_UR_with_commutivity
 
