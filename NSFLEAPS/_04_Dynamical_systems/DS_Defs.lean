@@ -1930,10 +1930,20 @@ have hUV : ∀ U V : Set X, IsOpen U → U.Nonempty → IsOpen V → V.Nonempty 
     exact hZ1
   let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem
     (diagDynamicalSystem dSystem dSystem) hI
+  have hZCC : IsCompact Z := by
+    rcases hZ with ⟨hZ1, hZ2⟩
+    rcases hZ1 with ⟨hZ3, hZ4, hZ5⟩
+    exact hZ4
+  have hZCompact0 : IsCompact (φ '' Z) := by
+    exact IsCompact.image hZCC hφContinuous
   have hZCompact : CompactSpace (φ '' Z) := by
-    sorry
+    exact isCompact_iff_compactSpace.mp hZCompact0
   have hZNonempty : Nonempty (φ '' Z) := by
-    sorry
+    have hZN1 : φ z ∈ φ '' Z := by
+      simp only [Set.mem_image, Prod.exists]
+      use z.1
+      use z.2
+    exact ⟨φ z, hZN1⟩
   have hYMinimal : isMinimalSystem dSystemY := by
     sorry
   have hInclude : (z.1, dSystem.map s z.2) ∈ φ '' Z := by
@@ -1948,7 +1958,25 @@ have hUV : ∀ U V : Set X, IsOpen U → U.Nonempty → IsOpen V → V.Nonempty 
     exact hYMinimal
   have hUR2 : isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem)
     (z.1, dSystem.map s z.2) := by
-    sorry
+    intro U hU1
+    let V := {y : φ '' Z | Subtype.val y ∈ U}
+    have hV :  V ∈ nhds ⟨(z.1, dSystem.map s z.2), hInclude⟩ := by
+      simp only [V]
+      let w := (z.1, dSystem.map s z.2)
+      have hw : w = (z.1, dSystem.map s z.2) := by
+        rfl
+      simp only [<- hw]
+      simp only [<- hw] at hU1
+      have hV1 : nhds ⟨w, hInclude⟩ = Filter.comap Subtype.val (nhds w) := by
+        apply nhds_subtype
+      rw [hV1]
+      simp only [Filter.mem_comap]
+      use U
+      constructor
+      · exact hU1
+      rfl
+    specialize hUR1 V hV
+    exact hUR1
   have hFinal : (z.1, dSystem.map s z.2) ∈ A := by
     exact hUR2
   have hFinal2 : (z.1, dSystem.map s z.2) ∈ (U ×ˢ V) ∩ A := by
