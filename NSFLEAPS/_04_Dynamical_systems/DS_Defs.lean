@@ -1151,7 +1151,48 @@ lemma imageOfMinimalSetIsMinimal
 (hEquivariant : isEquivariant dSystemX.map dSystemY.map π)
 (Z : Set X) (hZMinimal : isMinimalSubset dSystemX Z) :
 isMinimalSubset dSystemY (π '' Z):= by
+let hZ' := hZMinimal
+rcases hZ' with ⟨hZInvariant, hZ2⟩
+have hZInvariant' := hZInvariant
+let dSystemZ := fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZInvariant
+let W := π '' Z
+have hWSubsystem : isNonemptyCompactT2InvariantSubset dSystemY W := by
+  apply imageOfSubsystemIsSubsystem
+  · exact hContinuous
+  · exact hEquivariant
+  exact hZInvariant
+let dSystemW := fromNonemptyCompactT2InvariantSubsetToSystem dSystemY hWSubsystem
+rcases hZInvariant with ⟨hZ1, hZ2, hZ3⟩
+have hZCompact : CompactSpace Z := by
+  exact isCompact_iff_compactSpace.mp hZ2
+have hZNonempty : Nonempty Z := by
+  simp only [nonempty_subtype]
+  exact hZ1
+have hWCompact : CompactSpace W := by
+  have hWIsCompact : IsCompact W := by
+    exact IsCompact.image hZ2 hContinuous
+  exact isCompact_iff_compactSpace.mp hWIsCompact
+let π' : Z → W := fun x ↦ ⟨π x, ⟨x, x.property, rfl⟩⟩
+have hFactorMap : isFactorMap dSystemZ dSystemW π' := by
+  unfold isFactorMap
+  constructor
+  · sorry
+  constructor
+  · sorry
+  unfold isEquivariant
+  intro s
+  specialize hEquivariant s
+  ext x
   sorry
+have hFactorZW : isFactor dSystemW dSystemZ := by
+  unfold isFactor
+  use π'
+have hZMinimalSystem : isMinimalSystem dSystemZ := by
+  apply (minimalSubsetIffMinimalSubsystem dSystemX hZInvariant').mp hZMinimal
+have hWMinimalSystem : isMinimalSystem dSystemW := by
+  apply factorOfMinimalIsMinimal hZMinimalSystem hFactorZW
+apply (minimalSubsetIffMinimalSubsystem dSystemY hWSubsystem).mpr
+exact hWMinimalSystem
 
 /-- The set of times `U ⊆ X` visits `V ⊆ X`, `R(U,V)`, is equal
 to `R(x,V) R(x,U)^{-1}` in minimal systems -/
