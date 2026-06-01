@@ -1142,12 +1142,13 @@ have hY1 : ∀ y : Y, Dense (orbit dSystemY y) := by
 simp only [minimalIffDenseOrbits]
 exact hY1
 
-/-- Image of a minimal system is a minimal invariant set -/
+/-- Image of a minimal system under a continuous, equivariant map is a minimal invariant set -/
 lemma imageOfMinimalSetIsMinimal
 {dSystemX : DynamicalSystem S X}
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 {dSystemY : DynamicalSystem S Y}
-(π : X → Y) (hEquivariant : isEquivariant dSystemX.map dSystemY.map π)
+(π : X → Y) (hContinuous : Continuous π)
+(hEquivariant : isEquivariant dSystemX.map dSystemY.map π)
 (Z : Set X) (hZMinimal : isMinimalSubset dSystemX Z) :
 isMinimalSubset dSystemY (π '' Z):= by
   sorry
@@ -1884,7 +1885,12 @@ have hUV : ∀ U V : Set X, IsOpen U → U.Nonempty → IsOpen V → V.Nonempty 
     constructor
     · exact hz2
     exact hs
+  have hZCC : IsCompact Z := by
+    rcases hZ with ⟨hZ1, hZ2⟩
+    rcases hZ1 with ⟨hZ3, hZ4, hZ5⟩
+    exact hZ4
   let φ : X × X → X × X := fun (x, y) ↦ (x, dSystem.map s y)
+  let Y := φ '' Z
   have hφEquivariant : isEquivariant (diagDynamicalSystem dSystem dSystem).map
     (diagDynamicalSystem dSystem dSystem).map φ := by
     unfold isEquivariant
@@ -1920,32 +1926,38 @@ have hUV : ∀ U V : Set X, IsOpen U → U.Nonempty → IsOpen V → V.Nonempty 
       exact commSemi.mul_comm t s
     rw [hts]
   have hφContinuous : Continuous φ := by
-    sorry
-  have hI : isNonemptyCompactT2InvariantSubset (diagDynamicalSystem dSystem dSystem) (φ '' Z) := by
+    apply Continuous.prodMk
+    · exact continuous_fst
+    apply Continuous.comp
+    · exact dSystem.mapCont s
+    exact continuous_snd
+  have hI : isNonemptyCompactT2InvariantSubset (diagDynamicalSystem dSystem dSystem) Y := by
     apply imageOfSubsystemIsSubsystem (diagDynamicalSystem dSystem dSystem)
       (diagDynamicalSystem dSystem dSystem) φ Z
     · exact hφContinuous
     · exact hφEquivariant
     rcases hZ with ⟨hZ1⟩
     exact hZ1
-  let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem
-    (diagDynamicalSystem dSystem dSystem) hI
-  have hZCC : IsCompact Z := by
-    rcases hZ with ⟨hZ1, hZ2⟩
-    rcases hZ1 with ⟨hZ3, hZ4, hZ5⟩
-    exact hZ4
-  have hZCompact0 : IsCompact (φ '' Z) := by
+  have hYCompact0 : IsCompact Y := by
     exact IsCompact.image hZCC hφContinuous
-  have hZCompact : CompactSpace (φ '' Z) := by
-    exact isCompact_iff_compactSpace.mp hZCompact0
-  have hZNonempty : Nonempty (φ '' Z) := by
+  have hYCompact : CompactSpace Y := by
+    exact isCompact_iff_compactSpace.mp hYCompact0
+  have hYNonempty : Nonempty Y := by
     have hZN1 : φ z ∈ φ '' Z := by
       simp only [Set.mem_image, Prod.exists]
       use z.1
       use z.2
     exact ⟨φ z, hZN1⟩
+  have hYMinSubset : isMinimalSubset (diagDynamicalSystem dSystem dSystem) Y := by
+    apply imageOfMinimalSetIsMinimal
+    · exact hφContinuous
+    · exact hφEquivariant
+    exact hZ
+  let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem
+    (diagDynamicalSystem dSystem dSystem) hI
   have hYMinimal : isMinimalSystem dSystemY := by
-    sorry
+    apply (minimalSubsetIffMinimalSubsystem (diagDynamicalSystem dSystem dSystem) hI).mp
+    exact hYMinSubset
   have hInclude : (z.1, dSystem.map s z.2) ∈ φ '' Z := by
     have hInclude1 : φ z = (z.1, dSystem.map s z.2) := by
       rfl
