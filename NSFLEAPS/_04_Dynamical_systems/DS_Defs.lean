@@ -1142,7 +1142,8 @@ have hY1 : ∀ y : Y, Dense (orbit dSystemY y) := by
 simp only [minimalIffDenseOrbits]
 exact hY1
 
-/-- Image of a minimal system under a continuous, equivariant map is a minimal invariant set -/
+/-- Image of a minimal invariant set under a continuous, equivariant map
+is a minimal invariant set -/
 lemma imageOfMinimalSetIsMinimal
 {dSystemX : DynamicalSystem S X}
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
@@ -1156,6 +1157,7 @@ rcases hZ' with ⟨hZInvariant, hZ2⟩
 have hZInvariant' := hZInvariant
 let dSystemZ := fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZInvariant
 let W := π '' Z
+have hWDef : W = π '' Z := by rfl
 have hWSubsystem : isNonemptyCompactT2InvariantSubset dSystemY W := by
   apply imageOfSubsystemIsSubsystem
   · exact hContinuous
@@ -1172,18 +1174,44 @@ have hWCompact : CompactSpace W := by
   have hWIsCompact : IsCompact W := by
     exact IsCompact.image hZ2 hContinuous
   exact isCompact_iff_compactSpace.mp hWIsCompact
+have hπW : ∀ x : Z, π x ∈ W := by
+      intro x
+      exact ⟨x, x.property, rfl⟩
 let π' : Z → W := fun x ↦ ⟨π x, ⟨x, x.property, rfl⟩⟩
 have hFactorMap : isFactorMap dSystemZ dSystemW π' := by
   unfold isFactorMap
   constructor
-  · sorry
+  · let π2 : Z → Y := fun x ↦ π x
+    have hπ2Char : π2 = π ∘ Subtype.val := by
+      simp only [π2]
+      ext x
+      simp
+    have hπ2Continuous : Continuous π2 := by
+      rw [hπ2Char]
+      apply Continuous.comp
+      · exact hContinuous
+      exact continuous_subtype_val
+    apply Continuous.subtype_mk
+    simpa
   constructor
-  · sorry
+  · unfold Function.Surjective
+    simp [π']
+    simp only [hWDef]
+    simp
   unfold isEquivariant
   intro s
   specialize hEquivariant s
   ext x
-  sorry
+  have hF1 : (dSystemW.map s ∘ π') x = (dSystemW.map s) (π' x) := by
+    simp
+  have hF2 : (π' ∘ dSystemZ.map s) x = π' (dSystemZ.map s x) := by
+    simp
+  rw [hF1, hF2]
+  have hF3 : (dSystemY.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+    rw [hEquivariant]
+  have hF4 : (dSystemY.map s) (π x) = π (dSystemX.map s x) := by
+    exact hF3
+  simpa
 have hFactorZW : isFactor dSystemW dSystemZ := by
   unfold isFactor
   use π'
