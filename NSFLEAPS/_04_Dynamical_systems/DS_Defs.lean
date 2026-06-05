@@ -606,8 +606,60 @@ theorem intersectionOfICERsIsICER
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {c : Set (Set (X × X))}
 (hc : ∀ (I : Set (X × X)), I ∈ c → isICER dSystem I) :
-isICER dSystem (⋂₀ c) :=
-by sorry
+isICER dSystem (⋂₀ c) := by
+have hc1 : ∀ I ∈ c, isInvariantSet (diagDynamicalSystem dSystem dSystem) I := by
+  intro I hI
+  specialize hc I hI
+  rcases hc with ⟨hc1, hc2, hc3⟩
+  exact hc1
+have hc2 : ∀ I ∈ c, IsClosed I := by
+  intro I hI
+  specialize hc I hI
+  rcases hc with ⟨hc1, hc2, hc3⟩
+  exact hc2
+have hc3 : ∀ I ∈ c, isEquivalenceRelation I := by
+  intro I hI
+  specialize hc I hI
+  rcases hc with ⟨hc1, hc2, hc3⟩
+  exact hc3
+unfold isICER
+constructor
+· unfold isInvariantSet
+  intro s x hx
+  simp only [Set.mem_sInter]
+  intro I hI
+  simp only [Set.mem_sInter] at hx
+  specialize hx I hI
+  specialize hc1 I hI
+  unfold isInvariantSet at hc1
+  specialize hc1 s
+  specialize hc1 hx
+  exact hc1
+constructor
+· apply isClosed_sInter
+  intro I hI
+  specialize hc2 I hI
+  exact hc2
+unfold isEquivalenceRelation
+apply (equivalenceRelationSetForm (⋂₀ c)).mpr
+constructor
+· intro x I hI
+  specialize hc3 I hI
+  rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
+  specialize hc3a x
+  exact hc3a
+constructor
+· intro x y hxy I hI
+  specialize hc3 I hI
+  rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
+  specialize hxy I hI
+  apply hc3b hxy
+intro x y z hxy hyz I hI
+specialize hxy I hI
+specialize hyz I hI
+specialize hc3 I hI
+rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
+apply hc3c hxy hyz
 
 /-- If `X` is a compact Hausdorff topological space and `I` is a closed
 equivalence relation on `X^2`, then `X/I` is a Hausdorff topological space -/
