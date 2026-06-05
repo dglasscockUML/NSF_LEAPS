@@ -2182,8 +2182,76 @@ theorem imageOfProxByFactorIsProx
 {dSystemY : DynamicalSystem S Y}
 {π : X → Y} (hπ : isFactorMap dSystem dSystemY π)
 {x y : X} (hProx : proximal dSystem x y) :
-proximal dSystemY (π x) (π y) :=
-by sorry
+proximal dSystemY (π x) (π y) := by
+unfold proximal
+intro α hα
+let β := (Prod.map π π) ⁻¹' α
+have h1 : β ∈ nhdsSet (Set.diagonal X) := by
+  --unfold nhdsSet
+  --unfold nhdsSet at hα
+  rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+  simp only [β]
+  apply mem_nhdsSet_iff_exists.mpr
+  apply mem_nhdsSet_iff_exists.mp at hα
+  rcases hα with ⟨V, hα2, hα3, hα4⟩
+  let U := Prod.map π π ⁻¹' V
+  use U
+  constructor
+  · apply IsOpen.preimage
+    · apply Continuous.prodMap
+      · exact hπ1
+      exact hπ1
+    exact hα2
+  constructor
+  · simp only [U]
+    have h11 : Prod.map π π '' (Set.diagonal X) ⊆ Set.diagonal Y := by
+      intro z hz
+      simp only [Set.mem_image, Set.mem_diagonal_iff, Prod.exists, Prod.map_apply,
+        exists_eq_left'] at hz
+      unfold Set.diagonal
+      rcases hz with ⟨hz1, hz2⟩
+      rw [<- hz2]
+      simp
+    simp at h11
+    have h12 : Prod.map π π ⁻¹' Set.diagonal Y ⊆ Prod.map π π ⁻¹' V := by
+      apply Set.preimage_mono
+      exact hα3
+    exact h11.trans h12
+  simp only [U]
+  apply Set.preimage_mono
+  exact hα4
+specialize hProx β h1
+obtain ⟨s, hs⟩ := hProx
+use s
+have h21 : (dSystemY.map s ∘ π) x = (π ∘ dSystem.map s) x := by
+  rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+  unfold isEquivariant at hπ3
+  specialize hπ3 s
+  rw [hπ3]
+have h22 : dSystemY.map s (π x) = (dSystemY.map s ∘ π) x := by
+  rfl
+have h23 : π (dSystem.map s  x) = (π ∘ dSystem.map s) x := by
+  rfl
+have h24 : dSystemY.map s (π x) = π (dSystem.map s  x) := by
+  simpa
+have h31 : (dSystemY.map s ∘ π) y = (π ∘ dSystem.map s) y := by
+  unfold isFactorMap at hπ
+  rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+  unfold isEquivariant at hπ3
+  specialize hπ3 s
+  rw [hπ3]
+have h322 : dSystemY.map s (π y) = (dSystemY.map s ∘ π) y := by
+  rfl
+have h33 : π (dSystem.map s  y) = (π ∘ dSystem.map s) y := by
+  rfl
+have h34 : dSystemY.map s (π y) = π (dSystem.map s y) := by
+  simpa
+rw [h24, h34]
+have h4 :  (π (dSystem.map s x), π (dSystem.map s y))
+= (Prod.map π π) ((dSystem.map s x), (dSystem.map s y)) := by
+  rfl
+rw [h4]
+simpa
 
 end Proximality
 
