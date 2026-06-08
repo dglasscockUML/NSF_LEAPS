@@ -706,7 +706,7 @@ have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
 exact
 {
-  map := by sorry
+  map := by sorry --fun Quotient.mk ⟨setToRelation I, hI.2.2⟩ a
   mapMult := by sorry
   mapCont := by sorry
 }
@@ -751,8 +751,19 @@ have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
 have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
 isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
-  (Quotient.mk ⟨setToRelation I, hI.2.2⟩) :=
-by sorry
+  (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+constructor
+· apply continuous_quotient_mk'
+constructor
+· intro b
+  have h1 : ∃ a : X, Quotient.mk ⟨setToRelation I, hI.2.2⟩ a = b := by
+    apply Quotient.exists_rep
+  obtain ⟨a, ha⟩ := h1
+  use a
+intro s
+ext x
+simp
+sorry
 
 /-- Given a continuous, equivariant map `π : X → Y` between two systems and
 a nonempty, compact, T2, `S`-invariant set `A ⊆ X`, the image `πA` is nonempty,
@@ -2323,8 +2334,120 @@ theorem RPisSymmetric
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isSymmetric (RP dSystem) :=
-by sorry
+isSymmetric (RP dSystem) := by
+unfold isSymmetric
+unfold Symmetric
+intro x y hxy
+unfold RP at hxy
+unfold RP
+unfold setToRelation
+simp only [Set.mem_iInter]
+unfold setToRelation at hxy
+simp only [Set.mem_iInter] at hxy
+intro V hV
+let U := Prod.swap '' V
+have hVfU : V = Prod.swap '' U := by
+  simp only [U]
+  ext t
+  constructor
+  · simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq,
+    true_and, exists_eq_right]
+    intro ht
+    use t.2, t.1
+  · intro ht
+    simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq, true_and,
+      exists_eq_right] at ht
+    rcases ht with ⟨a, b, hab1, hab2⟩
+    rw [<- hab2]
+    exact hab1
+have hU : U ∈ nhdsSet (Set.diagonal X) := by
+  sorry
+specialize hxy U hU
+have hGoal : ∀ A ∈ nhds (x, y), ∃ u ∈ U, ∃ s : S,
+(diagDynamicalSystem dSystem dSystem).map s (u.1, u.2) ∈ A := by
+  -- apply mem_closure_iff.mp
+  sorry
+have hCor : ∀ B ∈ nhds (y, x), ∃ v ∈ V, ∃ s : S,
+(diagDynamicalSystem dSystem dSystem).map s (v.1, v.2) ∈ B := by
+  intro B hB
+  let A := Prod.swap '' B
+  have hAB : B = Prod.swap '' A := by
+    simp only [A]
+    ext t
+    constructor
+    · simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq,
+      true_and, exists_eq_right]
+      intro ht
+      use t.2, t.1
+    · intro ht
+      simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq,
+        true_and, exists_eq_right] at ht
+      rcases ht with ⟨a, b, hab1, hab2⟩
+      rw [<- hab2]
+      exact hab1
+  have hAfromB : A ∈ nhds (x, y) := by
+    apply mem_nhds_iff.mp at hB
+    rcases hB with ⟨W, hW1, hW2, hW3⟩
+    apply mem_nhds_iff.mpr
+    use Prod.swap '' W
+    constructor
+    · simp only [Set.image_subset_iff, A]
+      have hB1 : Prod.swap ⁻¹' (Prod.swap '' B) = B := by
+        ext x
+        simp
+      rw [hB1]
+      exact hW1
+    constructor
+    · have hW20 : Prod.swap '' W = Prod.swap ⁻¹' W := by
+        ext x
+        constructor
+        · intro hx
+          simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk] at hx
+          rcases hx with ⟨a, b, ha, hb⟩
+          rw [<- hb]
+          simpa
+        · intro hx
+          simp at hx
+          simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk]
+          have : (x.2, x.1) ∈ W := by
+            simpa
+          use x.2
+          use x.1
+      rw [hW20]
+      apply IsOpen.preimage
+      · apply continuous_swap
+      exact hW2
+    simpa
+  specialize hGoal A hAfromB
+  rcases hGoal with ⟨u, hu, s, hs⟩
+  use (u.2, u.1)
+  constructor
+  · rw [hVfU]
+    simp [hu]
+  simp only
+  use s
+  have hCor1 : (dSystem.map s u.1, dSystem.map s u.2) ∈ A := by
+    simpa
+  have hCor2 : (dSystem.map s u.2, dSystem.map s u.1) ∈ B := by
+    rw [hAB]
+    simpa
+  simpa
+apply mem_closure_iff.mpr
+intro W hW1 hW2
+have hWNei : W ∈ nhds (y, x) := by
+  apply mem_nhds_iff.mpr
+  use W
+specialize hCor W hWNei
+rcases hCor with ⟨v, hv, s, hs⟩
+have hW1 : (diagDynamicalSystem dSystem dSystem).map s (v.1, v.2)
+∈ setOrbit (diagDynamicalSystem dSystem dSystem) V := by
+  simp only [Prod.mk.eta]
+  unfold setOrbit
+  simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+  use s
+  use v.1
+  use v.2
+exact ⟨(diagDynamicalSystem dSystem dSystem).map s (v.1, v.2), hs, hW1⟩
 
 /-- The regionally proximal relation is invariant under the diagonal
 action by `S` -/
