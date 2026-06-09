@@ -2652,14 +2652,23 @@ lemma minimalImpliesNondegen
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
-setOrbitClosure dSystem Set.univ = Set.univ :=
-by
-    unfold setOrbitClosure
-    rcases (inferInstance : Nonempty X) with ⟨x⟩
-    have xDenseOrbit : Dense (orbit dSystem x) := (minimalIffDenseOrbits dSystem).mp hMin x
-    have xOrbitAll : closure (orbit dSystem x) = Set.univ := xDenseOrbit.closure_eq
-    have xOrbitInSetOrbit : orbit dSystem x ⊆ setOrbit dSystem Set.univ := by sorry
-    sorry
+setOrbitClosure dSystem Set.univ = Set.univ := by
+unfold setOrbitClosure
+rcases (inferInstance : Nonempty X) with ⟨x⟩
+have xDenseOrbit : Dense (orbit dSystem x) := (minimalIffDenseOrbits dSystem).mp hMin x
+have xOrbitAll : closure (orbit dSystem x) = Set.univ := xDenseOrbit.closure_eq
+have xOrbitInSetOrbit : orbit dSystem x ⊆ setOrbit dSystem Set.univ := by
+  apply Set.subset_def.mpr
+  intro y hy
+  rcases hy with ⟨z, hz1⟩
+  rw [<- hz1]
+  unfold setOrbit
+  simp
+apply Set.Subset.antisymm
+· simp
+nth_rw 1 [<- xOrbitAll]
+apply closure_mono
+exact xOrbitInSetOrbit
 
 /-- A point `(x,y)` belongs to `RP` iff there exists `w ∈ X` and an ultrafilter `F` on
 `X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
