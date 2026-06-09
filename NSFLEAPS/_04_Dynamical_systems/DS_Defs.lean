@@ -2346,6 +2346,7 @@ unfold setToRelation at hxy
 simp only [Set.mem_iInter] at hxy
 intro V hV
 let U := Prod.swap '' V
+have hUDef : U = Prod.swap '' V := by rfl
 have hVfU : V = Prod.swap '' U := by
   simp only [U]
   ext t
@@ -2361,12 +2362,84 @@ have hVfU : V = Prod.swap '' U := by
     rw [<- hab2]
     exact hab1
 have hU : U ∈ nhdsSet (Set.diagonal X) := by
-  sorry
+  have hV1 : ∃ W : Set (X × X), IsOpen W ∧ Set.diagonal X ⊆ W ∧ W ⊆ V := by
+    apply mem_nhdsSet_iff_exists.mp
+    exact hV
+  rcases hV1 with ⟨W, hW1, hW2, hW3⟩
+  have hWProdOpen : IsOpen (Prod.swap '' W) := by
+    have hWProdOpen1 : Prod.swap '' W = Prod.swap ⁻¹' W := by
+      ext x
+      constructor
+      · intro hx
+        simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk] at hx
+        rcases hx with ⟨a, b, ha, hb⟩
+        rw [<- hb]
+        simpa
+      · intro hx
+        simp at hx
+        simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk]
+        have : (x.2, x.1) ∈ W := by
+          simpa
+        use x.2
+        use x.1
+    rw [hWProdOpen1]
+    apply IsOpen.preimage
+    · apply continuous_swap
+    exact hW1
+  have hWProdDiag : Set.diagonal X ⊆ Prod.swap '' W := by
+    intro z hz
+    have hz1 : z.1 = z.2 := by
+      simpa
+    have hz2 : z ∈ W := by
+      apply hW2
+      exact hz
+    have hz3 : z = (z.1, z.1) := by
+      have hz3a : z = (z.1, z.2) := rfl
+      rw [hz3a]
+      rw [hz1]
+    have hz4 : (z.1, z.1) ∈ W := by
+      rw [<- hz3]
+      exact hz2
+    simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk]
+    use z.2
+    use z.1
+    constructor
+    · rw [<- hz1]
+      exact hz4
+    rfl
+  have hWProdContained : Prod.swap '' W ⊆ U := by
+    rw [hUDef]
+    exact Set.image_mono hW3
+  apply mem_nhdsSet_iff_exists.mpr
+  use Prod.swap '' W
 specialize hxy U hU
 have hGoal : ∀ A ∈ nhds (x, y), ∃ u ∈ U, ∃ s : S,
 (diagDynamicalSystem dSystem dSystem).map s (u.1, u.2) ∈ A := by
-  -- apply mem_closure_iff.mp
-  sorry
+  intro A hA
+  have hGoal1 : ∃ o ⊆ A, IsOpen o ∧ (x, y) ∈ o := by
+    exact mem_nhds_iff.mp hA
+  rcases hGoal1 with ⟨o, ho1, ho2, ho3⟩
+  have hGoal2 : (o ∩ setOrbit (diagDynamicalSystem dSystem dSystem) U).Nonempty := by
+    apply mem_closure_iff.mp hxy
+    · exact ho2
+    exact ho3
+  rcases hGoal2 with ⟨z, hz1, hz2⟩
+  have hGoal3 : ∃ u ∈ U, ∃ s, (diagDynamicalSystem dSystem dSystem).map s (u.1, u.2) = z := by
+    simp only [Prod.mk.eta, Prod.exists]
+    rcases hz2 with ⟨t, hz2b⟩
+    rw [<- hz2b]
+    simp only
+    use (t.2).val.1
+    use (t.2).val.2
+    simp
+  rcases hGoal3 with ⟨u, hu, s, hus⟩
+  use u
+  constructor
+  · exact hu
+  use s
+  rw [hus]
+  apply ho1
+  exact hz1
 have hCor : ∀ B ∈ nhds (y, x), ∃ v ∈ V, ∃ s : S,
 (diagDynamicalSystem dSystem dSystem).map s (v.1, v.2) ∈ B := by
   intro B hB
