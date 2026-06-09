@@ -2549,8 +2549,102 @@ theorem RPisReflexiveIfNondegen
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 (hNondegen : setOrbitClosure dSystem Set.univ = Set.univ) :
-isReflexive (RP dSystem) :=
-by sorry
+isReflexive (RP dSystem) := by
+unfold isReflexive
+unfold Reflexive
+intro x
+unfold RP
+unfold setToRelation
+simp only [Set.mem_iInter]
+intro U hU
+have hUDiag1 : ∃ W : Set (X × X), IsOpen W ∧ Set.diagonal X ⊆ W ∧ W ⊆ U := by
+  apply mem_nhdsSet_iff_exists.mp
+  exact hU
+rcases hUDiag1 with ⟨hU1, hU2, hU3, hU4⟩
+have hUDiag2 : Set.diagonal X ⊆ U := by
+  exact hU3.trans hU4
+have h1 : ∀ o : Set X, IsOpen o → x ∈ o → (o ∩ setOrbit dSystem Set.univ).Nonempty := by
+  apply mem_closure_iff.mp
+  unfold setOrbitClosure at hNondegen
+  rw [hNondegen]
+  simp
+have h2 : ∀ o : Set X, IsOpen o → x ∈ o → ∃ s : S, ∃ y : X, dSystem.map s y ∈ o := by
+  intro o ho1 ho2
+  specialize h1 o ho1 ho2
+  rcases h1 with ⟨z, h1a, h1b⟩
+  rcases h1b with ⟨t, ht⟩
+  use t.1
+  use t.2
+  have h11p : z = dSystem.map t.1 t.2 := by
+    rw [<- ht]
+  rw [<- h11p]
+  exact h1a
+have hGoal0 : ∀ u : Set (X × X), IsOpen u → (x, x) ∈ u
+→ (u ∩ setOrbit (diagDynamicalSystem dSystem dSystem) (Set.diagonal X)).Nonempty := by
+  intro u hu1 hu2
+  have hG01 : ∃ u1 u2 : Set X, IsOpen u1 ∧ IsOpen u2 ∧ x ∈ u1 ∧ x ∈ u2 ∧ u1 ×ˢ u2 ⊆ u := by
+    apply isOpen_prod_iff.mp
+    · exact hu1
+    exact hu2
+  rcases hG01 with ⟨u1, u2, hu1, hu2, hu11, hu12, hu3⟩
+  let v := u1 ∩ u2
+  have hv1 : IsOpen v := by
+    exact IsOpen.inter hu1 hu2
+  have hv2 : x ∈ v := by
+    simp only [Set.mem_inter_iff, v]
+    constructor
+    · exact hu11
+    exact hu12
+  specialize h2 v hv1 hv2
+  rcases h2 with ⟨s, y, hsy⟩
+  use (dSystem.map s y, dSystem.map s y)
+  constructor
+  · have huv0 : v ⊆ u1 := by
+      simp [v]
+    have huv1 : v ⊆ u2 := by
+      simp [v]
+    have huv2 : v ×ˢ v ⊆ u1 ×ˢ u2 := by
+      apply Set.prod_mono
+      · exact Set.inter_subset_left
+      exact huv1
+    have huv3 : v ×ˢ v ⊆ u := by
+      exact huv2.trans hu3
+    have huv4 : (dSystem.map s y, dSystem.map s y) ∈ v ×ˢ v := by
+      simp only [Set.mem_prod, and_self]
+      exact hsy
+    apply huv3
+    exact huv4
+  have hDiag : (dSystem.map s y, dSystem.map s y)
+  = (diagDynamicalSystem dSystem dSystem).map s (y, y) := by
+    rfl
+  rw [hDiag]
+  unfold setOrbit
+  simp
+have hGoal1 : (x, x) ∈ setOrbitClosure (diagDynamicalSystem dSystem dSystem) (Set.diagonal X) := by
+  apply mem_closure_iff.mpr
+  exact hGoal0
+have hGoal2 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) (Set.diagonal X)
+⊆ setOrbitClosure (diagDynamicalSystem dSystem dSystem) U := by
+  unfold setOrbitClosure
+  apply closure_mono
+  apply Set.subset_def.mpr
+  intro z hz
+  unfold setOrbit at hz
+  rcases hz with ⟨t, ht1⟩
+  rw [<- ht1]
+  unfold setOrbit
+  simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+  use t.1
+  use t.2.val.1
+  use t.2.val.2
+  constructor
+  · have ht12 : (t.2.val.1, t.2.val.2) ∈ Set.diagonal X := by
+      simp
+    apply hUDiag2
+    exact ht12
+  rfl
+apply hGoal2
+exact hGoal1
 
 /-- A minimal system satisfies the non-degeneracy condition required to conclude
 that `RP` is reflexive -/
