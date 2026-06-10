@@ -140,7 +140,7 @@ Z.Nonempty ∧ IsCompact Z ∧ T2Space Z ∧ isInvariantSet dSystem Z
 theorem intersectionOfInvIsInv
 (dSystem : DynamicalSystem S X)
 {i : Set (Set X)} (h : ∀ A ∈ i, isInvariantSet dSystem A) :
-isInvariantSet dSystem (⋂₀ i) := by
+isInvariantSet dSystem (i.sInter) := by
   intro s x hx
   rw [← Set.sInf_eq_sInter]
   simp only [sInf]
@@ -2528,8 +2528,69 @@ theorem RPisInvariant
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) :=
-by sorry
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := by
+have h1 : ∀ α ∈ nhdsSet (Set.diagonal X), isInvariantSet (diagDynamicalSystem dSystem dSystem)
+  (setOrbit (diagDynamicalSystem dSystem dSystem) α) := by
+  intro α hα
+  unfold isInvariantSet
+  intro s y hy
+  rcases hy with ⟨t, ht⟩
+  have hy1 : ∃ r : S, ∃ z ∈ α, y = (diagDynamicalSystem dSystem dSystem).map r z := by
+    use t.1
+    use t.2
+    constructor
+    · simp
+    simp only [ht]
+  rcases hy1 with ⟨r, z, hrz1, hrz2⟩
+  rw [hrz2]
+  have h2 : (diagDynamicalSystem dSystem dSystem).map s
+    ((diagDynamicalSystem dSystem dSystem).map r z)
+    = (diagDynamicalSystem dSystem dSystem).map (s * r) z := by
+    rw [(diagDynamicalSystem dSystem dSystem).mapMult s r z]
+  rw [h2]
+  unfold setOrbit
+  simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+  use s * r
+  use z.1
+  use z.2
+have h2 : ∀ α ∈ nhdsSet (Set.diagonal X),
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (setOrbitClosure
+(diagDynamicalSystem dSystem dSystem) α) := by
+  intro α hα
+  apply closureOfInvIsInv
+  specialize h1 α hα
+  exact h1
+unfold RP
+let C := {setOrbitClosure (diagDynamicalSystem dSystem dSystem) α | α ∈ nhdsSet (Set.diagonal X)}
+have h3 : (⋂ α ∈ nhdsSet (Set.diagonal X), setOrbitClosure (diagDynamicalSystem dSystem dSystem) α)
+= C.sInter := by
+  ext t
+  constructor
+  · intro ht
+    simp only [Set.mem_iInter] at ht
+    simp only [Set.mem_sInter]
+    intro p hp
+    rcases hp with ⟨q, hq, hpq⟩
+    specialize ht q hq
+    rw [<- hpq]
+    exact ht
+  · intro ht
+    simp only [Set.mem_sInter] at ht
+    simp only [Set.mem_iInter]
+    intro p hp
+    have h4 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) p ∈ C := by
+      unfold C
+      simp only [Set.mem_setOf_eq]
+      use p
+    specialize ht (setOrbitClosure (diagDynamicalSystem dSystem dSystem) p) h4
+    exact ht
+rw [h3]
+apply intersectionOfInvIsInv
+intro A hA
+rcases hA with ⟨B, hB, hAB⟩
+specialize h2 B hB
+rw [<- hAB]
+exact h2
 
 /-- The regionally proximal relation is closed -/
 theorem RPisClosed
