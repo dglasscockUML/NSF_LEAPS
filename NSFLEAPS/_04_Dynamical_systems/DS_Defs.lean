@@ -2750,8 +2750,72 @@ theorem imageOfRPIsInRP
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
-(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY :=
-by sorry
+(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY := by
+rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+have h0 : Set.range π = Set.univ := by
+    unfold Function.Surjective at hπ2
+    ext y
+    constructor
+    · simp
+    intro hy
+    specialize hπ2 y
+    rcases hπ2 with ⟨a, ha⟩
+    rw [<- ha]
+    simp
+have h1 : ∀ β ∈ nhdsSet (Set.diagonal Y),
+  ∃ α ∈ nhdsSet (Set.diagonal X), (Prod.map π π) '' α = β := by
+  intro β hβ
+  let α := (Prod.map π π) ⁻¹' β
+  use α
+  constructor
+  · have h1a : ∃ u ⊆ β, IsOpen u ∧ Set.diagonal Y ⊆ u := by
+      apply mem_nhdsSet.mp hβ
+    rcases h1a with ⟨u, hu1, hu2, hu3⟩
+    apply mem_nhdsSet.mpr
+    let v := (Prod.map π π) ⁻¹' u
+    use v
+    constructor
+    · apply Set.preimage_mono
+      exact hu1
+    constructor
+    · apply IsOpen.preimage
+      · apply Continuous.prodMap
+        · exact hπ1
+        exact hπ1
+      exact hu2
+    have h1a1 : (Prod.map π π) '' Set.diagonal X ⊆ Set.diagonal Y := by
+      intro t ht
+      rcases ht with ⟨p, hp1, hp2⟩
+      unfold Set.diagonal at hp1
+      have hp3 : p.1 = p.2 := by
+        exact hp1
+      simp only [Set.mem_diagonal_iff]
+      unfold Prod.map at hp2
+      have ht1 : (π p.1, π p.2) = (t.1, t.2) := by
+        exact hp2
+      rw [hp3] at ht1
+      have ht2 : π p.2 = t.1 := by
+        have ht2a : π p.2 = Prod.fst (π p.2, π p.2) := by simp
+        have ht2b : t.1 = Prod.fst (t.1, t.2) := by simp
+        rw [ht2a, ht2b]
+        rw [ht1]
+      have ht3 : π p.2 = t.2 := by
+        have ht3a : π p.2 = Prod.snd (π p.2, π p.2) := by simp
+        have ht3b : t.2 = Prod.snd (t.1, t.2) := by simp
+        rw [ht3a, ht3b]
+        rw [ht1]
+      rw [<- ht2, ht3]
+    have h1b : Set.diagonal X ⊆ (Prod.map π π) ⁻¹' (Set.diagonal Y) := by
+      simp only [Set.image_subset_iff] at h1a1
+      exact h1a1
+    simp only [v]
+    have h1c : (Prod.map π π) ⁻¹' (Set.diagonal Y) ⊆ Prod.map π π ⁻¹' u := by
+      apply Set.preimage_mono hu3
+    exact h1b.trans h1c
+  apply Set.image_preimage_eq_iff.mpr
+  simp
+  simp [h0]
+sorry
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
 acting semigroup, `RP_Y ⊆ (π ⊗ π) RP_X` -/
