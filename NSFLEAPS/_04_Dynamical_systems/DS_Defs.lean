@@ -2815,6 +2815,58 @@ have h1 : ∀ β ∈ nhdsSet (Set.diagonal Y),
   apply Set.image_preimage_eq_iff.mpr
   simp
   simp [h0]
+have h2 : (Prod.map π π) '' RP dSystemX ⊆ ⋂ α ∈ nhdsSet (Set.diagonal X),
+(Prod.map π π) '' (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α) := by
+  let P := {α : Set (X × X) | α ∈ nhdsSet (Set.diagonal X)}
+  let c : P → Set (X × X) := fun α ↦ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α
+  have h2a : RP dSystemX = Set.iInter c := by
+    unfold RP
+    unfold Set.iInter
+    simp
+    rfl
+  have h2b : RP dSystemX = ⋂ (i : P), c i := by
+    unfold RP
+    simp
+    rfl
+  have h2c : ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α =
+    ⋂ (i : P), Prod.map π π '' (c i) := by
+    simp
+    rfl
+  rw [h2b, h2c]
+  exact Set.image_iInter_subset c (Prod.map π π)
+have h3 : ∀ α ∈ nhdsSet (Set.diagonal X), (Prod.map π π) '' (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α)
+  ⊆ closure ((Prod.map π π) '' (setOrbit (diagDynamicalSystem dSystemX dSystemX) α)) := by
+  intro α hα
+  unfold setOrbitClosure
+  apply image_closure_subset_closure_image
+  apply Continuous.prodMap
+  exact hπ1
+  exact hπ1
+have h4 : ⋂ α ∈ nhdsSet (Set.diagonal X),
+  (Prod.map π π) '' (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α) ⊆
+  ⋂ α ∈ nhdsSet (Set.diagonal X),
+  closure ((Prod.map π π) '' (setOrbit (diagDynamicalSystem dSystemX dSystemX) α)) := by
+  simp
+  intro i hi
+  specialize h3 i hi
+  have h4a :  ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α
+    ⊆ Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) i := by
+    intro t ht
+    simp [Set.mem_iInter] at ht
+    specialize ht i hi
+    rcases ht with ⟨a, b, hab1, hab2⟩
+    rw [<- hab2]
+    simp
+    use a
+    use b
+  have h4b : Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) i
+    ⊆ closure (Prod.map π π '' setOrbit (diagDynamicalSystem dSystemX dSystemX) i) := by
+    unfold setOrbitClosure
+    apply image_closure_subset_closure_image
+    apply Continuous.prodMap
+    exact hπ1
+    exact hπ1
+  exact h4a.trans h4b
 sorry
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
