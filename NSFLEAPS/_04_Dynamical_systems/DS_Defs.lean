@@ -2828,35 +2828,38 @@ have h2 : (Prod.map π π) '' RP dSystemX ⊆ ⋂ α ∈ nhdsSet (Set.diagonal X
     unfold RP
     simp
     rfl
-  have h2c : ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α =
+  have h2c : ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π ''
+    setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α =
     ⋂ (i : P), Prod.map π π '' (c i) := by
     simp
     rfl
   rw [h2b, h2c]
   exact Set.image_iInter_subset c (Prod.map π π)
-have h3 : ∀ α ∈ nhdsSet (Set.diagonal X), (Prod.map π π) '' (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α)
+have h3 : ∀ α ∈ nhdsSet (Set.diagonal X), (Prod.map π π) ''
+  (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α)
   ⊆ closure ((Prod.map π π) '' (setOrbit (diagDynamicalSystem dSystemX dSystemX) α)) := by
   intro α hα
   unfold setOrbitClosure
   apply image_closure_subset_closure_image
   apply Continuous.prodMap
-  exact hπ1
+  · exact hπ1
   exact hπ1
 have h4 : ⋂ α ∈ nhdsSet (Set.diagonal X),
   (Prod.map π π) '' (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α) ⊆
   ⋂ α ∈ nhdsSet (Set.diagonal X),
   closure ((Prod.map π π) '' (setOrbit (diagDynamicalSystem dSystemX dSystemX) α)) := by
-  simp
+  simp only [Set.subset_iInter_iff]
   intro i hi
   specialize h3 i hi
-  have h4a :  ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α
+  have h4a :  ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π ''
+    setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α
     ⊆ Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) i := by
     intro t ht
-    simp [Set.mem_iInter] at ht
+    simp only [Set.mem_iInter, Set.mem_image, Prod.exists, Prod.map_apply] at ht
     specialize ht i hi
     rcases ht with ⟨a, b, hab1, hab2⟩
     rw [<- hab2]
-    simp
+    simp only [Set.mem_image, Prod.exists, Prod.map_apply, Prod.mk.injEq]
     use a
     use b
   have h4b : Prod.map π π '' setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) i
@@ -2864,10 +2867,114 @@ have h4 : ⋂ α ∈ nhdsSet (Set.diagonal X),
     unfold setOrbitClosure
     apply image_closure_subset_closure_image
     apply Continuous.prodMap
-    exact hπ1
+    · exact hπ1
     exact hπ1
   exact h4a.trans h4b
-sorry
+have h5prep : ∀ α ∈ nhdsSet (Set.diagonal X), (Prod.map π π) ''
+  (setOrbit (diagDynamicalSystem dSystemX dSystemX) α)
+  = setOrbit (diagDynamicalSystem dSystemY dSystemY) (Prod.map π π '' α) := by
+  intro α hα
+  unfold setOrbit
+  ext z1
+  constructor
+  · intro hz1
+    rcases hz1 with ⟨z2, hz3, hz4⟩
+    simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz3
+    rcases hz3 with ⟨s, a, b, hab1, hab2⟩
+    have h5prep1 : z1 = (π (dSystemX.map s a), π (dSystemX.map s b)) := by
+      rw [<- hz4, <- hab2]
+      rfl
+    have h5prep2 : z1 = (dSystemY.map s (π a), dSystemY.map s (π b)) := by
+      unfold isEquivariant at hπ3
+      specialize hπ3 s
+      have h5prep2a : ∀ x : X, (dSystemY.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+        rw [<- hπ3]
+        simp
+      have h5prep2b : ∀ x : X, dSystemY.map s (π x) = π (dSystemX.map s x) := by
+        intro x
+        specialize h5prep2a x
+        exact h5prep2a
+      rw [h5prep1]
+      simp only [Prod.mk.injEq]
+      constructor
+      · specialize h5prep2b a
+        rw [h5prep2b]
+      · specialize h5prep2b b
+        rw [h5prep2b]
+    rw [h5prep2]
+    simp only [Set.mem_range, Prod.exists, Subtype.exists, Set.mem_image, Prod.map_apply,
+      exists_prop, Prod.mk.injEq, ↓existsAndEq, and_true]
+    use s
+    use a
+    use b
+    constructor
+    · exact hab1
+    rfl
+  intro hz1
+  simp only [Set.mem_range, Prod.exists, Subtype.exists, Set.mem_image, Prod.map_apply, exists_prop,
+    Prod.mk.injEq, ↓existsAndEq, and_true] at hz1
+  rcases hz1 with ⟨s, a, b, hab1, hab2⟩
+  have h5prep3 : z1 = (dSystemY.map s (π a), dSystemY.map s (π b)) := by
+    rw [<- hab2]
+    rfl
+  have h5prep4 : z1 = (π (dSystemX.map s a), π (dSystemX.map s b)) := by
+    specialize hπ3 s
+    have h5prep3a : ∀ x : X, (dSystemY.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+      rw [<- hπ3]
+      simp
+    have h5prep3b : ∀ x : X, dSystemY.map s (π x) = π (dSystemX.map s x) := by
+      intro x
+      specialize h5prep3a x
+      exact h5prep3a
+    rw [h5prep3]
+    simp only [Prod.mk.injEq]
+    constructor
+    · specialize h5prep3b a
+      exact h5prep3b
+    specialize h5prep3b b
+    exact h5prep3b
+  rw [h5prep4]
+  simp only [Set.mem_image, Set.mem_range, Prod.exists, Subtype.exists, exists_prop, Prod.map_apply,
+    Prod.mk.injEq]
+  use dSystemX.map s a
+  use dSystemX.map s b
+  constructor
+  · use s
+    use a
+    use b
+    constructor
+    · exact hab1
+    rfl
+  constructor
+  · rfl
+  rfl
+have h5 : ⋂ α ∈ nhdsSet (Set.diagonal X),
+  closure ((Prod.map π π) '' (setOrbit (diagDynamicalSystem dSystemX dSystemX) α))
+    ⊆ ⋂ α ∈ nhdsSet (Set.diagonal X), setOrbitClosure
+    (diagDynamicalSystem dSystemY dSystemY) ((Prod.map π π) '' α) := by
+  unfold setOrbitClosure
+  simp only [Set.subset_iInter_iff]
+  intro i hi
+  specialize h5prep i hi
+  rw [<- h5prep]
+  intro y hy
+  simp only [Set.mem_iInter] at hy
+  specialize hy i hi
+  exact hy
+have h6 : ⋂ α ∈ nhdsSet (Set.diagonal X), setOrbitClosure
+  (diagDynamicalSystem dSystemY dSystemY) ((Prod.map π π) '' α)
+  ⊆ RP dSystemY := by
+  intro y hy
+  simp only [Set.mem_iInter] at hy
+  unfold RP
+  simp only [Set.mem_iInter]
+  intro β hβ
+  specialize h1 β hβ
+  rcases h1 with ⟨α, hα1, hα2⟩
+  specialize hy α hα1
+  rw [hα2] at hy
+  exact hy
+exact ((h2.trans h4).trans h5).trans h6
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
 acting semigroup, `RP_Y ⊆ (π ⊗ π) RP_X` -/
