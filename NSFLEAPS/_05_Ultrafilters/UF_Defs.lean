@@ -71,9 +71,9 @@ section Semigroup_stuff
 
 -- There is some basic semigroup stuff here that might be better in SG_Defs
 
-/-- `SemigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
+/-- `OurSemigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
 `st: X → X` is the composition of `s: X → X` and `t: X → X` -/
-structure SemigroupAction
+structure OurSemigroupAction
 (S : Type*) [Semigroup S] (X : Type*) where
   map : S → X → X
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
@@ -356,7 +356,7 @@ def ultraAction
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-SemigroupAction (Ultrafilter S) X :=
+OurSemigroupAction (Ultrafilter S) X :=
 {
   map := fun (p : Ultrafilter S) (x : X) ↦ ultraLim p (fun (s : S) ↦ dSystem.map s x)
   mapMult := by

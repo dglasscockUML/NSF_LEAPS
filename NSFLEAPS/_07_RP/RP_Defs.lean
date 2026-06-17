@@ -947,47 +947,44 @@ isTransitive (RP dSystem) :=
 by
   unfold isTransitive
   unfold setToRelation
-  exact {
-    trans := by
-      intro x y z xyInRP yzInRP
-      have yzzInOrbitCloszzz :
-        (y,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
-          (xyInRPIffxyyInyyyOrbClosure hMin y z).mp yzInRP
-      have yyInOrbitCloszz :
-        (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
-          diagonalOrbitVisits z y
-            ((subset_of_eq (minimalImpliesFullOrbitClosure hMin z).symm) (Set.mem_univ z))
-      have yyyInyTimesOrbitCloszz :
-        (y,y,y) ∈ ({y} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨z,z⟩) :=
-          by
-            constructor
-            · simp only [Set.mem_singleton_iff]
-            · exact yyInOrbitCloszz
-      have yyyInOrbitClosyzz :
-        (y,y,y) ∈ orbitClosure cornerSystem3 (y,z,z) :=
-          (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
-      have xyyInOrbitClosyyy :
-        (x,y,y) ∈ orbitClosure cornerSystem3 (y,y,y) :=
-          (xyInRPIffxyyInyyyOrbClosure hMin x y).mp xyInRP
-      have zzInOrbitClosyy :
-        (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
-          diagonalOrbitVisits y z
-            ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
-      have xzzInxTimesOrbitClosyy :
-        (x,z,z) ∈ ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,y⟩) :=
-          by
-            constructor
-            · simp only [Set.mem_singleton_iff]
-            · exact zzInOrbitClosyy
-      have xzzInOrbitClosxyy :
-        (x,z,z) ∈ orbitClosure cornerSystem3 (x,y,y) :=
-          (liftTo3Left x (xyyUniformlyRecurrent hMin x y)) xzzInxTimesOrbitClosyy
-      have xzzInOrbitCloszzz :
-        (x,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
-          orbitTransitivity (orbitTransitivity (orbitTransitivity
-            yzzInOrbitCloszzz yyyInOrbitClosyzz) xyyInOrbitClosyyy) xzzInOrbitClosxyy
-      exact (xyInRPIffxyyInyyyOrbClosure hMin x z).symm.mp xzzInOrbitCloszzz
-  }
+  intro x y z xyInRP yzInRP
+  have yzzInOrbitCloszzz :
+    (y,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
+      (xyInRPIffxyyInyyyOrbClosure hMin y z).mp yzInRP
+  have yyInOrbitCloszz :
+    (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
+      diagonalOrbitVisits z y
+        ((subset_of_eq (minimalImpliesFullOrbitClosure hMin z).symm) (Set.mem_univ z))
+  have yyyInyTimesOrbitCloszz :
+    (y,y,y) ∈ ({y} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨z,z⟩) :=
+      by
+        constructor
+        · simp only [Set.mem_singleton_iff]
+        · exact yyInOrbitCloszz
+  have yyyInOrbitClosyzz :
+    (y,y,y) ∈ orbitClosure cornerSystem3 (y,z,z) :=
+      (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
+  have xyyInOrbitClosyyy :
+    (x,y,y) ∈ orbitClosure cornerSystem3 (y,y,y) :=
+      (xyInRPIffxyyInyyyOrbClosure hMin x y).mp xyInRP
+  have zzInOrbitClosyy :
+    (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
+      diagonalOrbitVisits y z
+        ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
+  have xzzInxTimesOrbitClosyy :
+    (x,z,z) ∈ ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,y⟩) :=
+      by
+        constructor
+        · simp only [Set.mem_singleton_iff]
+        · exact zzInOrbitClosyy
+  have xzzInOrbitClosxyy :
+    (x,z,z) ∈ orbitClosure cornerSystem3 (x,y,y) :=
+      (liftTo3Left x (xyyUniformlyRecurrent hMin x y)) xzzInxTimesOrbitClosyy
+  have xzzInOrbitCloszzz :
+    (x,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
+      orbitTransitivity (orbitTransitivity (orbitTransitivity
+        yzzInOrbitCloszzz yyyInOrbitClosyzz) xyyInOrbitClosyyy) xzzInOrbitClosxyy
+  exact (xyInRPIffxyyInyyyOrbClosure hMin x z).symm.mp xzzInOrbitCloszzz
 
 /-- The regionally proximal relation of a minimal dynamical system
 is an ICER -/
@@ -1042,12 +1039,7 @@ by
     isSyndetic (ϕ '' visitTimeSet (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ (V ×ˢ U ×ˢ U)) :=
     by
       rcases UIsNonempty with ⟨z,hz⟩
-      have yxInRP : (y,x) ∈ RP dSystem :=
-        by
-          have := RPisSymmetric dSystem
-          unfold isSymmetric at this
-          unfold setToRelation at this
-          exact SetRel.symm (RP dSystem) hxyInRP
+      have yxInRP := (RPisSymmetric dSystem) hxyInRP
       have yxxInOrbClosxxx :
         ⟨y,x,x⟩ ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ :=
           (xyInRPIffxyyInyyyOrbClosure hMin y x).mp yxInRP
