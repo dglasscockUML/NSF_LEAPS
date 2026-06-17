@@ -15,7 +15,8 @@ structure RightSemigroupAction
   mapMult : ∀ s₁ s₂ x, map x (s₁ * s₂) = map (map x s₁) s₂
 
 
-/-- symbolicSystem S is the dynamical system consisting of {0,1}^S with the natural S action -/
+/-- Given a right action of `S` on `X`, `symbolicSystem S X rightAction`
+is the `S`-dynamical system (a left action) on `{0,1}^X` -/
 def symbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S]
 (X : Type*) [Nonempty X]
@@ -30,26 +31,26 @@ DynamicalSystem S (X → Bool) := {
 
 def basicRightAction
 (S : Type*) [Semigroup S] [Nonempty S] :
-RightSemigroupAction S S :=
-by sorry
+RightSemigroupAction S S := {
+    map := fun (x : S) ↦ (fun (s : S) ↦ x * s)
+    mapMult := by
+        intro s1 s2 x
+        exact Eq.symm (mul_assoc x s1 s2)
+}
 
-/-- symbolicSystem S is the dynamical system consisting of {0,1}^S with the natural S action -/
+/-- `symbolicSystem S` is the `S`-dynamical system (left action) of `S` on `{0,1}^S` -/
 def selfSymbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S (S → Bool) :=
 symbolicSystem S S (basicRightAction S)
-/- {
-    map := fun (s : S) ↦ (fun (φ : S → Bool) ↦ (fun (t : S) ↦ φ (t * s)))
-    mapMult := by
-        intro s1 s2 φ
-        simp only [mul_assoc]
-    mapCont := by sorry
-} -/
+
 
 def rightActionOfSOnMonoidExt
 (S : Type*) [Semigroup S] [Nonempty S] :
 RightSemigroupAction S (WithOne S) :=
 by sorry
+
+
 
 def monoidExtSymbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
