@@ -219,7 +219,6 @@ theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
       rw [mem_dual_alt]
       rw [mem_dual_alt] at h
       -- if Aᶜ ∉  F ∪ G, then Aᶜ ∉ F
-      apply Aesop.BuiltinRules.not_intro
       intro a
       apply h
       exact Or.inl a
@@ -227,7 +226,6 @@ theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
       rw [mem_dual_alt]
       rw [mem_dual_alt] at h
       -- if Aᶜ ∉  F ∪ G, then Aᶜ ∉ G
-      apply Aesop.BuiltinRules.not_intro
       intro a
       apply h
       exact Or.inr a
