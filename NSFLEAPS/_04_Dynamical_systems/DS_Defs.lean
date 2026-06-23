@@ -3017,23 +3017,62 @@ theorem diagSystemOfEquiSystemsIsEquiSystem
 {dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
 {dSystemY : DynamicalSystem S Y} (hYEqui : isEquicontinuousSystem dSystemY) :
 isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) := by
--- have hYUniform : UniformSpace Y := uniformSpaceOfCompactR1
--- have hXYUniform: UniformSpace (X × Y) := instUniformSpaceProd
--- intro β hβ F hF
--- simp only [Set.mem_setOf_eq]
--- simp only [Set.mem_image, Set.mem_diagonal_iff, Prod.exists, exists_eq_left'] at hF
--- rcases hF with ⟨a, b, hab⟩
--- rw [<- hab]
--- apply mem_nhds_iff.mpr
--- --let fChangeCor : (X × X) × (Y × Y) → (X × Y) × (X × Y) := fun ((x1, x2), (y1, y2)) ↦ ((x1, y1), (x2, y2))
--- have h1 : ∃ βX ∈ uniformity X, ∃ βY ∈ uniformity Y, entourageProd βX βY ⊆ β := by
---   apply entourageProd_subset
---   --exact hβ
---   -- There are two topologies here on X × Y, one is the product topology and the other
---   -- is the uniform topology (which are not proved to exist yet)
---   -- The conflict between these two topologies makes Lean complain
---   sorry
-sorry
+--have hXYUniform: UniformSpace (X × Y) := by infer_instance
+-- we don't want to create an instance of UniformSpace X × Y here because later
+-- Lean will not automatically assume the uniform structure of X × Y as coming from
+-- product topology
+-- in general, we should not create instance unless it's absolutely necessary
+intro β hβ
+simp only [Filter.Eventually]
+have h1 : ∃ βX ∈ uniformity X, ∃ βY ∈ uniformity Y, entourageProd βX βY ⊆ β := by
+  apply entourageProd_subset
+  exact hβ
+rcases h1 with ⟨βX, hβX, βY, hβY, hβXY⟩
+specialize hXEqui βX hβX
+simp only [Filter.Eventually] at hXEqui
+specialize hYEqui βY hβY
+simp only [Filter.Eventually] at hYEqui
+let αX := {x : X × X | ∀ (i : S), (dSystemX.map i x.1, dSystemX.map i x.2) ∈ βX}
+let αY := {y : Y × Y | ∀ (i : S), (dSystemY.map i y.1, dSystemY.map i y.2) ∈ βY}
+let αXY :=  {z : (X × Y) × (X × Y) | ∀ (i : S), ((diagDynamicalSystem dSystemX dSystemY).map i z.1,
+  (diagDynamicalSystem dSystemX dSystemY).map i z.2) ∈ β}
+have αXYDef : αXY =  {z : (X × Y) × (X × Y) | ∀ (i : S),
+  ((diagDynamicalSystem dSystemX dSystemY).map i z.1,
+  (diagDynamicalSystem dSystemX dSystemY).map i z.2) ∈ β} := by
+    rfl
+have hαX : αX ∈ uniformity X := by
+  simpa
+have hαY : αY ∈ uniformity Y := by
+  simpa
+have hαXY : entourageProd αX αY ⊆ αXY := by
+  intro z hz s
+  rcases hz with ⟨p1, p2⟩
+  have hα3 : ((diagDynamicalSystem dSystemX dSystemY).map s z.1,
+    (diagDynamicalSystem dSystemX dSystemY).map s z.2) ∈ entourageProd βX βY := by
+    simp only [mem_entourageProd]
+    constructor
+    · have hα4 : ((diagDynamicalSystem dSystemX dSystemY).map s z.1).1 = dSystemX.map s z.1.1 := by
+        rfl
+      have hα5 : ((diagDynamicalSystem dSystemX dSystemY).map s z.2).1 = dSystemX.map s z.2.1 :=
+        rfl
+      simp only [hα4, hα5]
+      specialize p1 s
+      exact p1
+    have hα6 : ((diagDynamicalSystem dSystemX dSystemY).map s z.1).2 = dSystemY.map s z.1.2 := by
+      rfl
+    have hα7 : ((diagDynamicalSystem dSystemX dSystemY).map s z.2).2 = dSystemY.map s z.2.2 := by
+      rfl
+    simp only [hα6, hα7]
+    specialize p2 s
+    exact p2
+  apply hβXY
+  exact hα3
+rw [<- αXYDef]
+have hαXY2 : entourageProd αX αY ∈ uniformity (X × Y) := by
+  apply entourageProd_mem_uniformity
+  · exact hαX
+  exact hαY
+exact Filter.mem_of_superset hαXY2 hαXY
 
 /-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
 nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
