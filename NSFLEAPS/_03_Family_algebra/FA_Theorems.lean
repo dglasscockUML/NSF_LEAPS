@@ -184,12 +184,16 @@ that follows it.
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
   ext A
+  have BinFuG : ∀ B ∈ F ⋎ G, A ∩ B = ∅ := by sorry
+  have CDinter : ∀ C ∈ F, ∀ D ∈ G, A ∩ C ∩ D = ∅ := by sorry
+  have CinterAinGdual : ∀ C ∈ F, A ∩ C ∈ G* := by sorry
+  have goalR : A ∈ F* ⋏ G* := by
+    sorry
   constructor
   · intro h
-    change ∀ B, B ∈ (F ⋎ G) → (A ∩ B).Nonempty at h
-
+    exact goalR
+  · intro h
     sorry
-  · sorry
 --thm_de_morgan_union_v2
 /- A ∈ (F ∪ G)∗
 – definition
@@ -222,24 +226,55 @@ theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by sorry
 
 --thm_classcap_contains_union
-theorem thm_classcap_contains_union (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G)  :=
+theorem thm_familyJoinContainsUnion (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G)  :=
   by sorry
 -- need to define what a subset of Fam is
 
 --thm_classcap_commutative
-theorem thm_classcap_commutative (F G : Family α) : (F ⋎ G) = (G ⋎ F) :=
-  by sorry
+theorem thm_familyJoinIsCommutative (F G : Family α) : (F ⋎ G) = (G ⋎ F) :=
+  by
+    ext A
+    constructor
+    · intro h
+      sorry
+    · intro h
+      sorry
 
 --thm_classcap_associative
-theorem thm_classcap_associative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F ⋎ G) ⋎ H) :=
-  by sorry
+ /- For all F, G, H ∈
+P(P(S)),
+(F ⋎ G) ⋎ H = F ⋎ (G ⋎ H).
+Proof. Let F, G, H ∈ P(P(S)). We must show that
+(F ⋎ G) ⋎ H = F ⋎ (G ⋎ H).
+If F = ∅ or G = ∅ or H = ∅, it is quick to check that this equality holds. Therefore, we will
+assume F, G, H̸ = ∅.
+Since F, G̸ = ∅,
+F ⋎ G = {A ∩ B : A ∈ F, B ∈ G}.
+Similarly, since G, H̸ = ∅,
+G ⋎ H = {A ∩ B : A ∈ G, B ∈ H}.
+Let X ⊆ S. Each line is equivalent to the one that follows it.
+1. X ∈ (F ⋎ G) ⋎ H
+2. there exists A ∈ (F ⋎ G) and B ∈ H such that X = A ∩ B
+3. there exists C ∈ F, D ∈ G, and B ∈ H such that X = (C ∩ D) ∩ B
+4. there exists C ∈ F, D ∈ G, and B ∈ H such that X = C ∩ (D ∩ B)
+5. there exists C ∈ F and E ∈ G ⋎ H such that X = C ∩ E
+6. X ∈ F ⋎ (G ⋎ H)
+Therefore, (F ⋎ G) ⋎ H = F ⋎ (G ⋎ H), as desired. -/
+theorem thm_familyJoinIsAssociative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F ⋎ G) ⋎ H) :=
+  by
+    ext A
+    constructor
+    · intro h
+      sorry
+    · intro h
+      sorry
 
 --thm_classcap_monotone
-theorem thm_classcap_monotone (F G H : Family α) : F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
+theorem thm_familyJoinIsMonotone (F G H : Family α) : F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   by sorry
 
 --thm_family_classcap_dual_is_partition_regular
-theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
+theorem thm_familyJoinIsPartitionRegular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
   by sorry
 
 --thm_classcap_idempotent_at_filters
@@ -249,25 +284,25 @@ theorem thm_family_classcap_dual_is_partition_regular (F : Family α) : isPRTwoS
 --  by sorry
 
 --thm_classcapdual_contained_in_intersection ***
-theorem thm_classcapdual_contained_in_intersection (F G : Family α) : (F ⋏ G) ⊆ (F ∩ G) :=
+theorem thm_familyMeetIsContainedInIntersection (F G : Family α) : (F ⋏ G) ⊆ (F ∩ G) :=
   by sorry
 
 
 --thm_classcapdual_commutative
-theorem thm_classcapdual_commutative (F G : Family α) : (F ⋏ G) = (G ⋏ F) :=
+theorem thm_familyMeetIsCommutative (F G : Family α) : (F ⋏ G) = (G ⋏ F) :=
   by sorry
 --thm_classcapdual_associative
-theorem thm_classcapdual_associative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
+theorem thm_familyMeetIsAssociative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
   by sorry
 
 --thm_classcapdual_monotone ***
-theorem thm_classcapdual_monotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
+theorem thm_familyMeetIsMonotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by sorry
 --thm_family_classcapdual_dual_is_filter
-theorem thm_family_classcapdual_dual_is_filter (F : Family α) : isFilterFamily (F ⋏ F*) :=
+theorem thm_familyMeetIsFilter (F : Family α) : isFilterFamily (F ⋏ F*) :=
   by sorry
 -- F ⋏ F = F ↔ isPRFamily F
-theorem thm_classcapdual_idempotent_at_pr_families (F : Family α) :
+theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
   F ⋏ F = F ↔ isPRFamily F := by sorry
 --
 --thm_combo_algebra_statement_one
