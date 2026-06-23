@@ -189,11 +189,16 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   have CinterAinGdual : ∀ C ∈ F, A ∩ C ∈ G* := by sorry
   have goalR : A ∈ F* ⋏ G* := by
     sorry
+
   constructor
   · intro h
+    rw [mem_dual_alt] at h
     exact goalR
   · intro h
-    sorry
+    rw [mem_dual_alt]
+    have h_complement : Aᶜ ∉ F ⋎ G := by sorry
+    exact h_complement
+
 --thm_de_morgan_union_v2
 /- A ∈ (F ∪ G)∗
 – definition
@@ -210,8 +215,22 @@ theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
   ext A
   constructor
   · intro h
-    have AinFdual : A ∈ F* := by sorry
-    have AinGdual : A ∈ G* := by sorry
+    have AinFdual : A ∈ F* := by
+      rw [mem_dual_alt]
+      rw [mem_dual_alt] at h
+      -- if Aᶜ ∉  F ∪ G, then Aᶜ ∉ F
+      apply Aesop.BuiltinRules.not_intro
+      intro a
+      apply h
+      exact Or.inl a
+    have AinGdual : A ∈ G* := by
+      rw [mem_dual_alt]
+      rw [mem_dual_alt] at h
+      -- if Aᶜ ∉  F ∪ G, then Aᶜ ∉ G
+      apply Aesop.BuiltinRules.not_intro
+      intro a
+      apply h
+      exact Or.inr a
     exact ⟨AinFdual, AinGdual⟩
   · intro h B BinFuG
     rcases h with ⟨a, b⟩
