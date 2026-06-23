@@ -543,7 +543,11 @@ def imageDynamicalSystem
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
 (hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
 DynamicalSystem S ↑(π '' Z) :=
-by sorry
+{
+  map := sorry
+  mapMult :=sorry
+  mapCont := sorry
+}
 
 /- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
 a continuous, intertwining map `π: X → Y` is a nonempty, compact, T2,
@@ -575,8 +579,25 @@ theorem contIntertwineRestrictionIsFactorMap
 (hZisInv : isNonemptyCompactT2InvariantSubset dSystemX Z) [CompactSpace ↑(π '' Z)] :
 isFactorMap (fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
 (imageDynamicalSystem dSystemX dSystemY π (hπInt := hπInt) (hπCont := hπCont) hZisInv.2.2.2)
-(Set.MapsTo.restrict π Z (π '' Z) (Set.mapsTo_image π Z)) :=
-by sorry
+(Set.MapsTo.restrict π Z (π '' Z) (Set.mapsTo_image π Z)) := by
+constructor
+· apply Continuous.restrict
+  exact hπCont
+constructor
+· simp only [Set.MapsTo.restrict_surjective_iff]
+  apply Set.surjOn_image
+unfold isEquivariant
+intro s
+specialize hπInt s
+ext z
+simp only [Function.comp_apply, Set.MapsTo.val_restrict_apply]
+have hz1 : dSystemY.map s (π z) = π (dSystemX.map s z) := by
+  apply congrFun hπInt
+have h2 : π ↑((fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv).map s z) =
+  π (dSystemX.map s z) := by
+  rfl
+rw [h2, <- hz1]
+sorry
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, an ICER
 (for dSystem) is an invariant (under the diagonal action of `S`),
@@ -776,8 +797,34 @@ theorem imageOfSubsystemIsSubsystem
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : Continuous π} {hEqui : isEquivariant dSystemX.map dSystemY.map π}
 (A : Set X) {hA : isNonemptyCompactT2InvariantSubset dSystemX A} :
-isNonemptyCompactT2InvariantSubset dSystemY (π '' A) :=
-by sorry
+isNonemptyCompactT2InvariantSubset dSystemY (π '' A) := by
+rcases hA with ⟨hA1, hA2, hA3, hA4⟩
+constructor
+· rcases hA1 with ⟨x, hx⟩
+  have hx1 : π x ∈ π '' A := by
+    use x
+  exact ⟨π x, hx1⟩
+constructor
+· apply IsCompact.image hA2 hπ
+constructor
+· infer_instance
+unfold isInvariantSet
+intro s
+unfold isInvariantSet at hA4
+specialize hA4 s
+unfold Set.MapsTo
+intro y hy
+rcases hy with ⟨x, hx1, hx2⟩
+rw [<- hx2]
+unfold isEquivariant at hEqui
+specialize hEqui s
+have hEquiSpec :  dSystemY.map s (π x) = π (dSystemX.map s x) := by
+  apply congrFun hEqui
+rw [hEquiSpec]
+unfold Set.MapsTo at hA4
+specialize hA4 hx1
+simp only [Set.mem_image]
+use (dSystemX.map s x)
 
 end Factor_maps_and_ICERS
 
@@ -1536,6 +1583,8 @@ theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x) :
 isMinimalSubset dSystem (orbitClosure dSystem x) := by
+have hXUniform : UniformSpace X := by
+  apply uniformSpaceOfCompactR1
 have h1 : ∀ U ∈ nhds x, (U ∩ orbit dSystem x).Nonempty := by
   intro U hU
   have h4 := xisUR U hU
@@ -1570,11 +1619,11 @@ have : CompactSpace Y := by
   exact hY.2.1
 have hYNonempty: Nonempty Y := by
   apply hY.1.to_subtype
+-- have h0 : UniformSpace Y := by
+--   apply instUniformSpaceSubtype
 have hYUreturn : ∀ y : Y, ∀ U : Set Y,
 IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   intro y U hUOpen hUNonempty
-  haveI h0 : UniformSpace Y := by
-    apply uniformSpaceOfCompactR1
   have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (Y × Y), γ ∈ uniformity Y ∧
 ∀ a ∈ V, ∀ b : Y, (a, b) ∈ γ → b ∈ U := by
     sorry
@@ -1673,13 +1722,21 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
     have h51a : CompactSpace Y := by
       infer_instance
     --exact CompactSpace.uniformContinuous_of_continuous h50
+    -- Lean complains that the two topologies on Y are incompatible
+    -- (subspace topology and uniform topology -- which inherits from uniform topology from X)
+    sorry
+  have h52 : ∀ f ∈ F, ∃ α ∈ uniformity Y,
+    (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
+    intro f hf
     sorry
   have h6 : ∃ α ∈ uniformity Y, ∀ f ∈ F,
   (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
     sorry
   rcases h6 with ⟨α, hα1, hα2⟩
   have h61 : ∃ W : Set Y, W ∈ nhds y ∧ IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
-    -- exact openClosureProductInEntourage y α
+    --exact openClosureProductInEntourage y α
+    -- Lean complains that the two topologies on Y are incompatible
+    -- (subspace topology and uniform topology -- which inherits from uniform topology from X)
     sorry
   have h61a : ∀ s : S, dSystem.map s x = Subtype.val (dSystemY.map s x') := by
     intro s
