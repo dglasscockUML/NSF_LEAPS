@@ -1574,7 +1574,7 @@ have hYUreturn : ∀ y : Y, ∀ U : Set Y,
 IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   intro y U hUOpen hUNonempty
   haveI h0 : UniformSpace Y := by
-    sorry
+    apply uniformSpaceOfCompactR1
   have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (Y × Y), γ ∈ uniformity Y ∧
 ∀ a ∈ V, ∀ b : Y, (a, b) ∈ γ → b ∈ U := by
     sorry
@@ -1672,7 +1672,7 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
     specialize h50 f hf
     have h51a : CompactSpace Y := by
       infer_instance
-    -- exact CompactSpace.uniformContinuous_of_continuous h50
+    --exact CompactSpace.uniformContinuous_of_continuous h50
     sorry
   have h6 : ∃ α ∈ uniformity Y, ∀ f ∈ F,
   (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
@@ -2995,26 +2995,45 @@ end Regional_proximality
 section Equicontinuity_and_regional_proximality
 
 variable {S} [Semigroup S] [Nonempty S]
-variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] [UniformSpace X]
 
 /- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
-instance : UniformSpace X := uniformSpaceOfCompactR1
+-- This is problematic because it hardcodes a uniform structure for all dynamical
+-- systems that we wants to prove to equicontinuous (which is called "instUniformSpace_nSFLEAPS").
+-- We need to prove X has uniform structure inside the definition
+-- instance : UniformSpace X := uniformSpaceOfCompactR1
 
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
 def isEquicontinuousSystem
-(dSystem : DynamicalSystem S X) :
+(dSystem : DynamicalSystem S X) [UniformSpace X] :
 Prop :=
 UniformEquicontinuous dSystem.map
 
 /-- If `dSystem` and `dSystemY` are equicontinuous dynamical systems, then the
 diagonal action of `S` on `X × Y` is an equicontinuous dynamical system -/
 theorem diagSystemOfEquiSystemsIsEquiSystem
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y] [UniformSpace Y]
 {dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
 {dSystemY : DynamicalSystem S Y} (hYEqui : isEquicontinuousSystem dSystemY) :
-isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) :=
-by sorry
+isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) := by
+-- have hYUniform : UniformSpace Y := uniformSpaceOfCompactR1
+-- have hXYUniform: UniformSpace (X × Y) := instUniformSpaceProd
+-- intro β hβ F hF
+-- simp only [Set.mem_setOf_eq]
+-- simp only [Set.mem_image, Set.mem_diagonal_iff, Prod.exists, exists_eq_left'] at hF
+-- rcases hF with ⟨a, b, hab⟩
+-- rw [<- hab]
+-- apply mem_nhds_iff.mpr
+-- --let fChangeCor : (X × X) × (Y × Y) → (X × Y) × (X × Y) := fun ((x1, x2), (y1, y2)) ↦ ((x1, y1), (x2, y2))
+-- have h1 : ∃ βX ∈ uniformity X, ∃ βY ∈ uniformity Y, entourageProd βX βY ⊆ β := by
+--   apply entourageProd_subset
+--   --exact hβ
+--   -- There are two topologies here on X × Y, one is the product topology and the other
+--   -- is the uniform topology (which are not proved to exist yet)
+--   -- The conflict between these two topologies makes Lean complain
+--   sorry
+sorry
 
 /-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
 nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
@@ -3023,8 +3042,58 @@ theorem subsystemOfEquicontinuousIsEquicontinuous
 {dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
 {Z : Set X} [CompactSpace Z] [Nonempty Z]
 (hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) :=
-by sorry
+isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := by
+unfold isEquicontinuousSystem at hXEqui
+have h1 : UniformEquicontinuousOn dSystem.map Z := by
+  apply UniformEquicontinuous.uniformEquicontinuousOn
+  exact hXEqui
+intro α hα
+unfold UniformEquicontinuous at hXEqui
+unfold UniformEquicontinuousOn at h1
+have h2init : uniformity (Z) = Filter.comap (fun (q : Subtype Z × Subtype Z)
+  => (Subtype.val q.1, Subtype.val q.2)) (uniformity X) := by
+  exact uniformity_subtype
+have h2 : ∃ β ∈ uniformity X, (Prod.map Subtype.val Subtype.val) ⁻¹' β ⊆ α:= by
+  simp only [h2init, Filter.mem_comap] at hα
+  rcases hα with ⟨γ, hγ1, hγ2⟩
+  use γ
+  constructor
+  · exact hγ1
+  exact hγ2
+rcases h2 with ⟨β, hβ1, hβ2⟩
+specialize hXEqui β hβ1
+let γ := {z : X × X | ∀ s : S, (dSystem.map s z.1, dSystem.map s z.2) ∈ β}
+have h3 : γ ∈ uniformity X := by
+  simp only [γ]
+  exact hXEqui
+let ZdSys := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ
+let δ := {z : (Z × Z) | ∀ s : S, (ZdSys.map s z.1, ZdSys.map s z.2) ∈ α}
+have h4 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ  ∈ uniformity Z := by
+  simp only [uniformity_subtype]
+  use γ
+  constructor
+  · exact h3
+  rfl
+have h5 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ ⊆ δ:= by
+  simp only [δ]
+  simp only [γ]
+  intro z hz
+  simp only [Set.mem_setOf_eq]
+  simp only [Set.preimage_setOf_eq, Prod.map_fst, Prod.map_snd, Set.mem_setOf_eq] at hz
+  intro s
+  specialize hz s
+  let θ : Set (↑Z × ↑Z) := (Prod.map Subtype.val Subtype.val) ⁻¹' β
+  have h51 : (ZdSys.map s z.1, ZdSys.map s z.2) ∈ θ := by
+    simpa
+  have h52 : θ ⊆ α := by
+    simpa
+  apply h52
+  exact h51
+have h6 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ ∈ uniformity Z := by
+  exact h4
+have hGoal : δ ∈ uniformity Z := by
+  exact Filter.mem_of_superset h6 h5
+exact hGoal
 
 /- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
 -- This seems unnecessary.  Typeclass is finding it properly.
@@ -3033,6 +3102,10 @@ by sorry
 {I : Set (X × X)} (hI : isICER dSystem I) :
 UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
 by sorry -/
+
+-- Be careful with this global instance. It likely will cause trouble later.
+-- I put it here so we don't have errors now. But we need to find a better fix later.
+instance : UniformSpace X := uniformSpaceOfCompactR1
 
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
