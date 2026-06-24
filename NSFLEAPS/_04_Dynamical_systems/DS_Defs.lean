@@ -597,6 +597,7 @@ have h2 : π ↑((fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
   π (dSystemX.map s z) := by
   rfl
 rw [h2, <- hz1]
+--the remaing task is simple but we need the definition of image dynamical systems first
 sorry
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, an ICER
@@ -688,8 +689,10 @@ theorem quotientOfCompactT2ByClosedIsT2
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {I : Set (X × X)} (hIClosed : IsClosed I)
 (hIEquiv : Equivalence (setToRelation I)) :
-T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
-by sorry
+T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) := by
+apply (t2Space_iff (Quotient ⟨setToRelation I, hIEquiv⟩)).mpr
+intro x y hxy
+sorry
 
 /- instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {I : Set (X × X)} {hIClosed : IsClosed I}
@@ -1583,7 +1586,7 @@ theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
 {x : X} (xisUR : isUniformlyRecurrent dSystem x) :
 isMinimalSubset dSystem (orbitClosure dSystem x) := by
-have hXUniform : UniformSpace X := by
+letI hXUniform : UniformSpace X := by
   apply uniformSpaceOfCompactR1
 have h1 : ∀ U ∈ nhds x, (U ∩ orbit dSystem x).Nonempty := by
   intro U hU
@@ -1614,13 +1617,11 @@ let x' : Y := ⟨x, xInY⟩
 have hY : isNonemptyCompactT2InvariantSubset dSystem Y := by
   apply orbitClosureIsNonemptyCompactT2InvariantSubset
 let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hY
-have : CompactSpace Y := by
+letI : CompactSpace Y := by
   apply isCompact_iff_compactSpace.mp
   exact hY.2.1
 have hYNonempty: Nonempty Y := by
   apply hY.1.to_subtype
--- have h0 : UniformSpace Y := by
---   apply instUniformSpaceSubtype
 have hYUreturn : ∀ y : Y, ∀ U : Set Y,
 IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   intro y U hUOpen hUNonempty
@@ -1719,25 +1720,56 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   have h51 : ∀ f ∈ F, UniformContinuous (dSystemY.map (t * f)) := by
     intro f hf
     specialize h50 f hf
-    have h51a : CompactSpace Y := by
-      infer_instance
-    --exact CompactSpace.uniformContinuous_of_continuous h50
+    exact CompactSpace.uniformContinuous_of_continuous h50
     -- Lean complains that the two topologies on Y are incompatible
     -- (subspace topology and uniform topology -- which inherits from uniform topology from X)
-    sorry
+    -- the fix is use letI instead of have at hXUniform
   have h52 : ∀ f ∈ F, ∃ α ∈ uniformity Y,
     (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
     intro f hf
-    sorry
+    specialize h51 f hf
+    let α := {z : Y × Y | (dSystemY.map (t * f) z.1, dSystemY.map (t * f) z.2) ∈ γ}
+    have h53 : α ∈ uniformity Y := by
+      apply uniformContinuous_def.mp
+      · exact h51
+      exact hγ1
+    use α
+    constructor
+    · exact h53
+    intro w hw1
+    rcases hw1 with ⟨u, hu1, hu2⟩
+    unfold α at hu1
+    rw [<- hu2]
+    unfold Prod.map
+    simp
+    simpa
+  choose φ hφ1 hφ2 using h52
   have h6 : ∃ α ∈ uniformity Y, ∀ f ∈ F,
   (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
-    sorry
+    let α := ⋂ (f ∈ F), φ f ‹_›
+    use α
+    constructor
+    · unfold α
+      sorry
+    · intro f hf
+      have h6a : α ⊆ φ f hf := by
+        simp only [α]
+        intro x hx
+        simp only [Set.mem_iInter] at hx
+        specialize hx f hf
+        exact hx
+      have h6b : Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f)) '' α
+        ⊆ Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f)) '' (φ f hf) := by
+        exact Set.image_mono h6a
+      have h6c : Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f)) '' (φ f hf)
+        ⊆ γ := by
+        specialize hφ2 f hf
+        exact hφ2
+      exact h6b.trans h6c
   rcases h6 with ⟨α, hα1, hα2⟩
   have h61 : ∃ W : Set Y, W ∈ nhds y ∧ IsOpen W ∧ ((closure W) ×ˢ (closure W) ⊆ α) := by
-    --exact openClosureProductInEntourage y α
-    -- Lean complains that the two topologies on Y are incompatible
-    -- (subspace topology and uniform topology -- which inherits from uniform topology from X)
-    sorry
+    apply openClosureProductInEntourage
+    exact hα1
   have h61a : ∀ s : S, dSystem.map s x = Subtype.val (dSystemY.map s x') := by
     intro s
     rfl
@@ -3047,10 +3079,9 @@ by sorry
 
 end Regional_proximality
 
-
-
 section Equicontinuity_and_regional_proximality
 
+--instance {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] : UniformSpace X := uniformSpaceOfCompactR1
 variable {S} [Semigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] [UniformSpace X]
 
@@ -3063,7 +3094,7 @@ variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] [Uni
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
 def isEquicontinuousSystem
-(dSystem : DynamicalSystem S X) [UniformSpace X] :
+(dSystem : DynamicalSystem S X) :
 Prop :=
 UniformEquicontinuous dSystem.map
 
@@ -3074,16 +3105,19 @@ theorem diagSystemOfEquiSystemsIsEquiSystem
 {dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
 {dSystemY : DynamicalSystem S Y} (hYEqui : isEquicontinuousSystem dSystemY) :
 isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) := by
---have hXYUniform: UniformSpace (X × Y) := by infer_instance
--- we don't want to create an instance of UniformSpace X × Y here because later
--- Lean will not automatically assume the uniform structure of X × Y as coming from
--- product topology
--- in general, we should not create instance unless it's absolutely necessary
 intro β hβ
 simp only [Filter.Eventually]
 have h1 : ∃ βX ∈ uniformity X, ∃ βY ∈ uniformity Y, entourageProd βX βY ⊆ β := by
   apply entourageProd_subset
   exact hβ
+  -- apply unique_uniformity_of_compact
+  -- example (X Y : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X]
+  -- [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] :
+  -- uniformSpaceOfCompactR1 (γ := X × Y) =
+  -- inferInstanceAs (UniformSpace (X × Y)) := by
+  -- apply unique_uniformity_of_compact
+  -- rfl
+  -- rfl
 rcases h1 with ⟨βX, hβX, βY, hβY, hβXY⟩
 specialize hXEqui βX hβX
 simp only [Filter.Eventually] at hXEqui
