@@ -3444,9 +3444,9 @@ by sorry
 /-- The equicontinuous structure relation of a dynamical system is an
 equicontinuous ICER -/
 theorem equiStructureRelationIsEquiICER
-{S : Type*} [Semigroup S] [Nonempty S]
+{S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) :
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
 isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) :=
 by sorry
 
