@@ -1581,6 +1581,102 @@ lemma subtype_closure_eq_of_isClosed
     exact h5
   apply Set.Subset.antisymm h6 h1
 
+/-- For any open set U, there exists an open set V ⊆ U and an entourage γ
+such that for all a ∈ V, the ball B_γ(a) ⊆ U -/
+-- This lemma is needed for Theorem "orbitClosureOfURPointIsMinimalSubset" below
+lemma existEntourageGivenOpenSet {X : Type*} [UniformSpace X] (U : Set X) (hUOpen : IsOpen U)
+  (hUNonempty : U.Nonempty) :
+  ∃ (V : Set X), V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (X × X), γ ∈ uniformity X ∧
+∀ a ∈ V, ∀ b : X, (a, b) ∈ γ → b ∈ U := by
+rcases hUNonempty with ⟨x0, hx0⟩
+have h1 : {p : X × X | p.1 = x0 → p.2 ∈ U} ∈ uniformity X := by
+  apply isOpen_uniformity.mp
+  · exact hUOpen
+  exact hx0
+let α := {p : X × X | p.1 = x0 → p.2 ∈ U}
+have hαDef : α = {p : X × X | p.1 = x0 → p.2 ∈ U} := rfl
+rw [<- hαDef] at h1
+let B1 := {y : X | (x0, y) ∈ α}
+have h2 : B1 ⊆ U := by
+  intro y hy
+  simp only [B1] at hy
+  simp only [Set.mem_setOf_eq, forall_const, Set.setOf_mem_eq, α] at hy
+  exact hy
+have h3 : ∃ γ ∈ uniformity X, SetRel.comp γ γ ⊆ α := by
+  apply comp_mem_uniformity_sets
+  exact h1
+have h31 : ∃ γ ∈ uniformity X, SetRel.IsSymm γ ∧ SetRel.comp γ γ ⊆ α := by
+  let ⟨β, hβ1, hβ2⟩ := h3
+  let ⟨γ, hγ1, hγ2, hγ3⟩ := symm_of_uniformity hβ1
+  use γ
+  constructor
+  · exact hγ1
+  constructor
+  · exact hγ2
+  have h31a : SetRel.comp γ γ ⊆ SetRel.comp β β := by
+    intro a ha
+    rcases ha with ⟨b, ha2, ha3⟩
+    unfold SetRel.comp
+    simp only [Set.mem_setOf_eq]
+    use b
+    constructor
+    · apply hγ3
+      exact ha2
+    · apply hγ3
+      exact ha3
+  exact h31a.trans hβ2
+rcases h31 with ⟨γ, hγ1, hγ2, hγ3⟩
+let B2 := {y : X | (x0, y) ∈ γ}
+have h4 : x0 ∈ B2 := by
+  simp only [B2]
+  apply mem_uniformity_of_eq
+  · exact hγ1
+  rfl
+have h5 : B2 ∈ nhds x0 := by
+  apply mem_nhds_uniformity_iff_right.mpr
+  simp only [B2]
+  have h5a : γ ⊆ {p : X × X| p.1 = x0 → (x0, p.2) ∈ γ} := by
+    intro q hq
+    simp only [Set.mem_setOf_eq]
+    intro hq1
+    rw [<- hq1]
+    exact hq
+  apply Filter.sets_of_superset
+  · exact hγ1
+  · exact h5a
+let ⟨B3, hB31, hB32, hB34⟩ := mem_nhds_iff.mp h5
+let V := B3 ∩ U
+use V
+constructor
+· simp [V]
+constructor
+· simp only [V]
+  have hB3Ux0 : x0 ∈ B3 ∩ U := by
+    simp only [Set.mem_inter_iff]
+    constructor
+    · exact hB34
+    · exact hx0
+  exact ⟨x0, hB3Ux0⟩
+constructor
+· exact IsOpen.inter hB32 hUOpen
+· use γ
+  constructor
+  · exact hγ1
+  · intro a ha b hab
+    simp only [V] at ha
+    rcases ha with ⟨ha1, ha2⟩
+    have ha3 : a ∈ B2 := by
+      apply hB31
+      exact ha1
+    simp [B2] at ha3
+    have hx0b : (x0, b) ∈ α := by
+      unfold SetRel.comp at hγ3
+      apply hγ3
+      simp only [Set.mem_setOf_eq]
+      use a
+    simp only [Set.mem_setOf_eq, forall_const, α] at hx0b
+    exact hx0b
+
 /-- The orbit closure of a uniformly recurrent point is a minimal set -/
 theorem orbitClosureOfURPointIsMinimalSubset
 (dSystem : DynamicalSystem S X)
@@ -1627,7 +1723,9 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   intro y U hUOpen hUNonempty
   have h1 : ∃ V : Set Y, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (Y × Y), γ ∈ uniformity Y ∧
 ∀ a ∈ V, ∀ b : Y, (a, b) ∈ γ → b ∈ U := by
-    sorry
+    apply existEntourageGivenOpenSet
+    · exact hUOpen
+    · exact hUNonempty
   obtain ⟨V, hV1, hV2, hV3, γ, hγ1, hγ2⟩ := h1
   rcases (isOpen_induced_iff.mp hV3) with ⟨V', hV'_open, hV_eq⟩
   have h12 : (V' ∩ Y).Nonempty := by
@@ -1721,9 +1819,6 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
     intro f hf
     specialize h50 f hf
     exact CompactSpace.uniformContinuous_of_continuous h50
-    -- Lean complains that the two topologies on Y are incompatible
-    -- (subspace topology and uniform topology -- which inherits from uniform topology from X)
-    -- the fix is use letI instead of have at hXUniform
   have h52 : ∀ f ∈ F, ∃ α ∈ uniformity Y,
     (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
     intro f hf
@@ -1746,11 +1841,40 @@ IsOpen U → U.Nonempty → ∃ s : S,  dSystemY.map s y ∈ U := by
   choose φ hφ1 hφ2 using h52
   have h6 : ∃ α ∈ uniformity Y, ∀ f ∈ F,
   (Prod.map (dSystemY.map (t * f)) (dSystemY.map (t * f))) '' α ⊆ γ := by
-    let α := ⋂ (f ∈ F), φ f ‹_›
+    let α := ⋂ f, ⋂ (h : f ∈ F), φ f h
     use α
     constructor
-    · unfold α
-      sorry
+    · let G := hF1.toFinset
+      let ψ : S → Set (Y × Y) := fun f => ⋂ (h : f ∈ F), φ f h
+      have hα3 : α = ⋂ f ∈ F, ψ f := by
+        simp only [α, ψ]
+        ext x
+        constructor
+        · intro hx
+          simp at hx
+          simp [hx]
+        · intro hx
+          simp only [Set.mem_iInter] at hx
+          simp only [Set.mem_iInter]
+          intro i hi
+          specialize hx i hi hi
+          exact hx
+      have hα4 : α = ⋂ f ∈ (G : Set S), ψ f := by
+        rw [hα3]
+        simp [G]
+      rw [hα4]
+      classical
+      refine Finset.induction_on G ?h_empty ?h_insert
+      · simp
+      intro a s has1 has2
+      simp only [Finset.coe_insert, Set.mem_insert_iff, SetLike.mem_coe,
+        Set.iInter_iInter_eq_or_left, Filter.inter_mem_iff, Filter.biInter_finset_mem]
+      constructor
+      · unfold ψ
+        simp [hφ1]
+      intro i hi
+      unfold ψ
+      simp [hφ1]
     · intro f hf
       have h6a : α ⊆ φ f hf := by
         simp only [α]
