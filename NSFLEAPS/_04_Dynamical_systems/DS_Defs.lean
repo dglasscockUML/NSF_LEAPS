@@ -3258,11 +3258,15 @@ RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem :=
 by sorry
 
 /- Note the following generalizes equicontinuousIffRPTrivial by
-applying the following to the identity map -/
+applying the following to the identity map --/
+/- I added [CommSemigroup S] later.  So in the following theorems,
+we have both [Semigroup S] and [CommSemigroup S].  This is probably
+not best practice.  Consider reducing the scope to not use the global
+variables. -/
 /-- A factor `π : X → Y` of a minimal system is equicontinuous
 iff `RP_X ⊆ R_π` -/
 theorem minimalFactorEquicontinuousIffRPInFactorRelation
-(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
+[CommSemigroup S] (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
@@ -3271,7 +3275,7 @@ by sorry
 
 /-- An ICER `I` of a minimal system `X` is equicontinuous iff `RP ⊆ I` -/
 theorem minimalICEREquicontinuousIffRPInICER
-{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
+[CommSemigroup S] {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
 {I : Set (X × X)} (hI : isICER dSystem I) :
 isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I :=
 by sorry
