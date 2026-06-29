@@ -3205,7 +3205,8 @@ end Regional_proximality
 
 section Equicontinuity_and_regional_proximality
 
---instance {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] : UniformSpace X := uniformSpaceOfCompactR1
+--instance {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] : UniformSpace X :=
+--uniformSpaceOfCompactR1
 variable {S} [Semigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] [UniformSpace X]
 
@@ -3381,30 +3382,65 @@ theorem equicontinuousIffRPTrivial
 RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem :=
 by sorry
 
+end Equicontinuity_and_regional_proximality
+
+section Equicontinuity_and_regional_proximality_with_S_commutative
+
 /- Note the following generalizes equicontinuousIffRPTrivial by
 applying the following to the identity map --/
 /- I added [CommSemigroup S] later.  So in the following theorems,
 we have both [Semigroup S] and [CommSemigroup S].  This is probably
 not best practice.  Consider reducing the scope to not use the global
 variables. -/
+/- This is indeed a problem. When I apply commMinRPIsInImageOfRP in
+minimalFactorEquicontinuousIffRPInFactorRelation,
+Lean cannot parse it. So I had to separate into a new section where we
+don't assume S is Semigroup, but a Commutative Semigroup -/
+
 /-- A factor `π : X → Y` of a minimal system is equicontinuous
 iff `RP_X ⊆ R_π` -/
 theorem minimalFactorEquicontinuousIffRPInFactorRelation
-[CommSemigroup S] (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
-RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY :=
-by sorry
+RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY := by
+constructor
+· intro h1
+  unfold mapRelation at h1
+  have h1recast : Prod.map π π '' RP dSystem ⊆ Set.diagonal Y := by
+    simp [h1]
+  have h2 : RP dSystemY ⊆ Prod.map π π '' RP dSystem := by
+    apply commMinRPIsInImageOfRP dSystem dSystemY
+    · exact hFactorMap
+    · exact hMin
+  have h3 : RP dSystemY ⊆ Set.diagonal Y := by
+    exact h2.trans h1recast
+  exact (equicontinuousIffRPTrivial dSystemY).mp h3
+· intro h1
+  unfold mapRelation
+  have h2 : RP dSystemY ⊆ Set.diagonal Y := by
+    exact (equicontinuousIffRPTrivial dSystemY).mpr h1
+  have h3 : Prod.map π π '' RP dSystem ⊆ RP dSystemY := by
+    apply imageOfRPIsInRP dSystem dSystemY
+    exact hFactorMap
+  have hGoal : Prod.map π π '' RP dSystem ⊆ Set.diagonal Y := by
+    exact h3.trans h2
+  simp only [Set.image_subset_iff] at hGoal
+  exact hGoal
 
 /-- An ICER `I` of a minimal system `X` is equicontinuous iff `RP ⊆ I` -/
 theorem minimalICEREquicontinuousIffRPInICER
-[CommSemigroup S] {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
+[CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
 {I : Set (X × X)} (hI : isICER dSystem I) :
 isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I :=
 by sorry
 
-end Equicontinuity_and_regional_proximality
+end Equicontinuity_and_regional_proximality_with_S_commutative
 
 section Equicontinuous_structure_relation
 
