@@ -148,7 +148,7 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
     contradiction
   exact hAcinF_not sorry
 
-theorem thm_pr_iff_dual_is_filter (P : Family α) : isIntersectionClosed (P.sets)* ↔
+theorem thm_familyIsPRIffDualIsFilter (P : Family α) : isIntersectionClosed (P.sets)* ↔
   partitionRegularTwoSets (P.sets) :=
   by sorry
 
@@ -184,20 +184,25 @@ that follows it.
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
   ext A
-  have BinFuG : ∀ B ∈ F ⋎ G, A ∩ B = ∅ := by sorry
-  have CDinter : ∀ C ∈ F, ∀ D ∈ G, A ∩ C ∩ D = ∅ := by sorry
-  have CinterAinGdual : ∀ C ∈ F, A ∩ C ∈ G* := by sorry
-  have goalR : A ∈ F* ⋏ G* := by
-    sorry
+  let BinFuG := ∀ B ∈ F ⋎ G, A ∩ B = ∅
+  let CDinter := ∀ C ∈ F, ∀ D ∈ G, A ∩ C ∩ D = ∅
+  let CinterAinGdual := ∀ C ∈ F, A ∩ C ∈ (G*)
+  have goalR : A ∈ F* ⋏ G* := by sorry
+  have equiv23 : BinFuG ↔ CDinter := by sorry
+  have equiv34 : CDinter ↔ CinterAinGdual := by sorry
+  have equiv24 : BinFuG ↔ CinterAinGdual := by exact Iff.trans equiv23 equiv34
+  have equiv45 : CinterAinGdual ↔ goalR := by sorry
+  have 
+  sorry
 
-  constructor
+  /- constructor
   · intro h
     rw [mem_dual_alt] at h
     exact goalR
   · intro h
     rw [mem_dual_alt]
     have h_complement : Aᶜ ∉ F ⋎ G := by sorry
-    exact h_complement
+    exact h_complement -/
 
 --thm_de_morgan_union_v2
 /- A ∈ (F ∪ G)∗
@@ -210,7 +215,7 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
 – logic
 5. A ∈ F∗ ∩ G∗
 -/
-theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
+theorem thm_familySetDeMorganLaw1 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
  by
   ext A
   constructor
@@ -238,6 +243,15 @@ theorem thm_de_morgan_union_v2 (F G : Family α) : (F ∪ G)* = (F* ∩ G*) :=
     · exact a i
     · exact b j
 
+/-Proof. Apply Theorem 3.18 to F∗ and G∗ to see that (F∗ ∪ G∗)∗ = (F∗)∗ ∩ (G∗)∗. By
+Theorem 3.14, we have that (F∗ ∪ G∗)∗ = F ∩ G. Taking the dual and again and using
+Theorem 3.14 again, we see F∗ ∪ G∗ = (F ∩ G)∗, as desired.-/
+theorem thm_familySetDeMorganLaw2 (F G : Family α) : (F ∩ G)* = (F* ∪ G*) :=
+ by
+  have dualof : (F ∩ G)** = (F* ∪ G*)* := by sorry
+  have fugdualdual : (F* ∪ G*)* = F ∩ G := by sorry
+
+  sorry
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by sorry
