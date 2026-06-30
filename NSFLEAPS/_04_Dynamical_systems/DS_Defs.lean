@@ -3522,10 +3522,17 @@ theorem equiStructureRelationIsEquiICER
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
-isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) :=
-by sorry
-
-
+isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) := by
+apply (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).mpr
+unfold equiStructureRelation
+simp only [Set.subset_sInter_iff]
+intro I hI
+unfold setOfEquicontinuousICERS at hI
+rcases hI with ⟨hI1, hI2⟩
+unfold setOfICERS at hI1
+simp only [Set.mem_setOf_eq] at hI1
+apply (minimalICEREquicontinuousIffRPInICER hMin hI1).mp
+exact hI2
 
 end Equicontinuous_structure_relation
 
