@@ -3508,8 +3508,13 @@ theorem equiStructureRelationIsICER
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isICER dSystem (equiStructureRelation dSystem) :=
-by sorry
+isICER dSystem (equiStructureRelation dSystem) := by
+apply intersectionOfICERsIsICER
+intro I hI
+unfold setOfEquicontinuousICERS at hI
+unfold setOfICERS at hI
+rcases hI with ⟨hI1, hI2⟩
+exact hI1
 
 /-- The equicontinuous structure relation of a dynamical system is an
 equicontinuous ICER -/
