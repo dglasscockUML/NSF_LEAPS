@@ -3433,12 +3433,46 @@ constructor
 
 /-- An ICER `I` of a minimal system `X` is equicontinuous iff `RP ⊆ I` -/
 theorem minimalICEREquicontinuousIffRPInICER
-[CommSemigroup S] [Nonempty S]
+{S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
 {I : Set (X × X)} (hI : isICER dSystem I) :
-isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I :=
-by sorry
+isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I := by
+have hQuotientNonempty:  Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+    nonemptyQuotient X hI.2.2
+have hQuotientT2 : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+    quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+have hFactorMap : isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
+    (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+    apply quotientMapIsFactorMap
+constructor
+· intro h1
+  have h3 : RP dSystem ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+    apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
+      (quotientDynamicalSystem dSystem hI) hFactorMap).mpr
+    · exact h1
+    · exact hMin
+  have h4 : mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) ⊆ I := by
+    intro t ht
+    unfold mapRelation at ht
+    · simp only [Set.mem_preimage, Set.mem_diagonal_iff, Prod.map_fst, Prod.map_snd] at ht
+      have h4a : (setToRelation I) t.1 t.2 := by
+        exact Quotient.eq.mp ht
+      unfold setToRelation at h4a
+      exact h4a
+  exact h3.trans h4
+· intro h1
+  unfold isEquicontinuousICER
+  have h2 : I ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+    intro t ht
+    have h2a : (setToRelation I) t.1 t.2 := by
+      unfold setToRelation
+      exact ht
+    apply Quotient.eq.mpr h2a
+  apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
+    (quotientDynamicalSystem dSystem hI) hFactorMap).mp
+  · exact h1.trans h2
+  · exact hMin
 
 end Equicontinuity_and_regional_proximality_with_S_commutative
 
