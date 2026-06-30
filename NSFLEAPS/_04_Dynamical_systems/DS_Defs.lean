@@ -3365,7 +3365,7 @@ instance : UniformSpace X := uniformSpaceOfCompactR1
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
 def isEquicontinuousICER
-(dSystem : DynamicalSystem S X)
+(dSystem : DynamicalSystem S X) [UniformSpace X]
 {I : Set (X × X)} (hI : isICER dSystem I) :
 Prop :=
 by
@@ -3375,12 +3375,69 @@ by
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
   exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
 
+theorem equalThings {X} (h1 : UniformSpace X) (h2 : CompactSpace X) : nhdsSet (Set.diagonal X) = uniformity X := by
+exact nhdsSet_diagonal_eq_uniformity
+
 /-- A dynamical system on `X` is equicontinuous if and only if the
 regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivial
 (dSystem : DynamicalSystem S X) :
-RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem :=
-by sorry
+RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
+constructor
+· intro h1
+  sorry
+· intro h1 t ht1
+  by_contra ht2
+  have h2 : ∃ β ∈ uniformity X, t ∉ closure β := by
+    sorry
+  rcases h2 with ⟨β, hβ1, hβ2⟩
+  let α := {z : X × X | ∀ s : S, (dSystem.map s z.1, dSystem.map s z.2) ∈ β}
+  have hα1 : α ∈ uniformity X := by
+    unfold isEquicontinuousSystem at h1
+    unfold UniformEquicontinuous at h1
+    specialize h1 β hβ1
+    exact h1
+  letI hXUniform : UniformSpace X := by
+      apply uniformSpaceOfCompactR1
+  have hEqual : nhdsSet (Set.diagonal X) = uniformity X := by
+    -- letI hXUniform : UniformSpace X := by
+    --   apply uniformSpaceOfCompactR1
+    letI hXCompact : CompactSpace X := by
+      infer_instance
+    exact equalThings hXUniform hXCompact
+    --rcases hXUniform with ⟨hX1, hX2, hX3, hX4⟩
+    --sorry
+  have hα2 : α ∈ nhdsSet (Set.diagonal X) := by
+    simp only [hEqual]
+    --exact hα1
+    sorry
+  have hα3 : setOrbit (diagDynamicalSystem dSystem dSystem) α ⊆ β := by
+    unfold setOrbit
+    simp only
+    simp only [Set.coe_setOf, Set.mem_setOf_eq, α]
+    intro w hw
+    simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hw
+    rcases hw with ⟨s, a, b, hs1, hs2, hs3⟩
+    specialize hs1 s
+    have hDiag : (diagDynamicalSystem dSystem dSystem).map s (a, b)
+      = (dSystem.map s a, dSystem.map s b) := by
+      rfl
+    rw [hDiag]
+    exact hs1
+  have hα4 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) α ⊆ closure β := by
+    unfold setOrbitClosure
+    apply closure_mono
+    exact hα3
+  have hα5 : t ∉ setOrbitClosure (diagDynamicalSystem dSystem dSystem) α := by
+    intro htFalse
+    have htFalse2 : t ∈ closure β := by
+      apply hα4
+      exact htFalse
+    exact hβ2 htFalse2
+  unfold RP at ht1
+  simp only [Set.mem_iInter] at ht1
+  specialize ht1 α hα2
+  exact hα5 ht1
 
 end Equicontinuity_and_regional_proximality
 
