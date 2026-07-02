@@ -3205,16 +3205,10 @@ end Regional_proximality
 
 section Equicontinuity_and_regional_proximality
 
---instance {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] : UniformSpace X :=
---uniformSpaceOfCompactR1
 variable {S} [Semigroup S] [Nonempty S]
-variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X] [UniformSpace X]
+variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
-/- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
--- This is problematic because it hardcodes a uniform structure for all dynamical
--- systems that we wants to prove to equicontinuous (which is called "instUniformSpace_nSFLEAPS").
--- We need to prove X has uniform structure inside the definition
--- instance : UniformSpace X := uniformSpaceOfCompactR1
+instance : UniformSpace X := uniformSpaceOfCompactR1
 
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
@@ -3223,26 +3217,36 @@ def isEquicontinuousSystem
 Prop :=
 UniformEquicontinuous dSystem.map
 
+-- We create the next definitions because Lean has trouble understanding
+-- that the uniformity structure
+-- from product space coming from uniformSpaceOfCompactR1 is the same
+-- as the one coming from instUniformSpaceProd
+def isEquicontinuousProductSystem
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y) :
+Prop :=
+UniformEquicontinuous (diagDynamicalSystem dSystemX dSystemY).map
+
+def isEquicontinuousSubSystem
+(dSystem : DynamicalSystem S X)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+Prop :=
+UniformEquicontinuous (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ).map
+
 /-- If `dSystem` and `dSystemY` are equicontinuous dynamical systems, then the
 diagonal action of `S` on `X × Y` is an equicontinuous dynamical system -/
 theorem diagSystemOfEquiSystemsIsEquiSystem
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y] [UniformSpace Y]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 {dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
 {dSystemY : DynamicalSystem S Y} (hYEqui : isEquicontinuousSystem dSystemY) :
-isEquicontinuousSystem (diagDynamicalSystem dSystemX dSystemY) := by
+isEquicontinuousProductSystem dSystemX dSystemY := by
 intro β hβ
 simp only [Filter.Eventually]
 have h1 : ∃ βX ∈ uniformity X, ∃ βY ∈ uniformity Y, entourageProd βX βY ⊆ β := by
   apply entourageProd_subset
   exact hβ
-  -- apply unique_uniformity_of_compact
-  -- example (X Y : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X]
-  -- [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] :
-  -- uniformSpaceOfCompactR1 (γ := X × Y) =
-  -- inferInstanceAs (UniformSpace (X × Y)) := by
-  -- apply unique_uniformity_of_compact
-  -- rfl
-  -- rfl
 rcases h1 with ⟨βX, hβX, βY, hβY, hβXY⟩
 specialize hXEqui βX hβX
 simp only [Filter.Eventually] at hXEqui
@@ -3297,7 +3301,9 @@ theorem subsystemOfEquicontinuousIsEquicontinuous
 {dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
 {Z : Set X} [CompactSpace Z] [Nonempty Z]
 (hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := by
+isEquicontinuousSubSystem dSystem hZ :=
+letI : UniformSpace X := uniformSpaceOfCompactR1
+by
 unfold isEquicontinuousSystem at hXEqui
 have h1 : UniformEquicontinuousOn dSystem.map Z := by
   apply UniformEquicontinuous.uniformEquicontinuousOn
@@ -3350,6 +3356,7 @@ have hGoal : δ ∈ uniformity Z := by
   exact Filter.mem_of_superset h6 h5
 exact hGoal
 
+
 /- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
 -- This seems unnecessary.  Typeclass is finding it properly.
 /- def quotientIsUniformSpace
@@ -3357,10 +3364,6 @@ exact hGoal
 {I : Set (X × X)} (hI : isICER dSystem I) :
 UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
 by sorry -/
-
--- Be careful with this global instance. It likely will cause trouble later.
--- I put it here so we don't have errors now. But we need to find a better fix later.
-instance : UniformSpace X := uniformSpaceOfCompactR1
 
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
@@ -3375,9 +3378,6 @@ by
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
   exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
 
-theorem equalThings {X} (h1 : UniformSpace X) (h2 : CompactSpace X) : nhdsSet (Set.diagonal X) = uniformity X := by
-exact nhdsSet_diagonal_eq_uniformity
-
 /-- A dynamical system on `X` is equicontinuous if and only if the
 regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivial
@@ -3385,11 +3385,79 @@ theorem equicontinuousIffRPTrivial
 RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
 constructor
 · intro h1
-  sorry
+  unfold isEquicontinuousSystem
+  unfold UniformEquicontinuous
+  simp [Filter.Eventually]
+  intro α hαUniformity
+  have hαNhdsDiag : α ∈ nhdsSet (Set.diagonal X) := by
+    simp [nhdsSet_diagonal_eq_uniformity]
+    exact hαUniformity
+  have hαContDiag : Set.diagonal X ⊆ α := by
+    have hα1 := mem_nhdsSet.mp hαNhdsDiag
+    rcases hα1 with ⟨U, hU1, hU2, hU3⟩
+    exact hU3.trans hU1
+  have hRPα : RP dSystem ⊆ α := by
+    exact h1.trans hαContDiag
+  unfold RP at hRPα
+  have hGoal : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
+    (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β ⊆ α):= by
+    sorry
+  rcases hGoal with ⟨F, hF1, hF2⟩
+  have hGoal2 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) (⋂ β ∈ F, β) ⊆
+    (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) := by
+    sorry
+  have hGoal3 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) (⋂ β ∈ F, β) ⊆ α := by
+    exact hGoal2.trans hF2
+  let γ := ⋂ β ∈ F, β
+  have hGoal4 : γ ∈ uniformity X := by
+    sorry
+  let θ := {z : X × X | ∀ (s : S), (dSystem.map s z.1, dSystem.map s z.2) ∈ α}
+  have hθDef : θ = {z : X × X | ∀ (s : S), (dSystem.map s z.1, dSystem.map s z.2) ∈ α} := by
+    rfl
+  rw [<- hθDef]
+  have hγθ : γ ⊆ θ := by
+    sorry
+  exact Filter.mem_of_superset hGoal4 hγθ
 · intro h1 t ht1
   by_contra ht2
+  have h2prep : ∃ β ∈ nhdsSet (Set.diagonal X), t ∉ closure β := by
+    have h2prep2 : SeparatedNhds {t} (Set.diagonal X) := by
+      apply normal_separation
+      · simp
+      · apply t2_iff_isClosed_diagonal.mp
+        simpa
+      · simp [ht2]
+    rcases h2prep2 with ⟨U, V, hU1, hV1, hU2, hV2, hUV⟩
+    let β := Uᶜ
+    use β
+    constructor
+    · apply mem_nhdsSet.mpr
+      use V
+      constructor
+      · unfold β
+        apply Disjoint.subset_compl_right
+        exact disjoint_comm.mp hUV
+      constructor
+      · exact hV1
+      · exact hV2
+    have hβClosed : IsClosed β := by
+      unfold β
+      simpa
+    have hβClosure : closure β = β := by
+      apply IsClosed.closure_eq
+      exact hβClosed
+    rw [hβClosure]
+    unfold β
+    simp only [Set.mem_compl_iff, not_not]
+    apply hU2
+    simp
   have h2 : ∃ β ∈ uniformity X, t ∉ closure β := by
-    sorry
+    rcases h2prep with ⟨β, hβ1, hβ2⟩
+    use β
+    constructor
+    · simp only [nhdsSet_diagonal_eq_uniformity] at hβ1
+      exact hβ1
+    · exact hβ2
   rcases h2 with ⟨β, hβ1, hβ2⟩
   let α := {z : X × X | ∀ s : S, (dSystem.map s z.1, dSystem.map s z.2) ∈ β}
   have hα1 : α ∈ uniformity X := by
@@ -3399,18 +3467,9 @@ constructor
     exact h1
   letI hXUniform : UniformSpace X := by
       apply uniformSpaceOfCompactR1
-  have hEqual : nhdsSet (Set.diagonal X) = uniformity X := by
-    -- letI hXUniform : UniformSpace X := by
-    --   apply uniformSpaceOfCompactR1
-    letI hXCompact : CompactSpace X := by
-      infer_instance
-    exact equalThings hXUniform hXCompact
-    --rcases hXUniform with ⟨hX1, hX2, hX3, hX4⟩
-    --sorry
   have hα2 : α ∈ nhdsSet (Set.diagonal X) := by
-    simp only [hEqual]
-    --exact hα1
-    sorry
+    simp only [nhdsSet_diagonal_eq_uniformity]
+    exact hα1
   have hα3 : setOrbit (diagDynamicalSystem dSystem dSystem) α ⊆ β := by
     unfold setOrbit
     simp only
