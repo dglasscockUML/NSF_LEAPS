@@ -186,6 +186,26 @@ def setOrbitClosure
 Set X :=
 closure (setOrbit dSystem Z)
 
+/-- If A ⊆ B, then the orbit closure of A is subset of the orbit closure of B -/
+lemma monotoneSetOrbitClosure
+(dSystem : DynamicalSystem S X) (A : Set X) (B : Set X) (hAB : A ⊆ B) :
+setOrbitClosure dSystem A ⊆ setOrbitClosure dSystem B := by
+  have h1 : setOrbit dSystem A ⊆ setOrbit dSystem B := by
+    unfold setOrbit
+    simp only
+    unfold Set.range
+    intro z hz
+    simp only [Prod.exists, Subtype.exists, exists_prop, Set.mem_setOf_eq] at hz
+    rcases hz with ⟨s, a, ha1, ha2⟩
+    simp only [Prod.exists, Subtype.exists, exists_prop, Set.mem_setOf_eq]
+    use s
+    use a
+    constructor
+    · apply hAB
+      exact ha1
+    · exact ha2
+  apply closure_mono
+  exact h1
 
 /-- When `S` acts on `X`, if `y` is in the orbit closure of `x` and `z` is
 in the orbit closure of `y`, then `z` is in the orbit closure of `x`. -/
@@ -3387,10 +3407,10 @@ constructor
 · intro h1
   unfold isEquicontinuousSystem
   unfold UniformEquicontinuous
-  simp [Filter.Eventually]
+  simp only [Filter.Eventually]
   intro α hαUniformity
   have hαNhdsDiag : α ∈ nhdsSet (Set.diagonal X) := by
-    simp [nhdsSet_diagonal_eq_uniformity]
+    simp only [nhdsSet_diagonal_eq_uniformity]
     exact hαUniformity
   have hαContDiag : Set.diagonal X ⊆ α := by
     have hα1 := mem_nhdsSet.mp hαNhdsDiag
@@ -3399,24 +3419,121 @@ constructor
   have hRPα : RP dSystem ⊆ α := by
     exact h1.trans hαContDiag
   unfold RP at hRPα
+  have hα0 : ∃ α0 ⊆ α, IsOpen α0 ∧ Set.diagonal X ⊆ α0 := by
+    apply mem_nhdsSet.mp hαNhdsDiag
+  rcases hα0 with ⟨α0, hα01, hα02, hα03⟩
+  have hRPα0 : RP dSystem ⊆ α0 := by
+    exact h1.trans hα03
+  have hGoalPrep0 : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
+    Disjoint (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) α0ᶜ := by
+    unfold RP at hRPα0
+    have h1 : ∃ F : Finset {β : Set (X × X) | β ∈ nhdsSet (Set.diagonal X)},
+      α0ᶜ ∩ (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) = ∅ := by
+      apply IsCompact.elim_finite_subfamily_closed
+      · apply IsClosed.isCompact
+        apply IsOpen.isClosed_compl
+        exact hα02
+      · intro i
+        unfold setOrbitClosure
+        apply isClosed_closure
+      · have hDisjoint :  Disjoint α0ᶜ (⋂ β ∈ nhdsSet (Set.diagonal X),
+          setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) := by
+          apply Set.subset_compl_iff_disjoint_left.mp
+          simp only [compl_compl]
+          exact hRPα0
+        apply Disjoint.inter_eq
+        intro x hx1 hx2
+        specialize hDisjoint hx1
+        have hxthis: x ≤ ⋂ β ∈ nhdsSet (Set.diagonal X), setOrbitClosure
+          (diagDynamicalSystem dSystem dSystem) β := by
+          simp only [Set.le_eq_subset, Set.subset_iInter_iff]
+          simp only [Set.coe_setOf, Set.mem_setOf_eq, Set.le_eq_subset, Set.subset_iInter_iff,
+            Subtype.forall] at hx2
+          exact hx2
+        apply hDisjoint hxthis
+    rcases h1 with ⟨G, hG⟩
+    let F : Finset (Set (X × X)) := G.map ⟨Subtype.val, Subtype.val_injective⟩
+    use F
+    constructor
+    · intro β hβ
+      have hβN : β ∈ nhdsSet (Set.diagonal X) := by
+        rw [Finset.mem_map] at hβ
+        simp only [Set.mem_setOf_eq, Function.Embedding.coeFn_mk, Subtype.exists, exists_and_right,
+          exists_eq_right] at hβ
+        rcases hβ with ⟨hx1, hx2⟩
+        exact hx1
+      simp only [nhdsSet_diagonal_eq_uniformity] at hβN
+      exact hβN
+    · simp [Set.disjoint_left]
+      intro a b hi
+      have hGnew : Disjoint (⋂ β ∈ G, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) α0ᶜ := by
+        sorry
+      simp [Set.disjoint_left] at hGnew
+      specialize hGnew a b
+      sorry
+  have hGoalPrep : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
+    (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β ⊆ α0) := by
+    rcases hGoalPrep0 with ⟨F, hF1, hF2⟩
+    use F
+    constructor
+    · exact hF1
+    · apply Set.disjoint_compl_right_iff_subset.mp
+      exact hF2
   have hGoal : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
     (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β ⊆ α):= by
-    sorry
+    rcases hGoalPrep with ⟨F, hF1, hF2⟩
+    use F
+    constructor
+    · exact hF1
+    · exact hF2.trans hα01
   rcases hGoal with ⟨F, hF1, hF2⟩
-  have hGoal2 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) (⋂ β ∈ F, β) ⊆
-    (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) := by
-    sorry
-  have hGoal3 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) (⋂ β ∈ F, β) ⊆ α := by
-    exact hGoal2.trans hF2
   let γ := ⋂ β ∈ F, β
+  have hGoal2 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) γ ⊆
+    (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) := by
+    unfold γ
+    simp only [Set.subset_iInter_iff]
+    intro ρ hρ
+    apply monotoneSetOrbitClosure
+    intro z hz
+    simp only [Set.mem_iInter] at hz
+    specialize hz ρ
+    apply hz hρ
+  have hGoal3 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) γ ⊆ α := by
+    exact hGoal2.trans hF2
   have hGoal4 : γ ∈ uniformity X := by
-    sorry
+    unfold γ
+    simp only [Filter.biInter_finset_mem]
+    exact hF1
   let θ := {z : X × X | ∀ (s : S), (dSystem.map s z.1, dSystem.map s z.2) ∈ α}
   have hθDef : θ = {z : X × X | ∀ (s : S), (dSystem.map s z.1, dSystem.map s z.2) ∈ α} := by
     rfl
   rw [<- hθDef]
   have hγθ : γ ⊆ θ := by
-    sorry
+    unfold θ
+    intro z hz
+    simp only [Set.mem_setOf_eq]
+    intro s
+    have h1 : setOrbit (diagDynamicalSystem dSystem dSystem) γ ⊆
+      setOrbitClosure (diagDynamicalSystem dSystem dSystem) γ := by
+      unfold setOrbitClosure
+      apply subset_closure
+    have hGoal3Cor : setOrbit (diagDynamicalSystem dSystem dSystem) γ ⊆ α := by
+      exact h1.trans hGoal3
+    unfold setOrbit at hGoal3Cor
+    simp only at hGoal3Cor
+    unfold Set.range at hGoal3Cor
+    simp only [Prod.exists, Subtype.exists, exists_prop] at hGoal3Cor
+    have h2 : (dSystem.map s z.1, dSystem.map s z.2) ∈
+      {x | ∃ a a_1 b, (a_1, b) ∈ γ ∧ (diagDynamicalSystem dSystem dSystem).map a (a_1, b) = x} := by
+      simp only [Set.mem_setOf_eq]
+      use s
+      use z.1
+      use z.2
+      constructor
+      · exact hz
+      · rfl
+    apply hGoal3Cor
+    exact h2
   exact Filter.mem_of_superset hGoal4 hγθ
 · intro h1 t ht1
   by_contra ht2
