@@ -132,8 +132,19 @@ theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
 
 -- theorem thm_dual_is_antitone (F G : Family α) : F.sets ⊆ G.sets → (F*).sets ⊆ (G*).sets :=
 --  by sorry
-theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
+
+theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → G* ⊆ F* :=
  by
+  intro h A hAinF
+  rw [famDualAlt] at hAinF
+  rw [famDualAlt]
+  simp only [Set.mem_setOf_eq] at hAinF ⊢
+  -- hAinF is: Aᶜ ∉ F
+  -- Goal is: Aᶜ ∉ G
+  intro hAcinG
+  apply hAinF
+  exact h hAcinG
+  /-
   intro h A hAinF
   -- rewrite F* membership using characterization
   rw [famDualAlt] at hAinF
@@ -146,7 +157,14 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → F* ⊆ G* :=
     intro hAcinF'
     have hAcinG' : Aᶜ ∈ G := h hAcinF'
     contradiction
-  exact hAcinF_not sorry
+  exact hAinF (by
+    -- Prove by contradiction using the forward inclusion
+    by_contra h_contra
+    -- If Aᶜ ∉ F is false, then Aᶜ ∈ F
+    have h_in_G := h h_contra
+    exact hAcinG h_in_G
+  )
+  sorry -/
 
 theorem thm_familyIsPRIffDualIsFilter (P : Family α) : isIntersectionClosed (P.sets)* ↔
   partitionRegularTwoSets (P.sets) :=
@@ -191,8 +209,10 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   have equiv23 : BinFuG ↔ CDinter := by
     simp_all only [BinFuG, CDinter]
     apply Iff.intro
-    ·sorry
-    ·sorry
+    · intro h C hC D hD
+      sorry
+    · intro h B hBinFuG
+      sorry
   have equiv34 : CDinter ↔ CinterAinGdual := by sorry
   have equiv24 : BinFuG ↔ CinterAinGdual := by exact Iff.trans equiv23 equiv34
   have equiv45 : CinterAinGdual ↔ goalR := by sorry
@@ -252,15 +272,12 @@ Theorem 3.14, we have that (F∗ ∪ G∗)∗ = F ∩ G. Taking the dual and aga
 Theorem 3.14 again, we see F∗ ∪ G∗ = (F ∩ G)∗, as desired.-/
 theorem thm_familySetDeMorganLaw2 (F G : Family α) : (F ∩ G)* = (F* ∪ G*) :=
  by
-  have dualof : (F ∩ G)** = (F* ∪ G*)* := by
-    rw [thm_familySetDeMorganLaw1]
-    repeat rw [thm_dual_is_involution]
   have ugdualdual : (F* ∪ G*)* = F ∩ G := by
     rw [thm_familySetDeMorganLaw1]
     repeat rw [thm_dual_is_involution]
   rw [← ugdualdual]
   rw [thm_dual_is_involution]
-  
+
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by sorry
@@ -303,11 +320,27 @@ Therefore, (F ⋎ G) ⋎ H = F ⋎ (G ⋎ H), as desired. -/
 theorem thm_familyJoinIsAssociative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F ⋎ G) ⋎ H) :=
   by
     ext A
-    constructor
-    · intro h
-      sorry
-    · intro h
-      sorry
+    by_cases hF : F.sets = ∅
+    · by_cases hG : G.sets = ∅
+      · by_cases hH : H.sets = ∅
+        · sorry  -- All empty
+        · sorry  -- F and G empty, H nonempty
+      · by_cases hH : H.sets = ∅
+        · sorry  -- F and H empty, G nonempty
+        · sorry  -- F empty, G and H nonempty
+    · by_cases hG : G.sets = ∅
+      · by_cases hH : H.sets = ∅
+        · sorry  -- F and H nonempty, G empty
+        · sorry  -- F nonempty, G and H nonempty
+      · by_cases hH : H.sets = ∅
+        · sorry  -- F and G nonempty, H empty
+        · -- All nonempty: F, G, H all nonempty
+          simp only [_root_.famJoin, hF, hG, hH, if_false]
+          constructor
+          · intro ⟨a, ha, b, ⟨c, hc, d, hd, hab_eq⟩, rfl⟩
+            exact ⟨a ∩ c, ⟨a, ha, c, hc, rfl⟩, d, hd, by rw [Set.inter_assoc, hab_eq]⟩
+          · intro ⟨⟨a, ha, c, hc, rfl⟩, b, hb, rfl⟩
+            exact ⟨a, ha, c ∩ b, ⟨c, hc, b, hb, rfl⟩, by rw [Set.inter_assoc]⟩
 
 --thm_classcap_monotone
 theorem thm_familyJoinIsMonotone (F G H : Family α) : F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
