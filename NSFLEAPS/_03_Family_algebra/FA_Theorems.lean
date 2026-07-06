@@ -139,32 +139,9 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → G* ⊆ F* :=
   rw [famDualAlt] at hAinF
   rw [famDualAlt]
   simp only [Set.mem_setOf_eq] at hAinF ⊢
-  -- hAinF is: Aᶜ ∉ F
-  -- Goal is: Aᶜ ∉ G
   intro hAcinG
   apply hAinF
   exact h hAcinG
-  /-
-  intro h A hAinF
-  -- rewrite F* membership using characterization
-  rw [famDualAlt] at hAinF
-  -- want: A ∈ G* ↔ Aᶜ ∉ G
-  rw [famDualAlt]
-  -- prove by contradiction
-  intro hAcinG
-  -- F ⊆ G means if Aᶜ ∈ F then Aᶜ ∈ G, so contrapositive: if Aᶜ ∉ G then Aᶜ ∉ F
-  have hAcinF_not : Aᶜ ∉ F := by
-    intro hAcinF'
-    have hAcinG' : Aᶜ ∈ G := h hAcinF'
-    contradiction
-  exact hAinF (by
-    -- Prove by contradiction using the forward inclusion
-    by_contra h_contra
-    -- If Aᶜ ∉ F is false, then Aᶜ ∈ F
-    have h_in_G := h h_contra
-    exact hAcinG h_in_G
-  )
-  sorry -/
 
 theorem thm_familyIsPRIffDualIsFilter (P : Family α) : isIntersectionClosed (P.sets)* ↔
   partitionRegularTwoSets (P.sets) :=
