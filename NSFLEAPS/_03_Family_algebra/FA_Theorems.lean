@@ -187,12 +187,16 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   let BinFuG := ∀ B ∈ F ⋎ G, A ∩ B = ∅
   let CDinter := ∀ C ∈ F, ∀ D ∈ G, A ∩ C ∩ D = ∅
   let CinterAinGdual := ∀ C ∈ F, A ∩ C ∈ (G*)
-  have goalR : A ∈ F* ⋏ G* := by sorry
-  have equiv23 : BinFuG ↔ CDinter := by sorry
+  let goalR := A ∈ F* ⋏ G*
+  have equiv23 : BinFuG ↔ CDinter := by
+    simp_all only [BinFuG, CDinter]
+    apply Iff.intro
+    ·sorry
+    ·sorry
   have equiv34 : CDinter ↔ CinterAinGdual := by sorry
   have equiv24 : BinFuG ↔ CinterAinGdual := by exact Iff.trans equiv23 equiv34
   have equiv45 : CinterAinGdual ↔ goalR := by sorry
-  have 
+  have equiv25 : BinFuG ↔ goalR := by exact Iff.trans equiv24 equiv45
   sorry
 
   /- constructor
@@ -248,10 +252,15 @@ Theorem 3.14, we have that (F∗ ∪ G∗)∗ = F ∩ G. Taking the dual and aga
 Theorem 3.14 again, we see F∗ ∪ G∗ = (F ∩ G)∗, as desired.-/
 theorem thm_familySetDeMorganLaw2 (F G : Family α) : (F ∩ G)* = (F* ∪ G*) :=
  by
-  have dualof : (F ∩ G)** = (F* ∪ G*)* := by sorry
-  have fugdualdual : (F* ∪ G*)* = F ∩ G := by sorry
-
-  sorry
+  have dualof : (F ∩ G)** = (F* ∪ G*)* := by
+    rw [thm_familySetDeMorganLaw1]
+    repeat rw [thm_dual_is_involution]
+  have ugdualdual : (F* ∪ G*)* = F ∩ G := by
+    rw [thm_familySetDeMorganLaw1]
+    repeat rw [thm_dual_is_involution]
+  rw [← ugdualdual]
+  rw [thm_dual_is_involution]
+  
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by sorry
