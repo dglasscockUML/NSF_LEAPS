@@ -3464,13 +3464,26 @@ constructor
         exact hx1
       simp only [nhdsSet_diagonal_eq_uniformity] at hβN
       exact hβN
-    · simp [Set.disjoint_left]
+    · simp only [Set.disjoint_left, Set.mem_iInter, Set.mem_compl_iff, not_not, Prod.forall]
       intro a b hi
-      have hGnew : Disjoint (⋂ β ∈ G, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) α0ᶜ := by
-        sorry
-      simp [Set.disjoint_left] at hGnew
+      have hGnew : Disjoint (⋂ β ∈ G, setOrbitClosure
+        (diagDynamicalSystem dSystem dSystem) β) α0ᶜ := by
+        apply Set.disjoint_iff_inter_eq_empty.mpr
+        have hGNew2 : (⋂ β ∈ G, setOrbitClosure
+          (diagDynamicalSystem dSystem dSystem) ↑β) ∩ α0ᶜ = ∅ := by
+          rw [Set.inter_comm]
+          exact hG
+        exact hGNew2
+      simp only [Set.coe_setOf, Set.mem_setOf_eq, Set.disjoint_left, Set.mem_iInter, Subtype.forall,
+        Set.mem_compl_iff, not_not, Prod.forall] at hGnew
       specialize hGnew a b
-      sorry
+      apply hGnew
+      intro a1 ha1 ha2
+      specialize hi a1
+      apply hi
+      simp only [Set.coe_setOf, Set.mem_setOf_eq, Finset.mem_map, Function.Embedding.coeFn_mk,
+        Subtype.exists, exists_and_right, exists_eq_right, F]
+      use ha1
   have hGoalPrep : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
     (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β ⊆ α0) := by
     rcases hGoalPrep0 with ⟨F, hF1, hF2⟩
