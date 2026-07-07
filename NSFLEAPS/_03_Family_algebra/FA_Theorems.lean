@@ -1,15 +1,5 @@
 import NSFLEAPS._03_Family_algebra.FA_Defs
 
-variable (fam famB: Family S)
-#check fam
-#check fam* = fam
-variable (α : Type _) (J K L : Set (Set α))
-#check J
-#check J*
-#check J** = J
-#check J
-#check K
-
 theorem famDualAlt {α} (F : Family α) :
 F* = {A : Set α | Aᶜ ∉ F} :=
   by
@@ -45,15 +35,6 @@ F* = {A : Set α | Aᶜ ∉ F} :=
       F.upward_closed B Aᶜ BinF hsubset
     exact AcninF this
  --complement of A in S not in F
-
---added this to get ext A to work, not sure why mine wasn't working but angelina's was
--- @[ext]
--- lemma Family.ext {α} {F G : Family α}
---   (h : F.sets = G.sets) : F = G := by
---   cases F
---   cases G
---   cases h
---   rfl
 
 /- @[simp]
 lemma dual_sets (F : Family α) :
@@ -221,7 +202,7 @@ theorem thm_familySetDeMorganLaw2 (F G : Family α) : (F ∩ G)* = (F* ∪ G*) :
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by
   -- h : (F* ⋎ G*)* = F** ⋏ G**
-  have h := thm_de_morgan_union_v1 α F* G*
+  have h := thm_de_morgan_union_v1 F* G*
   rw [thm_dual_is_involution] at h
   rw [thm_dual_is_involution] at h
   rw [← h]
