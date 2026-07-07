@@ -551,6 +551,8 @@ def isFactor
 Prop :=
 ∃ (π : X → Y), isFactorMap dSystemX dSystemY π
 
+set_option linter.unusedVariables false
+
 /- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
 a continuous, intertwining map `π: X → Y` as a dynamical system -/
 def imageDynamicalSystem
@@ -559,7 +561,7 @@ def imageDynamicalSystem
 (dSystemX : DynamicalSystem S X)
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
-(π : X → Y) {hπInt : isEquivariant dSystemX.map dSystemY.map π}
+(π : X → Y) {hπCont : Continuous π} {hπInt : isEquivariant dSystemX.map dSystemY.map π}
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
 (hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
 DynamicalSystem S ↑(π '' Z) :=
@@ -600,6 +602,8 @@ have hMapsto : ∀ s : S, Set.MapsTo (dSystemY.map s) (π '' Z) (π '' Z) := by
     apply Continuous.restrict
     exact hYCont
 }
+
+set_option linter.unusedVariables true
 
 /- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
 a continuous, intertwining map `π: X → Y` is a nonempty, compact, T2,
@@ -649,8 +653,8 @@ have h2 : π ↑((fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
   π (dSystemX.map s z) := by
   rfl
 rw [h2, <- hz1]
---the remaing task is simple but we need the definition of image dynamical systems first
-sorry
+unfold imageDynamicalSystem
+simp
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, an ICER
 (for dSystem) is an invariant (under the diagonal action of `S`),
