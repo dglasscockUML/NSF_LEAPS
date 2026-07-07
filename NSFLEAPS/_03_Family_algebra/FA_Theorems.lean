@@ -73,48 +73,13 @@ by
 lemma mem_dual_alt {F : Family α} {A : Set α} : A ∈ F* ↔ Aᶜ ∉ F :=
   Set.ext_iff.mp (famDualAlt F) A
 
-theorem dual_dual_smth_smth (F : Family α) : F** = F := by
+theorem thm_dual_is_involution (F : Family α) : F** = F := by
   ext A
   rw [mem_dual_alt]      -- 'A ∈ F**'
   rw [mem_dual_alt]      -- 'Aᶜ ∈ F*' inside the negation
   rw [compl_compl]
   push_neg
   rfl
-
--- theorem dual_dual_smth_smth (F : Family α) : F** = F := by
--- -- famDualAlt is a set equality lemma and ext requires membership based ones
---   apply SetLike.coe_injective
---   rw [famDualAlt (F*)]
---   ext A
---   dsimp
---   have h_inner : ∀ (X : Set α), X ∈ F* ↔ Xᶜ ∉ F := Set.ext_iff.mp (famDualAlt F)
---   rw [h_inner Aᶜ]
---   push_neg
---   rw [compl_compl]
---   rfl
-
-
-theorem thm_dual_is_involution (F : Family α) : F** = F := by
-ext A
-constructor
--- F** ⊆ F
-· intro h
-  by_contra hA
-  have h1 : Aᶜ ∉ F* := by
-    --rw [famDualAlt] at h
-    sorry
-  have h2 : Aᶜ ∈ F* := by
-    have : (Aᶜ)ᶜ ∉ F := by
-      simpa [compl_compl] using hA
-    sorry
-  exact h1 h2
-
--- F ⊆ F**
-· intro hA B hB
-  specialize hB A hA
-  exact Set.inter_nonempty_iff_exists_right.mpr hB
-
-
 
 --maybe funky
 theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
@@ -129,9 +94,6 @@ theorem thm_dual_is_bijection_on_fams (dual : Family α → Family α)
     intro F
     use dual F
     exact h F
-
--- theorem thm_dual_is_antitone (F G : Family α) : F.sets ⊆ G.sets → (F*).sets ⊆ (G*).sets :=
---  by sorry
 
 theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → G* ⊆ F* :=
  by
