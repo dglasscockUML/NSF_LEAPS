@@ -559,14 +559,46 @@ def imageDynamicalSystem
 (dSystemX : DynamicalSystem S X)
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
-(π : X → Y) {hπCont : Continuous π} {hπInt : isEquivariant dSystemX.map dSystemY.map π}
+(π : X → Y) {hπInt : isEquivariant dSystemX.map dSystemY.map π}
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
 (hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
 DynamicalSystem S ↑(π '' Z) :=
+have hMapsto : ∀ s : S, Set.MapsTo (dSystemY.map s) (π '' Z) (π '' Z) := by
+  intro s y hy
+  simp only [Set.mem_image] at hy
+  rcases hy with ⟨x, hx1, hx2⟩
+  rw [<- hx2]
+  unfold isEquivariant at hπInt
+  specialize hπInt s
+  have h1 : (dSystemY.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+    apply congrFun
+    exact hπInt
+  have h2 : dSystemY.map s (π x) = π (dSystemX.map s x) := by
+    exact h1
+  rw [h2]
+  simp only [Set.mem_image]
+  use dSystemX.map s x
+  constructor
+  · unfold isInvariantSet at hZisInv
+    specialize hZisInv s
+    unfold Set.MapsTo at hZisInv
+    specialize hZisInv hx1
+    exact hZisInv
+  · rfl
 {
-  map := sorry
-  mapMult :=sorry
-  mapCont := sorry
+  map := fun s ↦ Set.MapsTo.restrict (dSystemY.map s) (π '' Z) (π '' Z) (hMapsto s)
+  mapMult := by
+    intro s1 s2 y
+    apply Subtype.ext
+    have hYMapMult := dSystemY.mapMult
+    specialize hYMapMult s1 s2 y
+    exact hYMapMult
+  mapCont := by
+    have hYCont := dSystemY.mapCont
+    intro s
+    specialize hYCont s
+    apply Continuous.restrict
+    exact hYCont
 }
 
 /- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
