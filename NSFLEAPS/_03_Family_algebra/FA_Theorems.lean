@@ -220,14 +220,12 @@ theorem thm_familySetDeMorganLaw2 (F G : Family α) : (F ∩ G)* = (F* ∪ G*) :
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by
-  ext A
-  constructor
-  · intro h
-    -- show A ∈ F* ⋎ G*
-    sorry
-  · intro h
-    -- show A ∈ (F ⋏ G)*
-    sorry
+  -- h : (F* ⋎ G*)* = F** ⋏ G**
+  have h := thm_de_morgan_union_v1 α F* G*
+  rw [thm_dual_is_involution] at h
+  rw [thm_dual_is_involution] at h
+  rw [← h]
+  rw [thm_dual_is_involution]
 
 --thm_classcap_contains_union
 theorem thm_familyJoinContainsUnion (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G)  :=
