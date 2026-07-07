@@ -257,7 +257,15 @@ theorem thm_familySetDeMorganLaw2 (F G : Family α) : (F ∩ G)* = (F* ∪ G*) :
 
 --thm_de_morgan_v1_dual
 theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
-  by sorry
+  by
+  ext A
+  constructor
+  · intro h
+    -- show A ∈ F* ⋎ G*
+    sorry
+  · intro h
+    -- show A ∈ (F ⋏ G)*
+    sorry
 
 --thm_classcap_contains_union
 theorem thm_familyJoinContainsUnion (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G)  :=
@@ -294,31 +302,26 @@ Let X ⊆ S. Each line is equivalent to the one that follows it.
 5. there exists C ∈ F and E ∈ G ⋎ H such that X = C ∩ E
 6. X ∈ F ⋎ (G ⋎ H)
 Therefore, (F ⋎ G) ⋎ H = F ⋎ (G ⋎ H), as desired. -/
+#print Family
+#check (· ⋎ ·)
+lemma famJoin_empty_left (F : Set (Set α)) :
+    famJoin (∅ : Set (Set α)) F = F := by
+  simp [famJoin]
+
+lemma famJoin_empty_right (F : Set (Set α)) :
+    famJoin F (∅ : Set (Set α)) = F := by
+  simp only [famJoin, ↓reduceIte, ite_eq_right_iff]
+  intro h
+  exact h.symm
+
 theorem thm_familyJoinIsAssociative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((F ⋎ G) ⋎ H) :=
   by
     ext A
-    by_cases hF : F.sets = ∅
-    · by_cases hG : G.sets = ∅
-      · by_cases hH : H.sets = ∅
-        · sorry  -- All empty
-        · sorry  -- F and G empty, H nonempty
-      · by_cases hH : H.sets = ∅
-        · sorry  -- F and H empty, G nonempty
-        · sorry  -- F empty, G and H nonempty
-    · by_cases hG : G.sets = ∅
-      · by_cases hH : H.sets = ∅
-        · sorry  -- F and H nonempty, G empty
-        · sorry  -- F nonempty, G and H nonempty
-      · by_cases hH : H.sets = ∅
-        · sorry  -- F and G nonempty, H empty
-        · -- All nonempty: F, G, H all nonempty
-          simp only [_root_.famJoin, hF, hG, hH, if_false]
-          constructor
-          · intro ⟨a, ha, b, ⟨c, hc, d, hd, hab_eq⟩, rfl⟩
-            exact ⟨a ∩ c, ⟨a, ha, c, hc, rfl⟩, d, hd, by rw [Set.inter_assoc, hab_eq]⟩
-          · intro ⟨⟨a, ha, c, hc, rfl⟩, b, hb, rfl⟩
-            exact ⟨a, ha, c ∩ b, ⟨c, hc, b, hb, rfl⟩, by rw [Set.inter_assoc]⟩
-
+    constructor
+    · intro h
+      sorry
+    · intro h
+      sorry
 --thm_classcap_monotone
 theorem thm_familyJoinIsMonotone (F G H : Family α) : F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   by sorry
