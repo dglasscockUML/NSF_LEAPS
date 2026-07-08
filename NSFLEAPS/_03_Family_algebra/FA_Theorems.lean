@@ -130,10 +130,56 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
     simp_all only [BinFuG, CDinter]
     apply Iff.intro
     · intro h C hC D hD
-      sorry
+      specialize h (C ∩ D)
+      have hCDinFuG : C ∩ D ∈ F ⋎ G := by
+        change C ∩ D ∈ famJoin F G
+        unfold _root_.famJoin
+        split_ifs with hF hG
+        · have h_false : C ∈ F := hC
+          rw [Set.ext_iff] at hF
+          have h_memF := (hF C).mp hC
+          exact False.elim h_memF
+        · have h_false : C ∈ F := hC
+          rw [Set.ext_iff] at hG
+          have h_memG := (hG D).mp hD
+          exact False.elim h_memG
+        · exact ⟨C, hC, D, hD, rfl⟩
+      rw [Set.inter_assoc]
+      exact h hCDinFuG
     · intro h B hBinFuG
+      by_cases hF : F.sets = ∅
+      change B ∈ famJoin F G at hBinFuG
+      unfold _root_.famJoin at hBinFuG
+      split_ifs at hBinFuG with hF hG
+      · -- If F is empty, B ∈ ∅ is a contradiction
+        rw [Set.ext_iff] at hF
+        have h_memF := (hF B).mp sorry
+        exact False.elim h_memF
+      -- assuming F ⋎ G reduces to ∅ here, hBinFuG is False/Empty
+        --exact False.elim hBinFuG
+      · -- If G is empty, B ∈ ∅ is a contradiction
+        rw [Set.ext_iff] at hG
+        have h_memG := (hG B).mp sorry
+        exact False.elim h_memG
+      · -- Main case: B = C ∩ D for some C ∈ F, D ∈ G
+        rcases hBinFuG with ⟨C, hC, D, hD, rfl⟩
+        have h_goal := h C hC D hD
+        rw [←Set.inter_assoc]
+        exact h_goal
+      exact sorry
+  have equiv34 : CDinter ↔ CinterAinGdual := by
+    simp_all only [CDinter, CinterAinGdual]
+    apply Iff.intro
+    · intro h C hC
+      rw [mem_dual_alt]
+      intro hG
       sorry
-  have equiv34 : CDinter ↔ CinterAinGdual := by sorry
+
+    · intro h C hC D hD
+      have h_goal := h C hC
+      specialize h_goal D hD
+      rw [Set.inter_assoc] at h_goal
+      sorry
   have equiv24 : BinFuG ↔ CinterAinGdual := by exact Iff.trans equiv23 equiv34
   have equiv45 : CinterAinGdual ↔ goalR := by sorry
   have equiv25 : BinFuG ↔ goalR := by exact Iff.trans equiv24 equiv45
@@ -260,6 +306,7 @@ theorem thm_familyJoinIsAssociative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((
     ext A
     constructor
     · intro h
+      change A ∈ F ⋎ (G ⋎ H) at h
       sorry
     · intro h
       sorry
