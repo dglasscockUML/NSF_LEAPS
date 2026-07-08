@@ -746,9 +746,146 @@ theorem quotientOfCompactT2ByClosedIsT2
 {I : Set (X × X)} (hIClosed : IsClosed I)
 (hIEquiv : Equivalence (setToRelation I)) :
 T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) := by
+let f := Quotient.mk ⟨setToRelation I, hIEquiv⟩
+have hfSurjective : Function.Surjective f := by
+    exact Quot.mk_surjective
+have hfCont : Continuous f := by
+  exact continuous_quot_mk
+have hfClosed : IsClosedMap f := by
+  unfold IsClosedMap
+  intro K hK
+  have hKCompact : IsCompact K := by
+    apply IsClosed.isCompact
+    exact hK
+  have hfKCompact : IsCompact (f '' K) := by
+    apply IsCompact.image
+    · exact hKCompact
+    · exact hfCont
+  sorry
 apply (t2Space_iff (Quotient ⟨setToRelation I, hIEquiv⟩)).mpr
-intro x y hxy
-sorry
+intro z w hzw
+let Ez := f ⁻¹' {z}
+let Ew := f ⁻¹' {w}
+have hEzClosed : IsClosed Ez := by
+  specialize hfSurjective z
+  rcases hfSurjective with ⟨a, ha⟩
+  have hEzReDef : Ez = {x : X | (x, a) ∈ I} := by
+    simp only [Ez]
+    rw [<- ha]
+    simp only [f]
+    ext x
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
+    apply Equivalence.quot_mk_eq_iff hIEquiv
+  let g : X → X × X := fun x ↦ (x, a)
+  have hEzReDef2 : Ez = g ⁻¹' I := by
+    simp only [g]
+    rw [hEzReDef]
+    rfl
+  have hgCont : Continuous g := by
+    continuity
+  rw [hEzReDef2]
+  apply IsClosed.preimage
+  · exact hgCont
+  · exact hIClosed
+have hEwClosed : IsClosed Ew := by
+  specialize hfSurjective w
+  rcases hfSurjective with ⟨a, ha⟩
+  have hEwReDef : Ew = {x : X | (x, a) ∈ I} := by
+    simp only [Ew]
+    rw [<- ha]
+    simp only [f]
+    ext x
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
+    apply Equivalence.quot_mk_eq_iff hIEquiv
+  let g : X → X × X := fun x ↦ (x, a)
+  have hEwReDef2 : Ew = g ⁻¹' I := by
+    simp only [g]
+    rw [hEwReDef]
+    rfl
+  have hgCont : Continuous g := by
+    continuity
+  rw [hEwReDef2]
+  apply IsClosed.preimage
+  · exact hgCont
+  · exact hIClosed
+have hEzwDisjoint : Disjoint Ez Ew := by
+  simp only [Ez, Ew]
+  apply Set.disjoint_left.mpr
+  intro a ha
+  simp only [Set.mem_preimage, Set.mem_singleton_iff] at ha
+  simp only [Set.mem_preimage, Set.mem_singleton_iff]
+  rw [ha]
+  exact hzw
+letI hXNormal : NormalSpace X := by infer_instance
+have hEzwSeparated : SeparatedNhds Ez Ew := by
+  exact normal_separation hEzClosed hEwClosed hEzwDisjoint
+rcases hEzwSeparated with ⟨U, V, hU1, hV1, hU2, hV2, hUV⟩
+let u := (f '' Uᶜ)ᶜ
+let v := (f '' Vᶜ)ᶜ
+use u
+use v
+constructor
+· simp only [isOpen_compl_iff, u]
+  unfold IsClosedMap at hfClosed
+  specialize hfClosed Uᶜ
+  have hUcClosed : IsClosed Uᶜ := by
+    simp only [isClosed_compl_iff]
+    exact hU1
+  apply hfClosed hUcClosed
+constructor
+· simp only [isOpen_compl_iff, v]
+  unfold IsClosedMap at hfClosed
+  specialize hfClosed Vᶜ
+  have hVcClosed : IsClosed Vᶜ := by
+    simp only [isClosed_compl_iff]
+    exact hV1
+  apply hfClosed hVcClosed
+constructor
+· simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and, u]
+  intro x hx
+  have hxEz : x ∉ Ez := by
+    by_contra
+    have hxU : x ∈ U := by
+      apply hU2
+      exact this
+    exact hx hxU
+  unfold Ez at hxEz
+  simp only [Set.mem_preimage, Set.mem_singleton_iff] at hxEz
+  exact hxEz
+constructor
+· simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and, v]
+  intro x hx
+  have hxEw : x ∉ Ew := by
+    by_contra
+    have hxV : x ∈ V := by
+      apply hV2
+      exact this
+    exact hx hxV
+  unfold Ew at hxEw
+  simp only [Set.mem_preimage, Set.mem_singleton_iff] at hxEw
+  · exact hxEw
+· simp only [u, v]
+  by_contra
+  have hNotDisjoint : ∃ y, y ∈ (f '' Uᶜ)ᶜ ∧ y ∈ (f '' Vᶜ)ᶜ := by
+    apply Set.not_disjoint_iff.mp
+    exact this
+  rcases hNotDisjoint with ⟨y, hy1, hy2⟩
+  simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and] at hy1
+  simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and] at hy2
+  specialize hfSurjective y
+  rcases hfSurjective with ⟨a, ha⟩
+  have haU : a ∈ U := by
+    by_contra
+    specialize hy1 a this
+    exact hy1 ha
+  have haV : a ∈ V := by
+    by_contra
+    specialize hy2 a this
+    exact hy2 ha
+  have hUVNotDisjoint : ¬ Disjoint U V := by
+    apply Set.not_disjoint_iff.mpr
+    use a
+  exact hUVNotDisjoint hUV
 
 /- instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {I : Set (X × X)} {hIClosed : IsClosed I}
