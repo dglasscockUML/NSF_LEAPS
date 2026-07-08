@@ -959,20 +959,55 @@ def quotientDynamicalSystem
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 (dSystem : DynamicalSystem S X)
 {I : Set (X × X)} (hI : isICER dSystem I) :
-have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+let Y := Quotient ⟨setToRelation I, hI.2.2⟩
+have : Nonempty Y :=
   nonemptyQuotient X hI.2.2
-have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+have : T2Space Y :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
 DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) := by
-have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+let Y := Quotient ⟨setToRelation I, hI.2.2⟩
+have : Nonempty Y :=
   nonemptyQuotient X hI.2.2
-have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+have : T2Space Y :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+unfold isICER at hI
+rcases hI with ⟨hIInvariant, hIClosed, hIEquiv⟩
+let π := Quotient.mk ⟨setToRelation I, hIEquiv⟩
+let f : S → X → Y := fun s ↦ π ∘ (dSystem.map s)
+have hRespect : ∀ s : S, ∀ x y : X, (setToRelation I) x y → (f s) x = (f s) y := by
+  intro s x y hxy
+  simp only [Function.comp_apply, f]
+  apply (Equivalence.quot_mk_eq_iff hIEquiv (dSystem.map s x) (dSystem.map s y)).mpr
+  unfold setToRelation
+  unfold setToRelation at hxy
+  unfold isInvariantSet at hIInvariant
+  specialize hIInvariant s
+  unfold Set.MapsTo at hIInvariant
+  specialize hIInvariant hxy
+  exact hIInvariant
 exact
 {
-  map := by sorry --fun Quotient.mk ⟨setToRelation I, hI.2.2⟩ a
-  mapMult := by sorry
-  mapCont := by sorry
+  map := fun s ↦ Quotient.lift (f s) (hRespect s)
+  mapMult := by
+    intro s1 s2 y
+    simp only [f]
+    refine Quotient.inductionOn y ?_
+    intro x
+    simp only [Quotient.lift]
+    have hs12 : dSystem.map (s1 * s2) = (dSystem.map s1) ∘ (dSystem.map s2) := by
+      ext t
+      exact (dSystem.mapMult s1 s2 t)
+    simp [hs12]
+    rfl
+  mapCont := by
+    intro s
+    apply Continuous.quotient_lift
+    simp only [f]
+    have hπCont : Continuous π := by
+      exact continuous_quot_mk
+    have hsCont : Continuous (dSystem.map s) := by
+      exact (dSystem.mapCont s)
+    exact Continuous.comp hπCont hsCont
 }
 
 -- (hT2 := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2)
@@ -980,7 +1015,8 @@ exact
 
 -- The follow code is part of the debugging effort around quotientMapIsEquivariant
 /- variable {S : Type*} [Semigroup S] [Nonempty S]
-variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X]
+[hNonempty : Nonempty X]
 variable (dSystem : DynamicalSystem S X)
 variable {I : Set (X × X)} (hI : isICER dSystem I)
 
