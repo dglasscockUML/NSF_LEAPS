@@ -1052,11 +1052,12 @@ have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
 isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
   (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+rcases hI with ⟨hIInvariant, hIClosed, hIEquiv⟩
 constructor
 · apply continuous_quotient_mk'
 constructor
 · intro b
-  have h1 : ∃ a : X, Quotient.mk ⟨setToRelation I, hI.2.2⟩ a = b := by
+  have h1 : ∃ a : X, Quotient.mk ⟨setToRelation I, hIEquiv⟩ a = b := by
     apply Quotient.exists_rep
   obtain ⟨a, ha⟩ := h1
   use a
@@ -1064,6 +1065,7 @@ intro s
 ext x
 simp
 sorry
+
 
 /-- Given a continuous, equivariant map `π : X → Y` between two systems and
 a nonempty, compact, T2, `S`-invariant set `A ⊆ X`, the image `πA` is nonempty,
