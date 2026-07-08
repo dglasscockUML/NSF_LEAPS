@@ -754,14 +754,61 @@ have hfCont : Continuous f := by
 have hfClosed : IsClosedMap f := by
   unfold IsClosedMap
   intro K hK
-  have hKCompact : IsCompact K := by
+  have hPreImageRe : f ⁻¹' (f '' K) = Prod.fst '' ((Set.univ ×ˢ K) ∩ I) := by
+    ext x
+    constructor
+    · intro hx
+      simp only [Set.mem_preimage, Set.mem_image] at hx
+      rcases hx with ⟨k, hk1, hk2⟩
+      have hkx : (setToRelation I) k x := by
+        apply (Equivalence.quot_mk_eq_iff hIEquiv k x).mp
+        exact hk2
+      have hxk : (setToRelation I) x k := by
+        apply Equivalence.symmetric
+        · exact hIEquiv
+        · exact hkx
+      have hxkRe : (x, k) ∈ I := by
+        unfold setToRelation at hxk
+        exact hxk
+      simp only [Set.mem_image, Set.mem_inter_iff, Set.mem_prod, Set.mem_univ, true_and,
+        Prod.exists, exists_and_right, exists_eq_right]
+      use k
+    · intro hx
+      simp only [Set.mem_image, Set.mem_inter_iff, Set.mem_prod, Set.mem_univ, true_and,
+        Prod.exists, exists_and_right, exists_eq_right] at hx
+      rcases hx with ⟨k, hk1, hk2⟩
+      simp only [Set.mem_preimage, Set.mem_image]
+      use k
+      constructor
+      · exact hk1
+      · simp only [f]
+        apply (Equivalence.quot_mk_eq_iff hIEquiv k x).mpr
+        apply Equivalence.symmetric
+        · exact hIEquiv
+        · unfold setToRelation
+          exact hk2
+  have hXKClosed : IsClosed ((Set.univ : Set X) ×ˢ K) := by
+    exact IsClosed.prod isClosed_univ hK
+  have hXKIClosed : IsClosed ((Set.univ ×ˢ K) ∩ I) := by
+    apply IsClosed.inter
+    · exact hXKClosed
+    · exact hIClosed
+  have hXKICompact : IsCompact ((Set.univ ×ˢ K) ∩ I) := by
     apply IsClosed.isCompact
-    exact hK
-  have hfKCompact : IsCompact (f '' K) := by
+    exact hXKIClosed
+  have ffKCompact : IsCompact (f ⁻¹' (f '' K)) := by
+    rw [hPreImageRe]
     apply IsCompact.image
-    · exact hKCompact
-    · exact hfCont
-  sorry
+    · exact hXKICompact
+    · continuity
+  have hPreImageClosed : IsClosed (f ⁻¹' (f '' K)) := by
+    apply IsCompact.isClosed
+    exact ffKCompact
+  have hfQuotientMap : Topology.IsQuotientMap f := by
+    simp only [f]
+    exact isQuotientMap_quot_mk
+  apply (Topology.IsQuotientMap.isClosed_preimage hfQuotientMap).mp
+  exact hPreImageClosed
 apply (t2Space_iff (Quotient ⟨setToRelation I, hIEquiv⟩)).mpr
 intro z w hzw
 let Ez := f ⁻¹' {z}
@@ -798,12 +845,12 @@ have hEwClosed : IsClosed Ew := by
     simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
     apply Equivalence.quot_mk_eq_iff hIEquiv
   let g : X → X × X := fun x ↦ (x, a)
+  have hgCont : Continuous g := by
+    continuity
   have hEwReDef2 : Ew = g ⁻¹' I := by
     simp only [g]
     rw [hEwReDef]
     rfl
-  have hgCont : Continuous g := by
-    continuity
   rw [hEwReDef2]
   apply IsClosed.preimage
   · exact hgCont
