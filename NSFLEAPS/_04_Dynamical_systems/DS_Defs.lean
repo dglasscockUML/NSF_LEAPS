@@ -271,7 +271,6 @@ rw [h1]
 apply closureOfInvIsInv
 apply h2
 
-
 /-- The `S`-orbit closure of a point `x` is a sub dynamical system of `DynamicalSystem S X` -/
 theorem orbitClosureIsNonemptyCompactT2InvariantSubset
 (dSystem : DynamicalSystem S X) (x : X) :
@@ -285,7 +284,6 @@ by
   · exact IsClosed.isCompact (isClosed_closure)
   · infer_instance
   · exact orbClosIsInv
-
 
 /-- If `y` is in the orbit closure of `x`, then `(y,y)` is in
 the orbit closure of `(x,x)` under the diagonal action -/
@@ -1272,8 +1270,121 @@ Prop :=
 /-- Every system contains a minimal subset -/
 theorem existsMinimalSubset
 (dSystem : DynamicalSystem S X) :
-∃ Y : Set X, isMinimalSubset dSystem Y :=
-by sorry
+∃ Y : Set X, isMinimalSubset dSystem Y := by
+let C := {Z : Set X | isNonemptyCompactT2InvariantSubset dSystem Z}
+have hChain : ∀ c ⊆ C, IsChain (· ⊆ ·) c → c.Nonempty → ∃ lb ∈ C, ∀ t ∈ c, lb ⊆ t := by
+  intro c hc1 hc2 hc3
+  let lb := c.sInter
+  use lb
+  constructor
+  · simp only [Set.mem_setOf_eq, C]
+    constructor
+    · have hcDir : DirectedOn (· ⊇ ·) c := by
+        unfold DirectedOn
+        intro x hx y hy
+        simp only
+        unfold IsChain at hc2
+        simp only at hc2
+        specialize hc2 hx hy
+        by_cases hxEqy : x = y
+        · use x
+          constructor
+          · exact hx
+          constructor
+          · simp
+          · rw [hxEqy]
+        · have hxy1 : x ⊆ y ∨ y ⊆ x := by
+            apply hc2 hxEqy
+          rcases hxy1 with hP | hQ
+          · use x
+          · use y
+      have hCNonempty : Nonempty c := by
+        simp only [nonempty_subtype]
+        rcases hc3 with ⟨a, ha⟩
+        use a
+      apply IsCompact.nonempty_sInter_of_directed_nonempty_isCompact_isClosed
+      · exact hcDir
+      · intro U hU
+        have hUC : U ∈ C := by
+          apply hc1
+          exact hU
+        simp only [Set.mem_setOf_eq, C] at hUC
+        rcases hUC with ⟨hUC1, hUC2⟩
+        exact hUC1
+      · intro U hU
+        have hUC : U ∈ C := by
+          apply hc1
+          exact hU
+        simp only [Set.mem_setOf_eq, C] at hUC
+        rcases hUC with ⟨hUC1, hUC2, hUC3⟩
+        exact hUC2
+      · intro U hU
+        have hUC : U ∈ C := by
+          apply hc1
+          exact hU
+        simp only [Set.mem_setOf_eq, C] at hUC
+        rcases hUC with ⟨hUC1, hUC2, hUC3⟩
+        apply IsCompact.isClosed
+        exact hUC2
+    constructor
+    · have htClosed : ∀ t ∈ C, IsClosed t := by
+        intro t ht
+        apply IsCompact.isClosed
+        simp only [Set.mem_setOf_eq, C] at ht
+        rcases ht with ⟨ht1, ht2, ht3⟩
+        exact ht2
+      have hlbClosed : IsClosed lb := by
+        simp only [lb]
+        apply isClosed_sInter
+        intro t ht
+        have htC : t ∈ C := by
+          apply hc1 ht
+        specialize htClosed t
+        apply htClosed htC
+      apply IsClosed.isCompact
+      exact hlbClosed
+    constructor
+    · infer_instance
+    · apply intersectionOfInvIsInv
+      intro t ht
+      have htC : t ∈ C := by
+        apply hc1 ht
+      simp only [Set.mem_setOf_eq, C] at htC
+      rcases htC with ⟨ht1, ht2, ht3, ht4⟩
+      exact ht4
+  · intro t ht
+    simp only [lb]
+    exact Set.sInter_subset_of_mem ht
+have hXinS : Set.univ ∈ C := by
+  simp only [Set.mem_setOf_eq, C]
+  unfold isNonemptyCompactT2InvariantSubset
+  constructor
+  · simp
+  constructor
+  · exact isCompact_univ
+  constructor
+  · infer_instance
+  · unfold isInvariantSet
+    intro s
+    simp
+have hExistMin : ∃ m, m ⊆ Set.univ ∧ Minimal (· ∈ C) m := by
+  apply zorn_superset_nonempty
+  · exact hChain
+  · exact hXinS
+rcases hExistMin with ⟨Y, hY1, hY2⟩
+use Y
+unfold isMinimalSubset
+constructor
+· rcases hY2 with ⟨hY2a, hY2b⟩
+  simp only [Set.mem_setOf_eq, C] at hY2a
+  exact hY2a
+· intro Z hZ1 hZ2
+  unfold Minimal at hY2
+  rcases hY2 with ⟨hY2a, hY2b⟩
+  specialize hY2b hZ2
+  have hYZ : Y ⊆ Z := by
+    apply hY2b hZ1
+  exact subset_antisymm hYZ hZ1
 
 /- Depracated in favor of minimalSubsetIffMinimalSubsystem
 /-- A minimal set, when made into a system, is a minimal system -/
