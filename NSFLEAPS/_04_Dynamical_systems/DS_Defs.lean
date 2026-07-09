@@ -1061,11 +1061,10 @@ constructor
     apply Quotient.exists_rep
   obtain ⟨a, ha⟩ := h1
   use a
-intro s
-ext x
-simp
-sorry
-
+· intro s
+  ext x
+  simp
+  rfl
 
 /-- Given a continuous, equivariant map `π : X → Y` between two systems and
 a nonempty, compact, T2, `S`-invariant set `A ⊆ X`, the image `πA` is nonempty,
