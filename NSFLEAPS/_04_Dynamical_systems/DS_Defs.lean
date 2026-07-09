@@ -3586,8 +3586,25 @@ theorem commMinRPIsInImageOfRP
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
-RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) :=
-by sorry
+RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) := by
+have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ := by
+  intro z hz
+  let F := (Prod.map π π) ⁻¹' {z}
+  have hf : ∀ f ∈ F, f ∉ RP dSystemX := by
+    intro f hf
+    by_contra
+    have hf1 : (Prod.map π π) f ∈ (Prod.map π π) '' RP dSystemX := by
+      simp only [Set.mem_image, Prod.exists, Prod.map_apply]
+      use f.1
+      use f.2
+      constructor
+      · exact this
+      · rfl
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, F] at hf
+    rw [<- hf] at hz
+    exact hz hf1
+  sorry
+exact Set.compl_subset_compl.mp hComplement
 
 end Regional_proximality
 
