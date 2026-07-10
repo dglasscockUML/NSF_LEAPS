@@ -8,15 +8,14 @@ right multiplication by `s`, as a function from `S → S`, is continuous -/
 class RightTopological (S : Type*) [Semigroup S] [TopologicalSpace S] where
   rightCont : ∀ (s : S), Continuous (· * s)
 
-variable {S : Type*} [Nonempty S] [Semigroup S] [TopologicalSpace S]
+variable {S : Type*} [Semigroup S] [TopologicalSpace S]
   [CompactSpace S] [T2Space S] [hRT : RightTopological S]
 
 /-- Compact, Hausdorff, right-topological semigroups contain an idempotent element -/
-theorem compactT2RTSemigroupContainsIdempotent :
+theorem compactT2RTSemigroupContainsIdempotent [Nonempty S] :
 ∃ (s : S), s * s = s :=
 exists_idempotent_of_compact_t2_of_continuous_mul_left hRT.rightCont
 
-omit [Nonempty S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, principal left ideals,
 that is, sets of the form `Ss`, are closed -/
 theorem principalLeftIdealClosed
@@ -29,7 +28,6 @@ have hCompact : IsCompact ((· * s) '' Set.univ) := by
 apply IsCompact.isClosed
 exact hCompact
 
-omit [Nonempty S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every left ideal
 contains a closed left ideal -/
 theorem leftIdealContainsClosedLeftIdeal
@@ -67,7 +65,6 @@ constructor
   simp only [Set.mem_image]
   use s
 
-omit [Nonempty S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every minimal left
 ideal is compact -/
 theorem minimalLeftIdealCompact
@@ -89,11 +86,121 @@ exact hLClosed
 contains a minimal left ideal -/
 theorem leftIdealContainsMinLeftIdeal
 (L : Set S) {hL : isLeftIdeal L} :
-∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L :=
-by sorry
+∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L := by
+have LContain : ∃ LC : Set S, isLeftIdeal LC ∧ IsClosed LC ∧ LC ⊆ L := by
+  apply leftIdealContainsClosedLeftIdeal
+  exact hL
+rcases LContain with ⟨LC, hLC1, hLC2, hLC3⟩
+let C := {I : Set S | IsClosed I ∧ isLeftIdeal I ∧ I ⊆ LC}
+have hChain : ∀ c ⊆ C, IsChain (· ⊆ ·) c → c.Nonempty → ∃ lb ∈ C, ∀ t ∈ c, lb ⊆ t := by
+  intro c hc1 hc2 hc3
+  let lb := c.sInter
+  use lb
+  constructor
+  · simp only [Set.mem_setOf_eq, C]
+    constructor
+    · apply isClosed_sInter
+      intro t ht
+      have htInC : t ∈ C := by
+        apply hc1 ht
+      simp only [Set.mem_setOf_eq, C] at htInC
+      rcases htInC with ⟨ht1, ht2, ht3⟩
+      exact ht1
+    constructor
+    · apply nonemptyInterOfLeftIdealsIsLeftIdeal
+      · intro t ht
+        have htInC : t ∈ C := by
+          apply hc1 ht
+        simp only [Set.mem_setOf_eq, C] at htInC
+        rcases htInC with ⟨ht1, ht2, ht3⟩
+        exact ht2
+      have hcNonempty : Nonempty c := by
+        simpa
+      apply IsCompact.nonempty_sInter_of_directed_nonempty_isCompact_isClosed
+      · simp only [DirectedOn]
+        intro x hx y hy
+        simp only [IsChain] at hc2
+        specialize hc2 hx hy
+        by_cases hxEqy : x = y
+        · use x
+          constructor
+          · exact hx
+          constructor
+          · simp
+          · rw [hxEqy]
+        · specialize hc2 hxEqy
+          rcases hc2 with hP | hQ
+          · use x
+          · use y
+      · intro t ht
+        have htInC : t ∈ C := by
+          apply hc1 ht
+        simp only [Set.mem_setOf_eq, C] at htInC
+        rcases htInC with ⟨ht1, ht2, ht3⟩
+        rcases ht2 with ⟨ht2a, ht2b⟩
+        exact ht2a
+      · intro t ht
+        have htInC : t ∈ C := by
+          apply hc1 ht
+        simp only [Set.mem_setOf_eq, C] at htInC
+        rcases htInC with ⟨ht1, ht2, ht3⟩
+        apply IsClosed.isCompact ht1
+      · intro t ht
+        have htInC : t ∈ C := by
+          apply hc1 ht
+        simp only [Set.mem_setOf_eq, C] at htInC
+        rcases htInC with ⟨ht1, ht2, ht3⟩
+        exact ht1
+    simp only [lb]
+    rcases hc3 with ⟨t, ht⟩
+    have htInC : t ∈ C := by
+      apply hc1 ht
+    simp only [Set.mem_setOf_eq, C] at htInC
+    rcases htInC with ⟨ht1, ht2, ht3⟩
+    have htInt : c.sInter ⊆ t := by
+      apply Set.sInter_subset_of_mem ht
+    exact htInt.trans ht3
+  · intro t ht
+    simp only [lb]
+    apply Set.sInter_subset_of_mem ht
+have hLCinC : LC ∈ C := by
+  simp only [Set.mem_setOf_eq, subset_refl, and_true, C]
+  constructor
+  · exact hLC2
+  · exact hLC1
+have hExistMin : ∃ M, M ⊆ LC ∧ Minimal (· ∈ C) M := by
+  apply zorn_superset_nonempty
+  · exact hChain
+  · exact hLCinC
+rcases hExistMin with ⟨M, hM1, hM2⟩
+use M
+unfold Minimal at hM2
+rcases hM2 with ⟨hM2a, hM2b⟩
+constructor
+· constructor
+  · simp only [Set.mem_setOf_eq, C] at hM2a
+    rcases hM2a with ⟨hMClosed, hMLeftIdeal, hMjunk⟩
+    exact hMLeftIdeal
+  · intro I hI1 hI2
+    have hIContain : ∃ J : Set S, isLeftIdeal J ∧ IsClosed J ∧ J ⊆ I := by
+      apply leftIdealContainsClosedLeftIdeal
+      exact hI1
+    rcases hIContain with ⟨J, hJ1, hJ2, hJ3⟩
+    have hJinC : J ∈ C := by
+      simp only [Set.mem_setOf_eq, C]
+      constructor
+      · exact hJ2
+      constructor
+      · exact hJ1
+      · exact (hJ3.trans hI2).trans hM1
+    specialize hM2b hJinC (hJ3.trans hI2)
+    have hMinI : M ⊆ I := by
+      exact hM2b.trans hJ3
+    apply subset_antisymm hI2 hMinI
+· exact hM1.trans hLC3
 
 /-- Compact, right-topological semigroups contain minimal left ideals -/
-theorem rightTopSemigroupContainsMinLeftIdeal :
+theorem rightTopSemigroupContainsMinLeftIdeal [Nonempty S] :
 ∃ (L : Set S), isMinLeftIdeal L := by
 have hSleftIdeal : isLeftIdeal (Set.univ : Set S) := by
   unfold isLeftIdeal
@@ -106,7 +213,7 @@ have hExistLeftIdeal : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ Set.univ := b
 rcases hExistLeftIdeal with ⟨L, hL1, hL2⟩
 use L
 
-omit [Nonempty S] [CompactSpace S] in
+omit [CompactSpace S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, a compact
 subsemigroup contains and idempotent element -/
 theorem compactSubsemigroupContainsIdempotent
@@ -176,7 +283,7 @@ section Ultrafilters_as_a_semigroup
 -- Was S_left_mult
 /-- `leftMult s : S → S` is left multiplication by `s` -/
 def leftMult
-{S: Type*} [Semigroup S] (s : S) :
+{S : Type*} [Semigroup S] (s : S) :
 S → S :=
   (s * ·)
 
