@@ -34,8 +34,38 @@ exact hCompact
 contains a closed left ideal -/
 theorem leftIdealContainsClosedLeftIdeal
 (L : Set S) {hL : isLeftIdeal L} :
-∃ (M : Set S), isLeftIdeal M ∧ IsClosed M ∧ M ⊆ L :=
-by sorry
+∃ (M : Set S), isLeftIdeal M ∧ IsClosed M ∧ M ⊆ L := by
+rcases hL with ⟨hL1, hL2⟩
+rcases hL1 with ⟨s, hs⟩
+let M := (· * s) '' Set.univ
+use M
+constructor
+· unfold isLeftIdeal
+  constructor
+  · have hMNonempty : s * s ∈ M := by
+      simp [M]
+    exact ⟨s * s, hMNonempty⟩
+  · intro r t ht
+    simp only [Set.mem_image] at ht
+    rcases ht with ⟨m, hm1, hm2⟩
+    rw [<- hm2]
+    rcases hm1 with ⟨n, hn1, hn2⟩
+    simp only at hn2
+    rw [<- hn2]
+    have hEq : (r * n) * s = r * (n * s):= by
+      apply Semigroup.mul_assoc
+    rw [<- hEq]
+    simp [M]
+constructor
+· apply principalLeftIdealClosed
+· intro x hx
+  simp only [Set.image_univ, Set.mem_range, M] at hx
+  rcases hx with ⟨y, hy⟩
+  rw [<- hy]
+  specialize hL2 y
+  apply hL2
+  simp only [Set.mem_image]
+  use s
 
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every minimal left
 ideal is compact -/
