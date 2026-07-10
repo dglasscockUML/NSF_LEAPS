@@ -16,8 +16,7 @@ theorem compactT2RTSemigroupContainsIdempotent :
 ∃ (s : S), s * s = s :=
 exists_idempotent_of_compact_t2_of_continuous_mul_left hRT.rightCont
 
-omit [Nonempty S]
-
+omit [Nonempty S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, principal left ideals,
 that is, sets of the form `Ss`, are closed -/
 theorem principalLeftIdealClosed
@@ -30,6 +29,7 @@ have hCompact : IsCompact ((· * s) '' Set.univ) := by
 apply IsCompact.isClosed
 exact hCompact
 
+omit [Nonempty S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every left ideal
 contains a closed left ideal -/
 theorem leftIdealContainsClosedLeftIdeal
@@ -67,6 +67,7 @@ constructor
   simp only [Set.mem_image]
   use s
 
+omit [Nonempty S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every minimal left
 ideal is compact -/
 theorem minimalLeftIdealCompact
@@ -93,8 +94,17 @@ by sorry
 
 /-- Compact, right-topological semigroups contain minimal left ideals -/
 theorem rightTopSemigroupContainsMinLeftIdeal :
-∃ (L : Set S), isMinLeftIdeal L :=
-by sorry -- Just apply leftIdealContainsMinLeftIdeal with left ideal S
+∃ (L : Set S), isMinLeftIdeal L := by
+have hSleftIdeal : isLeftIdeal (Set.univ : Set S) := by
+  unfold isLeftIdeal
+  constructor
+  · simp
+  · simp
+have hExistLeftIdeal : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ Set.univ := by
+  apply leftIdealContainsMinLeftIdeal
+  exact hSleftIdeal
+rcases hExistLeftIdeal with ⟨L, hL1, hL2⟩
+use L
 
 omit [Nonempty S] [CompactSpace S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, a compact
