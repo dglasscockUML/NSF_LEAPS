@@ -71,8 +71,18 @@ constructor
 ideal is compact -/
 theorem minimalLeftIdealCompact
 {L : Set S} (hL : isMinLeftIdeal L) :
-IsCompact L :=
-by sorry
+IsCompact L := by
+rcases hL with ⟨hL1, hL2⟩
+have hM : ∃ (M : Set S), isLeftIdeal M ∧ IsClosed M ∧ M ⊆ L := by
+  apply leftIdealContainsClosedLeftIdeal
+  exact hL1
+rcases hM with ⟨M, hM1, hM2, hM3⟩
+specialize hL2 M hM1 hM3
+have hLClosed : IsClosed L := by
+  rw [<- hL2]
+  exact hM2
+apply IsClosed.isCompact
+exact hLClosed
 
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every left ideal
 contains a minimal left ideal -/
