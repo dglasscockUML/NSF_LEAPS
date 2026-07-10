@@ -119,8 +119,36 @@ exists_idempotent_in_compact_subsemigroup hRT.rightCont T hTnonempty hTcompact h
 an idempotent element -/
 theorem leftIdealContainsIdempotent
 (L : Set S) {hL : isLeftIdeal L} :
-∃ s ∈ L, s * s = s :=
-by sorry
+∃ s ∈ L, s * s = s := by
+have hContain : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L := by
+  apply leftIdealContainsMinLeftIdeal
+  exact hL
+rcases hContain with ⟨M, hM1, hM2⟩
+have hMsemi : isSubsemigroup M := by
+  unfold isSubsemigroup
+  intro s hs t ht
+  rcases hM1 with ⟨hM1a, hM1b⟩
+  rcases hM1a with ⟨hM1a1, hM1a2⟩
+  specialize hM1a2 s
+  apply hM1a2
+  simp only [Set.mem_image]
+  use t
+have hMcompact : IsCompact M := by
+  apply minimalLeftIdealCompact
+  exact hM1
+rcases hM1 with ⟨hM1a, hM1b⟩
+rcases hM1a with ⟨hM1a1, hM1a2⟩
+have hMcontainIdem : ∃ s ∈ M, s * s = s := by
+  apply compactSubsemigroupContainsIdempotent
+  · exact hMsemi
+  · exact hMcompact
+  · exact hM1a1
+rcases hMcontainIdem with ⟨s, hs1, hs2⟩
+use s
+constructor
+· apply hM2
+  exact hs1
+· exact hs2
 
 end Right_topological_semigroups
 
