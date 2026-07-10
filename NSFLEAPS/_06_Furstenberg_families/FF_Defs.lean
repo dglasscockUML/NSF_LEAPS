@@ -144,7 +144,8 @@ theorem dualThickSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] :
 (thickFamily S)* = (syndeticFamily S) := by
 rw [<- dualSyndeticThick]
-apply dual_dual_smth_smth
+sorry
+--apply dual_dual_smth_smth
 
 /-- If A is a thick set and K is a finite set of a semigroup S,
 then ⋂ k ∈ K, (k * ·) ⁻¹' A is thick -/

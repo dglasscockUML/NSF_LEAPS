@@ -16,12 +16,19 @@ theorem compactT2RTSemigroupContainsIdempotent :
 ∃ (s : S), s * s = s :=
 exists_idempotent_of_compact_t2_of_continuous_mul_left hRT.rightCont
 
+omit [Nonempty S]
+
 /-- In a compact, Hausdorff, right-topological semigroup `S`, principal left ideals,
 that is, sets of the form `Ss`, are closed -/
 theorem principalLeftIdealClosed
 (s : S) :
-IsClosed ((· * s) '' Set.univ) :=
-by sorry
+IsClosed ((· * s) '' Set.univ) := by
+have hCompact : IsCompact ((· * s) '' Set.univ) := by
+  apply IsCompact.image
+  · exact isCompact_univ
+  · apply hRT.rightCont
+apply IsCompact.isClosed
+exact hCompact
 
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every left ideal
 contains a closed left ideal -/
