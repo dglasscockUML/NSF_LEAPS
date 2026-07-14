@@ -128,6 +128,15 @@ We can make our definitions in the appropriate generality by making them for uni
     as was to be shown.
 \end{proof}
 
+\begin{lemma}
+    \label{lemma_open_nbhd_of_fiber_contains_open_preimage}
+    Let $\pi: X \to Y$ be a surjection of compact Hausdorff spaces.  For all $y \in Y$ and open $W \subseteq X$ such that $\pi^{-1} y \subseteq W$, there exists open $U \subseteq Y$ with $y \in U$ such that $\pi^{-1} U \subseteq W$.
+\end{lemma}
+
+\begin{proof}
+    By compactness and the fact that $\pi$ is a surjection, $\pi (X \setminus W)$ is closed and does not contain $y$.  Set $U = Y \setminus \pi(X \setminus W)$, and check that $y \in U$ and $\pi^{-1} U \subseteq W$.
+\end{proof}
+
 \section{Semigroups}
 \label{sec_semigroups}
 
@@ -587,6 +596,7 @@ In the following list, each statement is equivalent to the one that follows it.
 
 \begin{theorem}[Dual is antitone]
     \label{thm_dual_is_antitone}
+    \leanok{}
     \lean{dualIsAntitone}
     For all collections $\family, \familytwo \in \collections{S}$, if $\family \subseteq \familytwo$, then $\familytwo^* \subseteq \family^*$.
 \end{theorem}
@@ -676,6 +686,7 @@ In the following list, each statement is equivalent to the one that follows it.
 
 \begin{theorem}[Set DeMorgan 1]
     \label{thm_de_morgan_union_v1}
+    \leanok{}
     \lean{familySetDeMorganLaw1}
     For all collections $\family$, $\familytwo$, $(\family \cup \familytwo)^* = \family^* \cap \familytwo^*$.
 \end{theorem}
@@ -709,6 +720,7 @@ Let $\family, \familytwo \in \collections{S}$. In the following list, each state
 
 \begin{theorem}[Set DeMorgan 2]
     \label{thm_de_morgan_union_v2}
+    \leanok{}
     \lean{familySetDeMorganLaw2}
     For all collections $\family$, $\familytwo$, $(\family \cap \familytwo)^* = \family^* \cup \familytwo^*$.
 \end{theorem}
@@ -1314,6 +1326,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{proof}
 \uses{lemma_image_closure_equals_closure_image}
+\leanok{}
     Let $s \in S$.  We must show that $s \overline{A} \subseteq \overline{A}$.  Since $s A \subseteq A$, we have by \cref{lemma_image_closure_equals_closure_image} that $s \overline{A} = \overline{sA} \subseteq \overline{A}$.
 \end{proof}
 
@@ -1326,6 +1339,7 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 
 \begin{proof}
 \uses{lemma_closure_of_inv_is_inv}
+\leanok{}
     To see that $\overline{Sx}$ is $S$-invariant, it suffices by \cref{lemma_closure_of_inv_is_inv} to show that $Sx$ is $S$-invariant.  But this is immediate: $sSx = (sS)x \subseteq Sx$.
 \end{proof}
 
@@ -1359,7 +1373,6 @@ Notation: for $x \in X$, $U \subseteq X$, $g \in G$, and $H \subseteq G$, we wri
 \begin{definition}[Factor]
 \lean{isFactor}
     \leanok{}
-\anh{[My first Lean code. Please check]}
 Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together with a continuous surjection $X \to Y$ that intertwines the action of $G$.
 \end{definition}
 
@@ -1381,7 +1394,8 @@ Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together wi
 \end{lemma}
 
 \begin{proof}
-    Invariance and closedness are immediate.  The intersection of equivalence relations is an equivalence relation.
+\leanok{}
+    Invariance and closedness are immediate. The intersection of equivalence relations is an equivalence relation.
 \end{proof}
 
 \begin{theorem}[Quotient system]
@@ -1397,6 +1411,7 @@ Let $X$ be a $G$-system.  A \emph{factor of $X$} is a $G$-system $Y$ together wi
 \end{theorem}
 
 \begin{proof}
+\leanok{}
     \dgg{This is straightforward and hopefully most of it is quotable from mathlib.  If this theorem exists for ``flows'' in Mathlib, we can just adapt the proof for our tds.}
 \end{proof}
 
@@ -1436,6 +1451,7 @@ The following lemma describes the bijection between factors of a given system an
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Clearly, $\pi A$ is non-empty.  It is closed since $\pi$ is a closed map.  (By \verb|Continuous.isProperMap|, $f$ is proper. Therefore, by \verb|IsProperMap.isClosedMap|, $f$ is closed.)  To see $S$-invariance, let $s \in S$.  Then $s \pi A = \pi sA \subseteq \pi A$, as was to be shown.
 \end{proof}
 
@@ -1603,13 +1619,14 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{theorem}[Every system has a minimal subsystem]
 \label{thm_every_system_has_minimal_subsystem}
-\lean{existsMinimalSubsystem}
+\lean{existsMinimalSubset}
 \leanok{}
     Let $S$ be a semigroup and $X$ be an $S$-system.  There exists a non-empty, closed, $S$-invariant subset $Z \subseteq X$ (that is, an $S$-subsystem $Z$ of $X$) such that the $S$-system $Z$ is minimal.
 \end{theorem}
 
 \begin{proof}
 \uses{lemma_intersection_of_invariant}
+\leanok{}
     The subsystems of $X$ are ordered by containment.  Given any collection $Z_i$, $i \in I$, of $S$-subsystems of $X$, $\cap_i Z_i$ is closed, non-empty (by compactness), and $S$-invariant (by \cref{lemma_intersection_of_invariant}). Thus, $\cap_i Z_i$ is an $S$-subsystem of $X$.  This shows that every totally ordered subset of the set of subsystems of $X$ has a lower bound in $X$.  By Zorn's lemma, the set of subsystems has a minimal element.  This minimal element is a subsystem of $X$ that is minimal.
 \end{proof}
 
@@ -1687,17 +1704,19 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{proof}
 \uses{lemma_orb_closure_is_invariant}
+\leanok{}
     Note that $\overline{Sx}$ is an $S$-system by \cref{lemma_orb_closure_is_invariant}. For all $U \ni x$, $R(x,U)$ is syndetic, hence non-empty.  Therefore, $x \in \overline{Sx}$.
     
     Let $y \in \overline{Sx}$ and $U \subseteq \overline{Sx}$ be open and non-empty.  We must show that there exists $s \in S$ such that $sy \in U$.
 
     Let $V \subseteq U$ be non-empty, open, and $\gamma \subseteq X^2$ be an entourage such that if $(a,b) \in \gamma$ and $a \in V$, then $b \in U$.
     
-    Since $V \subseteq \overline{Sx}$ is open, non-empty, there exists $t \in S$ such that $tx \in V$, that is, $x \in t^{-1} V$.  By assumption $R(x,t^{-1} V)$ is syndetic: there exists a finite set $F \subseteq S$ such that for all $s \in S$, there exists $f \in F$ such that $fs \in R(x,t^{-1}U)$.
+    Since $V \subseteq \overline{Sx}$ is open, non-empty, there exists $t \in S$ such that $tx \in V$, that is, $x \in t^{-1} V$.  By assumption $R(x,t^{-1} V)$ is syndetic: there exists a finite set $F \subseteq S$ such that for all $s \in S$, there exists $f \in F$ such that $fs \in R(x,t^{-1}V)$.
 
     By the uniform continuity of the maps $tf: X \to X$, $f \in F$, there exists an entourage $\alpha \subseteq X^2$ such that for all $f \in F$, $tf \alpha \subseteq \gamma$.  Since $y \in \overline{Sx}$, there exists $s \in S$ such that $(sx,y) \in \alpha$.  By syndeticity, there exists $f \in F$ such that $fs \in R(x,t^{-1}V)$, that is, $tfs x \in V$.
 
     Since $(sx,y) \in \alpha$, we have that $(tfsx,tfy) = tf(sx,y) \in tf \alpha \subseteq \gamma$.  Since $tfsx \in V$, by our choice of $V$ and $\gamma$, we have that $tfy \in U$.  Therefore, $tf \in R(y,U)$, and hence $R(y,U)$ is non-empty, as was to be shown.
+    %\anh{I have trouble in Lean with giving $Y$ a uniform space structure given the subspace topology. Lean keeps complaining about the incompatibility of two topologies.}
 \end{proof}
 
 \begin{lemma}
@@ -1709,6 +1728,7 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{proof}
 \uses{lemma_orb_closure_of_ur_is_minimal,lemma_pts_in_minimal_are_ur}
+\leanok{}
     By \cref{lemma_orb_closure_of_ur_is_minimal}, $\overline{Sx}$ is a minimal $S$-system.  By \cref{lemma_pts_in_minimal_are_ur}, all points of $\overline{Sx}$ are $S$-uniformly recurrent. \dgg{Something subtle here that may cause issues in Lean: $y$ being $S$-uniformly recurrent is independent of the system.  That is: if $Z$ is a subsystem of $X$ and $y$ is $S$-uniform recurrent in $Z$, then it is uniformly recurrent in $X$...}
 \end{proof}
 
@@ -1721,15 +1741,30 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{proof}
 \uses{thm_every_system_has_minimal_subsystem,lemma_img_of_inv_is_inv,lemma_img_of_min_is_min,lemma_pts_in_minimal_are_ur}
-    Let $U \times V \subseteq X^2$ be a non-empty, open set. We will show that $U \times V$ contains an $S$-uniformly recurrent point.
+\leanok{}
+    Let $U \times V \subseteq X^2$ be a non-empty, open set. We will show that $U \times V$ contains an $S$-uniformly recurrent point. 
     
-    By \cref{thm_every_system_has_minimal_subsystem}, there exists a closed, non-empty, $S$-invariant (under the diagonal action) set $Z \subseteq X^2$.  Note that $\pi_1: X^2 \to X$ is an $S$-system factor map.  By \cref{lemma_img_of_inv_is_inv}, $\pi_1 Z$ is a closed, non-empty, $S$-invariant subset of $X$.  Since $X$ is minimal, $\pi_1 Z = X$.  Therefore, there exists $(x,y) \in Z$ such that $x \in U$.
+    By \cref{thm_every_system_has_minimal_subsystem}, there exists a closed, non-empty, $S$-invariant (under the diagonal action) set $Z \subseteq X^2$.  Note that $\pi_1: X^2 \to X$ is an $S$-system factor map.  By \cref{lemma_img_of_inv_is_inv}, $\pi_1 Z$ is a closed, non-empty, $S$-invariant subset of $X$.  Since $X$ is minimal, $\pi_1 Z = X$.  Therefore, there exists $(x,y) \in Z$ such that $x \in U$. 
     
     Since $X$ is a minimal $S$-system, there exists $s \in S$ such that $sy \in V$.  Note that the point $(x,sy) \in U \times V$.  We have only left to show that $(x,sy)$ is $S$-uniformly recurrent.
+    
     
     Since $S$ is commutative, the map $X^2 \to X^2$ given by $(w,z) \mapsto (w,sz)$ commutes with the diagonal action of $S$.  By \cref{lemma_img_of_inv_is_inv}, the image of $Z$ under this map is an $S$-system.  By \cref{lemma_img_of_min_is_min}, the image of $Z$ under this map is a minimal $S$ system.  By \cref{lemma_pts_in_minimal_are_ur}, the point $(x,sy)$ is $S$-uniformly recurrent, as desired.
 \end{proof}
 
+\begin{lemma}
+    \label{lemma_forward_backward_set_orb_clos_coincide}
+    \lean{forwardBackwardSetOrbClosCoincideInBronsSys}
+    Let $S$ be a semigroup and $X$ be an $S$ system. Suppose that the $S$-uniformly recurrent points are dense in $X$.  For all thick $A, B \subseteq S$ and all non-empty, open $W \subseteq X^2$,
+    \[\overline{AW} = \overline{B^{-1} W}.\]
+\end{lemma}
+
+\begin{proof}
+\uses{lemma_thick_right_shift_is_thick,lemma_dense_S_minimal_points_in_X2}
+    Let $W \subseteq X^2$ open and non-empty.  Let $(x,y) \in \overline{AW}$, and let $V \subseteq X^2$ be an open neighborhood of $(x,y)$.  Since $V \cap AW \neq \emptyset$, there exists $s \in A$ such that $V \cap sW \neq \emptyset$.  Therefore, $W \cap s^{-1}V \neq \emptyset$. By assumption, there exists an $S$-uniformly recurrent point $(a,b) \in W \cap s^{-1}V$. Since the set $Bs$ is thick (by \cref{lemma_thick_right_shift_is_thick}) and $(a,b)$ is $S$-uniformly recurrent, $(a,b) \in \overline{Bs(a,b)}$.  Therefore, there exists $t \in B$ such that $ts(a,b) \in W$.  We see $s(a,b) \in V \cap t^{-1} W$, whereby $V \cap B^{-1} W \neq \emptyset$.  Since $V$ was an arbitrary open neighborhood of $(x,y)$, we have that $(x,y) \in \overline{B^{-1} W}$.
+
+    Conversely, let $(x,y) \in \overline{B^{-1}W}$, and let $V \subseteq X^2$ be an open neighborhood of $(x,y)$.  Since $V \cap B^{-1}W \neq \emptyset$, there exists $s \in B$ such that $V \cap s^{-1}W \neq \emptyset$. By \cref{lemma_dense_S_minimal_points_in_X2}, there exists an $S$-uniformly recurrent point $(a,b) \in V \cap s^{-1}W$. Since the set $As$ is thick (by \cref{lemma_thick_right_shift_is_thick}) and $(a,b)$ is $S$-uniformly recurrent, $(a,b) \in \overline{As(a,b)}$.  Therefore, there exists $t \in A$ such that $ts(a,b) \in V \cap tW$, whereby $tW \cap V \neq \emptyset$.  Therefore, $V \cap A W \neq \emptyset$.  Since $V$ was an arbitrary open neighborhood of $(x,y)$, we have that $(x,y) \in \overline{A W}$.
+\end{proof}
 
 \subsection{Proximality}
 
@@ -1771,6 +1806,7 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{theorem}
 
 \begin{proof}
+    \leanok{}
     This is easy to check from the definitions.
 \end{proof}
 
@@ -1780,10 +1816,185 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \label{def_rp_relation}
 \lean{RP}
 \leanok{}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  The \emph{regionally proximal relation} is defined as
+    Let $S$ be a semigroup and $X$ be an $S$-system.  The \emph{(backward) regionally proximal relation} is defined as
     \[\RP = \bigcap_{\alpha} \overline{S \alpha},\]
     where the intersection is over all $\alpha$ in the uniformity on $X$, and $S$ acts diagonally.  We say that point $x \in X$ is \emph{regionally proximal to} point $y \in X$ if $(x,y) \in \RP$.
 \end{definition}
+
+The following definition is what is considered in \cite{dai_xiao_2017,auslander_dai_2019}.
+
+\begin{definition}[Forward regionally proximal relation]
+\label{def_foward_rp_relation}
+\lean{fRP}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  The \emph{(forward) regionally proximal relation} is defined as
+    \[\RP^+ = \bigcap_{\alpha} \overline{S^{-1} \alpha},\]
+    where the intersection is over all $\alpha$ in the uniformity on $X$, and $S$ acts diagonally.  We say that point $x \in X$ is \emph{forward regionally proximal to} point $y \in X$ if $(x,y) \in \RP^+$.
+\end{definition}
+
+\begin{theorem}
+    \label{thm_forward_equals_backward_rp}
+    \lean{forwardEqualsBackwardRPInMinCommSystem}
+    Let $S$ be a commutative semigroup and $X$ be a a minimal $S$-system. Then $\RP = \RP^+$.
+\end{theorem}
+
+\begin{proof}
+\uses{lemma_dense_S_minimal_points_in_X2,lemma_forward_backward_set_orb_clos_coincide,lemma_frp_iff_nbhd_tran_int_hits_diagonal,lemma_rp_iff_nbhd_tran_int_hits_diagonal}
+    This is immediate by combining \cref{lemma_dense_S_minimal_points_in_X2,lemma_forward_backward_set_orb_clos_coincide} with \cref{lemma_frp_iff_nbhd_tran_int_hits_diagonal,lemma_rp_iff_nbhd_tran_int_hits_diagonal}
+\end{proof}
+
+\subsubsection{Results on the forward RP relation}
+
+\begin{lemma}
+    \label{lemma_commuting_map_algebra}
+    Let $X$ be a set and $f, g : X \to X$ be commuting maps.  For all $A \subseteq X$, $f g^{-1} A \subseteq g^{-1} f A$.
+\end{lemma}
+
+\begin{proof}
+    Note $g f g^{-1} A = f g g^{-1} A \subseteq f A$, whereby $f g^{-1} A \subseteq g^{-1} f A$.
+\end{proof}
+
+\begin{lemma}
+    \label{lemma_frp_basics_symmetric}
+    \lean{forwardRPisSymmetric}
+    Let $X$ be an $S$-system.  The relation $\RP^+$ is symmetric.
+\end{lemma}
+
+\begin{proof}
+    Denote by $\Phi: X^2 \to X^2$ the map $\Phi(x,y) = (y,x)$. Let $(x,y) \in \RP^+$ and $\alpha \subseteq X^2$ be an entourage. By the definition of a uniform space, $\Phi \alpha$ is an entourage (sometimes called $\alpha^{-1}$). Since $(x,y) \in \RP^+$, $(x,y) \in \overline{S^{-1} \Phi \alpha}$. But $\overline{S^{-1} \Phi \alpha} = \Phi \overline{S^{-1} \alpha}$. Therefore, $(y,x) \in \overline{S^{-1} \alpha}$, as was to be shown.
+\end{proof}
+
+\begin{lemma}
+    \label{lemma_frp_basics_invariant}
+    \lean{forwardRPisInvariant}
+    Let $S$ be a commutative semigroup, and let $X$ be an $S$-system.  The relation $\RP^+$ is $S$-invariant.
+\end{lemma}
+
+\begin{proof}
+\uses{lemma_image_closure_equals_closure_image,lemma_commuting_map_algebra}
+    Let $\alpha$ be an entourage and let $s \in S$.  Note that $\beta \defeq s^{-1} \alpha$ is an entourage.  Note that for $t \in S$, $st^{-1} \beta \subseteq t^{-1} s \beta$. Then by \cref{lemma_image_closure_equals_closure_image} and \cref{lemma_commuting_map_algebra},
+    \[s \RP^+ = s \bigcap_{\gamma} \overline{S^{-1}\gamma} \subseteq s \overline{S^{-1} \beta} = \overline{sS^{-1} \beta} \subseteq \overline{S^{-1} s \beta} \subseteq \overline{S^{-1} \alpha}.\]
+    Since $\alpha$ was arbitrary, we see $s \RP^+ \subseteq \RP^+$, as desired.
+\end{proof}
+
+\begin{lemma}
+\label{lemma_frp_basics_closed}
+\lean{forwardRPisClosed}
+    Let $X$ be an $S$-system.  The relation $\RP^+$ is closed.
+\end{lemma}
+
+\begin{proof}
+    An arbitrary intersection of closed sets is closed. 
+\end{proof}
+
+\begin{lemma}
+\label{lemma_frp_reflexive}
+\lean{forwardRPisReflexiveIfNondegen}
+    Let $X$ be an $S$-system.  The relation $\RP^+$ is reflexive.
+\end{lemma}
+
+\begin{proof}
+    This is immediate from the definition, since $S^{-1} \alpha \supseteq \Delta.$
+\end{proof}
+
+\subsubsection{Image of forward $\RP$ under factor maps}
+
+The goal for this section is \cref{lemma_frp_functorial_property_minimal}.
+
+\begin{lemma}
+\label{lemma_frp_iff_nbhd_tran_int_hits_diagonal}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  For all $(x,y) \in X^2$, $(x,y) \in \RP^+$ if and only if
+    \[\Delta \cap \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S U} \neq \emptyset.\]
+\end{lemma}
+
+\begin{proof}
+    Let $(x,y) \in X^2$. By definition, $(x,y) \in \RP^+$ if and only if for all open neighborhoods $U$ of $(x,y)$ and all open neighborhoods $\alpha$ of $\Delta$,
+    \[U \cap S^{-1}\alpha \neq \emptyset.\]
+    The previous line is equivalent to
+    \[S U \cap \alpha \neq \emptyset.\]
+    This is precisely what is asserted in the lemma.
+\end{proof}
+
+The following lemma upgrades \cref{lemma_frp_iff_nbhd_tran_int_hits_diagonal} in the case that $S$ is commutative and $X$ is minimal.
+
+\begin{lemma}
+\label{lemma_frp_iff_nbhd_tran_int_contains_diagonal}
+    Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system.  If $(x,y) \in \RP^+$, then
+    \[\Delta \subseteq \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S U}.\]
+\end{lemma}
+
+\begin{proof}
+\uses{lemma_frp_iff_nbhd_tran_int_hits_diagonal,lemma_dense_S_minimal_points_in_X2,lemma_thick_right_shift_is_thick,lemma_image_closure_equals_closure_image}
+    Let $(x,y) \in \RP^+$, and put
+    \[Z \defeq \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S U}.\]
+    We will show that $Z \cap \Delta$ is non-empty, closed, and $S$-invariant.  It will follow then from the minimality of $X$ that $Z \cap \Delta = \Delta$.
+
+    \begin{enumerate}
+        \item That $Z \cap \Delta$ is closed is immediate.
+
+        \item That $Z \cap \Delta$ is non-empty follows from \cref{lemma_frp_iff_nbhd_tran_int_hits_diagonal}.
+
+        \item To see that $Z \cap \Delta$ is $S$-invariant, let $s \in S$.  Since $\Delta$ is $S$-invariant, it suffices to show that $Z$ is $S$-invariant.  By our assumptions and \cref{lemma_dense_S_minimal_points_in_X2}, the $S$-system $X^2$ has a dense set of periodic points.  By \cref{lemma_thick_right_shift_is_thick}, the set $Ss$ is thick, so $\overline{SsU} = \overline{SU}$. Therefore, by \cref{lemma_image_closure_equals_closure_image},
+        \[sZ = s\bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S U} = \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} s \overline{S U} = \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{sS U} = Z.\]
+    \end{enumerate}
+\end{proof}
+
+
+\begin{lemma}[{cf. \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993}}]
+    \label{lemma_frp_functorial_property}
+    \lean{imageOffRPIsInfRP}
+    Let $X$ be a $S$-system and $\pi: X \to Y$ be a factor.  Then $(\pi \times \pi) \RP^+_X \subseteq \RP^+_Y$.
+\end{lemma}
+
+\begin{proof}
+\uses{lemma_image_closure_equals_closure_image,lemma_commuting_map_algebra}
+    Let $\beta \subseteq Y^2$ be an entourage.  Since $\pi: X \to Y$ is continuous and $X$ is compact, it is uniformly continuous.  In particular, there exists $\alpha \subseteq X^2$ an entourage such that $(\pi \otimes \pi) \alpha \subseteq \beta$.  We see then by \cref{lemma_image_closure_equals_closure_image} and \cref{lemma_commuting_map_algebra} that
+    \[
+        (\pi \times \pi) \RP^+_X \subseteq (\pi \otimes \pi) \overline{S^{-1} \alpha} \subseteq \overline{(\pi \otimes \pi) S^{-1} \alpha} = \overline{S^{-1}(\pi \otimes \pi) \alpha} \subseteq \overline{S^{-1} \beta},\]
+    as was to be shown.
+\end{proof}
+
+\begin{theorem}
+    \label{lemma_frp_functorial_property_minimal}
+    \lean{commMinfRPIsInImageOffRP}
+    Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, and let $\pi: X \to Y$ be a factor map of $S$-systems.  Then $\RP^+_Y = (\pi \times \pi) \RP^+_X$.
+\end{theorem}
+
+\dgg{I tried briefly to re-write this proof for the forward $\RP$, and I wasn't successful.  Maybe this is even more reason to promote the backward $\RP$.}
+
+\begin{proof}
+\uses{lemma_rp_functorial_property,lemma_rp_iff_nbhd_tran_int_hits_diagonal,lemma_open_nbhd_of_fiber_contains_open_preimage,lemma_image_of_entourage_somewhere_dense_along_diagonal,lemma_frp_iff_nbhd_tran_int_contains_diagonal}
+    \dgg{Rewrite for forward.} By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP^+_X \subseteq \RP^+_Y$, so we only need to prove the reverse inclusion.
+
+    To see that $\RP^+_Y \subseteq (\pi \times \pi) \RP^+_X$, we will show that $Y \setminus (\pi \times \pi) \RP^+_X \subseteq Y \setminus \RP^+_Y$.  Suppose $(x,y) \in Y \setminus (\pi \times \pi) \RP^+_X$.  For all $f \in (\pi \times \pi)^{-1} \{(x,y)\}$, we have that $f \not\in \RP^+_X$.  By \cref{lemma_rp_iff_nbhd_tran_int_hits_diagonal}, there exists an open set $V_{f} \subseteq X^2$ with $f \in V_{f}$ such that $\overline{S V_{f}} \cap \Delta = \emptyset$. Therefore, there exists an open $\alpha_f \subseteq X^2$ containing $\Delta_X$ such that
+    \[SV_{f} \cap \alpha_f = \emptyset.\]
+
+    Now
+    \[(\pi \times \pi)^{-1} \{(x,y)\} \subseteq \bigcup_{(w,z) \in (\pi \times \pi)^{-1} \{(x,y)\}} V_{f},\]
+    so by compactness, there exists a finite set $F \subseteq (\pi \times \pi)^{-1} \{(x,y)\}$ such that
+    \[(\pi \times \pi)^{-1} \{(x,y)\} \subseteq \bigcup_{f \in F} V_{f}.\]
+    We have by \cref{lemma_open_nbhd_of_fiber_contains_open_preimage} (with $(x,y)$ as $y$ and $\bigcup_{f \in F} V_{f}$ as $W$) that there exists $U \ni (x,y)$ such that $(\pi \times \pi)^{-1} U \subseteq \bigcup_{f \in F} V_{f}$.
+
+    Put $\beta = \bigcap_{f \in F} \alpha_f$; it is an open neighborhood of $\Delta_X$. We see that
+    \begin{align*}
+        \emptyset = \bigcup_{f \in F} SV_f \cap \beta  &= \big( S \bigcup_{f \in F} V_f \big) \cap \beta \\
+        &\supseteq \big(S (\pi \times \pi)^{-1} U \big) \cap \beta \\
+        & = \big((\pi \times \pi)^{-1} S U \big) \cap \beta.
+    \end{align*}
+    \dgg{The previous line is potentially untrue, since in general $(\pi \times \pi)^{-1} S U \supseteq S (\pi \times \pi)^{-1} U$ not true.}
+    Since
+    \[\big((\pi \times \pi)^{-1} S U \big) \cap \beta = \emptyset,\]
+    we have that
+    \[\big(S U \big) \cap (\pi \times \pi) \beta  = \emptyset.\]
+
+    
+    By \cref{lemma_image_of_entourage_somewhere_dense_along_diagonal}, there exists a non-empty, open set $Z \subseteq Y$ such that $Z \times Z \subseteq (\pi \times \pi) \beta$, so
+    \[\big(S U \big) \cap (Z \times Z)  = \emptyset.\]
+    It follows that
+    \[\Delta \not\supseteq \overline{S U}.\]
+    Since $U \ni (x,y)$, we see by \cref{lemma_frp_iff_nbhd_tran_int_contains_diagonal} that $(x,y) \not\in \RP^+_Y$, as was to be shown.
+\end{proof}
+
+\subsubsection{Results on the backward RP relation}
 
 \begin{lemma}
     \label{lemma_rp_basics_symmetric}
@@ -1793,6 +2004,7 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Denote by $\Phi: X^2 \to X^2$ the map $\Phi(x,y) = (y,x)$. Let $(x,y) \in \RP$ and $\alpha \subseteq X^2$ be an entourage. By the definition of a uniform space, $\Phi \alpha$ is an entourage (sometimes called $\alpha^{-1}$). Since $(x,y) \in \RP$, $(x,y) \in \overline{G \Phi \alpha}$. But $\overline{G \Phi \alpha} = \Phi \overline{G \alpha}$. Therefore, $(y,x) \in \overline{G \alpha}$, as was to be shown.
 \end{proof}
 
@@ -1805,9 +2017,10 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{proof}
 \uses{lemma_intersection_of_invariant}
-    The set $G\alpha$ is clearly $G$-invariant.  Since $G$ acts by continuous maps,
-        \[g \overline{G\alpha} \subseteq \overline{gG \alpha} \subseteq \overline{G \alpha},\]
-        whereby $\overline{G\alpha}$ is $G$-invariant.  Finally, by \cref{lemma_intersection_of_invariant}, an arbitrary intersection of $G$-invariant sets is $G$-invariant, so $\RP$ is $G$-invariant.
+\leanok{}
+    The set $S\alpha$ is clearly $S$-invariant.  Since $S$ acts by continuous maps,
+        \[g \overline{S\alpha} \subseteq \overline{gS \alpha} \subseteq \overline{S \alpha},\]
+    whereby $\overline{S\alpha}$ is $S$-invariant.  Finally, by \cref{lemma_intersection_of_invariant}, an arbitrary intersection of $S$-invariant sets is $S$-invariant, so $\RP$ is $S$-invariant.
 \end{proof}
 
 \begin{lemma}
@@ -1818,6 +2031,7 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     An arbitrary intersection of closed sets is closed. 
 \end{proof}
 
@@ -1829,6 +2043,155 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 \end{lemma}
 
 \begin{proof}
+    Let $x \in X$.  To show $(x,x) \in \RP$, by the definition of $\RP$, we must show: for all non-empty, open $U \subseteq X$ containing $x$ and all open $\alpha \subseteq X^2$ containing the diagonal, $(U \times U) \cap S\alpha \neq \emptyset$.
+
+    Let $U \subseteq X$ be open and contain $x$ and $\alpha \subseteq X^2$ contain $\Delta$.  From the assumption that $\overline{SX} = X$, we get that there exists $s \in S$ and $y \in X$ such that $sy \in U$.  Therefore, $s(y,y) \in (U \times U) \cap S \alpha$, demonstrating that this set is non-empty. 
+\end{proof}
+
+\begin{lemma}
+\label{lemma_rp_implies_ultra}
+\lean{xyInRPIffUltraToSomewwxy}
+\leanok{}
+    Let $S$ be a semigroup, $X$ be an $S$-system, and $x, y \in X$. The point $(x,y) \in \RP$ if and only if there exists $w \in X$ and an ultrafilter $F$ on $X^2 \times S$ such that $\lim \varphi F = (w,w,x,y)$, where $\varphi: X^2 \times S \to X^4$ is defined by
+    \[\varphi (w, w', s) \mapsto (w, w', sw, sw').\]
+\end{lemma}
+
+\begin{proof}
+    \dgg{TBD}
+\end{proof}
+
+\subsubsection{Image of backward $\RP$ under factor maps}
+
+The goal for this section is \cref{lemma_rp_functorial_property_minimal}.
+
+\begin{lemma}
+\label{lemma_rp_iff_nbhd_tran_int_hits_diagonal}
+    Let $S$ be a semigroup and $X$ be an $S$-system.  For all $(x,y) \in X^2$, $(x,y) \in \RP$ if and only if
+    \[\Delta \cap \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S^{-1} U} \neq \emptyset.\]
+\end{lemma}
+
+\begin{proof}
+    Let $(x,y) \in X^2$. By definition, $(x,y) \in \RP$ if and only if for all open neighborhoods $U$ of $(x,y)$ and all open neighborhoods $\alpha$ of $\Delta$,
+    \[U \cap S\alpha \neq \emptyset.\]
+    The previous line is equivalent to
+    \[S^{-1} U \cap \alpha \neq \emptyset.\]
+    This is precisely what is asserted in the lemma.
+\end{proof}
+
+The following lemma upgrades \cref{lemma_rp_iff_nbhd_tran_int_hits_diagonal} in the case that $S$ is commutative and $X$ is minimal.
+
+\begin{lemma}
+\label{lemma_rp_iff_nbhd_tran_int_contains_diagonal}
+    Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system.  If $(x,y) \in \RP$, then
+    \[\Delta \subseteq \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S^{-1} U}.\]
+\end{lemma}
+
+\dgg{The same is true here for $\RP^+$ with $S^{-1}$ replaced by $S$, by nearly the same proof.}
+
+\begin{proof}
+\uses{lemma_rp_iff_nbhd_tran_int_hits_diagonal,lemma_dense_S_minimal_points_in_X2,lemma_thick_right_shift_is_thick,lemma_forward_backward_set_orb_clos_coincide,lemma_image_closure_equals_closure_image}
+    Let $(x,y) \in \RP$, and put
+    \[Z \defeq \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{S^{-1} U}.\]
+    We will show that $Z \cap \Delta$ is non-empty, closed, and $S$-invariant.  It will follow then from the minimality of $X$ that $Z \cap \Delta = \Delta$.
+
+    \begin{enumerate}
+        \item That $Z \cap \Delta$ is closed is immediate.
+
+        \item That $Z \cap \Delta$ is non-empty follows from \cref{lemma_rp_iff_nbhd_tran_int_hits_diagonal}.
+
+        \item To see that $Z \cap \Delta$ is $S$-invariant, let $s \in S$.  Since $\Delta$ is $S$-invariant, it suffices to show that $Z$ is $S$-invariant.  By our assumptions and \cref{lemma_dense_S_minimal_points_in_X2}, the $S$-system $X^2$ has a dense set of periodic points.  By \cref{lemma_thick_right_shift_is_thick}, the set $Ss$ is thick. Therefore, by \cref{lemma_forward_backward_set_orb_clos_coincide}, we have that
+        \[Z = \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{(Ss)^{-1} U}.\]
+        Note that $s(Ss)^{-1} U \subseteq S^{-1} U$.
+        Therefore, by \cref{lemma_image_closure_equals_closure_image},
+        \[sZ = s\bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{(Ss)^{-1} U} \subseteq \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} s \overline{(Ss)^{-1} U} = \bigcap_{\substack{U \ni (x,y) \\ U \text{ open}}} \overline{s(Ss)^{-1} U} \subseteq Z.\]
+    \end{enumerate}
+\end{proof}
+
+
+\begin{lemma}[{cf. \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993}}]
+    \label{lemma_rp_functorial_property}
+    \lean{imageOfRPIsInRP}
+    \leanok{}
+    Let $X$ be a $S$-system and $\pi: X \to Y$ be a factor.  Then $(\pi \times \pi) \RP_X \subseteq \RP_Y$.
+\end{lemma}
+
+\begin{proof}
+\uses{lemma_image_closure_equals_closure_image}
+\leanok{}
+    Let $\beta \subseteq Y^2$ be an entourage.  Since $\pi: X \to Y$ is continuous and $X$ is compact, it is uniformly continuous.  In particular, there exists $\alpha \subseteq X^2$ an entourage such that $(\pi \otimes \pi) \alpha \subseteq \beta$.  We see then by \cref{lemma_image_closure_equals_closure_image} that
+    \[
+        (\pi \times \pi) \RP_X \subseteq (\pi \otimes \pi) \overline{S \alpha} \subseteq \overline{(\pi \otimes \pi) S \alpha} = \overline{S(\pi \otimes \pi) \alpha} \subseteq \overline{S \beta},\]
+    as was to be shown.
+\end{proof}
+
+
+
+The following lemma is shown in \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993} for group actions.  Our semigroup version is considerably more involved since our semigroup maps are not necessarily open.
+
+\begin{theorem}
+    \label{lemma_rp_functorial_property_minimal}
+    \lean{commMinRPIsInImageOfRP}
+    \leanok{}
+    Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, and let $\pi: X \to Y$ be a factor map of $S$-systems.  Then $\RP_Y = (\pi \times \pi) \RP_X$.
+\end{theorem}
+
+\begin{proof}
+\uses{lemma_rp_functorial_property,lemma_rp_iff_nbhd_tran_int_hits_diagonal,lemma_open_nbhd_of_fiber_contains_open_preimage,lemma_image_of_entourage_somewhere_dense_along_diagonal,lemma_rp_iff_nbhd_tran_int_contains_diagonal}
+    By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP_X \subseteq \RP_Y$, so we only need to prove the reverse inclusion.
+
+    To see that $\RP_Y \subseteq (\pi \times \pi) \RP_X$, we will show that $Y \setminus (\pi \times \pi) \RP_X \subseteq Y \setminus \RP_Y$.  Suppose $(x,y) \in Y \setminus (\pi \times \pi) \RP_X$.  For all $f \in (\pi \times \pi)^{-1} \{(x,y)\}$, we have that $f \not\in \RP_X$.  By \cref{lemma_rp_iff_nbhd_tran_int_hits_diagonal}, there exists an open set $V_{f} \subseteq X^2$ with $f \in V_{f}$ such that $\overline{S^{-1}V_{f}} \cap \Delta = \emptyset$. Therefore, there exists an open $\alpha_f \subseteq X^2$ containing $\Delta_X$ such that
+    \[S^{-1}V_{f} \cap \alpha_f = \emptyset.\]
+
+    Now
+    \[(\pi \times \pi)^{-1} \{(x,y)\} \subseteq \bigcup_{(w,z) \in (\pi \times \pi)^{-1} \{(x,y)\}} V_{f},\]
+    so by compactness, there exists a finite set $F \subseteq (\pi \times \pi)^{-1} \{(x,y)\}$ such that
+    \[(\pi \times \pi)^{-1} \{(x,y)\} \subseteq \bigcup_{f \in F} V_{f}.\]
+    We have by \cref{lemma_open_nbhd_of_fiber_contains_open_preimage} (with $(x,y)$ as $y$ and $\bigcup_{f \in F} V_{f}$ as $W$) that there exists $U \ni (x,y)$ such that $(\pi \times \pi)^{-1} U \subseteq \bigcup_{f \in F} V_{f}$.
+
+    Put $\beta = \bigcap_{f \in F} \alpha_f$; it is an open neighborhood of $\Delta_X$. We see that
+    \begin{align*}
+        \emptyset = \bigcup_{f \in F} S^{-1}V_f \cap \beta  &= \big( S^{-1} \bigcup_{f \in F} V_f \big) \cap \beta \\
+        &\supseteq \big(S^{-1} (\pi \times \pi)^{-1} U \big) \cap \beta \\
+        & = \big((\pi \times \pi)^{-1} S^{-1} U \big) \cap \beta.
+    \end{align*}
+    Since
+    \[\big((\pi \times \pi)^{-1} S^{-1} U \big) \cap \beta = \emptyset,\]
+    we have that
+    \[\big(S^{-1} U \big) \cap (\pi \times \pi) \beta  = \emptyset.\]
+
+    
+    By \cref{lemma_image_of_entourage_somewhere_dense_along_diagonal}, there exists a non-empty, open set $Z \subseteq Y$ such that $Z \times Z \subseteq (\pi \times \pi) \beta$, so
+    \[\big(S^{-1} U \big) \cap (Z \times Z)  = \emptyset.\]
+    It follows that
+    \[\Delta \not\supseteq \overline{S^{-1} U}.\]
+    Since $U \ni (x,y)$, we see by \cref{lemma_rp_iff_nbhd_tran_int_contains_diagonal} that $(x,y) \not\in \RP_Y$, as was to be shown.
+\end{proof}
+
+% \begin{proof}
+\uses{lemma_rp_functorial_property,lemma_image_of_entourage_somewhere_dense_along_diagonal,lemma_rp_implies_intersects_open_nbhd_diagonal}
+%     By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP_X \subseteq \RP_Y$, so we only need to prove the reverse inclusion.
+
+%     To see that $\RP_Y \subseteq (\pi \times \pi) \RP_X$, let $(x,y) \in \RP_Y$.  Let $D$ be the product of the set of entourages of $X^2$ and the set of open subsets of $Y^2$ containing $(x,y)$.  For $d = (\alpha, U)$, by \cref{lemma_image_of_entourage_somewhere_dense_along_diagonal}, there exists a non-empty, open set $V \subseteq Y$ such that $V \times V \subseteq (\pi \otimes \pi) \alpha$.  By \cref{lemma_rp_implies_intersects_open_nbhd_diagonal},
+%     \[S^{-1} U \cap (V \times V) \neq \emptyset.\]
+%     Therefore,
+%     \[S^{-1} U \cap (\pi \otimes \pi) \alpha \neq \emptyset.\]
+%     Therefore, there exists $(a_d,b_d) \in \alpha$ and $s_d \in S$ such that $s_d(\pi a_d, \pi b_d) \in U$.
+%     %Note that there exists $a \in X$ such that
+%     %\[\lim_{d} (a_d,b_d,s_d \pi a_d, s_d \pi b_d) = (a,a,x,y).\]
+
+%     By compactness of $X^4$, the net $d \mapsto (a_d,b_d,s_d a_d, s_d b_d)$ has a convergent subnet $n \mapsto (a_n,b_n,s_n a_n, s_n b_n)$.  Thus, there exists $(a,b,w,z) \in X^4$ such that
+%     \[\lim_n (a_n,b_n,s_n a_n, s_n b_n) = (a,b,w,z).\]
+%     By the construction of the net, we see that $a=b$.  Therefore, $(w,z) \in \RP_X$.
+    
+%     Also by the construction of the net, we see that $s_n (\pi a_n, \pi b_n) \to (x,y)$.  But $s_n (\pi a_n, \pi b_n) = (\pi \otimes \pi) (s_n a_n, s_n b_n)$, and so by  continuity of $\pi \otimes \pi$, we have that
+%     \[(x,y) \leftarrow s_n (\pi a_n, \pi b_n) = (\pi \otimes \pi) (s_n a_n, s_n b_n) \to (\pi \otimes \pi) (w,z).\]
+%     Therefore, $(\pi \otimes \pi) (w,z) = (x,y)$, and so $(x,y) \in (\pi \otimes \pi) \RP_X$, as was to be shown.
+% \end{proof}
+
+\subsubsection{Old stuff}
+
+\begin{proof}
+\leanok{}
     Let $\alpha \subseteq X^2$ be an entourage.  Since $\overline{SX} = X$, $\Delta \subseteq \overline{S \alpha}$. Since $\alpha$ was arbitrary, $\Delta \subseteq \RP$.
 \end{proof}
 
@@ -1851,17 +2214,6 @@ Let $S$ be a semigroup, and let $X$ and $Y$ be $S$-systems.  For all $x \in X$, 
 
 \begin{proof}
     \dgg{Obvious from the definition.}
-\end{proof}
-
-\begin{lemma}
-\label{lemma_rp_implies_ultra}
-\lean{xyInRPIffUltraToSomewwxy}
-\leanok{}
-    Let $S$ be a semigroup, $X$ be an $S$-system, and $x, y \in X$. The point $(x,y) \in \RP$ if and only if there exists $w \in X$ and an ultrafilter $F$ on $X^2 \times S$ such that $\lim F = (w,w,x,y)$.
-\end{lemma}
-
-\begin{proof}
-    \dgg{TBD}
 \end{proof}
 
 \begin{lemma}
@@ -1985,52 +2337,7 @@ The goal now is to improve \cref{lemma_rp_implies_net_iff} by showing that the q
     and hence this set is non-empty, as was to be shown.
 \end{proof}
 
-\begin{lemma}[{cf. \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993}}]
-    \label{lemma_rp_functorial_property}
-    \lean{imageOfRPIsInRP}
-    \leanok{}
-    Let $X$ be a $S$-system and $\pi: X \to Y$ be a factor.  Then $(\pi \times \pi) \RP_X \subseteq \RP_Y$.
-\end{lemma}
 
-\begin{proof}
-    Let $\beta \subseteq Y^2$ be an entourage.  Since $\pi: X \to Y$ is continuous and $X$ is compact, it is uniformly continuous.  In particular, there exists $\alpha \subseteq X^2$ an entourage such that $(\pi \otimes \pi) \alpha \subseteq \beta$.  We see then that
-    \[(\pi \times \pi) \RP_X \subseteq (\pi \otimes \pi) \overline{S \alpha} = \overline{(\pi \otimes \pi) S \alpha} = \overline{S(\pi \otimes \pi) \alpha} \subseteq \overline{S \beta},\]
-    as was to be shown.
-\end{proof}
-
-
-
-The following lemma is shown in \cite[V. 2.12 and 2.14, pg. 416]{devries_book_1993} for group actions.  Our semigroup version is considerably more involved since our semigroup maps are not necessarily open.
-
-\dgg{Start by re-writing the proof of \cref{lemma_rp_functorial_property_minimal} using ultrafilters.  Trace the changes upstream to figure out the best way to write the previous stuff using ultrafilters.}
-
-\begin{lemma}
-    \label{lemma_rp_functorial_property_minimal}
-    \lean{commMinRPIsInImageOfRP}
-    \leanok{}
-    Let $S$ be a commutative semigroup, let $X$ be a minimal $S$-system, and let $\pi: X \to Y$ be a factor map of $S$-systems.  Then $\RP_Y = (\pi \times \pi) \RP_X$.
-\end{lemma}
-
-\begin{proof}
-\uses{lemma_rp_functorial_property,lemma_image_of_entourage_somewhere_dense_along_diagonal,lemma_rp_implies_intersects_open_nbhd_diagonal}
-    By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP_X \subseteq \RP_Y$, so we only need to prove the reverse inclusion.
-
-    To see that $\RP_Y \subseteq (\pi \times \pi) \RP_X$, let $(x,y) \in \RP_Y$.  Let $D$ be the product of the set of entourages of $X^2$ and the set of open subsets of $Y^2$ containing $(x,y)$.  For $d = (\alpha, U)$, by \cref{lemma_image_of_entourage_somewhere_dense_along_diagonal}, there exists a non-empty, open set $V \subseteq Y$ such that $V \times V \subseteq (\pi \otimes \pi) \alpha$.  By \cref{lemma_rp_implies_intersects_open_nbhd_diagonal},
-    \[S^{-1} U \cap (V \times V) \neq \emptyset.\]
-    Therefore,
-    \[S^{-1} U \cap (\pi \otimes \pi) \alpha \neq \emptyset.\]
-    Therefore, there exists $(a_d,b_d) \in \alpha$ and $s_d \in S$ such that $s_d(\pi a_d, \pi b_d) \in U$.
-    %Note that there exists $a \in X$ such that
-    %\[\lim_{d} (a_d,b_d,s_d \pi a_d, s_d \pi b_d) = (a,a,x,y).\]
-
-    By compactness of $X^4$, the net $d \mapsto (a_d,b_d,s_d a_d, s_d b_d)$ has a convergent subnet $n \mapsto (a_n,b_n,s_n a_n, s_n b_n)$.  Thus, there exists $(a,b,w,z) \in X^4$ such that
-    \[\lim_n (a_n,b_n,s_n a_n, s_n b_n) = (a,b,w,z).\]
-    By the construction of the net, we see that $a=b$.  Therefore, $(w,z) \in \RP_X$.
-    
-    Also by the construction of the net, we see that $s_n (\pi a_n, \pi b_n) \to (x,y)$.  But $s_n (\pi a_n, \pi b_n) = (\pi \otimes \pi) (s_n a_n, s_n b_n)$, and so by  continuity of $\pi \otimes \pi$, we have that
-    \[(x,y) \leftarrow s_n (\pi a_n, \pi b_n) = (\pi \otimes \pi) (s_n a_n, s_n b_n) \to (\pi \otimes \pi) (w,z).\]
-    Therefore, $(\pi \otimes \pi) (w,z) = (x,y)$, and so $(x,y) \in (\pi \otimes \pi) \RP_X$, as was to be shown.
-\end{proof}
 
 \subsection{Equicontinuity and regional proximality}
 
@@ -2050,7 +2357,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \cite[Ch. 4, (2.1)]{devries_book_1993}}]
     \lean{isEquicontinuousSystem}
     \leanok{}
-    A $G$-system $X$ is \emph{(uniformly) equicontinuous} if the set of maps $\{g: X \to X \mid g \in G\}$ is a (uniformly) equicontinuous family.
+    A $S$-system $X$ is \emph{(uniformly) equicontinuous} if the set of maps $\{S: X \to X \mid g \in G\}$ is a (uniformly) equicontinuous family.
 \end{definition}
 
 \begin{lemma}
@@ -2060,9 +2367,12 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
     Let $S$ be a semigroup.  The product of equicontinuous $S$-systems is an equicontinuous $S$-system.
 \end{lemma}
 
+\dgg{This lemma must be upgraded to arbitrary products.  Likely not harder.  See the corresponding result in the main RP file.}
+
 \begin{proof}
-    If $X$ and $Y$ are $S$-systems, then $X \times Y$ is an $S$-system via the diagonal action.  We need to show that the family of maps $\{(x,y) \mapsto (gx,gy) : g \in G\}$ from $X \times Y$ to $X \times Y$ is equicontinuous.  Let $\beta \subseteq (X \times Y)^2$ be an entourage.  By some general fact concerning the uniform structure on a Cartesian product of uniform spaces (in mathlib, see \verb|entourageProd_subset|), there exist entourages $\beta_X \subseteq X^2$ and $\beta_Y \subseteq Y^2$ such that $\beta_X \times \beta_Y \subseteq \beta$.  By equicontinuity of the systems $X$ and $Y$, there exist entourages $\alpha_X \subseteq X^2$ and $\alpha_Y \subseteq Y^2$ such that for all $g \in G$, $(g \otimes g) \alpha_X \subseteq \beta_X$ and $(g \otimes g) \alpha_Y \subseteq \beta_Y$.  Then $
-    \alpha \defeq \alpha_X \times \alpha_Y$ is an entourage of $X \times Y$, and for all $g \in G$, $(g \otimes g \otimes g \otimes g)\alpha \subseteq \beta$, as desired.
+\leanok{}
+    If $X$ and $Y$ are $S$-systems, then $X \times Y$ is an $S$-system via the diagonal action.  We need to show that the family of maps $\{(x,y) \mapsto (sx,sy) : s \in S\}$ from $X \times Y$ to $X \times Y$ is equicontinuous. Let $\beta \subseteq (X \times Y)^2$ be an entourage.  By some general fact concerning the uniform structure on a Cartesian product of uniform spaces (in mathlib, see \verb|entourageProd_subset|), there exist entourages $\beta_X \subseteq X^2$ and $\beta_Y \subseteq Y^2$ such that $\beta_X \times \beta_Y \subseteq \beta$. By equicontinuity of the systems $X$ and $Y$, there exist entourages $\alpha_X \subseteq X^2$ and $\alpha_Y \subseteq Y^2$ such that for all $s \in S$, $(s \otimes s) \alpha_X \subseteq \beta_X$ and $(s \otimes s) \alpha_Y \subseteq \beta_Y$. Then $
+    \alpha \defeq \alpha_X \times \alpha_Y$ is an entourage of $X \times Y$, and for all $s \in S$, $(s \otimes s \otimes s \otimes s)\alpha \subseteq \beta$, as desired.
 \end{proof}
 
 \begin{lemma}
@@ -2073,6 +2383,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     By assumption, the family of maps indexed by $S$ is equicontinuous.  Let $Z$ be a subsystem of $X$.  By definition, the system $Z$ is equicontinuous if the family of maps $\{\restr{s}{Z}: Z \to Z | s \in S\}$ is equicontinuous.  \dgg{This should be a general topological fact.}
 \end{proof}
 
@@ -2081,7 +2392,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
     Let $S$ be a commutative semigroup, and let $X$ be a minimal, equicontinuous $S$-system.  For all $x, y \in X$, there exists a factor map $\varphi: X \to X$ of $S$-systems such that $\varphi x = y$.
 \end{lemma}
 
-\dgg{If it would help here, we can prove first that a minimal action by a commutative semigroup acts by homeomorphisms.   Then perhaps in \cref{lemma_minimal_equi_implies_homogeneous} we could get that $\varphi$ is a homeomorphism, hence an automorphism of the $S$-system $X$.}
+\dgg{If it would help here, we can prove first that a minimal action by a commutative semigroup acts by homeomorphisms.   (This may be true.  Search in \cite{dai_xiao_2017,auslander_dai_2019}) Then perhaps in \cref{lemma_minimal_equi_implies_homogeneous} we could get that $\varphi$ is a homeomorphism, hence an automorphism of the $S$-system $X$.}
 
 \begin{proof}[Proof sketch.]
 \uses{lemma_img_of_inv_is_inv}
@@ -2116,9 +2427,12 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Suppose $\RP \subseteq \Delta$.  To see that $X$ is equicontinuous, let $\alpha \subseteq X^2$ be an entourage.  Since
-    \[\bigcap_{\gamma} \overline{G \gamma} = \RP \subseteq \Delta \subseteq \alpha,\]
-    by a general topological fact (\emph{if $\mathcal{K}$ is a collection of closed sets, $U$ is open, and $\cap_{Z \in \mathcal{K}} Z \subseteq U$, then there exists a finite subcollection $\mathcal{K}' \subseteq \mathcal{K}$ such that $\cap_{Z \in \mathcal{K}'} Z \subseteq U$}; to get this in mathlib, use \verb|IsCompact.elim_finite_subfamily_closed|) there exists an entourage $\beta \subseteq X^2$ such that $\overline{G \beta} \subseteq \alpha$.  Thus, $G \beta \subseteq \alpha$, as was to be shown.
+    \[
+        \bigcap_{\gamma} \overline{S \gamma} = \RP \subseteq \Delta \subseteq \alpha,
+    \]
+    by a general topological fact (\emph{if $\mathcal{K}$ is a collection of closed sets, $U$ is open, and $\cap_{Z \in \mathcal{K}} Z \subseteq U$, then there exists a finite subcollection $\mathcal{K}' \subseteq \mathcal{K}$ such that $\cap_{Z \in \mathcal{K}'} Z \subseteq U$}; to get this in mathlib, use \verb|IsCompact.elim_finite_subfamily_closed|) there exists an entourage $\beta \subseteq X^2$ such that $\overline{S \beta} \subseteq \alpha$.  Thus, $S \beta \subseteq \alpha$, as was to be shown.
 
     Conversely, suppose $X$ is an equicontinuous $S$-system.
     We will show that if $(x,y) \not\in \Delta$, then $(x,y) \not\in \RP$. Suppose $x \neq y$.  Choose $\beta \subseteq X^2$ an entourage such that $(x,y) \not\in \overline{\beta}$.  Since $X$ is equicontinuous, there exists $\alpha \subseteq X^2$ entourage such that $G \alpha \subseteq \beta$.  Thus, $(x,y) \not\in \overline{G \alpha}$, so $(x,y) \not\in \RP$.
@@ -2128,12 +2442,13 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
     \label{lemma_rp_characterization_of_equicont}
     \lean{minimalFactorEquicontinuousIffRPInFactorRelation}
     \leanok{}
-    Let $X$ be a minimal $G$-system.  A factor $\pi: X \to Y$ is equicontinuous if and only if $\RP \subseteq R_\pi$.
+    Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system.  A factor $\pi: X \to Y$ is equicontinuous if and only if $\RP \subseteq R_\pi$.
 \end{lemma}
     %\dgg{We might only get: if a factor $\pi: X \to Y$ is equicontinuous, then $\RP \subseteq R_\pi$.}
 
 \begin{proof}
 \uses{lemma_rp_functorial_property_minimal,lemma_rp_and_equicontinuity}
+\leanok{}
     Note that by the definition of $R_\pi$, $\RP \subseteq R_\pi$ if and only if $(\pi \times \pi) \RP \subseteq \Delta_Y$.  By \cref{lemma_rp_functorial_property_minimal}, this is if and only if $\RP_Y \subseteq \Delta_Y$.  By \cref{lemma_rp_and_equicontinuity}, this is if and only if $Y$ is equicontinuous.
 \end{proof}
     %\dgg{Alt: Suppose the factor $\pi$ is equicontinuous so that $\RP_Y \subseteq \Delta$. By \cref{lemma_rp_functorial_property}, $(\pi \times \pi) \RP \subseteq \RP_Y \subseteq \Delta$. By the definition of $R_\pi$, $(\pi \times \pi) \RP \subseteq \Delta_Y$ implies $\RP \subseteq R_\pi$, as desired.} 
@@ -2142,12 +2457,13 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
     \label{lemma_rp_characterization_of_equicont_icer}
     \lean{minimalICEREquicontinuousIffRPInICER}
     \leanok{}
-    Let $X$ be a minimal $G$-system.  An ICER $Q$ of $X$ is equicontinuous if and only if $\RP \subseteq Q$.
+    Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system.  An ICER $Q$ of $X$ is equicontinuous if and only if $\RP \subseteq Q$.
 \end{lemma}
 %\dgg{We might only get: if $Q$ is an equicontinuous ICER, then $\RP \subseteq Q$.}
 
 \begin{proof}
 \uses{lemma_rp_characterization_of_equicont}
+\leanok{}
     Suppose $Q$ is an ICER.  By definition, it is equicontinuous if and only if $\pi_Q: (X,T) \to (X/Q,T)$ is equicontinuous.  By \cref{lemma_rp_characterization_of_equicont}, this happens if and only if $\RP \subseteq R_{\pi_Q} = Q$.
 \end{proof}
     %\dgg{Alt: Suppose $Q$ is an equicontinuous ICER.  By definition, $\pi_Q: (X,T) \to (X/Q,T)$ is equicontinuous.  By \cref{lemma_rp_characterization_of_equicont}, this implies $\RP \subseteq R_{\pi_Q} = Q$.}
@@ -2165,11 +2481,12 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 \label{thm_equi_structure_relation_is_equi_ICER}
 \lean{equiStructureRelationIsEquiICER}
 \leanok{}
-    Let $S$ be a semigroup and $X$ be an $S$-system.  The equicontinuous structure relation is an equicontinuous ICER.
+    Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system.  The equicontinuous structure relation is an equicontinuous ICER.
 \end{theorem}
 
 \begin{proof}
 \uses{lemma_intersection_of_icers,lemma_rp_characterization_of_equicont_icer}
+\leanok{}
     The equicontinuous structure relation $\seq$ is an ICER by \cref{lemma_intersection_of_icers}.
 
     To show that it is an equicontinuous ICER, it suffices by \cref{lemma_rp_characterization_of_equicont_icer} to show that $\RP \subseteq \seq$.
@@ -2184,7 +2501,7 @@ Note for the definition of equicontinuous system: A $G$-system $X$ for us is a c
 
 \begin{theorem}
     \label{thm_kronecker_is_equicontinuous_system}
-    The Kronecker factor is an equicontinuous system.
+    Let $S$ be a commutative semigroup and $X$ be a minimal $S$-system. The Kronecker factor of $X$ is an equicontinuous system.
 \end{theorem}
 
 \begin{proof}
@@ -2286,6 +2603,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 \end{lemma}
 
 \begin{proof}
+\leanok{}
     Since $S$ is compact and $\rho_t$ is continuous, $\rho_t(S) = St$ is compact.  Since $S$ is Hausdorff, $St$ is closed.
 \end{proof}
 
@@ -2298,6 +2616,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{proof}
 \uses{lemma_principal_ideal_is_compact}
+\leanok{}
     Let $L$ be a left ideal.  Let $t \in L$.  Since $L$ is  a left ideal, $St$ is a left ideal contained in $L$.  By \cref{lemma_principal_ideal_is_compact}, $St$ is closed.
 \end{proof}
 
@@ -2310,6 +2629,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{proof}
 \uses{lemma_principal_ideal_is_compact}
+\leanok{}
     Let $L$ be a minimal left ideal of $S$.  Let $t \in L$. Then $St$ is a left ideal of $S$ contained in $L$.  Since $L$ is minimal, $St = L$.  By \cref{lemma_principal_ideal_is_compact}, $St$ is compact.
 \end{proof}
 
@@ -2323,6 +2643,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{proof}
 \uses{lemma_principal_ideal_is_compact,lemma_intersection_of_ideals_is_ideal}
+\leanok{}
     Let $L$ be a left ideal of $S$.  Consider the collection $\mathcal{C}$ of compact left ideals of $S$ contained in $L$.  For $s \in L$, we see by \cref{lemma_principal_ideal_is_compact} that $Ss \subseteq L$ is a compact left ideal of $S$ contained in $L$, so $\mathcal{C}$ is non-empty.  Any totally ordered chain in $\mathcal{C}$ has a lower bound in $\mathcal{C}$, namely the intersection, which is non-empty and compact since $S$ is Hausdorff, and which is an ideal by \cref{lemma_intersection_of_ideals_is_ideal}.  By Zorn's lemma, $\mathcal{C}$ has a minimal element.  This is a minimal left ideal of $S$ contained in $L$.
 \end{proof}
 
@@ -2335,6 +2656,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{proof}
 \uses{thm_every_left_contains_minimal_left}
+\leanok{}
     The semigroup $S$ is a left ideal of $S$, so by \cref{thm_every_left_contains_minimal_left}, $S$ contains a minimal left ideal of $S$.
 \end{proof}
 
@@ -2359,6 +2681,7 @@ For all the following results, cf. \cite[Corollary 2.6 and surrounding]{hindman_
 
 \begin{proof}
 \uses{lemma_exists_minimal_left_ideal,lemma_minimal_left_ideal_compact,exists_idempotent_in_compact_subsemigroup}
+\leanok{}
     Every left ideal contains a minimal left ideal (\cref{lemma_exists_minimal_left_ideal}).  Minimal left ideals are compact (\cref{lemma_minimal_left_ideal_compact}) subsemigroups.  Apply \cref{exists_idempotent_in_compact_subsemigroup}.
 \end{proof}
 
@@ -2886,7 +3209,7 @@ Contains:
 \label{lemma_pr_family_concentration}
 \lean{visitTimeConcentrationForPRFamily}
 \leanok{}
-    Let $X$ be an $S$-system, $x \in X$, and $U \subseteq X$ be closed.  Let $\family$ be a partition regular family of subsets of $S$. If $R(x,U) \in \family$, then there exists $y \in U$ such that for all non-empty, open $V \ni y$ open and non-empty, $R(x,V) \in \family$.
+    Let $X$ be an $S$-system, $x \in X$, and $U \subseteq X$ be closed.  Let $\family$ be a partition regular family of subsets of $S$. If $R(x,U) \in \family$, then there exists $y \in U$ such that for all non-empty, open $V \ni y$, $R(x,V) \in \family$.
 \end{lemma}
 
 \begin{proof}
@@ -2961,6 +3284,16 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is thick if for 
 
 \begin{proof}
     Let $K \subseteq S$ be finite.  To see that $\cap_{k \in K} k^{-1} H$ is thick, let $F \subseteq S$ be finite.  The set $KF$ is finite, so there is $s \in S$ such that $KFs \subseteq H$. We see $Fs \subseteq \cap_{k \in K} k^{-1} H$, as desired.
+\end{proof}
+
+\begin{lemma}
+    \label{lemma_thick_right_shift_is_thick}
+    \lean{rightTransOfThickIsThick}
+    Let $S$ be a semigroup and $H \subseteq S$ be thick.  For all $t \in S$, the set $Ht$ is thick.
+\end{lemma}
+
+\begin{proof}
+    Let $F \subseteq S$ be finite and $t \in S$.  There exists $s \in S$ such that $Fs \subseteq H$.  Then $Fst \subseteq Ht$.
 \end{proof}
 
 \begin{lemma}
@@ -3053,7 +3386,7 @@ Let $(S,\cdot)$ be a semigroup and $A \subseteq S$. The set $A$ is a $\Delta$ se
 
 \subsection{Bohr sets}
 
-\dgg{In the definition below, we require the system to be minimal.  We can drop that assumption if all points are uniformly recurrent for an equicontinuous semigroup action.  This is true for group actions, but may not be true any longer for semigroup actions.}
+\dgg{In the definition below, we require the system to be minimal.  We can drop that assumption if all points are uniformly recurrent for an equicontinuous semigroup action.  This is true for group actions, but may not be true any longer for semigroup actions. The papers \cite{dai_xiao_2017,auslander_dai_2019} may have something to say about that.}
 
 \begin{definition}
 \label{def_dcsyndeticbohr}
@@ -3402,6 +3735,8 @@ Since $X$ is $S$-minimal, $(x,x) \in \overline{S(y,y)}$. By \cref{thm_xxx_is_trt
 
 The proof of \cref{thm_rp_implies_same_minimal_component} below uses ultrafilters (in two ways!) to avoid nets.  The old net proof is commented out.
 
+\dgg{I tried briefly to replace the ``backward $\RP$'' that we use in this proof with the ``forward $\RP$'' we could/should use as the main definition.  It was not clear how to do that.  So perhaps this proof is a way to sell ``backward $\RP$''}
+
 \begin{theorem}
 \label{thm_rp_implies_same_minimal_component}
 \label{theorem_cube_space_orbit_implies_rp}
@@ -3411,25 +3746,25 @@ The proof of \cref{thm_rp_implies_same_minimal_component} below uses ultrafilter
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_implies_net_iff,lemma_exists_minimal_left_ideal,lemma_ultrafilter_surjective_action,lemma_ultrafilter_action_on_X3,thm_ultrafilter_action_with_fixed_x_is_continuous,lemma_ultrafilter_idempotent_lift,thm_ultra_point_in_orb_closure,thm_xxy_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v2,theorem_orbit_closure_transitivity,thm_xxx_is_trtl_unif_rec_v3,lemma_in_orb_clos_of_ur_implies_ur,lemma_idempotent_implies_proximal,lemma_prox_in_h_implies_in_g,theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}
-    Suppose $(x,y) \in \RP$. By \dgg{an ultrafilter version of} \cref{lemma_rp_implies_net_iff}, there exists $w \in X$ and an ultrafilter $\family$ on $X \times X \times S$ such that the image of $\family$ under the map $\varphi_1: (a,b,s) \mapsto (a,b,sa,sb)$ converges to $(w,w,x,y)$:
+\uses{lemma_rp_implies_ultra,lemma_exists_minimal_left_ideal,lemma_ultrafilter_surjective_action,lemma_ultrafilter_action_on_X3,thm_ultrafilter_action_with_fixed_x_is_continuous,lemma_ultrafilter_idempotent_lift,thm_ultra_point_in_orb_closure,thm_xxy_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v2,theorem_orbit_closure_transitivity,thm_xxx_is_trtl_unif_rec_v3,lemma_in_orb_clos_of_ur_implies_ur,lemma_idempotent_implies_proximal,lemma_prox_in_h_implies_in_g,theorem_proximal_and_minimal_implies_orbit_closure_contains_diagonal,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}
+    Suppose $(x,y) \in \RP$. By \cref{lemma_rp_implies_ultra}, there exists $w \in X$ and an ultrafilter $\family$ on $X \times X \times S$ such that the image of $\family$ under the map $\varphi_1: (a,b,s) \mapsto (a,b,sa,sb)$ \dgg{$\tilde \varphi_1: (a,b,s) \mapsto (sa,sb,a,b)$} converges to $(w,w,x,y)$:
     \[\varphi_1 \family \to (w,w,x,y).\]
+    \dgg{$\tilde\varphi_1 \family \to (w,w,a,b)$}
 
-    By \cref{lemma_exists_minimal_left_ideal}, $\beta S^2$ contains a minimal left ideal $L$.  Since $X^2$ is a minimal $S^2$-system, by \cref{lemma_ultrafilter_surjective_action}, for $(a,b,s) \in X \times X \times S$, there exists $p_{(a,b)} \in L$ such that $p_{(a,b)}(w,w) = (a,b)$.  Note that by \cref{lemma_ultrafilter_action_on_X3}, $p_{(a,b)} (w,w,y) = (a, b, p_{(a,b)} y)$. Thus we get a map $\varphi_2: X \times X \times S \to \beta S^2$ with image in $L$. Now $\varphi_2 \family$ is an ultrafilter on $\beta S^2$ and hence converges to some $p$:
+    By \cref{lemma_exists_minimal_left_ideal}, $\beta S^2$ contains a minimal left ideal $L$.  Since $X^2$ is a minimal $S^2$-system, by \cref{lemma_ultrafilter_surjective_action}, for $(a,b,s) \in X \times X \times S$, there exists $p_{(a,b)} \in L$ such that $p_{(a,b)}(w,w) = (a,b)$ \dgg{$p_{(a,b)}(a,b) = (w,w)$}.  Note that by \cref{lemma_ultrafilter_action_on_X3}, $p_{(a,b)} (w,w,y) = (a, b, p_{(a,b)} y)$ \dgg{$p_{(a,b)} (a,b,y) = (w, w, p_{(a,b)} y)$}. Thus we get a map $\varphi_2: X \times X \times S \to \beta S^2$ with image in $L$. Now $\varphi_2 \family$ is an ultrafilter on $\beta S^2$ and hence converges to some $p$:
     \[\varphi_2 \family \to p.\]
     Since $L$ is closed and $\varphi_2$ has image in $L$, $p \in L$.
     
-    By \cref{thm_ultrafilter_action_with_fixed_x_is_continuous}, the map $\varphi_3: \beta S^2 \to X^2$ given by $q \mapsto q(w,w)$ is continuous. Consider the composition $\varphi_3 \circ \varphi_2: X^2 \times S \to X^2$.  On the one hand, by the definitions, $\varphi_3 \circ \varphi_2 = \pi_{12} = \pi_{12} \circ \varphi_1$. We see from the fact that
+    By \cref{thm_ultrafilter_action_with_fixed_x_is_continuous}, the map $\varphi_3: \beta S^2 \to X^2$ given by $q \mapsto q(w,w)$ \dgg{$q \mapsto q(a,b)$} is continuous. Consider the composition $\varphi_3 \circ \varphi_2: X^2 \times S \to X^2$.  On the one hand, by the definitions, $\varphi_3 \circ \varphi_2 = \pi_{12} = \pi_{12} \circ \varphi_1$. We see from the fact that
     \[\varphi_1 \family \to (w,w,x,y)\]
     and the fact that $\pi_{12}$ is continuous that
     \[(\varphi_3 \circ \varphi_2) \family = (\pi_{12} \circ \varphi_1) \family \to \pi_{12} (w,w,x,y) = (w,w).\]
+    \dgg{$\varphi_3 \circ \varphi_2$ is constant $(w,w)$}
     On the other hand, $\varphi_3$ is continuous, so
     \[(\varphi_3 \circ \varphi_2) \family \to \varphi_3 (\text{limit of } \varphi_2 \family).\]
     Since $\varphi_2 \family \to p$, we see that
     \[(\varphi_3 \circ \varphi_2) \family \to \varphi_3 p = p(w,w).\]
     Therefore $p(w,w) = (w,w)$.
-
-abcde
 
     By \cref{lemma_ultrafilter_idempotent_lift}, there exists $q \in L$ such that $q (w,w) = (w,w)$ and $pq$ is idempotent. Consider the map $\varphi_4: X^2 \times S \to X^3$ given by
     \[(a,b,s) \mapsto (sa,sb,p_{(a,b)}qy).\]
@@ -3463,7 +3798,7 @@ abcde
 
     Conversely, suppose $(x,y,y) \in \overline{S^2 (y,y,y)}$. To show that $(x,y) \in \RP$, we will show that for all entourages $\alpha \subseteq X^2$, all open $W \subseteq X^2$ containing $(x,y)$, $W \cap S \alpha \neq \emptyset$.
     
-    Let $\alpha \subseteq X^2$ be an entourage and let $W \ni (x,y)$. Consider the neighborhood $W \times \alpha[y]$ of the point $(x,y,y)$.  \dgg{Is $\alpha[y] = $} By assumption, $(x,y,y) \in \overline{S^2 (y,y,y)}$, so there exists $(s,t) \in S^2$ so that $(s,t)(y,y,y) = (sy,sty,ty) \in W \times \alpha[y]$. That is: $(y,ty) \in \alpha$ and $s(y,ty) = (sy,sty) \in W$.  Therefore, $W \cap S \alpha \neq \emptyset$, as desired.
+    Let $\alpha \subseteq X^2$ be an entourage and let $W \ni (x,y)$. Consider the neighborhood $W \times \alpha[y]$ of the point $(x,y,y)$.  \dgg{Check definition of $\alpha[y]$} By assumption, $(x,y,y) \in \overline{S^2 (y,y,y)}$, so there exists $(s,t) \in S^2$ so that $(s,t)(y,y,y) = (sy,sty,ty) \in W \times \alpha[y]$. That is: $(y,ty) \in \alpha$ and $s(y,ty) = (sy,sty) \in W$.  Therefore, $W \cap S \alpha \neq \emptyset$, as desired.
 \end{proof}
 
 % OLD PROOF USING NETS.  SAVE FOR POSTERITY.
@@ -3572,9 +3907,9 @@ Here is another application of the material in this section. The theorem below i
 \end{theorem}
 
 \begin{proof}
-\uses{lemma_rp_basics_symmetric,thm_rp_implies_same_minimal_component,thm_xxx_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,lemma_return_time_algebra_three,lemma_image_of_syndetic}
+\uses{lemma_rp_basics_symmetric,thm_rp_implies_same_minimal_component,thm_xyy_is_trtl_unif_rec_v3,lemma_S_orb_closure_contained_in_S2_orbit_closure_v3,theorem_orbit_closure_transitivity,thm_xxx_is_trtl_unif_rec_v3,lemma_return_time_algebra_three,lemma_image_of_syndetic}
 \leanok{}
-    Let $U, V \subseteq X$ be non-empty, open with $y \in V$.  Let $z \in U$.  By \cref{lemma_rp_basics_symmetric}, $\RP$ is symmetric, so $(y,x) \in \RP$.  By \cref{thm_rp_implies_same_minimal_component}, $(y,x,x) \in \overline{S^2 (x,x,x)}$. By minimality, $(z,z) \in \overline{S(x,x)}$.  Since $(x,x,x)$ is $S^2$-uniformly recurrent (\cref{thm_xxx_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,z,z) \in \overline{S^2(y,x,x)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), $(y,z,z) \in \overline{S^2 (x,x,x)}$.
+    Let $U, V \subseteq X$ be non-empty, open with $y \in V$.  Let $z \in U$.  By \cref{lemma_rp_basics_symmetric}, $\RP$ is symmetric, so $(y,x) \in \RP$.  By \cref{thm_rp_implies_same_minimal_component}, $(y,x,x) \in \overline{S^2 (x,x,x)}$. By minimality, $(z,z) \in \overline{S(x,x)}$.  Since $(y,x,x)$ is $S^2$-uniformly recurrent (\cref{thm_xyy_is_trtl_unif_rec_v3}), by \cref{lemma_S_orb_closure_contained_in_S2_orbit_closure_v3}, $(y,z,z) \in \overline{S^2(y,x,x)}$.  By transitivity (\cref{theorem_orbit_closure_transitivity}), $(y,z,z) \in \overline{S^2 (x,x,x)}$.
     
     By \cref{thm_xxx_is_trtl_unif_rec_v3}, the point $(x,x,x)$ is $S^2$-uniformly recurrent.  Since $V \times U \times U$ is an open neighborhood of $(y,z,z)$ and $(y,z,z) \in \overline{S^2 (x,x,x)}$, we get that $R_{S^2}((x,x,x), V \times U \times U)$ is syndetic. This is the set of pairs $(g,r) \in S^2$ such that $T_{L,g} T_{R,r} (x,x,x) \in V \times U \times U$ -- that is, such that $r \in R(x,U)$, $g \in R(x,V)$, $rg \in R(x,U)$.  For each such pair $(g,r) \in S^2$, we see by \cref{lemma_return_time_algebra_three} that
     \[r \in R(x,U) \cap (R(x,U) R(x,V)^{-1}) = R(x,U) \cap R(V,U).\]
@@ -3745,7 +4080,7 @@ Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq 
 
 \begin{theorem}
 \label{thm_lspwf_upgrade}
-\lean{crtContainmentSufficesForFamilyContainment}
+\lean{urContainmentSufficesForFamilyContainment}
     Let $S$ be a semigroup. Let $\family$ and $\familytwo$ be families of subsets of $S$. Suppose that for all UR set $B \subseteq S$ and all thick $H \subseteq S$, if $B \cap H \in \family$, then $B \cap H \in \familytwo$.  Then we have
     \[\syndetic \classcapdual \family \subseteq \syndetic \classcapdual \familytwo.\]
 \end{theorem}
@@ -3754,6 +4089,7 @@ Let $S$ be a semigroup.  Let $A \subseteq S$ be a syndetic set and $H \subseteq 
 
 \begin{proof}
 \uses{thm_classcapdual_contained_in_intersection,lem:auslander-ellis}
+\leanok{}
 \begin{enumerate}
     \item Let $A \in \syndetic \classcapdual \family$ and $H \subseteq S$ be a thick set. Our goal is to show that $A \cap H \in \familytwo$.
 
@@ -3894,7 +4230,7 @@ A version of the following theorem can be found (for $\Z$-actions, or more gener
 
 \subsection{Proof of \cref{thm_bfw_dual_abelian} and some corollaries}
 
-If you only care about the combinatorics, the following is a weaker, but purely combinatorial and still highly-nontrivial-looking consequence:
+If we only care about the combinatorics, the following is a weaker, but purely combinatorial and still highly-nontrivial-looking consequence:
 \[\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0.\]
 
 \begin{theorem}
@@ -3906,6 +4242,7 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 
 \begin{proof}
 \uses{thm_delta_in_deltazero,thm_delta_zero_set_of_bohr_rec,thm_classcapdual_is_monotonic,thm_lspwf_upgrade,thm_classcapdual_contained_in_intersection,thm_dcthickbohr_is_delta_for_rxu}
+\leanok{}
     That
     \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}). So we have only left to show that
@@ -3924,6 +4261,7 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 
 \begin{proof}
 \uses{thm_delta_in_deltazero,thm_delta_zero_set_of_bohr_rec,thm_classcapdual_is_monotonic,thm_bfw_dual_abelian}
+\leanok{}
     That
     \[\syndetic \classcapdual \Delta \subseteq \syndetic \classcapdual \Delta_0 \subseteq \syndetic \classcapdual \dcthickbohr\]
     follows from $\Delta \subseteq \Delta_0$ (\cref{thm_delta_in_deltazero}), $\Delta_0 \subseteq \dcthickbohr$ (\cref{thm_delta_zero_set_of_bohr_rec}), and the monotonicity of $\classcapdual$ (\cref{thm_classcapdual_is_monotonic}).  By \cref{thm_bfw_dual_abelian}, $\syndetic \classcapdual \Delta = \syndetic \classcapdual \dcthickbohr$, so $\syndetic \classcapdual \Delta = \syndetic \classcapdual \Delta_0$, as desired.
@@ -3939,6 +4277,7 @@ If you only care about the combinatorics, the following is a weaker, but purely 
 
 \begin{proof}
 \uses{thm_bfw_dual_abelian,lemma_synd_thick_dual,lemma_dcsyndeticbohr_dcthickbohr_dual,thm_combo_algebra_statement_one}
+\leanok{}
     From \cref{thm_bfw_dual_abelian}, we have that
     \[\syndetic \classcapdual \dcthickbohr \subseteq \syndetic \classcapdual \Delta.\]
     Since $\syndetic^* = \thick$ (\cref{lemma_synd_thick_dual}) and $\dcthickbohr^* = \dcsyndeticbohr$ (\cref{lemma_dcsyndeticbohr_dcthickbohr_dual}), we have the conclusion from \cref{thm_combo_algebra_statement_one}.

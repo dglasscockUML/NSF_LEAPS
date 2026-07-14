@@ -404,9 +404,18 @@ by
   exact ultrafilter_isOpen_basic (Set.preimage (leftMult s) A)
 
 theorem leftIdealInBetaSContainsMinIdempotent
-{S : Type*} [Semigroup S] (L : Set (Ultrafilter S)) {hL : isLeftIdeal L} :
+{S : Type*} [Semigroup S] [Nonempty S] (L : Set (Ultrafilter S)) {hL : isLeftIdeal L} :
 ∃ (p : Ultrafilter S), (isMinimalUltrafilter p) ∧ (p * p = p) :=
-by sorry
+by
+  have := leftIdealContainsMinLeftIdeal (S := Ultrafilter S) L (hL := hL)
+  obtain ⟨M, hM1, hM2⟩ := this
+  have := leftIdealContainsIdempotent (S := Ultrafilter S) M (hL := hM1.1)
+  obtain ⟨p, hp1, hp2⟩ := this
+  use p
+  constructor
+  · unfold isMinimalUltrafilter
+    use M
+  · exact hp2
 
 end Ultrafilters_as_topological_semigroups
 
