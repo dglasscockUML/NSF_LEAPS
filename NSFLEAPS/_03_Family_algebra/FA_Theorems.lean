@@ -261,8 +261,18 @@ theorem thm_familyJoinContainsUnion (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G) 
   change h ∈ famJoin F G
   unfold _root_.famJoin
   split_ifs with hF hG
-  · sorry
-  · sorry
+  · cases union with
+    | inl hFmem =>
+      rw [hF] at hFmem
+      exact False.elim hFmem
+    | inr hGmem =>
+      exact hGmem
+  · cases union with
+    | inl hFmem =>
+      exact hFmem
+    | inr hGmem =>
+      rw [hG] at hGmem
+      exact False.elim hGmem
   · sorry
 -- need to define what a subset of Fam is
 
