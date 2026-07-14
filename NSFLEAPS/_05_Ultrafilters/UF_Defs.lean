@@ -426,7 +426,16 @@ acting on `βS` by left multiplication -/
 def ultrafilterSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S (Ultrafilter S) :=
-by sorry
+{
+  map := fun (s : S) ↦ leftMultUltra (pure s)
+  mapMult := by
+    intro s1 s2 p
+    have := pureIsHom (S := S)
+    simp only [pureIsHom (S := S) s1 s2]
+    unfold leftMultUltra
+    exact mul_assoc (pure s1) (pure s2) p
+  mapCont := leftMultPrincipalUltraContinuous
+}
 
 /-- The subsystems of `ultrafilterSystem S` are precisely
 the closed left ideals of `βS` -/
@@ -434,7 +443,70 @@ theorem ultraSubsystemIffClosedLeftIdeal
 {S : Type*} [Semigroup S] [Nonempty S] (Z : Set (Ultrafilter S)) :
 isNonemptyCompactT2InvariantSubset (ultrafilterSystem S) Z ↔
 (IsClosed Z ∧ isLeftIdeal Z) :=
-  by sorry
+  by
+    constructor
+    · intro nct2IS
+      unfold isNonemptyCompactT2InvariantSubset at nct2IS
+      obtain ⟨hNonempty, hCompact, hT2, hInv⟩ := nct2IS
+      constructor
+      · exact IsCompact.isClosed hCompact
+      · unfold isLeftIdeal
+        constructor
+        · exact hNonempty
+        · have betaSisClosureOfImageOfPure : closure (Set.range pure) = Set.univ (α := Ultrafilter S) := by
+            have := Dense.closure_eq (s := Set.range (pure : S → Ultrafilter S))
+            exact this denseRange_pure
+          have : ∀ (z : Ultrafilter S), z ∈ Z → (rightMultUltra z) '' (Set.univ (α := Ultrafilter S)) ⊆ Z := by
+            intro z hz
+            have := imageClosureIsClosureImage
+              (rightMultUltraContinuous z) (Set.range pure)
+            rw [← betaSisClosureOfImageOfPure]
+            rw [this]
+            have := IsClosed.closure_subset_iff (IsCompact.isClosed hCompact) (s := (rightMultUltra ↑z '' Set.range pure))
+            apply this.mpr
+            intro p hp
+            unfold Set.image at hp
+            obtain ⟨a, ha1, ha2⟩ := hp
+            unfold rightMultUltra at ha2
+            simp only [Set.mem_range] at ha1
+            obtain ⟨s, hs⟩ := ha1
+            rw [← hs] at ha2
+            specialize hInv s
+            unfold Set.MapsTo at hInv
+            specialize hInv hz
+            rw [←ha2]
+            exact hInv
+          intro p
+          unfold Set.image
+          simp only
+          intro q hq
+          obtain ⟨z, hz1, hz2⟩ := hq
+          specialize this z hz1
+          unfold Set.image at this
+          unfold rightMultUltra at this
+          apply this
+          use p
+          constructor
+          · simp only [Set.mem_univ]
+          · exact hz2
+    · intro ⟨isClosed, isL⟩
+      unfold isNonemptyCompactT2InvariantSubset
+      constructor
+      · exact isL.1
+      · constructor
+        · exact IsClosed.isCompact isClosed
+        · constructor
+          · infer_instance
+          · unfold isInvariantSet
+            unfold isLeftIdeal at isL
+            intro s
+            have := isL.2 (pure s)
+            unfold ultrafilterSystem
+            simp only
+            exact Set.mapsTo_iff_image_subset.mpr this
+
+
+
 
 /-- The minimal subsystems of `ultrafilterSystem S` are precisely
 the minimal left ideals of `βS` -/
