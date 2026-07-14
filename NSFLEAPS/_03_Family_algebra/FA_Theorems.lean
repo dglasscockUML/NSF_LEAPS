@@ -256,7 +256,14 @@ theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
 
 --thm_classcap_contains_union
 theorem thm_familyJoinContainsUnion (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G)  :=
-  by sorry
+  by
+  intro h union
+  change h ∈ famJoin F G
+  unfold _root_.famJoin
+  split_ifs with hF hG
+  · sorry
+  · sorry
+  · sorry
 -- need to define what a subset of Fam is
 
 --thm_classcap_commutative
