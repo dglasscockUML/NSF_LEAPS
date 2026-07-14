@@ -1428,10 +1428,17 @@ refine ⟨?_, ?_, ?_, ?_⟩
 /-- A subset of a system X is a minimal subset iff it is a minimal subsystem -/
 theorem minimalSubsetIffMinimalSubsystem
 (dSystem : DynamicalSystem S X)
-{Y : Set X} [CompactSpace Y] [Nonempty Y]
-(preSubSystem : isNonemptyCompactT2InvariantSubset dSystem Y) :
+{Y : Set X} (preSubSystem : isNonemptyCompactT2InvariantSubset dSystem Y) :
+letI : CompactSpace Y := isCompact_iff_compactSpace.mp (preSubSystem.2.1)
+letI : Nonempty Y := by
+  rcases preSubSystem.1 with ⟨y, hy⟩
+  exact ⟨⟨y, hy⟩⟩
 isMinimalSubset dSystem Y ↔
   isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem) := by
+letI : CompactSpace Y := isCompact_iff_compactSpace.mp (preSubSystem.2.1)
+letI : Nonempty Y := by
+  rcases preSubSystem.1 with ⟨y, hy⟩
+  exact ⟨⟨y, hy⟩⟩
 let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem
 have dYDef : dSystemY = fromNonemptyCompactT2InvariantSubsetToSystem dSystem preSubSystem := by
     trivial
@@ -2432,7 +2439,7 @@ have : CompactSpace Y := by
 have : Nonempty Y := by
   apply hY.1.to_subtype
 have hdSystemY_Minimal : isMinimalSystem dSystemY := by
-  rw [<- minimalSubsetIffMinimalSubsystem]
+  rw [←minimalSubsetIffMinimalSubsystem]
   exact hYMinimal
 unfold isUniformlyRecurrent
 intro U' hU'

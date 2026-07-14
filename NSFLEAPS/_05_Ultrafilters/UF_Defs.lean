@@ -506,20 +506,73 @@ isNonemptyCompactT2InvariantSubset (ultrafilterSystem S) Z ↔
             exact Set.mapsTo_iff_image_subset.mpr this
 
 
-
-
 /-- The minimal subsystems of `ultrafilterSystem S` are precisely
 the minimal left ideals of `βS` -/
 theorem ultraMinSubsystemIffMinLeftIdeal
 {S : Type*} [Semigroup S] [Nonempty S] (Z : Set (Ultrafilter S)) :
 isMinimalSubset (ultrafilterSystem S) Z ↔ isMinLeftIdeal Z :=
-  by sorry
+  by
+    constructor
+    · intro hMin
+      unfold isMinLeftIdeal
+      unfold isMinimalSubset at hMin
+      have ZIsClosedandIsIdeal := (ultraSubsystemIffClosedLeftIdeal Z).mp hMin.1
+      unfold isNonemptyCompactT2InvariantSubset at hMin
+      rcases hMin with ⟨⟨ZNonempty,ZCompact,ZT2,ZInv⟩,ZMin⟩
+      constructor
+      · exact ZIsClosedandIsIdeal.2
+      · intro M hM1 hM2
+        obtain ⟨K,hK1,hK2,hK3⟩ := leftIdealContainsClosedLeftIdeal M (hL := hM1)
+        obtain ⟨KNon,KComp,KT2,KInv⟩ := (ultraSubsystemIffClosedLeftIdeal K).mpr ⟨hK2,hK1⟩
+        have KinZ : K ⊆ Z := by exact LE.le.subset fun ⦃a⦄ a_1 ↦ hM2 (hK3 a_1)
+        specialize ZMin K KinZ ⟨KNon,KComp,KT2,KInv⟩
+        ext x
+        constructor
+        · intro hx
+          exact hM2 hx
+        · intro hx
+          rw [ZMin] at hx
+          exact hK3 hx
+    · intro ZMinLeftIdeal
+      have ZCompact := minimalLeftIdealCompact ZMinLeftIdeal
+      have ZClosed := IsCompact.isClosed ZCompact
+      unfold isMinLeftIdeal at ZMinLeftIdeal
+      have ZSubsystem := (ultraSubsystemIffClosedLeftIdeal Z).mpr ⟨ZClosed,ZMinLeftIdeal.1⟩
+      obtain ⟨ZleftIdeal,ZminProperty⟩ := ZMinLeftIdeal
+      unfold isMinimalSubset
+      constructor
+      · exact ZSubsystem
+      · intro Z1 Z1inZ hZ1
+        obtain ⟨Z1Closed,Z1LeftIdeal⟩ := (ultraSubsystemIffClosedLeftIdeal Z1).mp hZ1
+        exact (ZminProperty Z1 Z1LeftIdeal Z1inZ).symm
 
 /-- An ultrafilter is minimal if and only if it is `S`-uniformly recurrent -/
 theorem ultrafilterMinimalIffUnifRec
 {S : Type*} [Semigroup S] [Nonempty S] (p : Ultrafilter S) :
 isMinimalUltrafilter p ↔ isUniformlyRecurrent (ultrafilterSystem S) p :=
-  by sorry
+  by
+    constructor
+    · intro pMin
+      unfold isMinimalUltrafilter at pMin
+      obtain ⟨L,hL,pInL⟩ := pMin
+      obtain ⟨Lpresubsys,Lmin⟩ := (ultraMinSubsystemIffMinLeftIdeal L).mpr hL
+      have LCompact := minimalLeftIdealCompact hL
+      have LMinSystem :=
+        (minimalSubsetIffMinimalSubsystem (ultrafilterSystem S) Lpresubsys).mp ⟨Lpresubsys,Lmin⟩
+      letI : CompactSpace L := isCompact_iff_compactSpace.mp (Lpresubsys.2.1)
+      letI : Nonempty L := by
+        rcases Lpresubsys.1 with ⟨y, hy⟩
+        exact ⟨⟨y, hy⟩⟩
+      let newsys := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) Lpresubsys
+      have := minimalImpliesUniformlyRecurrent newsys (hMin := LMinSystem)
+      specialize this ⟨p,pInL⟩
+      sorry -- Finish this by saying that UR in a subsystem implies UR in the system
+    · intro pUR
+      have pOrbClosIsMin := orbitClosureOfURPointIsMinimalSubset (ultrafilterSystem S) pUR
+      let pOrbClos := orbitClosure (ultrafilterSystem S) p
+      have pOrbClosIsMinIdeal := (ultraMinSubsystemIffMinLeftIdeal pOrbClos).mp pOrbClosIsMin
+      have pInOrbClos : p ∈ pOrbClos := sorry -- A (uniformly) recurrent point is in its orbit closure
+      use pOrbClos
 
 end Ultrafilters_as_phase_space
 
