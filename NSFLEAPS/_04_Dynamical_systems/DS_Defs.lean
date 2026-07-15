@@ -1814,6 +1814,22 @@ def isUniformlyRecurrent
 Prop :=
 ∀ U ∈ nhds x, isSyndetic (visitTimeSet dSystem x U)
 
+/-- If `x ∈ X` is uniformly recurrent, then it belongs to its orbit closure -/
+lemma URPointBelongsToOrbitClosure
+(dSystem : DynamicalSystem S X) {x : X} (xUR : isUniformlyRecurrent dSystem x) :
+x ∈ orbitClosure dSystem x := by sorry
+
+/-- If a point is uniformly recurrent in a subsystem, it is uniformly
+recurrent in the system -/
+lemma URInSubsystemImpliesURInSystem
+(dSystem : DynamicalSystem S X) {Z : Set X}
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) (z : Z) :
+letI : CompactSpace Z := isCompact_iff_compactSpace.mp (hZ.2.1)
+letI : Nonempty Z := (fun ⟨y, hy⟩ ↦ ⟨⟨y, hy⟩⟩) hZ.1
+isUniformlyRecurrent (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) z →
+  isUniformlyRecurrent dSystem ↑z :=
+sorry
+
 /-- In a minimal system, for all `x ∈ X` and all non-empty, open `U ⊆ X`
 the set of visit times `R(x,U)` is syndetic -/
 theorem minimalImpliesSyndeticVisits

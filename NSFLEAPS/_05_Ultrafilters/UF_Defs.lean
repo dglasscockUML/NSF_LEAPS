@@ -564,14 +564,14 @@ isMinimalUltrafilter p ↔ isUniformlyRecurrent (ultrafilterSystem S) p :=
         rcases Lpresubsys.1 with ⟨y, hy⟩
         exact ⟨⟨y, hy⟩⟩
       let newsys := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) Lpresubsys
-      have := minimalImpliesUniformlyRecurrent newsys (hMin := LMinSystem)
-      specialize this ⟨p,pInL⟩
-      sorry -- Finish this by saying that UR in a subsystem implies UR in the system
+      have urInSubsys := minimalImpliesUniformlyRecurrent newsys (hMin := LMinSystem)
+      specialize urInSubsys ⟨p,pInL⟩
+      exact URInSubsystemImpliesURInSystem (ultrafilterSystem S) Lpresubsys ⟨p, pInL⟩ urInSubsys
     · intro pUR
       have pOrbClosIsMin := orbitClosureOfURPointIsMinimalSubset (ultrafilterSystem S) pUR
       let pOrbClos := orbitClosure (ultrafilterSystem S) p
       have pOrbClosIsMinIdeal := (ultraMinSubsystemIffMinLeftIdeal pOrbClos).mp pOrbClosIsMin
-      have pInOrbClos : p ∈ pOrbClos := sorry -- A (uniformly) recurrent point is in its orbit closure
+      have pInOrbClos : p ∈ pOrbClos := URPointBelongsToOrbitClosure (ultrafilterSystem S) pUR
       use pOrbClos
 
 end Ultrafilters_as_phase_space
@@ -714,14 +714,32 @@ variable (dSystem : DynamicalSystem S X)
 theorem ultraActionWithFixedxIsContinuous
 (x : X) :
 Continuous (fun (p : Ultrafilter S) ↦ (ultraAction dSystem).map p x) :=
-by sorry
+by
+  unfold ultraAction ultraLim
+  simp only
+  exact continuous_ultrafilter_extend fun s ↦ dSystem.map s x
+
+/-- The lift of a function `f : S → X` to `βS → X` has range in the
+closure of the range of `f` -/
+lemma ultraLiftMapsToClosure
+(f : S → X) :
+Set.range (Ultrafilter.extend f) ⊆ closure (Set.range f) := by sorry
+  -- Set.range (Ultrafilter.extend f) = Ultrafilter.extend f '' Set.univ
+  -- denseRange_pure (α := S) gives Set.univ = closure (Set.range (pure : S → Ultrafilter S))
+  -- Set.range (Ultrafilter.extend f) = Ultrafilter.extend f '' Set.univ = Ultrafilter.extend f '' closure (Set.range (pure : S → Ultrafilter S))
+  -- continuous_ultrafilter_extend f will give that Ultrafilter.extend f '' closure (Set.range (pure : S → Ultrafilter S)) = closure (Ultrafilter.extend f '' (Set.range (pure : S → Ultrafilter S))
+  -- but this is just closure (f '' Set.univ (S)), as desired
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
 `x : X`, and `p : βS`, the point `px` belongs to the orbit closure of `x` -/
 theorem ultraActionInOrbitClosure
 (p : Ultrafilter S) (x : X) :
 (ultraAction dSystem).map p x ∈ orbitClosure dSystem x :=
-by sorry
+by
+  unfold ultraAction ultraLim
+  simp only
+  have ultraLiftRange := ultraLiftMapsToClosure (fun s ↦ dSystem.map s x)
+  exact (Set.range_subset_iff).mp ultraLiftRange p
 
 /-- Given a factor map `π : X → Y` of dynamical systems and `p : βS`,
 the action of `p` intertwines with the factor map: `p ∘ π = π ∘ p` -/
