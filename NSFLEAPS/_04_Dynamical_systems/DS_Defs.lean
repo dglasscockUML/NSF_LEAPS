@@ -1846,8 +1846,44 @@ lemma URInSubsystemImpliesURInSystem
 letI : CompactSpace Z := isCompact_iff_compactSpace.mp (hZ.2.1)
 letI : Nonempty Z := (fun ⟨y, hy⟩ ↦ ⟨⟨y, hy⟩⟩) hZ.1
 isUniformlyRecurrent (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) z →
-  isUniformlyRecurrent dSystem ↑z :=
-sorry
+  isUniformlyRecurrent dSystem ↑z := by
+intro hUniZ
+unfold isUniformlyRecurrent
+intro U hU
+have hU1 : ∃ U1 ⊆ U, IsOpen U1 ∧ Subtype.val z ∈ U1 := by
+  apply mem_nhds_iff.mp hU
+rcases hU1 with ⟨U1, hU1a, hU1b, hU1c⟩
+let V : Set Z := Subtype.val ⁻¹' U1
+have hVOpen : IsOpen V := by
+  apply IsOpen.preimage
+  · continuity
+  · exact hU1b
+have hVContain : z ∈ V := by
+  simp only [Set.mem_preimage, V]
+  exact hU1c
+have hVnhds : V ∈ nhds z := by
+  apply mem_nhds_iff.mpr
+  use V
+unfold isUniformlyRecurrent at hUniZ
+specialize hUniZ V hVnhds
+unfold isSyndetic at hUniZ
+rcases hUniZ with ⟨F, hF1, hF2⟩
+use F
+constructor
+· exact hF1
+· intro s
+  specialize hF2 s
+  rcases hF2 with ⟨f, hf1, hf2⟩
+  use f
+  constructor
+  · exact hf1
+  · simp only [visitTimeSet, Set.mem_preimage]
+    simp only [visitTimeSet, Set.mem_preimage] at hf2
+    simp only [Set.mem_preimage, V] at hf2
+    have hGoal : dSystem.map (f * s) (Subtype.val z) ∈ U1 := by
+      exact hf2
+    apply hU1a
+    exact hGoal
 
 /-- In a minimal system, for all `x ∈ X` and all non-empty, open `U ⊆ X`
 the set of visit times `R(x,U)` is syndetic -/
