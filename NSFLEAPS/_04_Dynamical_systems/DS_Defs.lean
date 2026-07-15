@@ -1817,7 +1817,26 @@ Prop :=
 /-- If `x ∈ X` is uniformly recurrent, then it belongs to its orbit closure -/
 lemma URPointBelongsToOrbitClosure
 (dSystem : DynamicalSystem S X) {x : X} (xUR : isUniformlyRecurrent dSystem x) :
-x ∈ orbitClosure dSystem x := by sorry
+x ∈ orbitClosure dSystem x := by
+have h1 : ∀ U ∈ nhds x, (U ∩ orbit dSystem x).Nonempty := by
+  intro U hU
+  have h4 := xUR U hU
+  have h2 : (visitTimeSet dSystem x U).Nonempty := by
+    apply syndeticSetIsNonEmpty
+    exact h4
+  rcases h2 with ⟨s, hs⟩
+  have h3 : dSystem.map s x ∈ U := by
+    exact hs
+  have h5 : dSystem.map s x ∈ orbit dSystem x := by
+    unfold orbit
+    simp
+  exact ⟨dSystem.map s x, h3, h5⟩
+apply mem_closure_iff.2
+intro U hU1 hU2
+have h61 : U ∈ nhds x := by
+  apply IsOpen.mem_nhds hU1 hU2
+have h62 := h1 U h61
+exact h62
 
 /-- If a point is uniformly recurrent in a subsystem, it is uniformly
 recurrent in the system -/
