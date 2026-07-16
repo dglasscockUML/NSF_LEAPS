@@ -330,8 +330,24 @@ by
 theorem membershipInLeftMultByPrincipal
 {S : Type*} [Semigroup S]
 (s : S) (B : Set S) (p : Ultrafilter S) :
-B ∈ leftMultUltra (pure s) p ↔ (leftMult s) ⁻¹' B ∈ p :=
-by sorry
+B ∈ leftMultUltra (pure s) p ↔ (leftMult s) ⁻¹' B ∈ p := by
+constructor
+· intro hB
+  have h1 : leftMultUltra (pure s) p = (pure s) * p := by
+    rfl
+  rw [h1] at hB
+  simp only [ultraProductDescription, Ultrafilter.mem_pure, Set.mem_setOf_eq] at hB
+  have h2 : {t | s * t ∈ B} = leftMult s ⁻¹' B := by
+    rfl
+  rw [<- h2]
+  exact hB
+· intro hB
+  simp only [leftMultUltra]
+  simp only [ultraProductDescription, Ultrafilter.mem_pure, Set.mem_setOf_eq]
+  have h2 : {t | s * t ∈ B} = leftMult s ⁻¹' B := by
+    rfl
+  rw [h2]
+  exact hB
 
 /-- Given `s ∈ S` and `B ⊆ S`, `closure(s⁻¹B) = s⁻¹closure(B)` -/
 theorem preimageClosureDescription
