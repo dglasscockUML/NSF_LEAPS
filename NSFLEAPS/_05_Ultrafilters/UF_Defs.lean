@@ -278,6 +278,53 @@ Prop :=
 
 end Semigroup_stuff
 
+section Generic_ultrafilter_lemmas
+
+/-- The range of the lift of `f : S → X` to `βS → X` is equal to the
+closure of the range of `f` -/
+lemma ultraLiftMapsToClosure
+{S} {X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+(f : S → X) :
+Set.range (Ultrafilter.extend f) = closure (Set.range f) := by
+  have rangeDef : Set.range (Ultrafilter.extend f) = Ultrafilter.extend f '' Set.univ := by
+    simp only [Set.image_univ]
+  have setUnivIsClos : Set.univ = closure (Set.range (pure : S → Ultrafilter S)) := by
+    have := denseRange_pure (α := S)
+    unfold DenseRange at this
+    exact (Dense.closure_eq this).symm
+  have fImageDesc : Set.range (Ultrafilter.extend f) =
+    (Ultrafilter.extend f) '' (closure (Set.range (pure : S → Ultrafilter S))) := by
+      rw [rangeDef]
+      rw [setUnivIsClos]
+  have hThree : (Ultrafilter.extend f) '' closure (Set.range (pure : S → Ultrafilter S)) =
+    closure ((Ultrafilter.extend f) '' (Set.range (pure : S → Ultrafilter S))) := by
+      exact imageClosureIsClosureImage
+        (continuous_ultrafilter_extend f) (Set.range (pure : S → Ultrafilter S))
+  have imageOfPure : (Ultrafilter.extend f) '' (Set.range (pure : S → Ultrafilter S)) =
+    f '' Set.univ := by
+      ext x
+      constructor
+      · intro hx
+        simp only [Set.mem_image, Set.mem_range, exists_exists_eq_and,
+          ultrafilter_extend_pure] at hx
+        obtain ⟨s, hs⟩ := hx
+        use s
+        exact ⟨Set.mem_univ s,hs⟩
+      · intro hx
+        simp only [Set.image_univ, Set.mem_range] at hx
+        obtain ⟨s, hs⟩ := hx
+        use pure s
+        constructor
+        · simp only [Set.mem_range, exists_apply_eq_apply]
+        · simp only [ultrafilter_extend_pure]
+          exact hs
+  rw [imageOfPure] at hThree
+  rw [hThree] at fImageDesc
+  simp only [Set.image_univ] at fImageDesc
+  exact fImageDesc
+
+end Generic_ultrafilter_lemmas
+
 section Ultrafilters_as_a_semigroup
 
 -- Was S_left_mult
@@ -719,16 +766,35 @@ by
   simp only
   exact continuous_ultrafilter_extend fun s ↦ dSystem.map s x
 
-/-- The lift of a function `f : S → X` to `βS → X` has range in the
-closure of the range of `f` -/
-lemma ultraLiftMapsToClosure
-(f : S → X) :
-Set.range (Ultrafilter.extend f) ⊆ closure (Set.range f) := by sorry
-  -- Set.range (Ultrafilter.extend f) = Ultrafilter.extend f '' Set.univ
-  -- denseRange_pure (α := S) gives Set.univ = closure (Set.range (pure : S → Ultrafilter S))
-  -- Set.range (Ultrafilter.extend f) = Ultrafilter.extend f '' Set.univ = Ultrafilter.extend f '' closure (Set.range (pure : S → Ultrafilter S))
-  -- continuous_ultrafilter_extend f will give that Ultrafilter.extend f '' closure (Set.range (pure : S → Ultrafilter S)) = closure (Ultrafilter.extend f '' (Set.range (pure : S → Ultrafilter S))
-  -- but this is just closure (f '' Set.univ (S)), as desired
+theorem ultraFactorMap
+{x : X} (xDense : Dense (orbit dSystem x)) :
+isFactorMap (ultrafilterSystem S) dSystem
+  (fun (p : Ultrafilter S) ↦ (ultraAction dSystem).map p x) :=
+by
+  constructor
+  · exact ultraActionWithFixedxIsContinuous dSystem x
+  · constructor
+    · have ultraLiftFact := ultraLiftMapsToClosure (fun (s : S) ↦ (dSystem.map s) x)
+      have denseOrbit : closure (Set.range fun s ↦ dSystem.map s x) = Set.univ (α := X) := by
+        apply dense_iff_closure_eq.mp
+        exact xDense
+      rw [denseOrbit] at ultraLiftFact
+      exact Set.range_eq_univ.mp ultraLiftFact
+    · unfold isEquivariant
+      intro s
+      ext p
+      unfold ultrafilterSystem
+      simp only
+      have : ((fun p ↦ (ultraAction dSystem).map p x) ∘ leftMultUltra (pure s)) p =
+        (ultraAction dSystem).map ((pure s) * p) x := by
+          exact Function.comp_apply
+      rw [this]
+      rw [(ultraAction dSystem).mapMult]
+      have : (ultraAction dSystem).map (pure s) = dSystem.map s := by
+        unfold ultraAction ultraLim
+        simp only [ultrafilter_extend_pure]
+      rw [this]
+      simp only [Function.comp_apply]
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
 `x : X`, and `p : βS`, the point `px` belongs to the orbit closure of `x` -/
@@ -739,7 +805,9 @@ by
   unfold ultraAction ultraLim
   simp only
   have ultraLiftRange := ultraLiftMapsToClosure (fun s ↦ dSystem.map s x)
-  exact (Set.range_subset_iff).mp ultraLiftRange p
+  have : Set.range (Ultrafilter.extend fun s ↦ dSystem.map s x) ⊆ closure (Set.range fun s ↦ dSystem.map s x) := by
+    exact subset_of_subset_of_eq (fun ⦃a⦄ a_1 ↦ a_1) ultraLiftRange
+  exact (Set.range_subset_iff).mp this p
 
 /-- Given a factor map `π : X → Y` of dynamical systems and `p : βS`,
 the action of `p` intertwines with the factor map: `p ∘ π = π ∘ p` -/
@@ -756,7 +824,20 @@ by sorry
 theorem visitTimeSetBelongsToUltrafilter
 (x : X) (U : Set X) {hU : IsOpen U} (p : Ultrafilter S) :
 (ultraAction dSystem).map p x ∈ U → visitTimeSet dSystem x U ∈ p :=
-by sorry
+by
+  intro pxInU
+  unfold ultraAction ultraLim at pxInU
+  simp only at pxInU
+  let c := Ultrafilter.extend (fun s ↦ dSystem.map s x) p
+  have defofc : c = Ultrafilter.extend (fun s ↦ dSystem.map s x) p := by trivial
+  have UinNhdsc : U ∈ nhds c := by
+    exact IsOpen.mem_nhds hU pxInU
+  have ultraImageContainsNbhsOfC :=
+    (ultrafilter_extend_eq_iff (f := (fun s ↦ dSystem.map s x)) (b := p) (c := c)).mp defofc
+  have : U ∈ (Ultrafilter.map (fun s ↦ dSystem.map s x) p) := by
+    exact Ultrafilter.mem_map.mpr (ultraImageContainsNbhsOfC UinNhdsc)
+  unfold visitTimeSet
+  exact this
 
 /-- Given a minimal dynamical system `dSystem : DynamicalSystem S X`,
 a minimal left ideal `L ⊆ βS`, and points `x, y ∈ X`, there exists `p ∈ L`
