@@ -640,16 +640,19 @@ isNonemptyCompactT2InvariantSubset (ultrafilterSystem S) Z ↔
       · unfold isLeftIdeal
         constructor
         · exact hNonempty
-        · have betaSisClosureOfImageOfPure : closure (Set.range pure) = Set.univ (α := Ultrafilter S) := by
+        · have betaSisClosureOfImageOfPure : closure (Set.range pure)
+            = Set.univ (α := Ultrafilter S) := by
             have := Dense.closure_eq (s := Set.range (pure : S → Ultrafilter S))
             exact this denseRange_pure
-          have : ∀ (z : Ultrafilter S), z ∈ Z → (rightMultUltra z) '' (Set.univ (α := Ultrafilter S)) ⊆ Z := by
+          have : ∀ (z : Ultrafilter S), z ∈ Z → (rightMultUltra z) ''
+            (Set.univ (α := Ultrafilter S)) ⊆ Z := by
             intro z hz
             have := imageClosureIsClosureImage
               (rightMultUltraContinuous z) (Set.range pure)
             rw [← betaSisClosureOfImageOfPure]
             rw [this]
-            have := IsClosed.closure_subset_iff (IsCompact.isClosed hCompact) (s := (rightMultUltra ↑z '' Set.range pure))
+            have := IsClosed.closure_subset_iff (IsCompact.isClosed hCompact)
+              (s := (rightMultUltra ↑z '' Set.range pure))
             apply this.mpr
             intro p hp
             unfold Set.image at hp
@@ -782,10 +785,17 @@ noncomputable
 def ultraLimContinuousComp
 {S : Type*}
 {X : Type*} [TopologicalSpace X] [CompactSpace X]
-{Y : Type*} [TopologicalSpace Y] [CompactSpace Y]
-(p : Ultrafilter S) {g : X → Y} (hπ : Continuous g) (f : S → X) :
-ultraLim p (g ∘ f) = g (ultraLim p f) :=
-by sorry
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
+(p : Ultrafilter S) {g : X → Y} (hgCont : Continuous g) (f : S → X) :
+ultraLim p (g ∘ f) = g (ultraLim p f) := by
+unfold ultraLim
+--have hGoal : Ultrafilter.extend (g ∘ f) = g ∘ (Ultrafilter.extend f) := by
+have h1 : p.NeBot := by
+  apply Ultrafilter.neBot'
+apply tendsto_nhds_unique' h1
+· sorry
+· sorry
+· sorry
 
 -- This is a lemma needed in the proof of iteratedUltraLims
 lemma ultraSLeftExtension
@@ -945,7 +955,8 @@ by
   unfold ultraAction ultraLim
   simp only
   have ultraLiftRange := ultraLiftMapsToClosure (fun s ↦ dSystem.map s x)
-  have : Set.range (Ultrafilter.extend fun s ↦ dSystem.map s x) ⊆ closure (Set.range fun s ↦ dSystem.map s x) := by
+  have : Set.range (Ultrafilter.extend fun s ↦ dSystem.map s x) ⊆
+    closure (Set.range fun s ↦ dSystem.map s x) := by
     exact subset_of_subset_of_eq (fun ⦃a⦄ a_1 ↦ a_1) ultraLiftRange
   exact (Set.range_subset_iff).mp this p
 
@@ -956,8 +967,22 @@ theorem ultraActionIntertwinesWithFactor
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hπ : isFactorMap dSystem dSystemY π)
 (p : Ultrafilter S) :
-((ultraAction dSystemY).map p) ∘ π = π ∘ (ultraAction dSystem).map p :=
-by sorry
+((ultraAction dSystemY).map p) ∘ π = π ∘ (ultraAction dSystem).map p := by
+ext x
+simp only [Function.comp_apply]
+simp only [ultraAction]
+unfold isFactorMap at hπ
+rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+have h1 : (fun s ↦ dSystemY.map s (π x)) = fun s ↦ π (dSystem.map s x) := by
+  ext s
+  unfold isEquivariant at hπ3
+  specialize hπ3 s
+  have hπ3New : (dSystemY.map s ∘ π) x = (π ∘ dSystem.map s) x := by
+    apply congrFun hπ3
+  exact hπ3New
+rw [h1]
+apply ultraLimContinuousComp
+· exact hπ1
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
 `x : X`, an open set `U ⊆ X`, and `p : βS`, if `px ∈ U`, then `R(x,U) ∈ p` -/
