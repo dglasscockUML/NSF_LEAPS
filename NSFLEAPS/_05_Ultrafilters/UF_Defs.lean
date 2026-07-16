@@ -396,13 +396,87 @@ constructor
   rw [h2]
   exact hB
 
+/-- If ultrafilter p ∈ closure of B, then B ∈ p -/
+lemma memClosurePureIff
+{S : Type*} [Semigroup S]
+(B : Set S) (p : Ultrafilter S) :
+p ∈ closure (pure '' B) ↔ B ∈ p := by
+constructor
+· intro hp
+  by_contra hBNotInp
+  have hBCom : Bᶜ ∈ p := by
+    apply Ultrafilter.compl_mem_iff_notMem.mpr hBNotInp
+  let U := {u : Ultrafilter S | Bᶜ ∈ u}
+  have hpInU : p ∈ U := by
+    simp only [Set.mem_setOf_eq, U]
+    exact hBCom
+  have hUOpen : IsOpen U := by
+    apply ultrafilter_isOpen_basic
+  have hpBInter : (U ∩ pure '' B).Nonempty := by
+    apply mem_closure_iff.mp hp
+    · exact hUOpen
+    · exact hpInU
+  rcases hpBInter with ⟨q, hq1, hq2⟩
+  simp only [Set.mem_setOf_eq, U] at hq1
+  simp only [Set.mem_image] at hq2
+  rcases hq2 with ⟨b, hb1, hb2⟩
+  rw [<- hb2] at hq1
+  simp only [Ultrafilter.mem_pure, Set.mem_compl_iff] at hq1
+  exact hq1 hb1
+· intro hBinp
+  apply mem_closure_iff.mpr
+  intro U hU hpinU
+  have hUNeigh : U ∈ nhds p := by
+    apply mem_nhds_iff.mpr
+    use U
+  have hUCon : ∃ t ∈ ultrafilterBasis S, p ∈ t ∧ t ⊆ U := by
+    apply (TopologicalSpace.IsTopologicalBasis.mem_nhds_iff ultrafilterBasis_is_basis).mp
+    exact hUNeigh
+  rcases hUCon with ⟨t, ht1, ht2, ht3⟩
+  simp only [ultrafilterBasis, Set.mem_range] at ht1
+  rcases ht1 with ⟨A, hA⟩
+  have htIntB : (t ∩ pure '' B).Nonempty := by
+    rw [<- hA] at ht2
+    simp only [Set.mem_setOf_eq] at ht2
+    have hABinp : A ∩ B ∈ p := by
+      apply Filter.inter_mem ht2 hBinp
+    have hABNonempty : (A ∩ B).Nonempty := by
+      apply Ultrafilter.nonempty_of_mem hABinp
+    rcases hABNonempty with ⟨x, hx1, hx2⟩
+    have hxB : (pure x : Ultrafilter S) ∈ (pure '' B : Set (Ultrafilter S) ):= by
+      apply (Set.mem_image pure B (pure x)).mpr
+      use x
+    have hxt : pure x ∈ t := by
+      rw [<- hA]
+      simp only [Set.mem_setOf_eq, Ultrafilter.mem_pure]
+      exact hx1
+    exact ⟨pure x, hxt, hxB⟩
+  have hSubSet : t ∩ pure '' B ⊆ U ∩ pure '' B := by
+    apply Set.inter_subset_inter
+    · exact ht3
+    · rfl
+  apply Set.Nonempty.mono hSubSet htIntB
+
 /-- Given `s ∈ S` and `B ⊆ S`, `closure(s⁻¹B) = s⁻¹closure(B)` -/
 theorem preimageClosureDescription
 {S : Type*} [Semigroup S]
 (s : S) (B : Set S) :
 closure ((pure : S → Ultrafilter S) '' ((leftMult s) ⁻¹' B)) =
-(leftMultUltra (pure s)) ⁻¹' (closure ((pure : S → Ultrafilter S) '' B)):=
-by sorry
+(leftMultUltra (pure s)) ⁻¹' (closure ((pure : S → Ultrafilter S) '' B)) := by
+ext p
+constructor
+· intro hp
+  simp only [memClosurePureIff] at hp
+  simp only [← membershipInLeftMultByPrincipal] at hp
+  simp only [← memClosurePureIff] at hp
+  simp only [Set.mem_preimage]
+  exact hp
+· intro hp
+  simp only [Set.mem_preimage] at hp
+  simp only [memClosurePureIff] at hp
+  simp only [membershipInLeftMultByPrincipal] at hp
+  simp only [← memClosurePureIff] at hp
+  exact hp
 
 /-- Given a minimal left ideal `L ⊆ βS` and an idempotent `u ∈ L`,
 for all `p ∈ L`, `pu = p` -/
