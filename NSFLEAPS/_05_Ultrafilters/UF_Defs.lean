@@ -784,18 +784,37 @@ limit of `f` along `p` -/
 noncomputable
 def ultraLimContinuousComp
 {S : Type*}
-{X : Type*} [TopologicalSpace X] [CompactSpace X]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
 (p : Ultrafilter S) {g : X → Y} (hgCont : Continuous g) (f : S → X) :
 ultraLim p (g ∘ f) = g (ultraLim p f) := by
 unfold ultraLim
---have hGoal : Ultrafilter.extend (g ∘ f) = g ∘ (Ultrafilter.extend f) := by
-have h1 : p.NeBot := by
-  apply Ultrafilter.neBot'
-apply tendsto_nhds_unique' h1
-· sorry
-· sorry
-· sorry
+have h1 : ∀ s : S, Ultrafilter.extend (g ∘ f) (pure s) = (g ∘ (Ultrafilter.extend f)) (pure s) := by
+  intro s
+  simp
+have hGoal : Ultrafilter.extend (g ∘ f) = g ∘ (Ultrafilter.extend f) := by
+  have h1Cont : Continuous (Ultrafilter.extend (g ∘ f)) := by
+    apply continuous_ultrafilter_extend
+  have h2Cont : Continuous (g ∘ (Ultrafilter.extend f)) := by
+    apply Continuous.comp
+    · exact hgCont
+    · apply continuous_ultrafilter_extend
+  have h30 : DenseRange (pure : S → Ultrafilter S) := by
+    apply denseRange_pure
+  let R : Set (Ultrafilter S) := Set.range pure
+  have hDenseR : Dense R := by
+    unfold DenseRange at h30
+    simp only [R]
+    exact h30
+  apply Continuous.ext_on hDenseR h1Cont h2Cont
+  unfold Set.EqOn
+  intro p hpInR
+  simp only [Set.mem_range, R] at hpInR
+  rcases hpInR with ⟨s, hs⟩
+  rw [<- hs]
+  specialize h1 s
+  exact h1
+simp [hGoal]
 
 -- This is a lemma needed in the proof of iteratedUltraLims
 lemma ultraSLeftExtension
