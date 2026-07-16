@@ -348,8 +348,58 @@ theorem minimalIdempotentsAreLeftIdentites
 (L : Set (Ultrafilter S)) {hL : isMinLeftIdeal L}
 (u : Ultrafilter S) {huL : u ∈ L} {huIdempotent : u * u = u}
 (p : Ultrafilter S) :
-p ∈ L → p * u = p :=
-by sorry
+p ∈ L → p * u = p := by
+intro hpL
+let Lu := (· * u) '' L
+rcases hL with ⟨hL1, hL2⟩
+unfold isLeftIdeal at hL1
+rcases hL1 with ⟨hL1a, hL1b⟩
+have hLuInL : Lu ⊆ L := by
+  intro a ha
+  simp only [Set.mem_image, Lu] at ha
+  rcases ha with ⟨x, hx1, hx2⟩
+  rw [<- hx2]
+  specialize hL1b x
+  apply hL1b
+  simp only [Set.mem_image]
+  use u
+have hLuLeftI : isLeftIdeal Lu := by
+  constructor
+  · rcases hL1a with ⟨l, hl⟩
+    have hlIn : l * u ∈ Lu := by
+      simp only [Set.mem_image, Lu]
+      use l
+    exact ⟨l * u, hlIn⟩
+  · intro s a ha
+    simp only [Set.mem_image] at ha
+    rcases ha with ⟨x, hx1, hx2⟩
+    simp only [Set.mem_image, Lu] at hx1
+    rcases hx1 with ⟨y, hy1, hy2⟩
+    rw [<- hy2] at hx2
+    rw [<- hx2]
+    have hsyu : (s * y) * u = s * (y * u):= by
+      apply Semigroup.mul_assoc
+    rw [<- hsyu]
+    simp only [Set.mem_image, Lu]
+    use s * y
+    constructor
+    · specialize hL1b s
+      apply hL1b
+      simp only [Set.mem_image]
+      use y
+    · rfl
+have hLuEqL : Lu = L := by
+  exact hL2 Lu hLuLeftI hLuInL
+have hpLu : p ∈ Lu := by
+  rw [hLuEqL]
+  exact hpL
+simp only [Set.mem_image, Lu] at hpLu
+rcases hpLu with ⟨q, hq1, hq2⟩
+rw [<- hq2]
+have hquu : (q * u) * u = q * (u * u) := by
+  apply Semigroup.mul_assoc
+rw [hquu]
+rw [huIdempotent]
 
 /-- The predicate that the ultrafilter p on S is minimal, that is, belongs to
 some minimal left ideal -/
