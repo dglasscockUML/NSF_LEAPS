@@ -1112,7 +1112,21 @@ by sorry
 theorem minUltraImageIsUniformlyRecurrent
 (x : X) {p : Ultrafilter S} (hp : isMinimalUltrafilter p) :
 isUniformlyRecurrent dSystem ((ultraAction dSystem).map p x) :=
-by sorry
+by
+  unfold isUniformlyRecurrent
+  intro U hU
+  let px := (ultraAction dSystem).map p x
+  have hU2 : U ∈ nhdsSet {px} := sorry
+  obtain ⟨V, VOpen, Vhaspx, closureVInU⟩ :=
+    IsCompact.exists_isOpen_closure_subset (isCompact_singleton (x := px)) hU2
+  let RxV := visitTimeSet dSystem x V
+  let barRxV := {q : Ultrafilter S | RxV ∈ q}
+  have barRxVisnhdsp : barRxV ∈ nhds p := sorry
+  have visitTimeContain :
+    visitTimeSet (ultrafilterSystem S) p barRxV ⊆ visitTimeSet dSystem px U := sorry
+  have pUR := (ultrafilterMinimalIffUnifRec p).mp hp
+  have lhsSynd := pUR barRxV barRxVisnhdsp
+  exact syndeticIsMonotone lhsSynd visitTimeContain
 
 /-- Given a dynamical minimal system `dSystem : DynamicalSystem S X`, a minimal
 left ideal `L ⊆ βS`, and an ultrafilter `p ∈ L`, if `px = x`, then there exists
@@ -1202,6 +1216,7 @@ by
                 Eq.symm
                   ((fun {α} {f g} ↦ Ultrafilter.coe_inj.mp)
                     (congrArg Ultrafilter.toFilter (congrFun (id (Eq.symm heq)) ℓ)))
+  -- this equality holds in subtype form in hu3. the following gets the projection
   have upp : u * p = p := by
     unfold ultraAction Lsystem ultraLim
       fromNonemptyCompactT2InvariantSubsetToSystem ultrafilterSystem leftMultUltra at hu3
@@ -1220,6 +1235,7 @@ by
     rw [this] at hu4
     simp only [ultrafilter_extend_id, id_eq] at hu4
     exact hu4
+  -- this equality holds in subtype form in hq2. the following gets the projection
   have qpu : q * p = u := by
     unfold ultraAction Lsystem ultraLim
       fromNonemptyCompactT2InvariantSubsetToSystem ultrafilterSystem leftMultUltra at hq2
@@ -1238,6 +1254,7 @@ by
     rw [this] at hq4
     simp only [ultrafilter_extend_id, id_eq] at hq4
     exact hq4
+  -- this equality holds in subtype form in hr2. the following gets the projection
   have rqu : r * q = u := by
     unfold ultraAction Lsystem ultraLim
       fromNonemptyCompactT2InvariantSubsetToSystem ultrafilterSystem leftMultUltra at hr2
