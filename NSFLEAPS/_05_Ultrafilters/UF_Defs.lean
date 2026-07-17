@@ -1031,7 +1031,17 @@ theorem minLeftIdealSurjectsOntoMinSystem
 {L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
 (x y : X) :
 ∃ p ∈ L, (ultraAction dSystem).map p x = y :=
-by sorry
+by
+  let π := fun p ↦ (ultraAction dSystem).map p x
+  have isultrafactormap : isFactorMap (ultrafilterSystem S) dSystem π :=
+    ultraFactorMap dSystem ((minimalIffDenseOrbits dSystem).mp hdSystemMin x)
+  have LisMinSubset := (ultraMinSubsystemIffMinLeftIdeal L).mpr hLMin
+  have imageofLIsInvSet := imageOfSubsystemIsSubsystem (ultrafilterSystem S) dSystem π L (hA := LisMinSubset.1) (hEqui := isultrafactormap.2.2) (hπ := isultrafactormap.1)
+  have imageofLIsUniv := hdSystemMin (π '' L) imageofLIsInvSet
+  have yInUniv : y ∈ Set.univ := Set.mem_univ y
+  rw [←imageofLIsUniv] at yInUniv
+  simp only [Set.mem_image] at yInUniv
+  exact yInUniv
 
 /-- Given a minimal dynamical system `dSystem : DynamicalSystem S X`,
 a minimal left ideal `L ⊆ βS`, and a point `x ∈ X`, there exists an idempotent
@@ -1041,7 +1051,39 @@ theorem everyPointInMinFixedBySomeIdempotentUltrafilter
 {L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
 (x : X) :
 ∃ p ∈ L, (p * p = p) ∧ (ultraAction dSystem).map p x = x :=
-by sorry
+by
+  let A : Set (Ultrafilter S) := { q : Ultrafilter S | (ultraAction dSystem).map q x = x}
+  have AcapLisNonempty : (A ∩ L).Nonempty := by
+    obtain ⟨p,hp1,hp2⟩ := minLeftIdealSurjectsOntoMinSystem dSystem hdSystemMin hLMin x x
+    use p
+    exact ⟨hp2,hp1⟩
+  have AcapLisCompact : IsCompact (A ∩ L) := by
+    have AisClosed : IsClosed A := by
+      let f := fun p ↦ (ultraAction dSystem).map p x
+      have fcts : Continuous f := ultraActionWithFixedxIsContinuous dSystem x
+      have descOfA : A = Set.preimage f (Set.singleton x) := by
+        exact Eq.symm (Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1)
+      rw [descOfA]
+      have singleIsClosed : IsClosed (Set.singleton x) := isClosed_singleton
+      exact IsClosed.preimage fcts singleIsClosed
+    have := minimalLeftIdealCompact hLMin
+    exact IsCompact.inter_left this AisClosed
+  have AcapLisSubsemi : isSubsemigroup (A ∩ L) := by
+    intro p hp q hq
+    constructor
+    · unfold A
+      simp only [Set.mem_setOf_eq]
+      rw [(ultraAction dSystem).mapMult]
+      rw [hq.1]
+      exact hp.1
+    · unfold isMinLeftIdeal isLeftIdeal at hLMin
+      have leftMultImageInL := hLMin.1.2 p
+      have imageofPtInSet := Set.mem_image_of_mem (fun x ↦ p * x) hq.2
+      exact Set.mem_preimage.mp (leftMultImageInL imageofPtInSet)
+  have existsIdemp := compactSubsemigroupContainsIdempotent (A ∩ L) (hTnonempty := AcapLisNonempty) (hTcompact := AcapLisCompact) (hTsemi := AcapLisSubsemi)
+  obtain ⟨p, hp1, hp2⟩ := existsIdemp
+  use p
+  refine ⟨hp1.2,hp2,hp1.1⟩
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, `p ∈ βS`, and a
 point `x ∈ X`, the points `x` and `px` are proximal -/
@@ -1065,6 +1107,48 @@ theorem idempotentProductLifting
 {L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
 {p : Ultrafilter S} (hpL : p ∈ L) (hpFix : (ultraAction dSystem).map p x = x) :
 ∃ q ∈ L, ((p * q) * (p * q) = p * q) ∧ (ultraAction dSystem).map q x = x :=
-by sorry
+by
+  have LisMinimalSubset := (ultraMinSubsystemIffMinLeftIdeal L).mpr hLMin
+  let Lsystem := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) LisMinimalSubset.1
+  letI : CompactSpace ↑L := isCompact_iff_compactSpace.mp (LisMinimalSubset.1.2.1)
+  letI : Nonempty ↑L := (fun ⟨y, hy⟩ ↦ ⟨⟨y, hy⟩⟩) LisMinimalSubset.1.1
+  have LsystemMin : isMinimalSystem Lsystem :=
+    (minimalSubsetIffMinimalSubsystem (ultrafilterSystem S) LisMinimalSubset.1).mp LisMinimalSubset
+  obtain ⟨u,hu1,hu2,hu3⟩ :=
+    everyPointInMinFixedBySomeIdempotentUltrafilter Lsystem LsystemMin hLMin ⟨p,hpL⟩
+  obtain ⟨q,hq1,hq2⟩ := minLeftIdealSurjectsOntoMinSystem Lsystem LsystemMin hLMin ⟨p,hpL⟩ ⟨u,hu1⟩
+  obtain ⟨r,hr1,hr2⟩ := minLeftIdealSurjectsOntoMinSystem Lsystem LsystemMin hLMin ⟨q,hq1⟩ ⟨u,hu1⟩
+  have upp : u * p = p := sorry --should be easy from hu3 by understanding the coersion from Lsystem upward
+  have qpu : q * p = u := sorry --should be easy from hq2 by understanding the coersion from Lsystem upward
+  have rqu : r * q = u := sorry --should be easy from hr2 by understanding the coersion from Lsystem upward
+  let qx := (ultraAction dSystem).map q x
+  let q_px := (ultraAction dSystem).map q ((ultraAction dSystem).map p x)
+  let qp_x := (ultraAction dSystem).map (q * p) x
+  let ux := (ultraAction dSystem).map u x
+  let u_px := (ultraAction dSystem).map u ((ultraAction dSystem).map p x)
+  let up_x := (ultraAction dSystem).map (u * p) x
+  let px := (ultraAction dSystem).map p x
+  have qxx : qx = x :=
+    calc
+      qx = q_px := by unfold q_px ; rw [hpFix]
+      _ = qp_x := by unfold q_px ; rw [←(ultraAction dSystem).mapMult]
+      _ = ux := by unfold qp_x ; rw [qpu]
+      _ = u_px := by unfold ux ; unfold u_px ; rw [hpFix]
+      _ = up_x := by unfold u_px ; rw [←(ultraAction dSystem).mapMult]
+      _ = px := by unfold up_x ; rw [upp]
+      _ = x := by unfold px ; rw [hpFix]
+  have rur := minimalIdempotentsAreLeftIdentites
+    L (hL := hLMin) u (huL := hu1) (huIdempotent := hu2) r hr1
+  have pqu : p * q = u :=
+    calc
+      p * q = (u * p) * q := by rw [upp]
+      _ = u * (p * q) := by exact mul_assoc u p q
+      _ = (r * q) * (p * q) := by rw [rqu]
+      _ = (r * (q * p)) * q := by rw [←mul_assoc (r * q) p q] ; rw [←mul_assoc r q p]
+      _ = (r * u) * q := by rw [qpu]
+      _ = r * q := by rw [rur]
+      _ = u := by rw [rqu]
+  use q
+  refine ⟨hq1, by rw [pqu] ; exact hu2, qxx⟩
 
 end Ultrafilter_action_theorems
