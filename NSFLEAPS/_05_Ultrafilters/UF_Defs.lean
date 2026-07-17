@@ -323,6 +323,20 @@ Set.range (Ultrafilter.extend f) = closure (Set.range f) := by
   simp only [Set.image_univ] at fImageDesc
   exact fImageDesc
 
+@[simp]
+lemma ultrafilter_extend_id {S} :
+Ultrafilter.extend (pure : S → Ultrafilter S) = id := by
+  apply Continuous.ext_on
+    denseRange_pure
+    (continuous_ultrafilter_extend pure)
+    (continuous_id)
+  intro x hx
+  simp only [Set.mem_range] at hx
+  obtain ⟨y,hy⟩ := hx
+  rw [←hy]
+  rw [ultrafilter_extend_pure]
+  exact Ultrafilter.eq_of_le fun ⦃U⦄ a ↦ a
+
 end Generic_ultrafilter_lemmas
 
 section Ultrafilters_as_a_semigroup
@@ -1110,7 +1124,8 @@ theorem idempotentProductLifting
 ∃ q ∈ L, ((p * q) * (p * q) = p * q) ∧ (ultraAction dSystem).map q x = x :=
 by
   have LisMinimalSubset := (ultraMinSubsystemIffMinLeftIdeal L).mpr hLMin
-  let Lsystem := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) LisMinimalSubset.1
+  let Lsystem :=
+    fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) LisMinimalSubset.1
   letI : CompactSpace ↑L := isCompact_iff_compactSpace.mp (LisMinimalSubset.1.2.1)
   letI : Nonempty ↑L := (fun ⟨y, hy⟩ ↦ ⟨⟨y, hy⟩⟩) LisMinimalSubset.1.1
   have LsystemMin : isMinimalSystem Lsystem :=
@@ -1119,9 +1134,128 @@ by
     everyPointInMinFixedBySomeIdempotentUltrafilter Lsystem LsystemMin hLMin ⟨p,hpL⟩
   obtain ⟨q,hq1,hq2⟩ := minLeftIdealSurjectsOntoMinSystem Lsystem LsystemMin hLMin ⟨p,hpL⟩ ⟨u,hu1⟩
   obtain ⟨r,hr1,hr2⟩ := minLeftIdealSurjectsOntoMinSystem Lsystem LsystemMin hLMin ⟨q,hq1⟩ ⟨u,hu1⟩
-  have upp : u * p = p := sorry --should be easy from hu3 by understanding the coersion from Lsystem upward
-  have qpu : q * p = u := sorry --should be easy from hq2 by understanding the coersion from Lsystem upward
-  have rqu : r * q = u := sorry --should be easy from hr2 by understanding the coersion from Lsystem upward
+  -- "hprojp" shows the coersion from type L to type Ultrafilter S commutes with Ultrafilter.extend
+  -- The complicated 2nd coordinate is specific to this proof
+  have hprojp (ℓ : Ultrafilter S) : (fun x : L => (x : Ultrafilter S)) (Ultrafilter.extend
+      (fun s ↦ ⟨pure s * p, Subtype.map._proof_1 (fun x ↦ pure s * x)
+        (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
+          { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
+            mapCont := leftMultPrincipalUltraContinuous } LisMinimalSubset.left s) ⟨p, hpL⟩⟩) ℓ)
+              = Ultrafilter.extend (fun s ↦ pure s * p) ℓ := by
+                let f : S → L := fun s ↦ ⟨pure s * p, Subtype.map._proof_1 (fun x ↦ pure s * x)
+                  (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
+                    { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
+                      mapCont := leftMultPrincipalUltraContinuous }
+                        LisMinimalSubset.left s) ⟨p, hpL⟩⟩
+                let π : L → Ultrafilter S := fun x ↦ x.1
+                have h₁ : Continuous (π ∘ Ultrafilter.extend f) :=
+                  continuous_subtype_val.comp (continuous_ultrafilter_extend f)
+                have h₂ : Continuous (Ultrafilter.extend (π ∘ f)) :=
+                  continuous_ultrafilter_extend (π ∘ f)
+                have heq : π ∘ Ultrafilter.extend f = Ultrafilter.extend (π ∘ f) := by
+                  have continuous_π : Continuous π := continuous_subtype_val
+                  apply Continuous.ext_on
+                    denseRange_pure
+                    (continuous_π.comp (continuous_ultrafilter_extend f))
+                    (continuous_ultrafilter_extend (π ∘ f))
+                  intro s
+                  simp only [Function.comp_def]
+                  intro hs
+                  obtain ⟨x, hx⟩ := hs
+                  rw [←hx]
+                  rw [ultrafilter_extend_pure]
+                  simp only [ultrafilter_extend_pure]
+                exact
+                  Eq.symm
+                    ((fun {α} {f g} ↦ Ultrafilter.coe_inj.mp)
+                      (congrArg Ultrafilter.toFilter (congrFun (id (Eq.symm heq)) ℓ)))
+  --copy of same result with a q and hq1 instead of p and hpL
+  have hprojq (ℓ : Ultrafilter S) : (fun x : L => (x : Ultrafilter S)) (Ultrafilter.extend
+    (fun s ↦ ⟨pure s * q, Subtype.map._proof_1 (fun x ↦ pure s * x)
+      (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
+        { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
+          mapCont := leftMultPrincipalUltraContinuous } LisMinimalSubset.left s) ⟨q, hq1⟩⟩) ℓ)
+            = Ultrafilter.extend (fun s ↦ pure s * q) ℓ := by
+              let f : S → L := fun s ↦ ⟨pure s * q, Subtype.map._proof_1 (fun x ↦ pure s * x)
+                (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
+                  { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
+                    mapCont := leftMultPrincipalUltraContinuous } LisMinimalSubset.left s) ⟨q, hq1⟩⟩
+              let π : L → Ultrafilter S := fun x ↦ x.1
+              have h₁ : Continuous (π ∘ Ultrafilter.extend f) :=
+                continuous_subtype_val.comp (continuous_ultrafilter_extend f)
+              have h₂ : Continuous (Ultrafilter.extend (π ∘ f)) :=
+                continuous_ultrafilter_extend (π ∘ f)
+              have heq : π ∘ Ultrafilter.extend f = Ultrafilter.extend (π ∘ f) := by
+                have continuous_π : Continuous π := continuous_subtype_val
+                apply Continuous.ext_on
+                  denseRange_pure
+                  (continuous_π.comp (continuous_ultrafilter_extend f))
+                  (continuous_ultrafilter_extend (π ∘ f))
+                intro s
+                simp only [Function.comp_def]
+                intro hs
+                obtain ⟨x, hx⟩ := hs
+                rw [←hx]
+                rw [ultrafilter_extend_pure]
+                simp only [ultrafilter_extend_pure]
+              exact
+                Eq.symm
+                  ((fun {α} {f g} ↦ Ultrafilter.coe_inj.mp)
+                    (congrArg Ultrafilter.toFilter (congrFun (id (Eq.symm heq)) ℓ)))
+  have upp : u * p = p := by
+    unfold ultraAction Lsystem ultraLim
+      fromNonemptyCompactT2InvariantSubsetToSystem ultrafilterSystem leftMultUltra at hu3
+    simp only at hu3
+    unfold Set.MapsTo.restrict Subtype.map at hu3
+    simp only at hu3
+    have hu3' := congrArg (fun x : L ↦ (x : Ultrafilter S)) hu3
+    simp only at hu3'
+    have hu4 : Ultrafilter.extend (fun s ↦ pure s * p) u = p := by
+      rw [← hprojp u]
+      exact hu3'
+    have := rightMultUltraContinuous p
+    have := ultraLimContinuousComp u (rightMultUltraContinuous p) pure
+    unfold ultraLim rightMultUltra Function.comp at this
+    simp only at this
+    rw [this] at hu4
+    simp only [ultrafilter_extend_id, id_eq] at hu4
+    exact hu4
+  have qpu : q * p = u := by
+    unfold ultraAction Lsystem ultraLim
+      fromNonemptyCompactT2InvariantSubsetToSystem ultrafilterSystem leftMultUltra at hq2
+    simp only at hq2
+    unfold Set.MapsTo.restrict Subtype.map at hq2
+    simp only at hq2
+    have hq2' := congrArg (fun x : L ↦ (x : Ultrafilter S)) hq2
+    simp only at hq2'
+    have hq4 : Ultrafilter.extend (fun s ↦ pure s * p) q = u := by
+      rw [← hprojp q]
+      exact hq2'
+    have := rightMultUltraContinuous p
+    have := ultraLimContinuousComp q (rightMultUltraContinuous p) pure
+    unfold ultraLim rightMultUltra Function.comp at this
+    simp only at this
+    rw [this] at hq4
+    simp only [ultrafilter_extend_id, id_eq] at hq4
+    exact hq4
+  have rqu : r * q = u := by
+    unfold ultraAction Lsystem ultraLim
+      fromNonemptyCompactT2InvariantSubsetToSystem ultrafilterSystem leftMultUltra at hr2
+    simp only at hr2
+    unfold Set.MapsTo.restrict Subtype.map at hr2
+    simp only at hr2
+    have hr2' := congrArg (fun x : L ↦ (x : Ultrafilter S)) hr2
+    simp only at hr2'
+    have hr4 : Ultrafilter.extend (fun s ↦ pure s * q) r = u := by
+      rw [← hprojq r]
+      exact hr2'
+    have := rightMultUltraContinuous q
+    have := ultraLimContinuousComp r (rightMultUltraContinuous q) pure
+    unfold ultraLim rightMultUltra Function.comp at this
+    simp only at this
+    rw [this] at hr4
+    simp only [ultrafilter_extend_id, id_eq] at hr4
+    exact hr4
   let qx := (ultraAction dSystem).map q x
   let q_px := (ultraAction dSystem).map q ((ultraAction dSystem).map p x)
   let qp_x := (ultraAction dSystem).map (q * p) x
