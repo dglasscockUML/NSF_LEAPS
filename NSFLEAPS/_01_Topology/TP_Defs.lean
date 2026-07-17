@@ -97,15 +97,15 @@ constructor
 exact h4
 
 -- The following is an alternative to openClosureProductInEntourage using nbhds of diagonal
-/-- Given an entourage `α` of `X` and a point `x ∈ X`
-there exists an open neighborhood `U` of `x` such that
-the closure of `U × U` is a subset of `α` -/
+--/-- Given an entourage `α` of `X` and a point `x ∈ X`
+--there exists an open neighborhood `U` of `x` such that
+--the closure of `U × U` is a subset of `α` -/
 -- Since we already proved openClosureProductInEntourage, this theorem is no longer needed
-theorem openClosureProductInNhdDiag
-{X} [TopologicalSpace X]
-(x : X) (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
-∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) :=
-sorry
+-- theorem openClosureProductInNhdDiag
+-- {X} [TopologicalSpace X]
+-- (x : X) (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
+-- ∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) :=
+-- sorry
 
 /-- If every neighborhood of a set A intersects B, then A intersects closure of B -/
 theorem closureIntersect
@@ -143,11 +143,3 @@ theorem openProductInEntourageImage
 (π : X → Y) {hc : Continuous π} {hs : Function.Surjective π}
 (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
 ∃ (U : Set Y), IsOpen U ∧ ((U ×ˢ U) ⊆ ((Prod.map π π) '' α)) := sorry
-
--- this lemma is only used for theorem orbitClosureOfURPointIsMinimalSubset in DS_Defs
--- if it's not used anywhere else, maybe removed
-lemma existUniformSubset
-{X} [UniformSpace X] (U : Set X) {hUNonempty : U.Nonempty} {hUOpen : IsOpen U} :
-∃ V : Set X, V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ α : Set (X × X), α ∈ uniformity X ∧
-∀ a ∈ V, ∀ b : X, (a, b) ∈ α → b ∈ U := by
-sorry
