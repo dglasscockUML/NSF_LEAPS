@@ -1036,7 +1036,8 @@ by
   have isultrafactormap : isFactorMap (ultrafilterSystem S) dSystem π :=
     ultraFactorMap dSystem ((minimalIffDenseOrbits dSystem).mp hdSystemMin x)
   have LisMinSubset := (ultraMinSubsystemIffMinLeftIdeal L).mpr hLMin
-  have imageofLIsInvSet := imageOfSubsystemIsSubsystem (ultrafilterSystem S) dSystem π L (hA := LisMinSubset.1) (hEqui := isultrafactormap.2.2) (hπ := isultrafactormap.1)
+  have imageofLIsInvSet := imageOfSubsystemIsSubsystem (ultrafilterSystem S)
+    dSystem π L (hA := LisMinSubset.1) (hEqui := isultrafactormap.2.2) (hπ := isultrafactormap.1)
   have imageofLIsUniv := hdSystemMin (π '' L) imageofLIsInvSet
   have yInUniv : y ∈ Set.univ := Set.mem_univ y
   rw [←imageofLIsUniv] at yInUniv
