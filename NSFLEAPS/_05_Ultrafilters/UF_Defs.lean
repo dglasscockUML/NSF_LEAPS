@@ -931,6 +931,40 @@ OurSemigroupAction (Ultrafilter S) X :=
     simp only [nearlyGoal]
 }
 
+/-- Ultrafilter action via diagonal system is coordinate-wise -/
+lemma ultraDiagAction
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+(p : Ultrafilter S) (x y : X) :
+(ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,y⟩ =
+  ⟨(ultraAction dSystem).map p x, (ultraAction dSystem).map p y⟩ := by
+    let π1 : X × X → X := fun x ↦ x.1
+    have π1cts : Continuous π1 := continuous_fst
+    let π2 : X × X → X := fun x ↦ x.2
+    have π2cts : Continuous π2 := continuous_snd
+    unfold ultraAction diagDynamicalSystem
+    simp only
+    have firststep :=
+      ultraLimContinuousComp p π1cts (fun s ↦ Prod.map (dSystem.map s) (dSystem.map s) (x, y))
+    unfold Prod.map π1 at firststep
+    simp only at firststep
+    have : ((fun x ↦ x.1) ∘ fun s ↦ (dSystem.map s x, dSystem.map s y)) =
+      fun s ↦ dSystem.map s x := by
+        ext s
+        simp only [Function.comp_apply]
+    rw [this] at firststep
+    have secondstep :=
+      ultraLimContinuousComp p π2cts (fun s ↦ Prod.map (dSystem.map s) (dSystem.map s) (x, y))
+    unfold Prod.map π2 at secondstep
+    simp only at secondstep
+    have : ((fun x ↦ x.2) ∘ fun s ↦ (dSystem.map s x, dSystem.map s y)) =
+      fun s ↦ dSystem.map s y := by
+        ext s
+        simp only [Function.comp_apply]
+    rw [this] at secondstep
+    exact Prod.ext (id (Eq.symm firststep)) (id (Eq.symm secondstep))
+
 end Ultrafilters_as_acting_semigroup
 
 section Ultrafilter_action_theorems
@@ -1148,7 +1182,8 @@ by
       have leftMultImageInL := hLMin.1.2 p
       have imageofPtInSet := Set.mem_image_of_mem (fun x ↦ p * x) hq.2
       exact Set.mem_preimage.mp (leftMultImageInL imageofPtInSet)
-  have existsIdemp := compactSubsemigroupContainsIdempotent (A ∩ L) (hTnonempty := AcapLisNonempty) (hTcompact := AcapLisCompact) (hTsemi := AcapLisSubsemi)
+  have existsIdemp := compactSubsemigroupContainsIdempotent (A ∩ L)
+    (hTnonempty := AcapLisNonempty) (hTcompact := AcapLisCompact) (hTsemi := AcapLisSubsemi)
   obtain ⟨p, hp1, hp2⟩ := existsIdemp
   use p
   refine ⟨hp1.2,hp2,hp1.1⟩
@@ -1163,33 +1198,33 @@ by
   let px := (ultraAction dSystem).map p x
   let diagOrb := orbit (diagDynamicalSystem dSystem dSystem) ⟨x,px⟩
   let diagOrbClos := orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨x,px⟩
-  -- isolate the following as a lemma
-  have p_xpxIspxpxPre :
-    (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ =
-      ⟨(ultraAction dSystem).map p x, (ultraAction dSystem).map p px⟩ := by sorry
   have p_xpxIspxpx :
     (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ = ⟨px,px⟩ := by
-    rw [p_xpxIspxpxPre]
+    rw [ultraDiagAction dSystem p x px]
     unfold px
     rw [←(ultraAction dSystem).mapMult]
     rw [pIdempotent]
-  have pxpxindiag : ⟨px,px⟩ ∈ Set.diagonal X := by sorry
-    --def
+  have pxpxindiag : ⟨px,px⟩ ∈ Set.diagonal X := by trivial
   have ultraActinOrbClos :
-    (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ ∈ diagOrbClos := by sorry
-    -- ultralim in orbit closure
+    (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ ∈ diagOrbClos := by
+      exact ultraActionInOrbitClosure (diagDynamicalSystem dSystem dSystem) p ⟨x,px⟩
   have pxpxInOrbClosxpx : ⟨px,px⟩ ∈ diagOrbClos := by
     rw [p_xpxIspxpx] at ultraActinOrbClos
     exact ultraActinOrbClos
   intro α hα
-  have diagOrbClosHitsα : (diagOrbClos ∩ α).Nonempty := by sorry
-  have diagOrbHitsα : (diagOrb ∩ α).Nonempty := by sorry
-  obtain ⟨y,hy1,hy2⟩ := diagOrbHitsα
+  obtain ⟨U,hU1,hU2,hU3⟩ := mem_nhdsSet_iff_exists.mp hα
+  have diagOrbClosHitsU : (diagOrbClos ∩ U).Nonempty := by
+    use ⟨px,px⟩
+    exact ⟨pxpxInOrbClosxpx, hU2 pxpxindiag⟩
+  have diagOrbHitsU : (diagOrb ∩ U).Nonempty := by
+    exact (closure_inter_open_nonempty_iff hU1).mp diagOrbClosHitsU
+  obtain ⟨y,hy1,hy2⟩ := diagOrbHitsU
   unfold diagOrb orbit diagDynamicalSystem at hy1
   simp only [Prod.map_apply, Set.mem_range] at hy1
   obtain ⟨s,hs⟩ := hy1
   rw [←hs] at hy2
   use s
+  exact hU3 hy2
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, a minimal ultrafilter
 `p ∈ βS`, and a point `x ∈ X`, the point `px` is `S`-uniformly recurrent -/
