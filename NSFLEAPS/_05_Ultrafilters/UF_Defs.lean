@@ -1158,7 +1158,38 @@ point `x ∈ X`, the points `x` and `px` are proximal -/
 theorem pointAndUltraImageAreProximal
 (x : X) {p : Ultrafilter S} (pIdempotent : p * p = p) :
 proximal dSystem x ((ultraAction dSystem).map p x) :=
-by sorry
+by
+  unfold proximal
+  let px := (ultraAction dSystem).map p x
+  let diagOrb := orbit (diagDynamicalSystem dSystem dSystem) ⟨x,px⟩
+  let diagOrbClos := orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨x,px⟩
+  -- isolate the following as a lemma
+  have p_xpxIspxpxPre :
+    (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ =
+      ⟨(ultraAction dSystem).map p x, (ultraAction dSystem).map p px⟩ := by sorry
+  have p_xpxIspxpx :
+    (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ = ⟨px,px⟩ := by
+    rw [p_xpxIspxpxPre]
+    unfold px
+    rw [←(ultraAction dSystem).mapMult]
+    rw [pIdempotent]
+  have pxpxindiag : ⟨px,px⟩ ∈ Set.diagonal X := by sorry
+    --def
+  have ultraActinOrbClos :
+    (ultraAction (diagDynamicalSystem dSystem dSystem)).map p ⟨x,px⟩ ∈ diagOrbClos := by sorry
+    -- ultralim in orbit closure
+  have pxpxInOrbClosxpx : ⟨px,px⟩ ∈ diagOrbClos := by
+    rw [p_xpxIspxpx] at ultraActinOrbClos
+    exact ultraActinOrbClos
+  intro α hα
+  have diagOrbClosHitsα : (diagOrbClos ∩ α).Nonempty := by sorry
+  have diagOrbHitsα : (diagOrb ∩ α).Nonempty := by sorry
+  obtain ⟨y,hy1,hy2⟩ := diagOrbHitsα
+  unfold diagOrb orbit diagDynamicalSystem at hy1
+  simp only [Prod.map_apply, Set.mem_range] at hy1
+  obtain ⟨s,hs⟩ := hy1
+  rw [←hs] at hy2
+  use s
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, a minimal ultrafilter
 `p ∈ βS`, and a point `x ∈ X`, the point `px` is `S`-uniformly recurrent -/
