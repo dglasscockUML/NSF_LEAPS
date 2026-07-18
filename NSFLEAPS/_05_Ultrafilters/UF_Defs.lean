@@ -1037,6 +1037,59 @@ by
   unfold visitTimeSet
   exact this
 
+/-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
+`x : X`, a set `U ⊆ X`, and `p : βS`, if `R(x,U) ∈ p`, then `px ∈ closure U` -/
+theorem visitTimeSetInUltraImpliesUltraActInClosure
+(x : X) (U : Set X) (p : Ultrafilter S) :
+visitTimeSet dSystem x U ∈ p → (ultraAction dSystem).map p x ∈ closure U :=
+by
+  contrapose
+  intro pxNotInClosure
+  let V := Set.compl (closure U)
+  have UcapVempty : U ∩ V = ∅ := by
+    unfold V
+    ext x
+    simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and]
+    intro hx
+    apply subset_closure at hx
+    exact (Set.notMem_compl_iff).mpr hx
+  have pxInV : (ultraAction dSystem).map p x ∈ V := by
+    exact Set.mem_preimage.mp pxNotInClosure
+  have VIsOpen : IsOpen V := by
+    unfold V
+    have := isClosed_closure (s := U)
+    exact IsClosed.isOpen_compl
+  have visitTimeVinp := visitTimeSetBelongsToUltrafilter dSystem x V p (hU := VIsOpen) pxInV
+  have : (visitTimeSet dSystem x V) ∩ (visitTimeSet dSystem x U) = ∅ := by
+    by_contra h
+    apply Set.nonempty_iff_ne_empty.mpr at h
+    obtain ⟨s, hs1, hs2⟩ := h
+    unfold visitTimeSet at hs1
+    simp only [Set.mem_preimage] at hs1
+    unfold visitTimeSet at hs2
+    simp only [Set.mem_preimage] at hs2
+    have UcapVnonempty : (U ∩ V).Nonempty := by
+      use dSystem.map s x
+      exact ⟨hs2,hs1⟩
+    rw [UcapVempty] at UcapVnonempty
+    exact Set.not_nonempty_empty UcapVnonempty
+  have visitTimeUnotinp : visitTimeSet dSystem x U ∉ p := by
+    by_contra h
+    have visitTimeOfIntersection : visitTimeSet dSystem x (U ∩ V) ∈ p := by
+      have : visitTimeSet dSystem x (U ∩ V) =
+        visitTimeSet dSystem x U ∩ visitTimeSet dSystem x V := by
+          exact Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1
+      rw [this]
+      apply Filter.inter_mem_iff.mpr
+      exact ⟨h,visitTimeVinp⟩
+    rw [UcapVempty] at visitTimeOfIntersection
+    have emptyVisits : visitTimeSet dSystem x (∅ : Set X) = (∅ : Set S) := by
+      unfold visitTimeSet
+      exact Set.preimage_empty
+    rw [emptyVisits] at visitTimeOfIntersection
+    exact Ultrafilter.empty_notMem visitTimeOfIntersection
+  exact visitTimeUnotinp
+
 /-- Given a minimal dynamical system `dSystem : DynamicalSystem S X`,
 a minimal left ideal `L ⊆ βS`, and points `x, y ∈ X`, there exists `p ∈ L`
 such that `px = y` -/
@@ -1116,14 +1169,33 @@ by
   unfold isUniformlyRecurrent
   intro U hU
   let px := (ultraAction dSystem).map p x
-  have hU2 : U ∈ nhdsSet {px} := sorry
+  have hU2 : U ∈ nhdsSet {px} := by
+    rw [nhdsSet_singleton]
+    exact hU
   obtain ⟨V, VOpen, Vhaspx, closureVInU⟩ :=
     IsCompact.exists_isOpen_closure_subset (isCompact_singleton (x := px)) hU2
   let RxV := visitTimeSet dSystem x V
   let barRxV := {q : Ultrafilter S | RxV ∈ q}
-  have barRxVisnhdsp : barRxV ∈ nhds p := sorry
+  have barRxVisnhdsp : barRxV ∈ nhds p := by
+    apply mem_nhds_iff.mpr
+    use barRxV
+    refine ⟨by trivial, ?_, ?_⟩
+    · exact ultrafilter_isOpen_basic RxV
+    · simp only [Set.singleton_subset_iff] at Vhaspx
+      unfold px at Vhaspx
+      exact visitTimeSetBelongsToUltrafilter dSystem x V (hU := VOpen) p Vhaspx
   have visitTimeContain :
-    visitTimeSet (ultrafilterSystem S) p barRxV ⊆ visitTimeSet dSystem px U := sorry
+    visitTimeSet (ultrafilterSystem S) p barRxV ⊆ visitTimeSet dSystem px U := by
+      intro s hs
+      unfold visitTimeSet ultrafilterSystem leftMultUltra barRxV at hs
+      simp only [Set.preimage_setOf_eq, Set.mem_setOf_eq] at hs
+      have := visitTimeSetInUltraImpliesUltraActInClosure dSystem x V (pure s * p) hs
+      rw [(ultraAction dSystem).mapMult] at this
+      change (ultraAction dSystem).map (pure s) px ∈ closure V at this
+      unfold ultraAction ultraLim at this
+      simp only at this
+      rw [ultrafilter_extend_pure] at this
+      exact closureVInU this
   have pUR := (ultrafilterMinimalIffUnifRec p).mp hp
   have lhsSynd := pUR barRxV barRxVisnhdsp
   exact syndeticIsMonotone lhsSynd visitTimeContain
@@ -1132,8 +1204,7 @@ by
 left ideal `L ⊆ βS`, and an ultrafilter `p ∈ L`, if `px = x`, then there exists
 `q ∈ L` such that `pq` is idempotent and `qx = x` -/
 theorem idempotentProductLifting
-(hdSystemMin : isMinimalSystem dSystem) (x : X)
-{L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
+(x : X) {L : Set (Ultrafilter S)} (hLMin : isMinLeftIdeal L)
 {p : Ultrafilter S} (hpL : p ∈ L) (hpFix : (ultraAction dSystem).map p x = x) :
 ∃ q ∈ L, ((p * q) * (p * q) = p * q) ∧ (ultraAction dSystem).map q x = x :=
 by
