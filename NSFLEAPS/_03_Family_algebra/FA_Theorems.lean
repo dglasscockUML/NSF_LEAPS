@@ -282,6 +282,13 @@ theorem thm_familyJoinIsCommutative (F G : Family α) : (F ⋎ G) = (G ⋎ F) :=
     ext A
     constructor
     · intro h
+      change A ∈ famJoin F G at h
+      change A ∈ famJoin G F
+      unfold _root_.famJoin at h ⊢
+      split_ifs at h ⊢ with hF hG
+      · sorry
+      · sorry
+      · sorry
       sorry
     · intro h
       sorry
