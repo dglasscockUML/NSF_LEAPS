@@ -166,7 +166,7 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
         have h_goal := h C hC D hD
         rw [←Set.inter_assoc]
         exact h_goal
-      exact sorry
+      · sorry
   have equiv34 : CDinter ↔ CinterAinGdual := by
     simp_all only [CDinter, CinterAinGdual]
     apply Iff.intro
@@ -286,12 +286,55 @@ theorem thm_familyJoinIsCommutative (F G : Family α) : (F ⋎ G) = (G ⋎ F) :=
       change A ∈ famJoin G F
       unfold _root_.famJoin at h ⊢
       split_ifs at h ⊢ with hF hG
-      · sorry
-      · sorry
-      · sorry
-      sorry
+      · simp_all only [Set.mem_empty_iff_false]
+      · simp_all only [SetLike.mem_coe]
+      · simp_all only [SetLike.mem_coe]
+      simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+      obtain ⟨w, h⟩ := h
+      obtain ⟨left, right⟩ := h
+      obtain ⟨w_1, h⟩ := right
+      obtain ⟨left_1, right⟩ := h
+      subst right
+      apply Exists.intro
+      · apply And.intro
+        · exact left_1
+        · apply Exists.intro
+          · apply And.intro
+            · exact left
+            · ext x : 1
+              simp_all only [Set.mem_inter_iff]
+              apply Iff.intro
+              · intro a
+                simp_all only [and_self]
+              · intro a
+                simp_all only [and_self]
     · intro h
-      sorry
+      change A ∈ famJoin G F at h
+      change A ∈ famJoin F G
+      unfold _root_.famJoin at h ⊢
+      split_ifs at h ⊢ with hG hF
+      · simp_all only [Set.mem_empty_iff_false]
+      · simp_all only [SetLike.mem_coe]
+      · simp_all only [SetLike.mem_coe]
+      simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+      obtain ⟨w, h⟩ := h
+      obtain ⟨left, right⟩ := h
+      obtain ⟨w_1, h⟩ := right
+      obtain ⟨left_1, right⟩ := h
+      subst right
+      apply Exists.intro
+      · apply And.intro
+        · exact left_1
+        · apply Exists.intro
+          · apply And.intro
+            · exact left
+            · ext x : 1
+              simp_all only [Set.mem_inter_iff]
+              apply Iff.intro
+              · intro a
+                simp_all only [and_self]
+              · intro a
+                simp_all only [and_self]
 
 --thm_classcap_associative
  /- For all F, G, H ∈
