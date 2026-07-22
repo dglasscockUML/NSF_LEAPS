@@ -363,9 +363,11 @@ end Corner_System_2
 
 section Corner_System_1
 
+omit [CommSemigroup S] [Nonempty S] [CompactSpace X] [T2Space X] [Nonempty X] in
 /-- Given an action of `S` on `X`, `leftMap1: X → X` is defined by `s z = z` -/
 def leftMap1 (s : S) : X → X := id
 
+omit [CommSemigroup S] [Nonempty S] [CompactSpace X] [T2Space X] [Nonempty X] in
 /-- `leftMap1 : X → X` is continuous -/
 theorem leftMap1Continuous
 (s : S) :
@@ -673,7 +675,7 @@ by
       Filter.Tendsto.comp (f3continuous.tendsto p) f2FTendsTop
     have pwwIsww : pww = ww := tendsto_nhds_unique f3f2FTendsTopww f3f2FTendsToww
     rcases (idempotentProductLifting (cornerSystem2 (dSystem := dSystem))
-      (minimalSystemImpliesMinimalcornerSystem2 hMin) ww LMin pInL pwwIsww)
+      ww LMin pInL pwwIsww)
         with ⟨q,qInL,pqIdempotent,qFixesww⟩
     let f4 : (X × X) × S → X × X × X :=
       fun (⟨a,s⟩ : (X × X) × S) ↦
