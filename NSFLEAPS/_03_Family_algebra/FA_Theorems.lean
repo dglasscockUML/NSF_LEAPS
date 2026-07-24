@@ -406,9 +406,36 @@ theorem thm_familyMeetIsAssociative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((
 --thm_classcapdual_monotone ***
 theorem thm_familyMeetIsMonotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by sorry
---thm_family_classcapdual_dual_is_filter
+--thm_family_classcapdual_dual_is_filter &&&&&&&&& WORK ON THIS
 theorem thm_familyMeetIsFilter (F : Family α) : isFilterFamily (F ⋏ F*) :=
-  by sorry
+  by
+  unfold isFilterFamily
+  intro A B hAinFFstar hBinFFstar
+  change A ∩ B ∈ _root_.famMeet F F* at ⊢
+  change A ∈ _root_.famMeet F F* at hAinFFstar
+  change B ∈ _root_.famMeet F F* at hBinFFstar
+  unfold _root_.famMeet at hAinFFstar hBinFFstar ⊢
+  split_ifs at hAinFFstar hBinFFstar ⊢ with hF hFstar hG hGstar
+  · change A ∈ F* at hAinFFstar
+    change B ∈ F* at hBinFFstar
+    change A ∩ B ∈ F* at ⊢
+    rw [mem_dual_alt] at hAinFFstar hBinFFstar ⊢
+    intro h
+    rw [Set.compl_inter] at h
+    change Aᶜ ∈ SetLike.coe F → False at hAinFFstar
+    rw [hF] at hAinFFstar
+    unfold fullCollection at hAinFFstar
+    exact hAinFFstar (Set.subset_univ Aᶜ)
+  · change A ∈ F at hAinFFstar
+    change B ∈ F at hBinFFstar
+    change A ∩ B ∈ F
+    have aComplinDual : Aᶜ ∈ (↑F)* := by
+      sorry
+      --change Aᶜ ∈ (SetLike.coe F)*
+    rw [mem_dual_alt] at aComplinDual
+    rw [compl_compl] at aComplinDual
+    contradiction
+  · sorry
 -- F ⋏ F = F ↔ isPRFamily F
 theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
   F ⋏ F = F ↔ isPRFamily F := by sorry
