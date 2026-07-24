@@ -168,7 +168,27 @@ noncomputable def famJoin (F G : Set (Set α)) : Set (Set α) :=
   else { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B }
 --F ⋏ G = {A ⊆ S: ∀ B ∈ F*, A ∩ B ∈ G} if both not P(S),
 --if F = P(S), then G, if G = P(S) then F
+def newFamJoin (F G : Set (Set α)) : Set (Set α) :=
+  { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B }
 
+def Family.newFamJoin (famA famB : Family α) : Family α :=
+{
+  sets := _root_.newFamJoin famA.sets famB.sets,
+  upward_closed := by
+    intro A B hA hAB
+    unfold _root_.newFamJoin at hA ⊢
+    rcases hA with ⟨C, hCF, D, hDG, hAeq⟩
+    have hC' : (B ∪ C) ∈ famA.sets := famA.upward_closed C (B ∪ C) hCF Set.subset_union_right
+    have hD' : (B ∪ D) ∈ famB.sets := famB.upward_closed D (B ∪ D) hDG Set.subset_union_right
+    have hsub : C ∩ D ⊆ B := by simpa [hAeq] using hAB
+    have hB : B = (B ∪ C) ∩ (B ∪ D) := by
+      calc B = B ∪ (C ∩ D) := by exact (Set.union_eq_left.mpr hsub).symm
+      _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
+    exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
+}
+lemma mem_newFamJoin (F G : Set (Set α)) (A : Set α) :
+  A ∈ famJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
+  sorry
 open Classical in
 noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
 {
@@ -202,6 +222,23 @@ noncomputable instance : HasFamJoin (Family α) where
   famJoin := @Family.famJoin α
 
 -- ⋏ definitions
+def newFamMeet (F G : Set (Set α)) : Set (Set α) :=
+  { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
+def Family.newFamMeet (famA famB : Family α) : Family α := {
+  sets := _root_.newFamMeet famA.sets famB.sets,
+  upward_closed := by
+    intro A B hA hAB
+    unfold _root_.newFamMeet at hA ⊢
+    intro C hCF
+    have hBCmem : B ∩ C ∈ famB.sets :=
+      famB.upward_closed (A ∩ C) (B ∩ C) (hA C hCF)
+      (Set.inter_subset_inter hAB (Set.Subset.refl C))
+    exact hBCmem
+}
+lemma mem_newFamMeet (F G : Set (Set α)) (A : Set α) :
+  A ∈ newFamMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
+  rfl
+
 open Classical in
 noncomputable def famMeet (F G : Set (Set α)) : Set (Set α) :=
   if F = fullCollection α then G

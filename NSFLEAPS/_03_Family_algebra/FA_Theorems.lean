@@ -429,13 +429,23 @@ theorem thm_familyMeetIsFilter (F : Family α) : isFilterFamily (F ⋏ F*) :=
   · change A ∈ F at hAinFFstar
     change B ∈ F at hBinFFstar
     change A ∩ B ∈ F
-    have aComplinDual : Aᶜ ∈ (↑F)* := by
-      sorry
-      --change Aᶜ ∈ (SetLike.coe F)*
-    rw [mem_dual_alt] at aComplinDual
-    rw [compl_compl] at aComplinDual
-    contradiction
-  · sorry
+    sorry
+  · intro A hA B hB
+    sorry
+theorem thm_familyMeetIsFilterNew (F : Family α) : isFilterFamily (Family.newFamMeet F F*) :=
+ by
+ unfold isFilterFamily
+ intro A B hAinFFstar hBinFFstar
+ change ∀ C ∈ F*, A ∩ C ∈ F* at hAinFFstar
+ change ∀ C ∈ F*, B ∩ C ∈ F* at hBinFFstar
+ change ∀ C ∈ F*, (A ∩ B) ∩ C ∈ F* at ⊢
+ intro C hC
+ have hBC : B ∩ C ∈ F* := hBinFFstar C hC
+ have hABC : A ∩ (B ∩ C) ∈ F* := hAinFFstar (B ∩ C) hBC
+ simpa [Set.inter_assoc]
+
+--(F G : Set (Set α)) : Set (Set α) :=
+--  { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
 -- F ⋏ F = F ↔ isPRFamily F
 theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
   F ⋏ F = F ↔ isPRFamily F := by sorry
