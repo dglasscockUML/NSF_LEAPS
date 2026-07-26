@@ -450,8 +450,16 @@ theorem thm_familyJoinIsAssociative (F G H : Family α) : (F ⋎ (G ⋎ H)) = ((
 --thm_classcap_monotone
 theorem thm_familyJoinIsMonotone (F G H : Family α) : F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   by sorry
-theorem thm_familyJoinIsMonotonenew (F G H : Family α) : F ⊆ G → (Family.newFamJoin F  H) ⊆ (Family.newFamJoin G H) :=
-  by sorry
+theorem thm_familyJoinIsMonotonenew (F G H : Family α) : F ⊆ G →
+(Family.newFamJoin F  H)⊆ (Family.newFamJoin G H) :=
+  by
+  intro h_sub A hA
+  unfold Family.newFamJoin _root_.newFamJoin at hA ⊢
+  change A ∈ { h | ∃ A ∈ F.sets, ∃ B ∈ H.sets, h = A ∩ B } at hA
+  change A ∈ { h | ∃ A ∈ G.sets, ∃ B ∈ H.sets, h = A ∩ B }
+  rcases hA with ⟨C, hC, D, hD, rfl⟩
+  have hC_in_G : C ∈ G.sets := h_sub hC
+  exact ⟨C, hC_in_G, D, hD, rfl⟩
 
 --thm_family_classcap_dual_is_partition_regular
 theorem thm_familyJoinIsPartitionRegular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
@@ -471,9 +479,28 @@ theorem thm_familyMeetIsContainedInIntersection (F G : Family α) : (F ⋏ G) �
 --thm_classcapdual_commutative
 theorem thm_familyMeetIsCommutative (F G : Family α) : (F ⋏ G) = (G ⋏ F) :=
   by sorry
+
+theorem thm_familyMeetIsCommutativenew (F G : Family α) : (Family.newFamMeet F G) =
+(Family.newFamMeet G F) :=
+  by
+  have h_dual_meet : Family.newFamMeet F** G** = Family.newFamMeet G** F** := by
+      ext A
+      rw [← thm_de_morgan_union_v1new (F*) (G*)]
+      rw [← thm_de_morgan_union_v1new (G*) (F*)]
+      rw [thm_familyJoinIsCommutativenew (F*) (G*)]
+  simp_rw [thm_dual_is_involution] at h_dual_meet
+  exact h_dual_meet
+
 --thm_classcapdual_associative
 theorem thm_familyMeetIsAssociative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
   by sorry
+theorem thm_familyMeetIsAssociativenew (F G H : Family α) : (Family.newFamMeet F (Family.newFamMeet G H))
+= (Family.newFamMeet (Family.newFamMeet F G) H) :=
+  by
+  sorry
+
+
+
 
 --thm_classcapdual_monotone ***
 theorem thm_familyMeetIsMonotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
