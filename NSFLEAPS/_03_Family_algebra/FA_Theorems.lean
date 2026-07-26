@@ -114,11 +114,68 @@ that follows it.
 – definition
 2. for all B ∈ F ⋎ G, A ∩ B̸ = ∅
 – definition
-3. for all C ∈ F and D ∈ G, A ∩ C ∩ D̸ = ∅
+3. for all C ∈ F and D ∈ G, A ∩ C ∩ D ≠ ∅
 – definition
 4. for all C ∈ F, A ∩ C ∈ G∗
 – definition
 5. A ∈ F∗ ⋏ G∗-/
+theorem thm_de_morgan_union_v1new (F G : Family α) : (Family.newFamJoin F G)* =
+(Family.newFamMeet F* G*) :=
+by
+  ext A
+  let BinFuG := ∀ B ∈ newFamJoin F G, A ∩ B ≠ ∅
+  let CDinter := ∀ C ∈ F, ∀ D ∈ G, A ∩ C ∩ D ≠ ∅
+  let CinterAinGdual := ∀ C ∈ F, A ∩ C ∈ (G*)
+  let goalR := A ∈ newFamMeet F* G*
+  have equiv23 : BinFuG ↔ CDinter := by
+    unfold BinFuG CDinter
+    constructor
+    · intro h C hC D hD
+      have hCD_mem : (C ∩ D) ∈ newFamJoin F.sets G.sets := by
+        unfold newFamJoin
+        exact ⟨C, hC, D, hD, rfl⟩
+      have h_inter := h (C ∩ D) hCD_mem
+      rw [Set.inter_assoc]
+      exact h_inter
+    · intro h B hB
+      rcases hB with ⟨B, hB, D, hD, rfl⟩
+      have h_ne := h B hB D hD
+      rw [Set.inter_assoc] at h_ne
+      exact h_ne
+  have equiv34 : CDinter ↔ CinterAinGdual := by
+    unfold CDinter CinterAinGdual
+    constructor
+    · intro h C hC D hD
+      have h_ne : A ∩ C ∩ D ≠ ∅ := h C hC D hD
+      exact Set.nonempty_iff_ne_empty.mpr h_ne
+    · intro h C hC D hD
+      specialize h C
+      have hinstar : A ∩ C ∈ G* := h hC
+      change  ∀ B ∈ G, (A ∩ C ∩ B).Nonempty at hinstar
+      have h_nonempty : ((A ∩ C) ∩ D).Nonempty := hinstar D hD
+      exact Set.nonempty_iff_ne_empty.mp h_nonempty
+  have equiv45 : CinterAinGdual ↔ goalR := by
+    unfold CinterAinGdual goalR
+    constructor
+    · intro h C hC B hB
+      change C ∈ F** at hC
+      rw [thm_dual_is_involution] at hC
+      have hstar : A ∩ C ∈ G* := h C hC
+      change ∀ B ∈ ↑G, (A ∩ C ∩ B).Nonempty at hstar
+      exact hstar B hB
+    · intro h C hC B hB
+      change  ∀ B ∈ F**, A ∩ B ∈ G* at h
+      rw [thm_dual_is_involution] at h
+      have hstar : A ∩ C ∈ G* := h C hC
+      change ∀ B ∈ ↑G, (A ∩ C ∩ B).Nonempty at hstar
+      exact hstar B hB
+  have equiv24 : BinFuG ↔ CinterAinGdual := by exact Iff.trans equiv23 equiv34
+  have equiv25 : BinFuG ↔ goalR := by exact Iff.trans equiv24 equiv45
+  unfold BinFuG goalR at equiv25
+  change (∀ B ∈ newFamJoin ↑F ↑G, (A ∩ B).Nonempty) ↔ A ∈ newFamMeet (↑F)* (↑G)*
+  simp_rw [Set.nonempty_iff_ne_empty]
+  exact equiv25
+
 theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   by
   ext A
@@ -249,8 +306,8 @@ theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by
   -- h : (F* ⋎ G*)* = F** ⋏ G**
   have h := thm_de_morgan_union_v1 F* G*
-  rw [thm_dual_is_involution] at h
-  rw [thm_dual_is_involution] at h
+  repeat rw [thm_dual_is_involution] at h
+  --rw [thm_dual_is_involution] at h
   rw [← h]
   rw [thm_dual_is_involution]
 
@@ -275,7 +332,12 @@ theorem thm_familyJoinContainsUnion (F G : Family α) : (F ∪ G) ⊆ (F ⋎ G) 
       exact False.elim hGmem
   · sorry
 -- need to define what a subset of Fam is
-
+theorem thm_familyJoinContainsUnionnew (F G : Family α) : (F ∪ G) ⊆ (Family.newFamJoin F G)  :=
+  by
+  intro h union
+  change ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B
+  simp_all only [SetLike.mem_coe]
+  sorry
 --thm_classcap_commutative
 theorem thm_familyJoinIsCommutative (F G : Family α) : (F ⋎ G) = (G ⋎ F) :=
   by
@@ -316,6 +378,58 @@ theorem thm_familyJoinIsCommutative (F G : Family α) : (F ⋎ G) = (G ⋎ F) :=
       · simp_all only [Set.mem_empty_iff_false]
       · simp_all only [SetLike.mem_coe]
       · simp_all only [SetLike.mem_coe]
+      simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+      obtain ⟨w, h⟩ := h
+      obtain ⟨left, right⟩ := h
+      obtain ⟨w_1, h⟩ := right
+      obtain ⟨left_1, right⟩ := h
+      subst right
+      apply Exists.intro
+      · apply And.intro
+        · exact left_1
+        · apply Exists.intro
+          · apply And.intro
+            · exact left
+            · ext x : 1
+              simp_all only [Set.mem_inter_iff]
+              apply Iff.intro
+              · intro a
+                simp_all only [and_self]
+              · intro a
+                simp_all only [and_self]
+
+theorem thm_familyJoinIsCommutativenew (F G : Family α) : (Family.newFamJoin F G) =
+(Family.newFamJoin G F) :=
+  by
+    ext A
+    constructor
+    · intro h
+      change A ∈ newFamJoin F G at h
+      change A ∈ newFamJoin G F
+      unfold _root_.newFamJoin at h ⊢
+      simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+      obtain ⟨w, h⟩ := h
+      obtain ⟨left, right⟩ := h
+      obtain ⟨w_1, h⟩ := right
+      obtain ⟨left_1, right⟩ := h
+      subst right
+      apply Exists.intro
+      · apply And.intro
+        · exact left_1
+        · apply Exists.intro
+          · apply And.intro
+            · exact left
+            · ext x : 1
+              simp_all only [Set.mem_inter_iff]
+              apply Iff.intro
+              · intro a
+                simp_all only [and_self]
+              · intro a
+                simp_all only [and_self]
+    · intro h
+      change A ∈ newFamJoin G F at h
+      change A ∈ newFamJoin F G
+      unfold _root_.newFamJoin at h ⊢
       simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
       obtain ⟨w, h⟩ := h
       obtain ⟨left, right⟩ := h
@@ -432,10 +546,15 @@ theorem thm_familyMeetIsFilter (F : Family α) : isFilterFamily (F ⋏ F*) :=
     sorry
   · intro A hA B hB
     sorry
+
 theorem thm_familyMeetIsFilterNew (F : Family α) : isFilterFamily (Family.newFamMeet F F*) :=
  by
  unfold isFilterFamily
  intro A B hAinFFstar hBinFFstar
+ /- change A ∈ newFamMeet F F* at hAinFFstar
+ change B ∈ newFamMeet F F* at hBinFFstar
+ change A ∩ B ∈ newFamMeet F F* at ⊢
+ unfold newFamMeet at hAinFFstar hBinFFstar ⊢ -/
  change ∀ C ∈ F*, A ∩ C ∈ F* at hAinFFstar
  change ∀ C ∈ F*, B ∩ C ∈ F* at hBinFFstar
  change ∀ C ∈ F*, (A ∩ B) ∩ C ∈ F* at ⊢

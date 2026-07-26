@@ -17,12 +17,17 @@ class HasFamJoin (T : Type _) where
   famJoin : T → T → T
 class HasFamMeet (T : Type _) where
   famMeet : T → T → T
+class HasFamMeetnew (T : Type _) where
+  famMeet : T → T → T
+/-class HasFamJoinnew (T : Type _) where
+  famJoin : T → T → T-/
 
 --operators
 postfix:max "*" => HasFamDual.famDual
 infixr:80 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
 infixr:80 "⋏" => HasFamMeet.famMeet
-
+--infixr:80 "~" => HasFamJoinnew.newFamJoin -- dont like 2 with max precedence
+infixr:80 "!" => HasFamMeetnew.newFamMeet
 def upwardClosed (F : Set (Set α)) : Prop :=
   ∀ (A B : Set α), A ∈ F → A ⊆ B → B ∈ F
 
@@ -187,8 +192,12 @@ def Family.newFamJoin (famA famB : Family α) : Family α :=
     exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
 lemma mem_newFamJoin (F G : Set (Set α)) (A : Set α) :
-  A ∈ famJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
-  sorry
+  A ∈ newFamJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
+  rfl
+/- instance : HasFamJoin (Set (Set α))  where
+  famJoin := _root_.newFamJoin
+noncomputable instance : HasFamJoin (Family α) where
+  famJoin := @Family.newFamJoin α -/
 open Classical in
 noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
 {
@@ -238,6 +247,11 @@ def Family.newFamMeet (famA famB : Family α) : Family α := {
 lemma mem_newFamMeet (F G : Set (Set α)) (A : Set α) :
   A ∈ newFamMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
   rfl
+instance : HasFamMeetnew (Set (Set α))  where
+  famMeet := _root_.newFamMeet
+instance : HasFamMeetnew (Family α) where
+  famMeet := @Family.newFamMeet α
+
 
 open Classical in
 noncomputable def famMeet (F G : Set (Set α)) : Set (Set α) :=
