@@ -186,9 +186,9 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
       rw [Set.inter_assoc]
       exact h hCDinFuG
     · intro h B hBinFuG
-      by_cases hF : F.sets = ∅
       change B ∈ famJoin F G at hBinFuG
       unfold _root_.famJoin at hBinFuG
+      by_cases hF : F.sets = ∅
       split_ifs at hBinFuG with hF hG
       · -- If F is empty, B ∈ ∅ is a contradiction
         rw [Set.ext_iff] at hF
@@ -288,6 +288,14 @@ theorem thm_de_morgan_v1_dual (F G : Family α) : (F ⋏ G)* = (F* ⋎ G*) :=
   by
   -- h : (F* ⋎ G*)* = F** ⋏ G**
   have h := thm_de_morgan_union_v1 F* G*
+  repeat rw [thm_dual_is_involution] at h
+  rw [← h]
+  rw [thm_dual_is_involution]
+theorem thm_de_morgan_v1_dualnew (F G : Family α) : (Family.newFamMeet F G)* =
+(Family.newFamJoin F* G*) :=
+  by
+  -- h : (F* ⋎ G*)* = F** ⋏ G**
+  have h := thm_de_morgan_union_v1new F* G*
   repeat rw [thm_dual_is_involution] at h
   rw [← h]
   rw [thm_dual_is_involution]
@@ -465,6 +473,22 @@ theorem thm_familyJoinIsMonotonenew (F G H : Family α) : F ⊆ G →
 theorem thm_familyJoinIsPartitionRegular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
   by sorry
 
+theorem thm_familyJoinIsPartitionRegularnew (F : Family α) : isPRTwoSets (Family.newFamJoin F F*) :=
+by
+  rw [isPRTwoSets]
+  intro A hA c
+  have h_decomp : ∃ B ∈ F.sets, ∃ C ∈ (F*).sets, A = B ∩ C := by sorry
+  rcases h_decomp with ⟨B, hB, C, hC, rfl⟩
+  by_cases h0 : {x ∈ B | c x = 0} ∈ F.sets
+  · use 0
+    have h_goal : {x ∈ B ∩ C | c x = 0} ∈ (Family.newFamJoin F F*).sets := by
+      sorry
+    exact h_goal
+  · use 1
+    have h1 : {x ∈ B | c x = 1} ∈ F*.sets := by sorry
+    have h_goal : {x ∈ B ∩ C | c x = 1} ∈ (Family.newFamJoin F F*).sets := by sorry
+    exact h_goal
+
 --thm_classcap_idempotent_at_filters
 
 --thm_family_classcapdual_is_family don't need
@@ -494,11 +518,15 @@ theorem thm_familyMeetIsCommutativenew (F G : Family α) : (Family.newFamMeet F 
 --thm_classcapdual_associative
 theorem thm_familyMeetIsAssociative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
   by sorry
-theorem thm_familyMeetIsAssociativenew (F G H : Family α) : (Family.newFamMeet F (Family.newFamMeet G H))
-= (Family.newFamMeet (Family.newFamMeet F G) H) :=
+theorem thm_familyMeetIsAssociativenew (F G H : Family α) :
+(Family.newFamMeet F (Family.newFamMeet G H)) = (Family.newFamMeet (Family.newFamMeet F G) H) :=
   by
-  sorry
-
+  nth_rw 1 [← thm_dual_is_involution (Family.newFamMeet F (Family.newFamMeet G H))]
+  rw [thm_de_morgan_v1_dualnew]
+  rw [thm_de_morgan_v1_dualnew]
+  rw [thm_familyJoinIsAssociativenew]
+  repeat rw [thm_de_morgan_union_v1new]
+  repeat rw [thm_dual_is_involution]
 
 
 
@@ -536,10 +564,6 @@ theorem thm_familyMeetIsFilterNew (F : Family α) : isFilterFamily (Family.newFa
  by
  unfold isFilterFamily
  intro A B hAinFFstar hBinFFstar
- /- change A ∈ newFamMeet F F* at hAinFFstar
- change B ∈ newFamMeet F F* at hBinFFstar
- change A ∩ B ∈ newFamMeet F F* at ⊢
- unfold newFamMeet at hAinFFstar hBinFFstar ⊢ -/
  change ∀ C ∈ F*, A ∩ C ∈ F* at hAinFFstar
  change ∀ C ∈ F*, B ∩ C ∈ F* at hBinFFstar
  change ∀ C ∈ F*, (A ∩ B) ∩ C ∈ F* at ⊢
@@ -553,11 +577,31 @@ theorem thm_familyMeetIsFilterNew (F : Family α) : isFilterFamily (Family.newFa
 -- F ⋏ F = F ↔ isPRFamily F
 theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
   F ⋏ F = F ↔ isPRFamily F := by sorry
---
+-- H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H
+-- H* ⊆ (F ⋏ ((F* ⋎ G*)))** ↔ F ⋏ G ⊆ F ⋏ H
+-- H* ⊆ (F* ⋎ (F* ⋎ G*)\*)* ↔ F ⋏ G ⊆ F ⋏ H
+-- H* ⊆ (F* ⋎ (F ⋏ G)**)* ↔ F ⋏ G ⊆ F ⋏ H
+-- H* ⊆ (F* ⋎ (F ⋏ G))* ↔ F ⋏ G ⊆ F ⋏ H
 --thm_combo_algebra_statement_one
 theorem thm_combo_algebra_statement_one (F G H : Family α) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
 by
-  sorry
+  nth_rw 1 [← thm_dual_is_involution (F ⋏ (F* ⋎ G*))]
+  rw [thm_de_morgan_v1_dual]
+  rw [thm_de_morgan_union_v1]
+  repeat rw [thm_dual_is_involution]
+  rw [← thm_de_morgan_v1_dual]
+  have step : H* ⊆ F⋏(F⋏G)* ↔ ((H* ⊆ F) ∧ (H* ⊆ (F ⋏ G)*)) := by sorry
+  rw [step]
+  constructor
+  · intro h
+    have h2 : H* ⊆ (F ⋏ G)* := h.2
+    have h_anti := thm_dual_is_antitone _ _ h2
+    rw [thm_dual_is_involution, thm_dual_is_involution] at h_anti
+    intro A hA
+    sorry
+  · intro h
+
+    sorry
   /- classical
   constructor
   · intro h A hAinFG
