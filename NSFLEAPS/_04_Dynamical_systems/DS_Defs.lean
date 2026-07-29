@@ -3694,29 +3694,83 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
   have hHS : ∀ f ∈ H, ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
     ∧ f ∈ Vf ∧ IsOpen Vf ∧
     Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
-    sorry
-  -- have hHS : ∀ f ∈ H, ∃ αf ∈ nhdsSet (Set.diagonal X), ∃ Vf ∈ nhds f,
-  --   Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
-  --   sorry
+    intro f hfInH
+    specialize hfH f hfInH
+    unfold RP at hfH
+    have hExistDisj : ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
+      ∧ f ∈ Vf ∧ IsOpen Vf ∧
+      Disjoint Vf (⋃ (s : S), ((Prod.map (dSystemX.map s) (dSystemX.map s)) '' αf)) := by
+      sorry
+    rcases hExistDisj with ⟨αf, Vf, hDiag, hOpenα, hfInVf, hOpenVf, hDisjoint⟩
+    use αf
+    use Vf
+    constructor
+    · exact hDiag
+    constructor
+    · exact hOpenα
+    constructor
+    · exact hfInVf
+    constructor
+    · exact hOpenVf
+    · by_contra hContra
+      simp only [Set.disjoint_iUnion_left, not_forall] at hContra
+      rcases hContra with ⟨s, hsContra⟩
+      have hSomething : ∃ w : X × X, w ∈ (Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' Vf)
+        ∧ w ∈ αf := by
+        apply Set.not_disjoint_iff.mp
+        exact hsContra
+      rcases hSomething with ⟨w, hw1, hw2⟩
+      simp at hw1
+      have hw2Next : Prod.map (dSystemX.map s) (dSystemX.map s) w ∈
+        Prod.map (dSystemX.map s) (dSystemX.map s) '' αf := by
+        apply Set.mem_image_of_mem
+        exact hw2
+      simp only [Set.disjoint_iUnion_right] at hDisjoint
+      specialize hDisjoint s
+      have hNotDisjoint : ¬ Disjoint Vf (Prod.map (dSystemX.map s) (dSystemX.map s) '' αf) := by
+        apply Set.not_disjoint_iff.mpr
+        use Prod.map (dSystemX.map s) (dSystemX.map s) w
+      exact hNotDisjoint hDisjoint
   choose α V hαConta hαOpen hVConta hVOpen hαVDisj using hHS
   have hfCover : H ⊆ ⋃ f : X × X, ⋃ (h : f ∈ H), V f h := by
     intro t ht
     specialize hVConta t ht
-    simp
+    simp only [Set.mem_iUnion, Prod.exists]
     use t.1
     use t.2
     use ht
   have hFiniteCover : ∃ F ⊆ H, F.Finite ∧ H ⊆ ⋃ f : X × X,
     ⋃ (h1 : f ∈ H), ⋃ (h2 : f ∈ F), V f h1 := by
     sorry
-
-
-
-
-
-
-
-
+  rcases hFiniteCover with ⟨F, hFinH, hFfinite, hHSub⟩
+  have hExistOpen : ∃ U : Set (Y × Y), IsOpen U ∧ z ∈ U ∧
+    (Prod.map π π) ⁻¹' U ⊆ ⋃ f : X × X, ⋃ (h1 : f ∈ H), ⋃ (h2 : f ∈ F), V f h1 := by
+    apply existOpenNeighborhoodPreImageContainedIn
+    · apply Continuous.prodMap
+      · exact hπCont
+      · exact hπCont
+    · apply isOpen_sUnion
+      intro t ht
+      simp only [Set.mem_range, Prod.exists] at ht
+      rcases ht with ⟨a, b, hab⟩
+      rw [<- hab]
+      apply isOpen_sUnion
+      intro t1 ht1
+      simp only [Set.mem_range] at ht1
+      rcases ht1 with ⟨a1, ha1⟩
+      rw [<- ha1]
+      apply isOpen_sUnion
+      intro t2 ht2
+      simp only [Set.mem_range, exists_prop] at ht2
+      rcases ht2 with ⟨a2, ha2⟩
+      rw [<- ha2]
+      specialize hVOpen (a, b) a1
+      exact hVOpen
+    · have hHDef : H = (Prod.map π π) ⁻¹' {z} := by
+        rfl
+      rw [<- hHDef]
+      exact hHSub
+  sorry
 exact Set.compl_subset_compl.mp hComplement
 
 end Regional_proximality
