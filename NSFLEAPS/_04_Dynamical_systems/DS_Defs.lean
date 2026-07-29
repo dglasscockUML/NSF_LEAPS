@@ -3667,8 +3667,18 @@ theorem commMinRPIsInImageOfRP
 RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) := by
 have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ := by
   intro z hz
-  let F := (Prod.map π π) ⁻¹' {z}
-  have hf : ∀ f ∈ F, f ∉ RP dSystemX := by
+  let H := (Prod.map π π) ⁻¹' {z}
+  have hπCont : Continuous π := by
+    unfold isFactorMap at hπ
+    rcases hπ with ⟨hπCont, hRest⟩
+    exact hπCont
+  have hHCompact : IsCompact H := by
+    apply IsCompact.preimage_continuous
+    · simp
+    · apply Continuous.prodMap
+      · exact hπCont
+      · exact hπCont
+  have hfH : ∀ f ∈ H, f ∉ RP dSystemX := by
     intro f hf
     by_contra
     have hf1 : (Prod.map π π) f ∈ (Prod.map π π) '' RP dSystemX := by
@@ -3678,10 +3688,35 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
       constructor
       · exact this
       · rfl
-    simp only [Set.mem_preimage, Set.mem_singleton_iff, F] at hf
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, H] at hf
     rw [<- hf] at hz
     exact hz hf1
-  sorry
+  have hHS : ∀ f ∈ H, ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
+    ∧ f ∈ Vf ∧ IsOpen Vf ∧
+    Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
+    sorry
+  -- have hHS : ∀ f ∈ H, ∃ αf ∈ nhdsSet (Set.diagonal X), ∃ Vf ∈ nhds f,
+  --   Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
+  --   sorry
+  choose α V hαConta hαOpen hVConta hVOpen hαVDisj using hHS
+  have hfCover : H ⊆ ⋃ f : X × X, ⋃ (h : f ∈ H), V f h := by
+    intro t ht
+    specialize hVConta t ht
+    simp
+    use t.1
+    use t.2
+    use ht
+  have hFiniteCover : ∃ F ⊆ H, F.Finite ∧ H ⊆ ⋃ f : X × X,
+    ⋃ (h1 : f ∈ H), ⋃ (h2 : f ∈ F), V f h1 := by
+    sorry
+
+
+
+
+
+
+
+
 exact Set.compl_subset_compl.mp hComplement
 
 end Regional_proximality

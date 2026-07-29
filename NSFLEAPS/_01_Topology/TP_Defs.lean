@@ -294,3 +294,49 @@ constructor
     specialize hU3 x
     exact hU3
   exact hWV.trans hVx
+
+/-- If π : X → Y is continuous surjection of compact Hausdorff spaces, y ∈ Y, W ⊆ X
+such that π ⁻¹' {y} ⊆ W, then there exists an open U ⊇ y such that π ⁻¹' U ⊆ W -/
+theorem existOpenNeighborhoodPreImageContainedIn
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
+(π : X → Y) {hc : Continuous π}
+(y : Y) (W : Set X) (hWOpen : IsOpen W) (hyW : π ⁻¹' {y} ⊆ W) :
+∃ U : Set Y, IsOpen U ∧ y ∈ U ∧ π ⁻¹' U ⊆ W := by
+have h1 : IsClosed (π '' (Wᶜ)) := by
+  apply IsCompact.isClosed
+  apply IsCompact.image
+  · apply IsClosed.isCompact
+    apply IsOpen.isClosed_compl
+    exact hWOpen
+  · exact hc
+have h2 : y ∉ π '' Wᶜ := by
+  simp only [Set.mem_image, Set.mem_compl_iff, not_exists, not_and]
+  by_contra hContra
+  simp only [not_forall, not_not] at hContra
+  rcases hContra with ⟨x, hx1, hx2⟩
+  have hxComp : x ∈ π ⁻¹' {y} := by
+    simp only [Set.mem_preimage, Set.mem_singleton_iff]
+    exact hx2
+  have hxW : x ∈ W := by
+    apply hyW
+    exact hxComp
+  exact hx1 hxW
+let U := (π '' Wᶜ)ᶜ
+have hUCont : y ∈ U := by
+  unfold U
+  apply (Set.mem_compl_iff (π '' Wᶜ) y).mpr
+  exact h2
+have hUPre : π ⁻¹' U ⊆ W := by
+  unfold U
+  intro x hx
+  simp only [Set.preimage_compl, Set.mem_compl_iff, Set.mem_preimage, Set.mem_image, not_exists,
+    not_and] at hx
+  by_contra hContra
+  specialize hx x hContra
+  have hx2 : π x = π x := rfl
+  exact hx hx2
+have hUOpen : IsOpen U := by
+  apply isOpen_compl_iff.mpr
+  exact h1
+use U
