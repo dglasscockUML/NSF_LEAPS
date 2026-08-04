@@ -3770,6 +3770,197 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
         rfl
       rw [<- hHDef]
       exact hHSub
+  rcases hExistOpen with ⟨U, hU1, hU2, hU3⟩
+  let β := ⋂ f : X × X, ⋂ (hfH : f ∈ H), ⋂ (hfF : f ∈ F), α f hfH
+  let Nα : F → Set (X × X) := fun f ↦ α f.1 (hFinH f.2)
+  have hβRedefined : β = ⋂ (f : X × X ) (hfF : f ∈ F), α f (hFinH hfF) := by
+    ext z
+    constructor
+    · intro hz
+      simp [β] at hz
+      simp
+      intro a b hab
+      specialize hz a b (hFinH hab) hab
+      exact hz
+    · intro hz
+      simp at hz
+      simp [β]
+      intro a b habH habF
+      specialize hz a b habF
+      exact hz
+  have hβRedefined2 : β = ⋂ f : F, Nα f := by
+    rw [hβRedefined]
+    ext z
+    constructor
+    · intro hz
+      simp
+      simp at hz
+      intro a b hab
+      specialize hz a b hab
+      exact hz
+    · intro hz
+      simp at hz
+      simp
+      intro a b hab
+      specialize hz a b hab
+      exact hz
+  have hβOpen : IsOpen β := by
+    rw [hβRedefined2]
+    apply Set.Finite.isOpen_sInter
+    · have hFFinite : Finite F := by
+        apply Set.Finite.to_subtype
+        exact hFfinite
+      apply Set.finite_range
+    · intro t ht
+      simp at ht
+      rcases ht with ⟨a, b, hab1, hab2⟩
+      rw [<- hab2]
+      simp [Nα]
+      specialize hαOpen (a, b) (hFinH hab1)
+      exact hαOpen
+  have hβContaDiag : Set.diagonal X ⊆ β := by
+    apply Set.subset_sInter
+    intro t1 ht1
+    simp at ht1
+    rcases ht1 with ⟨a1, b1, hab1⟩
+    rw [<- hab1]
+    apply Set.subset_sInter
+    intro t2 ht2
+    simp at ht2
+    rcases ht2 with ⟨a2, ha2⟩
+    rw [<- ha2]
+    apply Set.subset_sInter
+    intro t3 ht3
+    simp at ht3
+    rcases ht3 with ⟨a3, ha3⟩
+    rw [<- ha3]
+    specialize hαConta (a1, b1)
+    have ha1b1H : (a1, b1) ∈ H := by
+      apply hFinH
+      exact a3
+    specialize hαConta ha1b1H
+    exact hαConta
+  have hDisjointβ0 : ∀ (f : X × X) (hfH : f ∈ H) (hfF : f ∈ F), Disjoint
+    (⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) β := by
+    intro f hfH hfF
+    have hβSub : β ⊆ α f hfH := by
+      intro z hz
+      simp [β] at hz
+      specialize hz f.1 f.2 hfH hfF
+      exact hz
+    apply Set.disjoint_of_subset_right hβSub
+    specialize hαVDisj f hfH
+    exact hαVDisj
+  have hDisjoinβ : Disjoint (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
+    Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) β := by
+    apply Set.disjoint_sUnion_left.mpr
+    intro t1 ht1
+    simp at ht1
+    rcases ht1 with ⟨a, b, hab⟩
+    rw [<- hab]
+    apply Set.disjoint_sUnion_left.mpr
+    intro t2 ht2
+    simp at ht2
+    rcases ht2 with ⟨ha2, hb2⟩
+    rw [<- hb2]
+    apply Set.disjoint_sUnion_left.mpr
+    intro t3 ht3
+    simp at ht3
+    rcases ht3 with ⟨ha3, hb3⟩
+    rw [<- hb3]
+    specialize hDisjointβ0 (a, b) ha2 ha3
+    exact hDisjointβ0
+  have hβSubset : ((Prod.map π π) ⁻¹' ⋃ (s : S),
+    (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U) ⊆
+    (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
+    Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) := by
+    have hβSubset1 : ⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹'
+      (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) ⊆
+      (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
+      Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) := by
+      intro z hz
+      simp at hz
+      rcases hz with ⟨s, x, y, hxy1, t, ht⟩
+      simp
+      use x
+      use y
+      constructor
+      · exact hxy1
+      · use t
+        use s
+    have hβSubset2 : ⋃ s : S, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+      ((Prod.map π π) ⁻¹' U) ⊆
+      ⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+      (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) := by
+      apply Set.sUnion_subset
+      intro w hw
+      simp at hw
+      rcases hw with ⟨s, hs⟩
+      rw [<- hs]
+      have hβSubsub : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' ((Prod.map π π) ⁻¹' U) ⊆
+        Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (⋃ f, ⋃ (hfH : f ∈ H), ⋃ (_ : f ∈ F), V f hfH) := by
+        apply Set.preimage_mono
+        exact hU3
+      have hβSubsub2 : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (⋃ f, ⋃ (hfH : f ∈ H), ⋃ (_ : f ∈ F), V f hfH) ⊆
+        ⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+        (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) := by
+        apply Set.subset_sUnion_of_mem
+        simp
+      exact hβSubsub.trans hβSubsub2
+    have hβSubset3 : ⋃ s : S, (Prod.map π π) ⁻¹'
+      (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹'U) ⊆
+      ⋃ s : S, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+      ((Prod.map π π) ⁻¹' U) := by
+      apply Set.sUnion_subset
+      intro t ht
+      simp at ht
+      rcases ht with ⟨s, hs⟩
+      rw [<- hs]
+      have hβSub0 : Prod.map π π ⁻¹' (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U)
+        ⊆ Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U) := by
+        intro z hz
+        simp
+        simp at hz
+        simp [Prod.map]
+        simp [Prod.map] at hz
+        have hEq1 : π (dSystemX.map s z.1) = dSystemY.map s (π z.1) := by
+          unfold isFactorMap at hπ
+          rcases hπ with ⟨hπCont, hπSurj, hπEquiv⟩
+          unfold isEquivariant at hπEquiv
+          specialize hπEquiv s
+          have hEq1a : (dSystemY.map s ∘ π) (z.1) = (π ∘ dSystemX.map s) (z.1) := by
+            apply congr_fun
+            exact hπEquiv
+          have hEq1b : π (dSystemX.map s z.1) = (π ∘ dSystemX.map s) (z.1) := by
+            simp
+          have hEq1c : dSystemY.map s (π z.1) = (dSystemY.map s ∘ π) (z.1) := by
+            simp
+          rw [hEq1b, hEq1c, hEq1a]
+        have hEq2 : π (dSystemX.map s z.2) = dSystemY.map s (π z.2) := by
+          unfold isFactorMap at hπ
+          rcases hπ with ⟨hπCont, hπSurj, hπEquiv⟩
+          unfold isEquivariant at hπEquiv
+          specialize hπEquiv s
+          have hEq2a : (dSystemY.map s ∘ π) (z.2) = (π ∘ dSystemX.map s) (z.2) := by
+            apply congr_fun
+            exact hπEquiv
+          have hEq2b : π (dSystemX.map s z.2) = (π ∘ dSystemX.map s) (z.2) := by
+            simp
+          have hEq2c : dSystemY.map s (π z.2) = (dSystemY.map s ∘ π) (z.2) := by
+            simp
+          rw [hEq2b, hEq2c, hEq2a]
+        rw [hEq1, hEq2]
+        exact hz
+      have hβSub1 : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U)
+        ⊆  ⋃ s, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U) := by
+        apply Set.subset_sUnion_of_mem
+        simp
+      exact hβSub0.trans hβSub1
+    sorry
+  have hDisjointβ10 : Disjoint ((Prod.map π π) ⁻¹' ⋃ (s : S),
+    (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U) β := by
+    apply Set.disjoint_of_subset_left hβSubset
+    exact hDisjoinβ
   sorry
 exact Set.compl_subset_compl.mp hComplement
 
