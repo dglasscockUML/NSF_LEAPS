@@ -145,7 +145,7 @@ theorem openProductInEntourageImage
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (π : X → Y) {hc : Continuous π} {hs : Function.Surjective π}
 (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
-∃ (U : Set Y), IsOpen U ∧ ((U ×ˢ U) ⊆ ((Prod.map π π) '' α)) := by
+∃ (U : Set Y), U.Nonempty ∧ IsOpen U ∧ ((U ×ˢ U) ⊆ ((Prod.map π π) '' α)) := by
 letI : UniformSpace X := uniformSpaceOfCompactR1
 have h1 : ∀ x : X, ∃ Ux ∈ nhds x, IsOpen Ux ∧ ((closure Ux) ×ˢ (closure Ux) ⊆ α) := by
   intro x
@@ -253,6 +253,8 @@ have hWExist : ∃ W ⊆ V x, IsOpen W ∧ y ∈ W := by
   exact hy
 rcases hWExist with ⟨W, hW1, hW2, hW3⟩
 use W
+constructor
+· exact Set.nonempty_of_mem hW3
 constructor
 · exact hW2
 · have hWV : W ×ˢ W ⊆ (V x) ×ˢ (V x) := by
