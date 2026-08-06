@@ -2056,7 +2056,8 @@ lemma subtype_closure_eq_of_isClosed
 /-- For any open set U, there exists an open set V ⊆ U and an entourage γ
 such that for all a ∈ V, the ball B_γ(a) ⊆ U -/
 -- This lemma is needed for Theorem "orbitClosureOfURPointIsMinimalSubset" below
-lemma existEntourageGivenOpenSet {X : Type*} [UniformSpace X] (U : Set X) (hUOpen : IsOpen U)
+lemma existEntourageGivenOpenSet
+{X : Type*} [UniformSpace X] (U : Set X) (hUOpen : IsOpen U)
   (hUNonempty : U.Nonempty) :
   ∃ (V : Set X), V ⊆ U ∧ V.Nonempty ∧ IsOpen V ∧ ∃ γ : Set (X × X), γ ∈ uniformity X ∧
 ∀ a ∈ V, ∀ b : X, (a, b) ∈ γ → b ∈ U := by
@@ -2583,6 +2584,153 @@ have hV3 : dSystem.map (f * s) y ∈ V := by
 apply hU
 apply hUV
 exact hV3
+
+lemma inMinimalSubsetUR
+{dSystemX : DynamicalSystem S X} {Y : Set X}
+(hYMin : isMinimalSubset dSystemX Y)
+{y : X} (hyInY : y ∈ Y) :
+isUniformlyRecurrent dSystemX y := by
+sorry
+
+lemma preimageSubsystemIsSubsystem
+{dSystemX : DynamicalSystem S X}
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y}
+{π : X → Y}
+(hπFactorMap : isFactorMap dSystemX dSystemY π)
+(Z : Set Y) (hZInv : isNonemptyCompactT2InvariantSubset dSystemY Z) :
+isNonemptyCompactT2InvariantSubset dSystemX (π ⁻¹' Z) := by
+sorry
+
+/-- If π : X → Y is a factor map and y ∈ Y is uniformly recurrent, then there exists
+uniformly recurrent point x ∈ X such that π x = y -/
+theorem liftUniformRecurrentPoint
+{dSystemX : DynamicalSystem S X}
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y}
+{π : X → Y}
+(hπFactorMap : isFactorMap dSystemX dSystemY π)
+(y : Y) (hYUniRec : isUniformlyRecurrent dSystemY y) :
+∃ x : X, π x = y ∧ isUniformlyRecurrent dSystemX x := by
+let Z := orbitClosure dSystemY y
+have hZInv : isNonemptyCompactT2InvariantSubset dSystemY Z := by
+  apply orbitClosureIsNonemptyCompactT2InvariantSubset
+have hZMin : isMinimalSubset dSystemY Z := by
+  apply orbitClosureOfURPointIsMinimalSubset
+  exact hYUniRec
+have hyInZ : y ∈ Z := by
+  apply URPointBelongsToOrbitClosure
+  exact hYUniRec
+let dSystemZ := fromNonemptyCompactT2InvariantSubsetToSystem dSystemY hZInv
+let X1 := π ⁻¹' Z
+have hX1Inv : isNonemptyCompactT2InvariantSubset dSystemX X1 := by
+  apply preimageSubsystemIsSubsystem
+  · exact hπFactorMap
+  · exact hZInv
+let dSystemX1 := fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hX1Inv
+have hX1Nonempty : Nonempty X1 := by
+  rcases hX1Inv with ⟨hX1Nonempty, hX1Compact, hX13⟩
+  apply Set.Nonempty.to_subtype hX1Nonempty
+have hX1CompactSpace : CompactSpace X1 := by
+  rcases hX1Inv with ⟨hX1Nonempty, hX1Compact, hX13⟩
+  apply isCompact_iff_compactSpace.mp
+  exact hX1Compact
+have hExistW1 := existsMinimalSubset dSystemX1
+rcases hExistW1 with ⟨W1, hW1⟩
+let W : Set X := Subtype.val '' W1
+have hWMin : isMinimalSubset dSystemX W := by
+  rcases hW1 with ⟨hW1Inv, hW1Min⟩
+  unfold isMinimalSubset
+  have hW1InvCopy := hW1Inv
+  rcases hW1InvCopy with ⟨hW1a, hW1b, hW1c, hW1d⟩
+  have hW1Compact : CompactSpace W1 := by
+    apply isCompact_iff_compactSpace.mp
+    exact hW1b
+  have hW1Nonempty : Nonempty W1 := by
+    apply Set.Nonempty.to_subtype
+    exact hW1a
+  constructor
+  · apply subSystemOfSubsystem dSystemX hX1Inv
+    have hX1System : dSystemX1 =
+      (fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hX1Inv) := by
+      rfl
+    rw [<- hX1System]
+    exact hW1Inv
+  · intro M hMa hMb
+    let M1 : Set X1 := Subtype.val ⁻¹' M
+    have hW1W : W1 = Subtype.val ⁻¹' W := by
+      simp [W]
+    have hM1inW1 : M1 ⊆ W1 := by
+      simp only [M1]
+      simp only [hW1W]
+      apply Set.preimage_mono hMa
+    have hM1Inv : isNonemptyCompactT2InvariantSubset dSystemX1 M1 := by
+      rcases hMb with ⟨hMb1, hMb2, hMb3, hMb4⟩
+      simp only [M1]
+      constructor
+      · have hExistx := Set.nonempty_def.mp hMb1
+        rcases hExistx with ⟨x, hx⟩
+        simp only [Set.nonempty_def, Set.mem_preimage, Subtype.exists, exists_prop]
+        use x
+        constructor
+        · have hWinX1 : W ⊆ X1 := by
+            simp [W]
+          apply hWinX1
+          apply hMa hx
+        · exact hx
+      constructor
+      · simp only [Subtype.isCompact_iff, Subtype.image_preimage_coe]
+        apply IsCompact.inter
+        · rcases hX1Inv with ⟨hX1a, hX1b, hX1c, hX1d⟩
+          exact hX1b
+        · exact hMb2
+      constructor
+      · infer_instance
+      · unfold isInvariantSet
+        intro s
+        specialize hMb4 s
+        intro y hy
+        let x := Subtype.val y
+        have hxM : x ∈ M := by
+          exact hy
+        specialize hMb4 hxM
+        have hEqualThing : Subtype.val (dSystemX1.map s y) = dSystemX.map s x := by
+          rfl
+        simp only [Set.mem_preimage, hEqualThing]
+        exact hMb4
+    specialize hW1Min M1 hM1inW1 hM1Inv
+    have hMSubtype : M = Subtype.val '' M1 := by
+      simp only [Subtype.image_preimage_coe, Set.right_eq_inter, M1]
+      have hWSubX1 : W ⊆ X1 := by
+        simp [W]
+      exact hMa.trans hWSubX1
+    simp only [hMSubtype, Set.image_val_inj, W]
+    exact hW1Min
+have hImageMin : isMinimalSubset dSystemY (π '' W) := by
+  rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
+  apply imageOfMinimalSetIsMinimal π
+  · exact hπ1
+  · exact hπ3
+  · exact hWMin
+have hImageWSubset : π '' W ⊆ Z := by
+  simp only [Set.image_subset_iff]
+  have hX1Equi : X1 = π ⁻¹' Z := by
+    rfl
+  rw [<- hX1Equi]
+  simp [W]
+have hImageEqua : Z = π '' W := by
+  unfold isMinimalSubset at hZMin
+  rcases hZMin with ⟨hZ1, hZ2⟩
+  rcases hImageMin with ⟨hπW1, hπW2⟩
+  specialize hZ2 (π '' W) hImageWSubset hπW1
+  exact hZ2
+rw [hImageEqua] at hyInZ
+simp only [Set.mem_image] at hyInZ
+rcases hyInZ with ⟨x, hx1, hx2⟩
+use x
+constructor
+· exact hx2
+· exact inMinimalSubsetUR hWMin hx1
 
 end Uniform_recurrence
 
