@@ -3670,6 +3670,64 @@ exact ((h2.trans h4).trans h5).trans h6
 -- Set.diagonal X ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U := by
 -- sorry
 
+lemma commMinOrbInterDiagonalBackward
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+(z : X × X) (hzRP : z ∈ RP dSystemX)
+(U : Set (X × X)) (hUz : U ∈ nhds z) :
+(Set.diagonal X ∩ closure
+  (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
+unfold RP at hzRP
+have hzInEach := Set.mem_sInter.mp hzRP
+simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Set.mem_iInter] at hzInEach
+have hUα : ∀ α ∈ nhdsSet (Set.diagonal X),
+  ((setOrbit (diagDynamicalSystem dSystemX dSystemX) α) ∩ U).Nonempty := by
+  intro α hα
+  specialize hzInEach α hα
+  unfold setOrbitClosure at hzInEach
+  simp only [Set.inter_comm]
+  apply mem_closure_iff_nhds.mp hzInEach
+  exact hUz
+have hUEv : ∀ α ∈ nhdsSet (Set.diagonal X),
+  (α ∩ (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
+  intro α hα
+  specialize hUα α hα
+  simp only [Set.inter_nonempty, Prod.exists] at hUα
+  rcases hUα with ⟨a, b, hab1, hab2⟩
+  simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hab1
+  rcases hab1 with ⟨s, x, y, hxy1, hxy2⟩
+  apply Set.inter_nonempty.mpr
+  use (x, y)
+  constructor
+  · exact hxy1
+  · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+    use s
+    rw [hxy2]
+    exact hab2
+apply Set.not_disjoint_iff_nonempty_inter.mp
+by_contra hContra
+let α := (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))ᶜ
+have hαNhds : α ∈ nhdsSet (Set.diagonal X) := by
+  apply mem_nhdsSet.mpr
+  use α
+  constructor
+  · simp
+  constructor
+  · apply isOpen_compl_iff.mpr
+    apply isClosed_closure
+  · apply Disjoint.subset_compl_right
+    exact hContra
+specialize hUEv α hαNhds
+have hαInverseInter : Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+  apply Set.subset_compl_iff_disjoint_right.mp
+  simp only [Set.compl_subset_compl, α]
+  apply subset_closure
+have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+  apply Set.not_disjoint_iff_nonempty_inter.mpr
+  exact hUEv
+exact hαNotDisjoint hαInverseInter
+
 /-- If a point z ∈ X × X is in RP, then for every neighborhood U of z,
 the closure of S⁻¹U contains the digonal of X × X -/
 lemma commMinOrbContainDiagonalBackward
