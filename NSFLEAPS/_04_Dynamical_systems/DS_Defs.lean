@@ -2618,6 +2618,7 @@ have hdSystemYDef : dSystemY = fromNonemptyCompactT2InvariantSubsetToSystem dSys
 rw [<- hdSystemYDef]
 exact hy'UniRec
 
+/-- Preimage of a subsystem under a factor map is a subsystem -/
 lemma preimageSubsystemIsSubsystem
 {dSystemX : DynamicalSystem S X}
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
@@ -2626,7 +2627,40 @@ lemma preimageSubsystemIsSubsystem
 (hπFactorMap : isFactorMap dSystemX dSystemY π)
 (Z : Set Y) (hZInv : isNonemptyCompactT2InvariantSubset dSystemY Z) :
 isNonemptyCompactT2InvariantSubset dSystemX (π ⁻¹' Z) := by
-sorry
+rcases hZInv with ⟨hZ1, hZ2, hZ3, hZ4⟩
+rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
+unfold isNonemptyCompactT2InvariantSubset
+constructor
+· apply Set.Nonempty.preimage
+  · exact hZ1
+  · exact hπ2
+constructor
+· apply IsClosed.isCompact
+  apply IsClosed.preimage
+  · exact hπ1
+  · apply IsCompact.isClosed
+    exact hZ2
+constructor
+· infer_instance
+· unfold isInvariantSet
+  intro s
+  specialize hZ4 s
+  intro x hx
+  simp only [Set.mem_preimage] at hx
+  specialize hZ4 hx
+  unfold isEquivariant at hπ3
+  simp only [Set.mem_preimage]
+  specialize hπ3 s
+  have hCompo : (dSystemY.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+    apply congr_fun hπ3
+  have hCompo1 : (dSystemY.map s ∘ π) x = dSystemY.map s (π x) := by
+    simp
+  have hCompo2 : (π ∘ dSystemX.map s) x = π (dSystemX.map s x) := by
+    simp
+  have hCompo3 : π (dSystemX.map s x) = dSystemY.map s (π x) := by
+    rw [<- hCompo2, <- hCompo, hCompo1]
+  rw [hCompo3]
+  exact hZ4
 
 /-- If π : X → Y is a factor map and y ∈ Y is uniformly recurrent, then there exists
 uniformly recurrent point x ∈ X such that π x = y -/
