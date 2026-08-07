@@ -2585,12 +2585,38 @@ apply hU
 apply hUV
 exact hV3
 
+/-- If y belongs to a minimal subset Y of dynamical system X, then y is uniformly recurrent -/
 lemma inMinimalSubsetUR
 {dSystemX : DynamicalSystem S X} {Y : Set X}
 (hYMin : isMinimalSubset dSystemX Y)
 {y : X} (hyInY : y ∈ Y) :
 isUniformlyRecurrent dSystemX y := by
-sorry
+let hYMinCopy := hYMin
+rcases hYMinCopy with ⟨hY1, hY2⟩
+let dSystemY := fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hY1
+rcases hY1 with ⟨hY1a, hY1b, hY1c, hY1d⟩
+have hYCompactSpace : CompactSpace Y := by
+  apply isCompact_iff_compactSpace.mp
+  exact hY1b
+have hYNonempty : Nonempty Y := by
+  apply Set.Nonempty.to_subtype
+  exact hY1a
+have hSystemYMin : isMinimalSystem dSystemY := by
+  rw [<- minimalSubsetIffMinimalSubsystem]
+  exact hYMin
+let y' : Y := ⟨y, hyInY⟩
+have hy'UniRec : isUniformlyRecurrent dSystemY y' := by
+  apply minimalImpliesUniformlyRecurrent
+  exact hSystemYMin
+have hySubtypeval : y = Subtype.val y' := by
+  rfl
+rw [hySubtypeval]
+rcases hYMin with ⟨hYInv, hYMin2⟩
+apply URInSubsystemImpliesURInSystem dSystemX hYInv
+have hdSystemYDef : dSystemY = fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hYInv := by
+  rfl
+rw [<- hdSystemYDef]
+exact hy'UniRec
 
 lemma preimageSubsystemIsSubsystem
 {dSystemX : DynamicalSystem S X}
