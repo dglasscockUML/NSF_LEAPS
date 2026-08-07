@@ -3945,7 +3945,121 @@ lemma commMinOrbContainDiagonalBackward
 (z : X × X) (hzRP : z ∈ RP dSystemX)
 (U : Set (X × X)) (hUz : U ∈ nhds z) :
 Set.diagonal X ⊆ closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
-sorry
+let Z := closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
+have hZInvariant : ∀ s : S, (diagDynamicalSystem dSystemX dSystemX).map s '' Z ⊆ Z := by
+  intro s
+  let W := ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map (t * s) ⁻¹' U
+  have hZsubW : Z ⊆ closure W := by
+    sorry
+  have hsZsubsW : (diagDynamicalSystem dSystemX dSystemX).map s '' Z
+    ⊆ (diagDynamicalSystem dSystemX dSystemX).map s '' closure W := by
+    intro z hz
+    simp only [Set.mem_image, Prod.exists] at hz
+    rcases hz with ⟨a, b, hab1, hab2⟩
+    simp only [Set.mem_image, Prod.exists]
+    use a
+    use b
+    constructor
+    · apply hZsubW hab1
+    · exact hab2
+  have hsWsubZ : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆ Z := by
+    sorry
+  exact hsZsubsW.trans hsWsubZ
+have hZInterDiag : (Set.diagonal X ∩ Z).Nonempty := by
+  simp only [Z]
+  apply commMinOrbInterDiagonalBackward
+  · exact hzRP
+  · exact hUz
+have hZClosed : IsClosed Z := by
+  apply isClosed_closure
+let hExistz := Set.inter_nonempty.mp hZInterDiag
+rcases hExistz with ⟨z, hz1, hz2⟩
+let W := {(diagDynamicalSystem dSystemX dSystemX).map s z | s : S}
+have hWinZ : W ⊆ Z := by
+  intro t ht
+  simp only [Set.mem_setOf_eq, W] at ht
+  rcases ht with ⟨s, hst⟩
+  rw [<- hst]
+  specialize hZInvariant s
+  rw [<- Set.mapsTo_iff_image_subset] at hZInvariant
+  specialize hZInvariant hz2
+  exact hZInvariant
+have hClosureWinZ : closure W ⊆ Z := by
+  apply closure_minimal
+  · exact hWinZ
+  · exact hZClosed
+have hWinDiag : W ⊆ Set.diagonal X := by
+  simp only [W]
+  intro t ht
+  simp only [Set.mem_setOf_eq] at ht
+  rcases ht with ⟨s, hs⟩
+  rw [<- hs]
+  simp only [Set.mem_diagonal_iff]
+  simp only [diagDynamicalSystem, Prod.map_fst, Prod.map_snd]
+  simp only [Set.mem_diagonal_iff] at hz1
+  rw [hz1]
+have hEveryPoint : ∀ t ∈ Set.diagonal X, ∀ U ∈ nhds t, (U ∩ W).Nonempty := by
+  intro t ht U hU
+  have hUNeigh := mem_nhds_prod_iff.mp hU
+  rcases hUNeigh with ⟨U1, hU1, U2, hU2, hU12⟩
+  let V := U1 ∩ U2
+  simp only [Set.mem_diagonal_iff] at ht
+  simp only [Set.mem_diagonal_iff] at hz1
+  rw [<- ht] at hU2
+  have hUNeight : V ∈ nhds t.1 := by
+    simp only [mem_nhds_iff]
+    simp only [mem_nhds_iff] at hU1
+    simp only [mem_nhds_iff] at hU2
+    rcases hU1 with ⟨W1, hW1a, hW1b, hW1c⟩
+    rcases hU2 with ⟨W2, hW2a, hW2b, hW2c⟩
+    use W1 ∩ W2
+    constructor
+    · apply Set.inter_subset_inter hW1a hW2a
+    constructor
+    · apply IsOpen.inter hW1b hW2b
+    · simp only [Set.mem_inter_iff]
+      constructor
+      · exact hW1c
+      · exact hW2c
+  have hExists : ∃ s : S, dSystemX.map s z.1 ∈ V := by
+    let hVExpand := mem_nhds_iff.mp hUNeight
+    rcases hVExpand with ⟨V1, hV1a, hV1b, hV1c⟩
+    have hV1Nonempty: V1.Nonempty := by
+      apply Set.nonempty_of_mem hV1c
+    have hVisit := minimalImpliesNonemptySetVisits hMin z.1 hV1b hV1Nonempty
+    unfold visitTimeSet at hVisit
+    simp only [Set.nonempty_def, Set.mem_preimage] at hVisit
+    rcases hVisit with ⟨s, hs⟩
+    use s
+    apply hV1a
+    exact hs
+  rcases hExists with ⟨s, hs⟩
+  simp only [Set.inter_nonempty, Prod.exists]
+  use dSystemX.map s z.1
+  use dSystemX.map s z.1
+  constructor
+  · apply hU12
+    simp only [Set.mem_prod]
+    constructor
+    · have hVU1 : V ⊆ U1 := by
+        apply Set.inter_subset_left
+      apply hVU1
+      exact hs
+    · have hVU2 : V ⊆ U2 := by
+        apply Set.inter_subset_right
+      apply hVU2
+      exact hs
+  · simp only [Set.mem_setOf_eq, W]
+    use s
+    simp only [diagDynamicalSystem]
+    simp only [Prod.map, Prod.mk.injEq, true_and]
+    rw [hz1]
+have hWClosureContDiag : Set.diagonal X ⊆ closure W := by
+  intro t ht
+  specialize hEveryPoint t ht
+  apply mem_closure_iff_nhds.mpr
+  exact hEveryPoint
+exact hWClosureContDiag.trans hClosureWinZ
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
 acting semigroup, `RP_Y ⊆ (π ⊗ π) RP_X` -/
