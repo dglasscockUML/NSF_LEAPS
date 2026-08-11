@@ -442,21 +442,26 @@ theorem thm_familyJoinIsMonotonenew (F G H : Family α) : F ⊆ G →
 theorem thm_familyJoinIsPartitionRegular (F : Family α) : isPRTwoSets (F ⋎ F*) :=
   by sorry
 
-theorem thm_familyJoinIsPartitionRegularnew (F : Family α) : isPRTwoSets (Family.newFamJoin F F*) :=
-by
-  rw [isPRTwoSets]
-  intro A hA c
-  have h_decomp : ∃ B ∈ F.sets, ∃ C ∈ (F*).sets, A = B ∩ C := by sorry
-  rcases h_decomp with ⟨B, hB, C, hC, rfl⟩
-  by_cases h0 : {x ∈ B | c x = 0} ∈ F.sets
-  · use 0
-    have h_goal : {x ∈ B ∩ C | c x = 0} ∈ (Family.newFamJoin F F*).sets := by
-      sorry
-    exact h_goal
-  · use 1
-    have h1 : {x ∈ B | c x = 1} ∈ F*.sets := by sorry
-    have h_goal : {x ∈ B ∩ C | c x = 1} ∈ (Family.newFamJoin F F*).sets := by sorry
-    exact h_goal
+
+-- From Anh : I temporarily comment out the next theorem since it has an error
+-- which causes the files downstream not able to compile
+-- After the error is fixed, please uncomment the theorem
+
+-- theorem thm_familyJoinIsPartitionRegularnew (F : Family α) : isPRTwoSets (Family.newFamJoin F F*) :=
+-- by
+--   rw [isPRTwoSets]
+--   intro A hA c
+--   have h_decomp : ∃ B ∈ F.sets, ∃ C ∈ (F*).sets, A = B ∩ C := by sorry
+--   rcases h_decomp with ⟨B, hB, C, hC, rfl⟩
+--   by_cases h0 : {x ∈ B | c x = 0} ∈ F.sets
+--   · use 0
+--     have h_goal : {x ∈ B ∩ C | c x = 0} ∈ (Family.newFamJoin F F*).sets := by
+--       sorry
+--     exact h_goal
+--   · use 1
+--     have h1 : {x ∈ B | c x = 1} ∈ F*.sets := by sorry
+--     have h_goal : {x ∈ B ∩ C | c x = 1} ∈ (Family.newFamJoin F F*).sets := by sorry
+--     exact h_goal
 
 --thm_classcap_idempotent_at_filters
 

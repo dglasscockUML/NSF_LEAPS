@@ -192,6 +192,18 @@ def inverseSetOrbit
 Set X :=
 ⋃ (s : S), (dSystem.map s) ⁻¹' Z
 
+/-- The orbit along a set A ⊆ S -/
+def setOrbitAlongASet
+(dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
+Set X :=
+⋃ (s : A), (dSystem.map s) ⁻¹' Z
+
+/-- The inverse orbit along a set A ⊆ S -/
+def inverseSetOrbitAlongASet
+(dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
+Set X :=
+⋃ (s : A), (dSystem.map s) ⁻¹' Z
+
 /-- If A ⊆ B, then the orbit closure of A is subset of the orbit closure of B -/
 lemma monotoneSetOrbitClosure
 (dSystem : DynamicalSystem S X) (A : Set X) (B : Set X) (hAB : A ⊆ B) :
@@ -3049,6 +3061,13 @@ have hA : ∀ W : Set (X × X), IsOpen W → W.Nonempty → (W ∩ A).Nonempty :
   exact Set.Nonempty.mono hA2 hUV
 rw [<- hDefA]
 exact dense_iff_inter_open.mpr hA
+
+-- theorem forwardBackwardSetOrbClosCoincideInBronsSys
+-- {S : Type*} [Semigroup S] [Nonempty S]
+-- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X)
+-- (hDense : Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)})
+-- (A B : S) (hAThick : )
 
 end Minimality_and_UR_with_commutivity
 
