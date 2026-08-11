@@ -96,29 +96,7 @@ theorem thm_familyIsPRIffDualIsFilter (P : Family α) : isIntersectionClosed (P.
  -- by sorry
 
 --thm_de_morgan_union_v1
-
 --∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty
-/-Proof. We consider three cases.
-Case 1: F = ∅. In this case,
-• F ⋎ G = G, by definition
-• F∗ = P(S)
-• F∗ ⋏ G∗ = P(S) ⋏ G∗ = G∗, by definition
-Therefore,
-(F ⋎ G)∗ = G∗ = F∗ ⋏ G∗,
-as desired.
-Case 2: G = ∅. In this case, we follow the analogous argument. (Alternatively, we could
-use the fact that ⋎ and ⋏ are commutative.)
-Case 3: F̸ = ∅ and G̸ = ∅. In the following list, each statement is equivalent to the one
-that follows it.
-1. A ∈ (F ⋎ G)∗
-– definition
-2. for all B ∈ F ⋎ G, A ∩ B̸ = ∅
-– definition
-3. for all C ∈ F and D ∈ G, A ∩ C ∩ D ≠ ∅
-– definition
-4. for all C ∈ F, A ∩ C ∈ G∗
-– definition
-5. A ∈ F∗ ⋏ G∗-/
 theorem thm_de_morgan_union_v1new (F G : Family α) : (Family.newFamJoin F G)* =
 (Family.newFamMeet F* G*) :=
 by
@@ -223,15 +201,6 @@ theorem thm_de_morgan_union_v1 (F G : Family α) : (F ⋎ G)* = (F* ⋏ G*) :=
   have equiv45 : CinterAinGdual ↔ goalR := by sorry
   have equiv25 : BinFuG ↔ goalR := by exact Iff.trans equiv24 equiv45
   sorry
-
-  /- constructor
-  · intro h
-    rw [mem_dual_alt] at h
-    exact goalR
-  · intro h
-    rw [mem_dual_alt]
-    have h_complement : Aᶜ ∉ F ⋎ G := by sorry
-    exact h_complement -/
 
 --thm_de_morgan_union_v2
 /- A ∈ (F ∪ G)∗
@@ -499,7 +468,14 @@ by
 theorem thm_familyMeetIsContainedInIntersection (F G : Family α) : (F ⋏ G) ⊆ (F ∩ G) :=
   by sorry
 
-
+theorem thm_familyMeetIsContainedInIntersectionnew (F G : Family α) : (Family.newFamMeet F G) ⊆ (F ∩ G) :=
+  by
+  intro A hA
+  change A ∈ newFamMeet F G at hA
+  unfold newFamMeet at hA
+  change A ∈ {A | ∀ B ∈ famDual F, A ∩ B ∈ ↑G} at hA
+  unfold famDual at hA
+  sorry
 --thm_classcapdual_commutative
 theorem thm_familyMeetIsCommutative (F G : Family α) : (F ⋏ G) = (G ⋏ F) :=
   by sorry
@@ -583,6 +559,16 @@ theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
 -- H* ⊆ (F* ⋎ (F ⋏ G)**)* ↔ F ⋏ G ⊆ F ⋏ H
 -- H* ⊆ (F* ⋎ (F ⋏ G))* ↔ F ⋏ G ⊆ F ⋏ H
 --thm_combo_algebra_statement_one
+theorem thm_familyMeetIsIdempotentAtPRFamiliesnew (F : Family α) :
+  Family.newFamMeet F F = F ↔ isPRFamily F := by
+  constructor
+  · intro h
+    unfold isPRFamily
+    intro A hA n c
+    sorry
+  · intro h
+    unfold isPRFamily at h
+    sorry
 theorem thm_combo_algebra_statement_one (F G H : Family α) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
 by
   nth_rw 1 [← thm_dual_is_involution (F ⋏ (F* ⋎ G*))]
@@ -598,7 +584,20 @@ by
     have h_anti := thm_dual_is_antitone _ _ h2
     rw [thm_dual_is_involution, thm_dual_is_involution] at h_anti
     intro A hA
-    sorry
+    have hmono : (F ⋏ G) ⋏ F ⊆ H ⋏ F :=
+      thm_familyMeetIsMonotone (F ⋏ G) H F h_anti
+    have h2 : (F ⋏ G) ⋏ F = F ⋏ G := by
+      rw [←thm_familyMeetIsAssociative]
+      rw [thm_familyMeetIsCommutative G F]
+      rw [thm_familyMeetIsAssociative]
+      sorry
+    have h3 : H ⋏ F = F ⋏ H := by
+      rw [thm_familyMeetIsCommutative]
+    have h4 : F ⋏ G ⊆ F ⋏ H := by
+      rw [← h2]
+      rw [←h3]
+      exact hmono
+    exact h4 hA
   · intro h
 
     sorry
