@@ -17,17 +17,13 @@ class HasFamJoin (T : Type _) where
   famJoin : T → T → T
 class HasFamMeet (T : Type _) where
   famMeet : T → T → T
-class HasFamMeetnew (T : Type _) where
-  famMeet : T → T → T
-/-class HasFamJoinnew (T : Type _) where
-  famJoin : T → T → T-/
 
 --operators
 postfix:max "*" => HasFamDual.famDual
 infixr:80 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
 infixr:80 "⋏" => HasFamMeet.famMeet
 --infixr:80 "~" => HasFamJoinnew.newFamJoin -- dont like 2 with max precedence
-infixr:80 "!" => HasFamMeetnew.newFamMeet
+--infixr:80 "!" => HasFamMeetnew.newFamMeet
 def upwardClosed (F : Set (Set α)) : Prop :=
   ∀ (A B : Set α), A ∈ F → A ⊆ B → B ∈ F
 
@@ -166,22 +162,22 @@ instance : HasFamDual (Set (Set α)) where
 -- ⋎ definitions
 lemma mem_dual_star {α : Type*} (F : Family α) (A : Set α) :
     A ∈ F* ↔ ∀ B ∈ F, (A ∩ B).Nonempty := Iff.rfl
-open Classical in
+/- open Classical in
 noncomputable def famJoin (F G : Set (Set α)) : Set (Set α) :=
   if F = ∅ then G
   else if G = ∅ then F
-  else { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B }
+  else { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B } -/
 --F ⋏ G = {A ⊆ S: ∀ B ∈ F*, A ∩ B ∈ G} if both not P(S),
 --if F = P(S), then G, if G = P(S) then F
-def newFamJoin (F G : Set (Set α)) : Set (Set α) :=
+def famJoin (F G : Set (Set α)) : Set (Set α) :=
   { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B }
 
-def Family.newFamJoin (famA famB : Family α) : Family α :=
+def Family.famJoin (famA famB : Family α) : Family α :=
 {
-  sets := _root_.newFamJoin famA.sets famB.sets,
+  sets := _root_.famJoin famA.sets famB.sets,
   upward_closed := by
     intro A B hA hAB
-    unfold _root_.newFamJoin at hA ⊢
+    unfold _root_.famJoin at hA ⊢
     rcases hA with ⟨C, hCF, D, hDG, hAeq⟩
     have hC' : (B ∪ C) ∈ famA.sets := famA.upward_closed C (B ∪ C) hCF Set.subset_union_right
     have hD' : (B ∪ D) ∈ famB.sets := famB.upward_closed D (B ∪ D) hDG Set.subset_union_right
@@ -191,14 +187,14 @@ def Family.newFamJoin (famA famB : Family α) : Family α :=
       _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
     exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
-lemma mem_newFamJoin (F G : Set (Set α)) (A : Set α) :
-  A ∈ newFamJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
+lemma mem_famJoin (F G : Set (Set α)) (A : Set α) :
+  A ∈ famJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
   rfl
-/- instance : HasFamJoin (Set (Set α))  where
-  famJoin := _root_.newFamJoin
+instance : HasFamJoin (Set (Set α))  where
+  famJoin := _root_.famJoin
 noncomputable instance : HasFamJoin (Family α) where
-  famJoin := @Family.newFamJoin α -/
-open Classical in
+  famJoin := @Family.famJoin α
+/- open Classical in
 noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
 {
   sets := _root_.famJoin famA.sets famB.sets,
@@ -228,32 +224,32 @@ by sorry
 noncomputable instance : HasFamJoin (Set (Set α))  where
   famJoin := _root_.famJoin
 noncomputable instance : HasFamJoin (Family α) where
-  famJoin := @Family.famJoin α
+  famJoin := @Family.famJoin α -/
 
 -- ⋏ definitions
-def newFamMeet (F G : Set (Set α)) : Set (Set α) :=
+def famMeet (F G : Set (Set α)) : Set (Set α) :=
   { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
-def Family.newFamMeet (famA famB : Family α) : Family α := {
-  sets := _root_.newFamMeet famA.sets famB.sets,
+def Family.famMeet (famA famB : Family α) : Family α := {
+  sets := _root_.famMeet famA.sets famB.sets,
   upward_closed := by
     intro A B hA hAB
-    unfold _root_.newFamMeet at hA ⊢
+    unfold _root_.famMeet at hA ⊢
     intro C hCF
     have hBCmem : B ∩ C ∈ famB.sets :=
       famB.upward_closed (A ∩ C) (B ∩ C) (hA C hCF)
       (Set.inter_subset_inter hAB (Set.Subset.refl C))
     exact hBCmem
 }
-lemma mem_newFamMeet (F G : Set (Set α)) (A : Set α) :
-  A ∈ newFamMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
+lemma mem_famMeet (F G : Set (Set α)) (A : Set α) :
+  A ∈ famMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
   rfl
-instance : HasFamMeetnew (Set (Set α))  where
-  famMeet := _root_.newFamMeet
-instance : HasFamMeetnew (Family α) where
-  famMeet := @Family.newFamMeet α
+instance : HasFamMeet (Set (Set α))  where
+  famMeet := _root_.famMeet
+instance : HasFamMeet (Family α) where
+  famMeet := @Family.famMeet α
 
 
-open Classical in
+/- open Classical in
 noncomputable def famMeet (F G : Set (Set α)) : Set (Set α) :=
   if F = fullCollection α then G
   else if G = fullCollection α then F
@@ -282,4 +278,4 @@ by sorry
 instance : HasFamMeet (Set (Set α))  where
   famMeet := _root_.famMeet
 noncomputable instance : HasFamMeet (Family α) where
-  famMeet := @Family.famMeet α
+  famMeet := @Family.famMeet α -/
