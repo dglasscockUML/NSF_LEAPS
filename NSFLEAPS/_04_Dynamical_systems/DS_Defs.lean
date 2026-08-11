@@ -3936,9 +3936,43 @@ have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSyst
   exact hUEv
 exact hαNotDisjoint hαInverseInter
 
+/-- For any s ∈ S, s closure U ⊆ closure s U -/
+lemma moveInside
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+(U : Set X) (s : S) :
+(dSystemX.map s) '' closure U ⊆ closure (dSystemX.map s '' U) := by
+intro x hx
+simp only [Set.mem_image] at hx
+rcases hx with ⟨v, hv1, hv2⟩
+apply mem_closure_iff.mpr
+intro W hW1 hW2
+have hNeigh : v ∈ (dSystemX.map s) ⁻¹' W := by
+  simp only [Set.mem_preimage]
+  rw [hv2]
+  exact hW2
+have hPreWOpen : IsOpen ((dSystemX.map s) ⁻¹' W) := by
+  apply IsOpen.preimage
+  · exact dSystemX.mapCont s
+  · exact hW1
+have hGoal : ((dSystemX.map s) ⁻¹' W ∩ U).Nonempty := by
+  apply mem_closure_iff.mp hv1
+  · exact hPreWOpen
+  · exact hNeigh
+let hExist := Set.inter_nonempty.mp hGoal
+rcases hExist with ⟨t, ht1, ht2⟩
+simp only [Set.mem_preimage] at ht1
+apply Set.inter_nonempty.mpr
+use dSystemX.map s t
+constructor
+· exact ht1
+· simp only [Set.mem_image]
+  use t
+
 /-- If a point z ∈ X × X is in RP, then for every neighborhood U of z,
 the closure of S⁻¹U contains the digonal of X × X -/
-lemma commMinOrbContainDiagonalBackward
+theorem commMinOrbContainDiagonalBackward
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X) {hMin : isMinimalSystem dSystemX}
@@ -3962,8 +3996,39 @@ have hZInvariant : ∀ s : S, (diagDynamicalSystem dSystemX dSystemX).map s '' Z
     constructor
     · apply hZsubW hab1
     · exact hab2
+  have hMovesIn : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆
+    closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W) := by
+    apply moveInside
+  have hMovesIn1 : (diagDynamicalSystem dSystemX dSystemX).map s '' W
+    = ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
+    (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U) := by
+    simp only [W]
+    apply Set.image_iUnion
+  have hMovesIn2 : closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W)
+    = closure (⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
+    (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U)) := by
+    rw [hMovesIn1]
+  have hMovesIn3 : closure (⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
+    (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U))
+    ⊆ Z := by
+    simp only [Z]
+    unfold inverseSetOrbit
+    apply closure_mono
+    apply Set.iUnion_mono
+    intro t z hz
+    simp only [Set.mem_image, Set.mem_preimage, Prod.exists] at hz
+    rcases hz with ⟨a, b, hab1, hab2⟩
+    simp only [Set.mem_preimage]
+    have hEqu : (diagDynamicalSystem dSystemX dSystemX).map (t * s) (a, b)
+      = (diagDynamicalSystem dSystemX dSystemX).map t
+        ((diagDynamicalSystem dSystemX dSystemX).map s (a, b)) := by
+      exact (diagDynamicalSystem dSystemX dSystemX).mapMult t s (a, b)
+    rw [hEqu] at hab1
+    rw [hab2] at hab1
+    exact hab1
   have hsWsubZ : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆ Z := by
-    sorry
+    rw [hMovesIn2] at hMovesIn
+    exact hMovesIn.trans hMovesIn3
   exact hsZsubsW.trans hsWsubZ
 have hZInterDiag : (Set.diagonal X ∩ Z).Nonempty := by
   simp only [Z]
