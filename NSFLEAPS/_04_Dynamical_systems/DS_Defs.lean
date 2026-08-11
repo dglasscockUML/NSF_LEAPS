@@ -3062,12 +3062,27 @@ have hA : ∀ W : Set (X × X), IsOpen W → W.Nonempty → (W ∩ A).Nonempty :
 rw [<- hDefA]
 exact dense_iff_inter_open.mpr hA
 
--- theorem forwardBackwardSetOrbClosCoincideInBronsSys
--- {S : Type*} [Semigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X)
--- (hDense : Dense {(x,y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x,y)})
--- (A B : S) (hAThick : )
+-- Put definition of thick sets for use in the next theorem
+-- Will remove after we resolve the conflict
+/-- A set `A ⊆ S` is thick if for all finite subsets `F ⊆ S`,
+there exists `s ∈ S` such that `Fs ⊆ A` -/
+def isThick
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A
+
+/-- If A and B ⊆ S are thick then closure A U = closure B⁻¹ U for any open U ⊆ X × X -/
+theorem forwardBackwardSetOrbClosCoincideInBronsSys
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+(hDense :
+Dense {(x, y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x, y)})
+(A B : Set S) (hAThick : isThick A) (hBThick : isThick B)
+(W : Set (X × X)) (hWOpen : IsOpen W) :
+closure (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) A W)
+= closure (inverseSetOrbitAlongASet (diagDynamicalSystem dSystem dSystem) B W) := by
+sorry
 
 end Minimality_and_UR_with_commutivity
 
@@ -3996,14 +4011,88 @@ theorem commMinOrbContainDiagonalBackward
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X) {hMin : isMinimalSystem dSystemX}
 (z : X × X) (hzRP : z ∈ RP dSystemX)
-(U : Set (X × X)) (hUz : U ∈ nhds z) :
+(U : Set (X × X)) (hUOpen : IsOpen U) (hUContz : z ∈ U) :
 Set.diagonal X ⊆ closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
 let Z := closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
 have hZInvariant : ∀ s : S, (diagDynamicalSystem dSystemX dSystemX).map s '' Z ⊆ Z := by
   intro s
   let W := ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map (t * s) ⁻¹' U
   have hZsubW : Z ⊆ closure W := by
-    sorry
+    have hSThick : isThick (Set.univ : Set S) := by
+      unfold isThick
+      intro F hF
+      have hSNonempty : Nonempty S := by
+        infer_instance
+      let s := Nonempty.some hSNonempty
+      use s
+      simp
+    let Ss := {t * s | t : S}
+    have hSsThick : isThick (Ss) := by
+      unfold isThick
+      intro F hF
+      simp only [Set.image_subset_iff, Set.preimage_setOf_eq, Ss]
+      use s
+      have hEquaN : Set.univ ⊆ {a | ∃ t, t * s = a * s} := by
+        intro u hu
+        simp
+      have hFUniv : F ⊆ Set.univ := by
+        simp
+      exact hFUniv.trans hEquaN
+    have hSEqua1 : closure
+      (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
+      = closure
+      (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
+      apply forwardBackwardSetOrbClosCoincideInBronsSys
+      · apply inMinCommSystemURPairsDense
+        exact hMin
+      · exact hSThick
+      · exact hSThick
+      · exact hUOpen
+    have hSEqua2 : closure
+      (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
+      = closure (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Ss U) := by
+      apply forwardBackwardSetOrbClosCoincideInBronsSys
+      · apply inMinCommSystemURPairsDense
+        exact hMin
+      · exact hSThick
+      · exact hSsThick
+      · exact hUOpen
+    have hSEqua3 : Z = closure
+      (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
+      simp only [Z]
+      apply Set.Subset.antisymm_iff.mpr
+      constructor
+      · apply closure_mono
+        unfold inverseSetOrbit
+        unfold inverseSetOrbitAlongASet
+        simp
+      · apply closure_mono
+        unfold inverseSetOrbit
+        unfold inverseSetOrbitAlongASet
+        simp
+    have hSEqua4 : closure W = closure
+      (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Ss U) := by
+      unfold inverseSetOrbitAlongASet
+      simp only [Set.coe_setOf, Set.mem_setOf_eq, W, Ss]
+      apply Set.Subset.antisymm_iff.mpr
+      constructor
+      · apply closure_mono
+        intro z hz
+        simp only [Set.mem_iUnion, Set.mem_preimage] at hz
+        rcases hz with ⟨r, hr⟩
+        simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop,
+          exists_exists_eq_and]
+        use r
+      · apply closure_mono
+        intro z hz
+        simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop,
+          exists_exists_eq_and] at hz
+        rcases hz with ⟨r, hr⟩
+        simp only [Set.mem_iUnion, Set.mem_preimage]
+        use r
+    have hZequalW : Z = closure W := by
+      rw [hSEqua3, hSEqua4, <- hSEqua2, <- hSEqua1]
+    rw [hZequalW]
   have hsZsubsW : (diagDynamicalSystem dSystemX dSystemX).map s '' Z
     ⊆ (diagDynamicalSystem dSystemX dSystemX).map s '' closure W := by
     intro z hz
@@ -4053,7 +4142,8 @@ have hZInterDiag : (Set.diagonal X ∩ Z).Nonempty := by
   simp only [Z]
   apply commMinOrbInterDiagonalBackward
   · exact hzRP
-  · exact hUz
+  · apply mem_nhds_iff.mpr
+    use U
 have hZClosed : IsClosed Z := by
   apply isClosed_closure
 let hExistz := Set.inter_nonempty.mp hZInterDiag
@@ -4595,8 +4685,8 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
     apply commMinOrbContainDiagonalBackward
     · exact hYMin
     · exact hzInRP
-    · simp only [mem_nhds_iff]
-      use U
+    · exact hU1
+    · exact hU2
   have hDisjointInverse : Disjoint
     (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) (Z ×ˢ Z) := by
     unfold inverseSetOrbit
