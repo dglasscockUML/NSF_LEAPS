@@ -44,27 +44,6 @@ end Abstract_results
 
 section Syndetic_and_thick_sets
 
--- The definition of syndetic (`isSyndetic`) is in the _02_Semigroups file
-
-/-- A set `A ⊆ S` is thick if for all finite subsets `F ⊆ S`,
-there exists `s ∈ S` such that `Fs ⊆ A` -/
-def isThick
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A
-
-/-- If `A ⊆ S` is thick and `A ⊆ B`, then `B` is thick. -/
-theorem thickIsMonotone
-{S : Type*} [Semigroup S] [Nonempty S]
-{A B : Set S} (hSA : isThick A) (hAB : A ⊆ B) :
-isThick B :=
-by
-  intro F FFinite
-  specialize hSA F FFinite
-  rcases hSA with ⟨s,hSA⟩
-  use s
-  exact hSA.trans hAB
-
 /-- The family of syndetic subsets of a semigroup -/
 def syndeticFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=

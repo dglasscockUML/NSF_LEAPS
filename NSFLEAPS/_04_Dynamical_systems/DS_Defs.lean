@@ -3062,14 +3062,6 @@ have hA : ∀ W : Set (X × X), IsOpen W → W.Nonempty → (W ∩ A).Nonempty :
 rw [<- hDefA]
 exact dense_iff_inter_open.mpr hA
 
--- Put definition of thick sets for use in the next theorem
--- Will remove after we resolve the conflict
-/-- A set `A ⊆ S` is thick if for all finite subsets `F ⊆ S`,
-there exists `s ∈ S` such that `Fs ⊆ A` -/
-def isThick
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A
 
 /-- If A and B ⊆ S are thick then closure A U = closure B⁻¹ U for any open U ⊆ X × X -/
 theorem forwardBackwardSetOrbClosCoincideInBronsSys
