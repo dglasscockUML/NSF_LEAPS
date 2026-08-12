@@ -86,7 +86,8 @@ by
     · exact finF
     · exact hAB fsinA
 
-/- Still not sure we want to pursue this route, but it would make sense to define class Syndetic as follows. -/
+/- Still not sure we want to pursue this route,
+but it would make sense to define class Syndetic as follows. -/
 class Syndetic
 {S : Type*} [Semigroup S] (A : Set S) where
   syndetic_prop : ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
@@ -197,3 +198,26 @@ by
   rcases hSA with ⟨s,hSA⟩
   use s
   exact hSA.trans hAB
+
+/-- Every syndetic set and every thick set intersects -/
+lemma syndeticThickIntersect
+{S : Type*} [Semigroup S] [Nonempty S]
+(A B : Set S)
+(hASyndetic : isSyndetic A)
+(hBThick : isThick B) :
+(A ∩ B).Nonempty := by
+unfold isSyndetic at hASyndetic
+unfold isThick at hBThick
+rcases hASyndetic with ⟨F, hF1, hF2⟩
+specialize hBThick F hF1
+rcases hBThick with ⟨s, hs⟩
+specialize hF2 s
+rcases hF2 with ⟨f, hf1, hf2⟩
+apply Set.inter_nonempty.mpr
+use f * s
+constructor
+· exact hf2
+· have hIn : f * s ∈ (fun x ↦ x * s) '' F := by
+    simp only [Set.mem_image]
+    use f
+  apply hs hIn

@@ -196,7 +196,7 @@ Set X :=
 def setOrbitAlongASet
 (dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
 Set X :=
-⋃ (s : A), (dSystem.map s) ⁻¹' Z
+⋃ (s : A), (dSystem.map s) '' Z
 
 /-- The inverse orbit along a set A ⊆ S -/
 def inverseSetOrbitAlongASet
@@ -1856,6 +1856,37 @@ have h61 : U ∈ nhds x := by
 have h62 := h1 U h61
 exact h62
 
+-- Next lemma is an upgrade of URPointBelongsToOrbitClosure
+/-- A uniformly recurrent point belongs to its orbit closure along any thick set -/
+lemma uniformRecurrentPointBelongToThickOrbit
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X)
+(A : Set S) (hAThick : isThick A)
+(x : X) (hxUR : isUniformlyRecurrent dSystem x) :
+x ∈ closure (setOrbitAlongASet dSystem A {x}) := by
+apply mem_closure_iff.mpr
+intro U hU1 hU2
+unfold isUniformlyRecurrent at hxUR
+specialize hxUR U
+have hUNeigh : U ∈ nhds x := by
+  apply mem_nhds_iff.mpr
+  use U
+specialize hxUR hUNeigh
+have hInterNonempty : ((visitTimeSet dSystem x U) ∩ A).Nonempty := by
+  apply syndeticThickIntersect
+  · exact hxUR
+  · exact hAThick
+rcases (Set.inter_nonempty.mp hInterNonempty) with ⟨s, hs1, hs2⟩
+simp only [visitTimeSet, Set.mem_preimage] at hs1
+apply Set.inter_nonempty.mpr
+use dSystem.map s x
+constructor
+· exact hs1
+· simp only [setOrbitAlongASet, Set.image_singleton, Set.iUnion_singleton_eq_range, Set.mem_range,
+  Subtype.exists, exists_prop]
+  use s
+
 /-- If a point is uniformly recurrent in a subsystem, it is uniformly
 recurrent in the system -/
 lemma URInSubsystemImpliesURInSystem
@@ -3062,7 +3093,6 @@ have hA : ∀ W : Set (X × X), IsOpen W → W.Nonempty → (W ∩ A).Nonempty :
 rw [<- hDefA]
 exact dense_iff_inter_open.mpr hA
 
-
 /-- If A and B ⊆ S are thick then closure A U = closure B⁻¹ U for any open U ⊆ X × X -/
 theorem forwardBackwardSetOrbClosCoincideInBronsSys
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -3074,7 +3104,194 @@ Dense {(x, y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSystem dSyst
 (W : Set (X × X)) (hWOpen : IsOpen W) :
 closure (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) A W)
 = closure (inverseSetOrbitAlongASet (diagDynamicalSystem dSystem dSystem) B W) := by
-sorry
+apply Set.Subset.antisymm_iff.mpr
+constructor
+· intro z hz
+  apply mem_closure_iff.mpr
+  intro V hV1 hV2
+  let hVA := mem_closure_iff.mp hz
+  specialize hVA V hV1 hV2
+  have hVExists := Set.inter_nonempty.mp hVA
+  rcases hVExists with ⟨v, hv1, hv2⟩
+  simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_iUnion, Set.mem_image, Prod.exists,
+    exists_prop] at hv2
+  rcases hv2 with ⟨s, hs1, hs2⟩
+  rcases hs2 with ⟨a, b, hab1, hab2⟩
+  have hInterNonempty : (W ∩ (diagDynamicalSystem dSystem dSystem).map s ⁻¹' V).Nonempty := by
+    apply Set.inter_nonempty.mpr
+    use (a, b)
+    constructor
+    · exact hab1
+    · simp only [Set.mem_preimage]
+      rw [hab2]
+      exact hv1
+  have hIntOpen : IsOpen (W ∩ (diagDynamicalSystem dSystem dSystem).map s ⁻¹' V) := by
+    apply IsOpen.inter
+    · exact hWOpen
+    · apply IsOpen.preimage
+      · exact (diagDynamicalSystem dSystem dSystem).mapCont s
+      · exact hV1
+  have hEInter := dense_iff_inter_open.mp
+    hDense (W ∩ (diagDynamicalSystem dSystem dSystem).map s ⁻¹' V)
+    hIntOpen hInterNonempty
+  have hExiOne := Set.inter_nonempty.mp hEInter
+  rcases hExiOne with ⟨t, ht1, ht2⟩
+  simp only [Prod.mk.eta, Set.mem_setOf_eq] at ht2
+  let Bs := {b * s | b ∈ B}
+  have hBsThick : isThick Bs := by
+    unfold isThick
+    intro F hF
+    unfold isThick at hBThick
+    specialize hBThick F hF
+    rcases hBThick with ⟨t, ht⟩
+    use t * s
+    simp only [Set.image_subset_iff, Set.preimage_setOf_eq, Bs]
+    simp only [Set.image_subset_iff] at ht
+    intro f hf
+    simp only [Set.mem_setOf_eq]
+    specialize ht hf
+    simp only [Set.mem_preimage] at ht
+    use f * t
+    constructor
+    · exact ht
+    · exact Semigroup.mul_assoc f t s
+  have htInClosure : t ∈ closure
+    (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) Bs {t}) := by
+    apply uniformRecurrentPointBelongToThickOrbit
+    · exact hBsThick
+    · exact ht2
+  have hInter2 := mem_closure_iff.mp htInClosure W hWOpen
+  have htInW : t ∈ W := by
+    let h := (Set.mem_inter_iff t W ((diagDynamicalSystem dSystem dSystem).map s ⁻¹' V)).mp ht1
+    rcases h with ⟨h1, h2⟩
+    exact h1
+  specialize hInter2 htInW
+  have hENew1 := Set.inter_nonempty.mp hInter2
+  rcases hENew1 with ⟨x, hx1, hx2⟩
+  simp only [setOrbitAlongASet, Set.image_singleton, Set.iUnion_singleton_eq_range, Set.mem_range,
+    Subtype.exists, exists_prop] at hx2
+  rcases hx2 with ⟨r, hr1, hr2⟩
+  simp only [Set.mem_setOf_eq, Bs] at hr1
+  rcases hr1 with ⟨b, hb1, hb2⟩
+  have hAlmostGoal : (diagDynamicalSystem dSystem dSystem).map s t ∈
+    V ∩ ((diagDynamicalSystem dSystem dSystem).map b) ⁻¹' W := by
+    apply Set.mem_inter
+    · apply Set.mem_preimage.mp
+      let h := (Set.mem_inter_iff t W ((diagDynamicalSystem dSystem dSystem).map s ⁻¹' V)).mp ht1
+      rcases h with ⟨h1, h2⟩
+      exact h2
+    · simp only [Set.mem_preimage]
+      have hEq : (diagDynamicalSystem dSystem dSystem).map (b * s) t
+        = (diagDynamicalSystem dSystem dSystem).map b
+        ((diagDynamicalSystem dSystem dSystem).map s t) := by
+        exact (diagDynamicalSystem dSystem dSystem).mapMult b s t
+      rw [<- hEq, hb2, hr2]
+      exact hx1
+  let m := (diagDynamicalSystem dSystem dSystem).map s t
+  apply Set.inter_nonempty.mpr
+  use m
+  constructor
+  · simp only [m]
+    apply Set.mem_of_mem_of_subset hAlmostGoal
+    simp
+  · unfold inverseSetOrbitAlongASet
+    simp only [Set.iUnion_coe_set, Set.mem_iUnion, Set.mem_preimage, exists_prop]
+    use b
+    constructor
+    · exact hb1
+    · simp only [m]
+      apply Set.mem_preimage.mp
+      apply Set.mem_of_mem_of_subset hAlmostGoal
+      simp
+· intro z hz
+  apply mem_closure_iff.mpr
+  intro V hV1 hV2
+  let hVA := mem_closure_iff.mp hz
+  specialize hVA V hV1 hV2
+  have hVExists := Set.inter_nonempty.mp hVA
+  rcases hVExists with ⟨v, hv1, hv2⟩
+  simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_iUnion, Set.mem_preimage,
+    exists_prop] at hv2
+  rcases hv2 with ⟨s, hs1, hs2⟩
+  have hNonempty : (V ∩ ((diagDynamicalSystem dSystem dSystem).map s) ⁻¹' W).Nonempty := by
+    apply Set.inter_nonempty.mpr
+    use v
+    constructor
+    · exact hv1
+    · simp only [Set.mem_preimage]
+      exact hs2
+  have hInterOpen : IsOpen (V ∩ ((diagDynamicalSystem dSystem dSystem).map s) ⁻¹' W) := by
+    apply IsOpen.inter
+    · exact hV1
+    · apply IsOpen.preimage
+      · exact (diagDynamicalSystem dSystem dSystem).mapCont s
+      · exact hWOpen
+  have hEInter := dense_iff_inter_open.mp
+    hDense (V ∩ ((diagDynamicalSystem dSystem dSystem).map s) ⁻¹' W)
+    hInterOpen hNonempty
+  have hExiOne := Set.inter_nonempty.mp hEInter
+  rcases hExiOne with ⟨y, hy1, hy2⟩
+  simp only [Prod.mk.eta, Set.mem_setOf_eq] at hy2
+  let As := {a * s | a ∈ A}
+  have hAsThick : isThick As := by
+    unfold isThick
+    intro F hF
+    unfold isThick at hAThick
+    specialize hAThick F hF
+    rcases hAThick with ⟨t, ht⟩
+    use t * s
+    simp only [Set.image_subset_iff, Set.preimage_setOf_eq, As]
+    simp only [Set.image_subset_iff] at ht
+    intro f hf
+    simp only [Set.mem_setOf_eq]
+    specialize ht hf
+    simp only [Set.mem_preimage] at ht
+    use f * t
+    constructor
+    · exact ht
+    · exact Semigroup.mul_assoc f t s
+  have hyInClosure : y ∈ closure
+    (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) As {y}) := by
+    apply uniformRecurrentPointBelongToThickOrbit
+    · exact hAsThick
+    · exact hy2
+  have hInter2 := mem_closure_iff.mp hyInClosure V hV1
+  have hyInV : y ∈ V := by
+    have h := (Set.mem_inter_iff y V ((diagDynamicalSystem dSystem dSystem).map s ⁻¹' W)).mp hy1
+    rcases h with ⟨h1, h2⟩
+    exact h1
+  specialize hInter2 hyInV
+  have hENew1 := Set.inter_nonempty.mp hInter2
+  rcases hENew1 with ⟨x, hx1, hx2⟩
+  simp only [setOrbitAlongASet, Set.image_singleton, Set.iUnion_singleton_eq_range, Set.mem_range,
+    Subtype.exists, exists_prop] at hx2
+  rcases hx2 with ⟨r, hr1, hr2⟩
+  simp only [Set.mem_setOf_eq, As] at hr1
+  rcases hr1 with ⟨a, ha1, ha2⟩
+  have hIn1 : (diagDynamicalSystem dSystem dSystem).map (a * s) y ∈ V := by
+    rw [ha2, hr2]
+    exact hx1
+  have hIn2 : (diagDynamicalSystem dSystem dSystem).map (a * s) y ∈
+    setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) A W := by
+    simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_iUnion, Set.mem_image, Prod.exists,
+      exists_prop]
+    use a
+    constructor
+    · exact ha1
+    · let m :=  (diagDynamicalSystem dSystem dSystem).map s y
+      use m.1
+      use m.2
+      constructor
+      · simp only [Prod.mk.eta]
+        simp only [m]
+        have hInterExpandRight := Set.mem_of_mem_inter_right hy1
+        simp only [Set.mem_preimage] at hInterExpandRight
+        exact hInterExpandRight
+      · simp only [Prod.mk.eta]
+        simp only [m]
+        rw [(diagDynamicalSystem dSystem dSystem).mapMult a s y]
+  apply Set.inter_nonempty.mpr
+  use (diagDynamicalSystem dSystem dSystem).map (a * s) y
 
 end Minimality_and_UR_with_commutivity
 
