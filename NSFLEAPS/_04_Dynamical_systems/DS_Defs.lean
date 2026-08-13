@@ -3456,6 +3456,7 @@ end Proximality
 
 section Regional_proximality
 
+/-
 /-- The regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RP
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -3463,19 +3464,58 @@ def RP
 (dSystem : DynamicalSystem S X) :
 Set (X × X) :=
 ⋂ α ∈ nhdsSet (Set.diagonal X),
-setOrbitClosure (diagDynamicalSystem dSystem dSystem) α
+inverseSetOrbit (diagDynamicalSystem dSystem dSystem) α
 
 /-- The regionally proximal relation is symmetric -/
 theorem RPisSymmetric
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isSymmetric (RP dSystem) := by
+isSymmetric (RP dSystem) := sorry
+
+/-- The regionally proximal relation is invariant under the diagonal
+action by `S`, provided that `S` is commutative -/
+theorem RPInCommSemiIsInvariant
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := sorry
+
+/-- The regionally proximal relation is closed -/
+theorem RPisClosed
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+IsClosed (RP dSystem) := sorry
+
+/-- If `SX` is dense in `X` (a basic nondegeneracy criterion), then `RP` is reflexive -/
+theorem RPisReflexive
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isReflexive (RP dSystem) := sorry
+-/
+
+/-- The backward regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
+def RPM
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (X × X) :=
+⋂ α ∈ nhdsSet (Set.diagonal X),
+setOrbitClosure (diagDynamicalSystem dSystem dSystem) α
+
+/-- The backward regionally proximal relation is symmetric -/
+theorem RPMisSymmetric
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isSymmetric (RPM dSystem) := by
 unfold isSymmetric
 unfold Symmetric
 intro x y hxy
-unfold RP at hxy
-unfold RP
+unfold RPM at hxy
+unfold RPM
 unfold setToRelation
 simp only [Set.mem_iInter]
 unfold setToRelation at hxy
@@ -3658,13 +3698,13 @@ have hW1 : (diagDynamicalSystem dSystem dSystem).map s (v.1, v.2)
   use v.2
 exact ⟨(diagDynamicalSystem dSystem dSystem).map s (v.1, v.2), hs, hW1⟩
 
-/-- The regionally proximal relation is invariant under the diagonal
+/-- The backward regionally proximal relation is invariant under the diagonal
 action by `S` -/
-theorem RPisInvariant
+theorem RPMisInvariant
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := by
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (RPM dSystem) := by
 have h1 : ∀ α ∈ nhdsSet (Set.diagonal X), isInvariantSet (diagDynamicalSystem dSystem dSystem)
   (setOrbit (diagDynamicalSystem dSystem dSystem) α) := by
   intro α hα
@@ -3696,7 +3736,7 @@ isInvariantSet (diagDynamicalSystem dSystem dSystem) (setOrbitClosure
   apply closureOfInvIsInv
   specialize h1 α hα
   exact h1
-unfold RP
+unfold RPM
 let C := {setOrbitClosure (diagDynamicalSystem dSystem dSystem) α | α ∈ nhdsSet (Set.diagonal X)}
 have h3 : (⋂ α ∈ nhdsSet (Set.diagonal X), setOrbitClosure (diagDynamicalSystem dSystem dSystem) α)
 = C.sInter := by
@@ -3728,29 +3768,29 @@ specialize h2 B hB
 rw [<- hAB]
 exact h2
 
-/-- The regionally proximal relation is closed -/
-theorem RPisClosed
+/-- The backward regionally proximal relation is closed -/
+theorem RPMisClosed
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-IsClosed (RP dSystem) := by
+IsClosed (RPM dSystem) := by
 apply isClosed_iInter
 intro U
 apply isClosed_iInter
 intro hU
 exact isClosed_closure
 
-/-- If `SX` is dense in `X` (a basic nondegeneracy criterion), then `RP` is reflexive -/
-theorem RPisReflexiveIfNondegen
+/-- If `SX` is dense in `X` (a basic nondegeneracy criterion), then `RPM` is reflexive -/
+theorem RPMisReflexiveIfNondegen
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 (hNondegen : setOrbitClosure dSystem Set.univ = Set.univ) :
-isReflexive (RP dSystem) := by
+isReflexive (RPM dSystem) := by
 unfold isReflexive
 unfold Reflexive
 intro x
-unfold RP
+unfold RPM
 unfold setToRelation
 simp only [Set.mem_iInter]
 intro U hU
@@ -3844,7 +3884,7 @@ apply hGoal2
 exact hGoal1
 
 /-- A minimal system satisfies the non-degeneracy condition required to conclude
-that `RP` is reflexive -/
+that `RPM` is reflexive -/
 lemma minimalImpliesNondegen
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -3867,26 +3907,26 @@ nth_rw 1 [<- xOrbitAll]
 apply closure_mono
 exact xOrbitInSetOrbit
 
-/-- A point `(x,y)` belongs to `RP` iff there exists `w ∈ X` and an ultrafilter `F` on
+/-- A point `(x,y)` belongs to `RPM` iff there exists `w ∈ X` and an ultrafilter `F` on
 `X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
-theorem xyInRPIffUltraToSomewwxy
+theorem xyInRPMIffUltraToSomewwxy
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (x y : X) :
-⟨x,y⟩ ∈ RP dSystem ↔ ∃ (w : X) (F : Ultrafilter ((X × X) × S)),
+⟨x,y⟩ ∈ RPM dSystem ↔ ∃ (w : X) (F : Ultrafilter ((X × X) × S)),
     Filter.Tendsto (fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a))
       F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) :=
 by sorry
 
-/-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
-theorem imageOfRPIsInRP
+/-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RPM_X ⊆ RPM_Y` -/
+theorem imageOfRPMIsInRPM
 {S : Type*} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
-(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY := by
+(Prod.map π π) '' (RPM dSystemX) ⊆ RPM dSystemY := by
 rcases hπ with ⟨hπ1, hπ2, hπ3⟩
 have h0 : Set.range π = Set.univ := by
     unfold Function.Surjective at hπ2
@@ -3951,17 +3991,17 @@ have h1 : ∀ β ∈ nhdsSet (Set.diagonal Y),
   apply Set.image_preimage_eq_iff.mpr
   simp
   simp [h0]
-have h2 : (Prod.map π π) '' RP dSystemX ⊆ ⋂ α ∈ nhdsSet (Set.diagonal X),
+have h2 : (Prod.map π π) '' RPM dSystemX ⊆ ⋂ α ∈ nhdsSet (Set.diagonal X),
 (Prod.map π π) '' (setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α) := by
   let P := {α : Set (X × X) | α ∈ nhdsSet (Set.diagonal X)}
   let c : P → Set (X × X) := fun α ↦ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α
-  have h2a : RP dSystemX = Set.iInter c := by
-    unfold RP
+  have h2a : RPM dSystemX = Set.iInter c := by
+    unfold RPM
     unfold Set.iInter
     simp
     rfl
-  have h2b : RP dSystemX = ⋂ (i : P), c i := by
-    unfold RP
+  have h2b : RPM dSystemX = ⋂ (i : P), c i := by
+    unfold RPM
     simp
     rfl
   have h2c : ⋂ α ∈ nhdsSet (Set.diagonal X), Prod.map π π ''
@@ -4099,10 +4139,10 @@ have h5 : ⋂ α ∈ nhdsSet (Set.diagonal X),
   exact hy
 have h6 : ⋂ α ∈ nhdsSet (Set.diagonal X), setOrbitClosure
   (diagDynamicalSystem dSystemY dSystemY) ((Prod.map π π) '' α)
-  ⊆ RP dSystemY := by
+  ⊆ RPM dSystemY := by
   intro y hy
   simp only [Set.mem_iInter] at hy
-  unfold RP
+  unfold RPM
   simp only [Set.mem_iInter]
   intro β hβ
   specialize h1 β hβ
@@ -4121,65 +4161,72 @@ exact ((h2.trans h4).trans h5).trans h6
 -- Set.diagonal X ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U := by
 -- sorry
 
-lemma commMinOrbInterDiagonalBackward
+-- This doesn't say what it says in the paper.  Resolve.
+/- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures of all open
+neighborhoods of `(x,y)` intersect the diagonal at a point -/
+lemma inRPMiffBackwardUOrbitClosHitsDiag
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
-(z : X × X) (hzRP : z ∈ RP dSystemX)
-(U : Set (X × X)) (hUz : U ∈ nhds z) :
-(Set.diagonal X ∩ closure
+(z : X × X) (U : Set (X × X)) (hUz : U ∈ nhds z) :
+z ∈ RPM dSystemX ↔ (Set.diagonal X ∩ closure
   (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
-unfold RP at hzRP
-have hzInEach := Set.mem_sInter.mp hzRP
-simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Set.mem_iInter] at hzInEach
-have hUα : ∀ α ∈ nhdsSet (Set.diagonal X),
-  ((setOrbit (diagDynamicalSystem dSystemX dSystemX) α) ∩ U).Nonempty := by
-  intro α hα
-  specialize hzInEach α hα
-  unfold setOrbitClosure at hzInEach
-  simp only [Set.inter_comm]
-  apply mem_closure_iff_nhds.mp hzInEach
-  exact hUz
-have hUEv : ∀ α ∈ nhdsSet (Set.diagonal X),
-  (α ∩ (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
-  intro α hα
-  specialize hUα α hα
-  simp only [Set.inter_nonempty, Prod.exists] at hUα
-  rcases hUα with ⟨a, b, hab1, hab2⟩
-  simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hab1
-  rcases hab1 with ⟨s, x, y, hxy1, hxy2⟩
-  apply Set.inter_nonempty.mpr
-  use (x, y)
-  constructor
-  · exact hxy1
-  · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
-    use s
-    rw [hxy2]
-    exact hab2
-apply Set.not_disjoint_iff_nonempty_inter.mp
-by_contra hContra
-let α := (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))ᶜ
-have hαNhds : α ∈ nhdsSet (Set.diagonal X) := by
-  apply mem_nhdsSet.mpr
-  use α
-  constructor
-  · simp
-  constructor
-  · apply isOpen_compl_iff.mpr
-    apply isClosed_closure
-  · apply Disjoint.subset_compl_right
-    exact hContra
-specialize hUEv α hαNhds
-have hαInverseInter : Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
-  apply Set.subset_compl_iff_disjoint_right.mp
-  simp only [Set.compl_subset_compl, α]
-  apply subset_closure
-have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
-  apply Set.not_disjoint_iff_nonempty_inter.mpr
-  exact hUEv
-exact hαNotDisjoint hαInverseInter
+constructor
+· intro hzRP
+  unfold RPM at hzRP
+  have hzInEach := Set.mem_sInter.mp hzRP
+  simp only [Set.mem_range, forall_exists_index,
+    forall_apply_eq_imp_iff, Set.mem_iInter] at hzInEach
+  have hUα : ∀ α ∈ nhdsSet (Set.diagonal X),
+    ((setOrbit (diagDynamicalSystem dSystemX dSystemX) α) ∩ U).Nonempty := by
+    intro α hα
+    specialize hzInEach α hα
+    unfold setOrbitClosure at hzInEach
+    simp only [Set.inter_comm]
+    apply mem_closure_iff_nhds.mp hzInEach
+    exact hUz
+  have hUEv : ∀ α ∈ nhdsSet (Set.diagonal X),
+    (α ∩ (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
+    intro α hα
+    specialize hUα α hα
+    simp only [Set.inter_nonempty, Prod.exists] at hUα
+    rcases hUα with ⟨a, b, hab1, hab2⟩
+    simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hab1
+    rcases hab1 with ⟨s, x, y, hxy1, hxy2⟩
+    apply Set.inter_nonempty.mpr
+    use (x, y)
+    constructor
+    · exact hxy1
+    · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+      use s
+      rw [hxy2]
+      exact hab2
+  apply Set.not_disjoint_iff_nonempty_inter.mp
+  by_contra hContra
+  let α := (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))ᶜ
+  have hαNhds : α ∈ nhdsSet (Set.diagonal X) := by
+    apply mem_nhdsSet.mpr
+    use α
+    constructor
+    · simp
+    constructor
+    · apply isOpen_compl_iff.mpr
+      apply isClosed_closure
+    · apply Disjoint.subset_compl_right
+      exact hContra
+  specialize hUEv α hαNhds
+  have hαInverseInter : Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+    apply Set.subset_compl_iff_disjoint_right.mp
+    simp only [Set.compl_subset_compl, α]
+    apply subset_closure
+  have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+    apply Set.not_disjoint_iff_nonempty_inter.mpr
+    exact hUEv
+  exact hαNotDisjoint hαInverseInter
+· sorry
 
-/-- For any s ∈ S, s closure U ⊆ closure s U -/
+--Instead of moveInside, can we not use imageClosureIsClosureImage from TP_Defs?
+/-- For any `s ∈ S`, `s closure U ⊆ closure s U` -/
 lemma moveInside
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -4213,13 +4260,13 @@ constructor
 · simp only [Set.mem_image]
   use t
 
-/-- If a point z ∈ X × X is in RP, then for every neighborhood U of z,
-the closure of S⁻¹U contains the digonal of X × X -/
+/-- If a point `z ∈ X × X` is in `RPM`, then for every neighborhood `U` of `z`,
+the closure of `S⁻¹U` contains the digonal of `X × X` -/
 theorem commMinOrbContainDiagonalBackward
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X) {hMin : isMinimalSystem dSystemX}
-(z : X × X) (hzRP : z ∈ RP dSystemX)
+(z : X × X) (hzRP : z ∈ RPM dSystemX)
 (U : Set (X × X)) (hUOpen : IsOpen U) (hUContz : z ∈ U) :
 Set.diagonal X ⊆ closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
 let Z := closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
@@ -4349,10 +4396,8 @@ have hZInvariant : ∀ s : S, (diagDynamicalSystem dSystemX dSystemX).map s '' Z
   exact hsZsubsW.trans hsWsubZ
 have hZInterDiag : (Set.diagonal X ∩ Z).Nonempty := by
   simp only [Z]
-  apply commMinOrbInterDiagonalBackward
-  · exact hzRP
-  · apply mem_nhds_iff.mpr
-    use U
+  apply (inRPMiffBackwardUOrbitClosHitsDiag dSystemX z U (hUOpen.mem_nhds hUContz)).mp
+  exact hzRP
 have hZClosed : IsClosed Z := by
   apply isClosed_closure
 let hExistz := Set.inter_nonempty.mp hZInterDiag
@@ -4445,7 +4490,7 @@ have hWClosureContDiag : Set.diagonal X ⊆ closure W := by
 exact hWClosureContDiag.trans hClosureWinZ
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
-acting semigroup, `RP_Y ⊆ (π ⊗ π) RP_X` -/
+acting semigroup, `RPM_Y ⊆ (π ⊗ π) RPM_X` -/
 theorem commMinRPIsInImageOfRP
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -4453,7 +4498,7 @@ theorem commMinRPIsInImageOfRP
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
-RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) := by
+RPM dSystemY ⊆ (Prod.map π π) '' (RPM dSystemX) := by
 have hYMin : isMinimalSystem dSystemY := by
   have hYFactorX : isFactor dSystemY dSystemX := by
     unfold isFactor
@@ -4461,7 +4506,7 @@ have hYMin : isMinimalSystem dSystemY := by
   exact factorOfMinimalIsMinimal hMin hYFactorX
 unfold isFactorMap at hπ
 rcases hπ with ⟨hπCont, hπSurj, hπEquiv⟩
-have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ := by
+have hComplement : ((Prod.map π π) '' (RPM dSystemX))ᶜ ⊆ (RPM dSystemY)ᶜ := by
   intro z hz
   let H := (Prod.map π π) ⁻¹' {z}
   have hHCompact : IsCompact H := by
@@ -4470,10 +4515,10 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
     · apply Continuous.prodMap
       · exact hπCont
       · exact hπCont
-  have hfH : ∀ f ∈ H, f ∉ RP dSystemX := by
+  have hfH : ∀ f ∈ H, f ∉ RPM dSystemX := by
     intro f hf
     by_contra
-    have hf1 : (Prod.map π π) f ∈ (Prod.map π π) '' RP dSystemX := by
+    have hf1 : (Prod.map π π) f ∈ (Prod.map π π) '' RPM dSystemX := by
       simp only [Set.mem_image, Prod.exists, Prod.map_apply]
       use f.1
       use f.2
@@ -4488,7 +4533,7 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
     Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
     intro f hfInH
     specialize hfH f hfInH
-    unfold RP at hfH
+    unfold RPM at hfH
     have hExistDisj : ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
       ∧ f ∈ Vf ∧ IsOpen Vf ∧
       Disjoint Vf (⋃ (s : S), ((Prod.map (dSystemX.map s) (dSystemX.map s)) '' αf)) := by
@@ -4886,7 +4931,7 @@ have hComplement : ((Prod.map π π) '' (RP dSystemX))ᶜ ⊆ (RP dSystemY)ᶜ :
     · exact hZConta
     · exact hDisjointβ11
   by_contra hContra
-  have hzInRP : z ∈ RP dSystemY := by
+  have hzInRP : z ∈ RPM dSystemY := by
     simp only [Set.mem_compl_iff, not_not] at hContra
     exact hContra
   have hContainDiag : Set.diagonal Y ⊆ closure
@@ -5106,10 +5151,10 @@ by
   exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
 
 /-- A dynamical system on `X` is equicontinuous if and only if the
-regionally proximal relation is contained in the diagonal of `X × X` -/
-theorem equicontinuousIffRPTrivial
+backward regionally proximal relation is contained in the diagonal of `X × X` -/
+theorem equicontinuousIffRPMTrivial
 (dSystem : DynamicalSystem S X) :
-RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
+RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
 constructor
 · intro h1
   unfold isEquicontinuousSystem
@@ -5123,17 +5168,17 @@ constructor
     have hα1 := mem_nhdsSet.mp hαNhdsDiag
     rcases hα1 with ⟨U, hU1, hU2, hU3⟩
     exact hU3.trans hU1
-  have hRPα : RP dSystem ⊆ α := by
+  have hRPα : RPM dSystem ⊆ α := by
     exact h1.trans hαContDiag
-  unfold RP at hRPα
+  unfold RPM at hRPα
   have hα0 : ∃ α0 ⊆ α, IsOpen α0 ∧ Set.diagonal X ⊆ α0 := by
     apply mem_nhdsSet.mp hαNhdsDiag
   rcases hα0 with ⟨α0, hα01, hα02, hα03⟩
-  have hRPα0 : RP dSystem ⊆ α0 := by
+  have hRPα0 : RPM dSystem ⊆ α0 := by
     exact h1.trans hα03
   have hGoalPrep0 : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
     Disjoint (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) α0ᶜ := by
-    unfold RP at hRPα0
+    unfold RPM at hRPα0
     have h1 : ∃ F : Finset {β : Set (X × X) | β ∈ nhdsSet (Set.diagonal X)},
       α0ᶜ ∩ (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) = ∅ := by
       apply IsCompact.elim_finite_subfamily_closed
@@ -5330,7 +5375,7 @@ constructor
       apply hα4
       exact htFalse
     exact hβ2 htFalse2
-  unfold RP at ht1
+  unfold RPM at ht1
   simp only [Set.mem_iInter] at ht1
   specialize ht1 α hα2
   exact hα5 ht1
@@ -5359,27 +5404,27 @@ theorem minimalFactorEquicontinuousIffRPInFactorRelation
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
-RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY := by
+RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY := by
 constructor
 · intro h1
   unfold mapRelation at h1
-  have h1recast : Prod.map π π '' RP dSystem ⊆ Set.diagonal Y := by
+  have h1recast : Prod.map π π '' RPM dSystem ⊆ Set.diagonal Y := by
     simp [h1]
-  have h2 : RP dSystemY ⊆ Prod.map π π '' RP dSystem := by
+  have h2 : RPM dSystemY ⊆ Prod.map π π '' RPM dSystem := by
     apply commMinRPIsInImageOfRP dSystem dSystemY
     · exact hFactorMap
     · exact hMin
-  have h3 : RP dSystemY ⊆ Set.diagonal Y := by
+  have h3 : RPM dSystemY ⊆ Set.diagonal Y := by
     exact h2.trans h1recast
-  exact (equicontinuousIffRPTrivial dSystemY).mp h3
+  exact (equicontinuousIffRPMTrivial dSystemY).mp h3
 · intro h1
   unfold mapRelation
-  have h2 : RP dSystemY ⊆ Set.diagonal Y := by
-    exact (equicontinuousIffRPTrivial dSystemY).mpr h1
-  have h3 : Prod.map π π '' RP dSystem ⊆ RP dSystemY := by
-    apply imageOfRPIsInRP dSystem dSystemY
+  have h2 : RPM dSystemY ⊆ Set.diagonal Y := by
+    exact (equicontinuousIffRPMTrivial dSystemY).mpr h1
+  have h3 : Prod.map π π '' RPM dSystem ⊆ RPM dSystemY := by
+    apply imageOfRPMIsInRPM dSystem dSystemY
     exact hFactorMap
-  have hGoal : Prod.map π π '' RP dSystem ⊆ Set.diagonal Y := by
+  have hGoal : Prod.map π π '' RPM dSystem ⊆ Set.diagonal Y := by
     exact h3.trans h2
   simp only [Set.image_subset_iff] at hGoal
   exact hGoal
@@ -5390,7 +5435,7 @@ theorem minimalICEREquicontinuousIffRPInICER
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
 {I : Set (X × X)} (hI : isICER dSystem I) :
-isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I := by
+isEquicontinuousICER dSystem hI ↔ RPM dSystem ⊆ I := by
 have hQuotientNonempty:  Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
     nonemptyQuotient X hI.2.2
 have hQuotientT2 : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
@@ -5400,7 +5445,7 @@ have hFactorMap : isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
     apply quotientMapIsFactorMap
 constructor
 · intro h1
-  have h3 : RP dSystem ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+  have h3 : RPM dSystem ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
     apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
       (quotientDynamicalSystem dSystem hI) hFactorMap).mpr
     · exact h1
