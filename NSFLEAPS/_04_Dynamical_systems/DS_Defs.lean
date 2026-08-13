@@ -3463,7 +3463,7 @@ def RP
 (dSystem : DynamicalSystem S X) :
 Set (X × X) :=
 ⋂ α ∈ nhdsSet (Set.diagonal X),
-inverseSetOrbit (diagDynamicalSystem dSystem dSystem) α
+closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) α)
 
 /-- The regionally proximal relation is symmetric -/
 theorem RPisSymmetric
@@ -3930,6 +3930,78 @@ apply closure_mono
 exact xOrbitInSetOrbit
 -/
 
+-- DGG: I updated the statement here to match the paper, but the proof now
+-- needs to be updated.
+/-- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures open
+neighborhoods of `(x,y)` intersect the diagonal -/
+theorem inRPMiffBackwardUOrbitClosHitsDiag
+{S : Type*} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X) (z : X × X) :
+z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.diagonal X ∩ closure
+  (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
+constructor
+· intro hzRP U hUOpen hUContz
+  unfold RPM at hzRP
+  have hzInEach := Set.mem_sInter.mp hzRP
+  simp only [Set.mem_range, forall_exists_index,
+    forall_apply_eq_imp_iff, Set.mem_iInter] at hzInEach
+  have hUα : ∀ α ∈ nhdsSet (Set.diagonal X),
+    ((setOrbit (diagDynamicalSystem dSystemX dSystemX) α) ∩ U).Nonempty := by
+    intro α hα
+    specialize hzInEach α hα
+    unfold setOrbitClosure at hzInEach
+    simp only [Set.inter_comm]
+    apply mem_closure_iff_nhds.mp hzInEach
+    exact hUOpen.mem_nhds hUContz
+  have hUEv : ∀ α ∈ nhdsSet (Set.diagonal X),
+    (α ∩ (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
+    intro α hα
+    specialize hUα α hα
+    simp only [Set.inter_nonempty, Prod.exists] at hUα
+    rcases hUα with ⟨a, b, hab1, hab2⟩
+    simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hab1
+    rcases hab1 with ⟨s, x, y, hxy1, hxy2⟩
+    apply Set.inter_nonempty.mpr
+    use (x, y)
+    constructor
+    · exact hxy1
+    · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+      use s
+      rw [hxy2]
+      exact hab2
+  apply Set.not_disjoint_iff_nonempty_inter.mp
+  by_contra hContra
+  let α := (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))ᶜ
+  have hαNhds : α ∈ nhdsSet (Set.diagonal X) := by
+    apply mem_nhdsSet.mpr
+    use α
+    constructor
+    · simp
+    constructor
+    · apply isOpen_compl_iff.mpr
+      apply isClosed_closure
+    · apply Disjoint.subset_compl_right
+      exact hContra
+  specialize hUEv α hαNhds
+  have hαInverseInter : Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+    apply Set.subset_compl_iff_disjoint_right.mp
+    simp only [Set.compl_subset_compl, α]
+    apply subset_closure
+  have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+    apply Set.not_disjoint_iff_nonempty_inter.mpr
+    exact hUEv
+  exact hαNotDisjoint hαInverseInter
+· sorry
+
+lemma inRPMiffBackwardUOrbitClosInterNeighDiag
+{S : Type*} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X) (z : X × X) :
+z ∈ RPM dSystemX ↔ ∀ (U α : Set (X × X)), IsOpen U → z ∈ U → IsOpen α → Set.diagonal X ⊆ α → (α ∩
+  (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
+sorry
+
 /-- A point `(x,y)` belongs to `RPM` iff there exists `w ∈ X` and an ultrafilter `F` on
 `X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
 theorem xyInRPMIffUltraToSomewwxy
@@ -3938,8 +4010,68 @@ theorem xyInRPMIffUltraToSomewwxy
 (dSystem : DynamicalSystem S X) (x y : X) :
 ⟨x,y⟩ ∈ RPM dSystem ↔ ∃ (w : X) (F : Ultrafilter ((X × X) × S)),
     Filter.Tendsto (fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a))
-      F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) :=
-by sorry
+      F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) := by
+let φ := fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a)
+constructor
+· intro hAssumption
+  have hMapPrep : ∀ Z ∈ nhds (x, y), ∀ α ∈ nhdsSet (Set.diagonal X), ∃ t : (X × X) × S,
+    φ t ∈ α ×ˢ Z := by
+    intro Z hZ α hα
+    have hRP := (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mp hAssumption
+    rcases (mem_nhds_iff.mp hZ) with ⟨Z', hZ'1, hZ'2, hZ'3⟩
+    rcases (mem_nhdsSet.mp hα) with ⟨α', hα'1, hα'2, hα'3⟩
+    specialize hRP Z' α' hZ'2 hZ'3 hα'2 hα'3
+    rcases Set.inter_nonempty.mp hRP with ⟨z, hz1, hz2⟩
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz2
+    rcases hz2 with ⟨s, hs⟩
+    use (z, s)
+    simp only [Set.mem_prod]
+    constructor
+    · simp only [φ]
+      apply hα'1
+      exact hz1
+    · simp only [φ]
+      apply hZ'1
+      exact hs
+  choose ψ hψ1 hψ2 using hMapPrep
+  sorry
+· intro hAssumption
+  have hφDef : φ = fun (⟨a,s⟩ : (X × X) × S) ↦
+    (a, (diagDynamicalSystem dSystem dSystem).map s a) := by
+    rfl
+  rw [<- hφDef] at hAssumption
+  apply (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mpr
+  intro Z α hZOpen hxy hαOpen hαDiag
+  simp only [Filter.Tendsto] at hAssumption
+  rcases hAssumption with ⟨w, F, hwF⟩
+  have hNhds : α ×ˢ Z ∈ nhds ((w, w), (x, y)) := by
+    apply prod_mem_nhds
+    · apply mem_nhds_iff.mpr
+      use α
+      constructor
+      · simp
+      constructor
+      · exact hαOpen
+      · apply hαDiag
+        simp
+    · apply mem_nhds_iff.mpr
+      use Z
+  have hPreimage : φ ⁻¹' (α ×ˢ Z) ∈ F := by
+    apply hwF
+    exact hNhds
+  have hNonempty : (φ ⁻¹' (α ×ˢ Z)).Nonempty := by
+    apply Ultrafilter.nonempty_of_mem hPreimage
+  have hExist := Set.nonempty_def.mp hNonempty
+  rcases hExist with ⟨t, ht⟩
+  simp only [Set.mem_preimage, Set.mem_prod] at ht
+  simp only [φ] at ht
+  rcases ht with ⟨ht1, ht2⟩
+  apply Set.inter_nonempty.mpr
+  use t.1
+  constructor
+  · exact ht1
+  · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+    use t.2
 
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RPM_X ⊆ RPM_Y` -/
 theorem imageOfRPMIsInRPM
@@ -4184,70 +4316,6 @@ exact ((h2.trans h4).trans h5).trans h6
 -- Set.diagonal X ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U := by
 -- sorry
 
--- DGG: I updated the statement here to match the paper, but the proof now
--- needs to be updated.
-/-- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures open
-neighborhoods of `(x,y)` intersect the diagonal -/
-theorem inRPMiffBackwardUOrbitClosHitsDiag
-{S : Type*} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X) (z : X × X) :
-z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.diagonal X ∩ closure
-  (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
-constructor
-· intro hzRP U hUOpen hUContz
-  unfold RPM at hzRP
-  have hzInEach := Set.mem_sInter.mp hzRP
-  simp only [Set.mem_range, forall_exists_index,
-    forall_apply_eq_imp_iff, Set.mem_iInter] at hzInEach
-  have hUα : ∀ α ∈ nhdsSet (Set.diagonal X),
-    ((setOrbit (diagDynamicalSystem dSystemX dSystemX) α) ∩ U).Nonempty := by
-    intro α hα
-    specialize hzInEach α hα
-    unfold setOrbitClosure at hzInEach
-    simp only [Set.inter_comm]
-    apply mem_closure_iff_nhds.mp hzInEach
-    exact hUOpen.mem_nhds hUContz
-  have hUEv : ∀ α ∈ nhdsSet (Set.diagonal X),
-    (α ∩ (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
-    intro α hα
-    specialize hUα α hα
-    simp only [Set.inter_nonempty, Prod.exists] at hUα
-    rcases hUα with ⟨a, b, hab1, hab2⟩
-    simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hab1
-    rcases hab1 with ⟨s, x, y, hxy1, hxy2⟩
-    apply Set.inter_nonempty.mpr
-    use (x, y)
-    constructor
-    · exact hxy1
-    · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
-      use s
-      rw [hxy2]
-      exact hab2
-  apply Set.not_disjoint_iff_nonempty_inter.mp
-  by_contra hContra
-  let α := (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))ᶜ
-  have hαNhds : α ∈ nhdsSet (Set.diagonal X) := by
-    apply mem_nhdsSet.mpr
-    use α
-    constructor
-    · simp
-    constructor
-    · apply isOpen_compl_iff.mpr
-      apply isClosed_closure
-    · apply Disjoint.subset_compl_right
-      exact hContra
-  specialize hUEv α hαNhds
-  have hαInverseInter : Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
-    apply Set.subset_compl_iff_disjoint_right.mp
-    simp only [Set.compl_subset_compl, α]
-    apply subset_closure
-  have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
-    apply Set.not_disjoint_iff_nonempty_inter.mpr
-    exact hUEv
-  exact hαNotDisjoint hαInverseInter
-· sorry
-
 end Regional_proximality_basics
 
 section Regional_proximality_in_min_comm_systems
@@ -4298,7 +4366,7 @@ constructor
 -- DGG: I updated the statement of the theorem, but now the proof needs to be fixed.
 
 /-- If a point `z ∈ X × X` is in `RPM`, then for every neighborhood `U` of `z`,
-the closure of `S⁻¹U` contains the digonal of `X × X` -/
+the closure of `S⁻¹U` contains the diagonal of `X × X` -/
 theorem inMinCommxyInRPIffNhdOrbitClosContainsDiag
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -4347,7 +4415,8 @@ have RPMwithInvOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U �
         have hSEqua1 : closure
           (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
           = closure
-          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
+          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
+          := by
           apply forwardBackwardSetOrbClosCoincideInBronsSys
           · apply inMinCommSystemURPairsDense
             exact hMin
@@ -4364,7 +4433,8 @@ have RPMwithInvOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U �
           · exact hSsThick
           · exact hUOpen
         have hSEqua3 : Z = closure
-          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
+          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
+          := by
           simp only [Z]
           apply Set.Subset.antisymm_iff.mpr
           constructor
@@ -5011,7 +5081,8 @@ have goalRPM : RPM dSystemY ⊆ (Prod.map π π) '' (RPM dSystemX) := by
       · exact hZOpen
     have hZCompClosed : IsClosed (Z ×ˢ Z)ᶜ := by
       apply IsOpen.isClosed_compl hZZOpen
-    have hInverseSubset : inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U ⊆ (Z ×ˢ Z)ᶜ := by
+    have hInverseSubset : inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U ⊆ (Z ×ˢ Z)ᶜ
+      := by
       apply Disjoint.subset_compl_right hDisjointInverse
     have hInverseClosureSubset : closure
       (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) ⊆ (Z ×ˢ Z)ᶜ := by
