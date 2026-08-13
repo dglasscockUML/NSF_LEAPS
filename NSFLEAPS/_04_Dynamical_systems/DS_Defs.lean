@@ -3454,9 +3454,8 @@ simpa
 
 end Proximality
 
-section Regional_proximality
+section Regional_proximality_basics
 
-/-
 /-- The regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RP
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -3494,7 +3493,28 @@ theorem RPisReflexive
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
 isReflexive (RP dSystem) := sorry
--/
+
+
+/-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
+theorem imageOfRPIsInRP
+{S : Type*} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
+(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY := by sorry
+
+
+/-- A pair `(x,y) ∈ RP` if and only if orbit closure of open
+neighborhoods of `(x,y)` intersect the diagonal -/
+theorem inRPiffForwardUOrbitClosHitsDiag
+{S : Type*} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X) (z : X × X) :
+z ∈ RP dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.diagonal X ∩
+  setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U).Nonempty := by sorry
+
 
 /-- The backward regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RPM
@@ -3883,8 +3903,10 @@ have hGoal2 : setOrbitClosure (diagDynamicalSystem dSystem dSystem) (Set.diagona
 apply hGoal2
 exact hGoal1
 
-/-- A minimal system satisfies the non-degeneracy condition required to conclude
+--DGG we may not use this lemma any more!
+/- A minimal system satisfies the non-degeneracy condition required to conclude
 that `RPM` is reflexive -/
+/-
 lemma minimalImpliesNondegen
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -3906,6 +3928,7 @@ apply Set.Subset.antisymm
 nth_rw 1 [<- xOrbitAll]
 apply closure_mono
 exact xOrbitInSetOrbit
+-/
 
 /-- A point `(x,y)` belongs to `RPM` iff there exists `w ∈ X` and an ultrafilter `F` on
 `X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
@@ -4161,18 +4184,18 @@ exact ((h2.trans h4).trans h5).trans h6
 -- Set.diagonal X ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U := by
 -- sorry
 
--- This doesn't say what it says in the paper.  Resolve.
-/- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures of all open
-neighborhoods of `(x,y)` intersect the diagonal at a point -/
-lemma inRPMiffBackwardUOrbitClosHitsDiag
-{S : Type*} [CommSemigroup S] [Nonempty S]
+-- DGG: I updated the statement here to match the paper, but the proof now
+-- needs to be updated.
+/-- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures open
+neighborhoods of `(x,y)` intersect the diagonal -/
+theorem inRPMiffBackwardUOrbitClosHitsDiag
+{S : Type*} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-(z : X × X) (U : Set (X × X)) (hUz : U ∈ nhds z) :
-z ∈ RPM dSystemX ↔ (Set.diagonal X ∩ closure
+(dSystemX : DynamicalSystem S X) (z : X × X) :
+z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.diagonal X ∩ closure
   (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
 constructor
-· intro hzRP
+· intro hzRP U hUOpen hUContz
   unfold RPM at hzRP
   have hzInEach := Set.mem_sInter.mp hzRP
   simp only [Set.mem_range, forall_exists_index,
@@ -4184,7 +4207,7 @@ constructor
     unfold setOrbitClosure at hzInEach
     simp only [Set.inter_comm]
     apply mem_closure_iff_nhds.mp hzInEach
-    exact hUz
+    exact hUOpen.mem_nhds hUContz
   have hUEv : ∀ α ∈ nhdsSet (Set.diagonal X),
     (α ∩ (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
     intro α hα
@@ -4225,7 +4248,19 @@ constructor
   exact hαNotDisjoint hαInverseInter
 · sorry
 
+end Regional_proximality_basics
+
+section Regional_proximality_in_min_comm_systems
+
+/-- In minimal systems with a commutative acting semigroup, `RP = RPM` -/
+theorem forwardEqualsBackwardRPInMinCommSystem
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+RP dSystem = RPM dSystem := by sorry
+
 --Instead of moveInside, can we not use imageClosureIsClosureImage from TP_Defs?
+--This lemma really has nothing to do with commutative semigroups, right?
 /-- For any `s ∈ S`, `s closure U ⊆ closure s U` -/
 lemma moveInside
 {S : Type*} [CommSemigroup S] [Nonempty S]
@@ -4260,237 +4295,260 @@ constructor
 · simp only [Set.mem_image]
   use t
 
+-- DGG: I updated the statement of the theorem, but now the proof needs to be fixed.
+
 /-- If a point `z ∈ X × X` is in `RPM`, then for every neighborhood `U` of `z`,
 the closure of `S⁻¹U` contains the digonal of `X × X` -/
-theorem commMinOrbContainDiagonalBackward
+theorem inMinCommxyInRPIffNhdOrbitClosContainsDiag
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X) {hMin : isMinimalSystem dSystemX}
-(z : X × X) (hzRP : z ∈ RPM dSystemX)
-(U : Set (X × X)) (hUOpen : IsOpen U) (hUContz : z ∈ U) :
-Set.diagonal X ⊆ closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
-let Z := closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
-have hZInvariant : ∀ s : S, (diagDynamicalSystem dSystemX dSystemX).map s '' Z ⊆ Z := by
-  intro s
-  let W := ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map (t * s) ⁻¹' U
-  have hZsubW : Z ⊆ closure W := by
-    have hSThick : isThick (Set.univ : Set S) := by
-      unfold isThick
-      intro F hF
-      have hSNonempty : Nonempty S := by
-        infer_instance
-      let s := Nonempty.some hSNonempty
-      use s
-      simp
-    let Ss := {t * s | t : S}
-    have hSsThick : isThick (Ss) := by
-      unfold isThick
-      intro F hF
-      simp only [Set.image_subset_iff, Set.preimage_setOf_eq, Ss]
-      use s
-      have hEquaN : Set.univ ⊆ {a | ∃ t, t * s = a * s} := by
-        intro u hu
-        simp
-      have hFUniv : F ⊆ Set.univ := by
-        simp
-      exact hFUniv.trans hEquaN
-    have hSEqua1 : closure
-      (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
-      = closure
-      (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
-      apply forwardBackwardSetOrbClosCoincideInBronsSys
-      · apply inMinCommSystemURPairsDense
-        exact hMin
-      · exact hSThick
-      · exact hSThick
-      · exact hUOpen
-    have hSEqua2 : closure
-      (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
-      = closure (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Ss U) := by
-      apply forwardBackwardSetOrbClosCoincideInBronsSys
-      · apply inMinCommSystemURPairsDense
-        exact hMin
-      · exact hSThick
-      · exact hSsThick
-      · exact hUOpen
-    have hSEqua3 : Z = closure
-      (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
-      simp only [Z]
-      apply Set.Subset.antisymm_iff.mpr
-      constructor
-      · apply closure_mono
-        unfold inverseSetOrbit
-        unfold inverseSetOrbitAlongASet
-        simp
-      · apply closure_mono
-        unfold inverseSetOrbit
-        unfold inverseSetOrbitAlongASet
-        simp
-    have hSEqua4 : closure W = closure
-      (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Ss U) := by
-      unfold inverseSetOrbitAlongASet
-      simp only [Set.coe_setOf, Set.mem_setOf_eq, W, Ss]
-      apply Set.Subset.antisymm_iff.mpr
-      constructor
-      · apply closure_mono
-        intro z hz
-        simp only [Set.mem_iUnion, Set.mem_preimage] at hz
-        rcases hz with ⟨r, hr⟩
-        simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop,
-          exists_exists_eq_and]
-        use r
-      · apply closure_mono
-        intro z hz
-        simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop,
-          exists_exists_eq_and] at hz
-        rcases hz with ⟨r, hr⟩
-        simp only [Set.mem_iUnion, Set.mem_preimage]
-        use r
-    have hZequalW : Z = closure W := by
-      rw [hSEqua3, hSEqua4, <- hSEqua2, <- hSEqua1]
-    rw [hZequalW]
-  have hsZsubsW : (diagDynamicalSystem dSystemX dSystemX).map s '' Z
-    ⊆ (diagDynamicalSystem dSystemX dSystemX).map s '' closure W := by
-    intro z hz
-    simp only [Set.mem_image, Prod.exists] at hz
-    rcases hz with ⟨a, b, hab1, hab2⟩
-    simp only [Set.mem_image, Prod.exists]
-    use a
-    use b
-    constructor
-    · apply hZsubW hab1
-    · exact hab2
-  have hMovesIn : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆
-    closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W) := by
-    apply moveInside
-  have hMovesIn1 : (diagDynamicalSystem dSystemX dSystemX).map s '' W
-    = ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
-    (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U) := by
-    simp only [W]
-    apply Set.image_iUnion
-  have hMovesIn2 : closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W)
-    = closure (⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
-    (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U)) := by
-    rw [hMovesIn1]
-  have hMovesIn3 : closure (⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
-    (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U))
-    ⊆ Z := by
-    simp only [Z]
-    unfold inverseSetOrbit
-    apply closure_mono
-    apply Set.iUnion_mono
-    intro t z hz
-    simp only [Set.mem_image, Set.mem_preimage, Prod.exists] at hz
-    rcases hz with ⟨a, b, hab1, hab2⟩
-    simp only [Set.mem_preimage]
-    have hEqu : (diagDynamicalSystem dSystemX dSystemX).map (t * s) (a, b)
-      = (diagDynamicalSystem dSystemX dSystemX).map t
-        ((diagDynamicalSystem dSystemX dSystemX).map s (a, b)) := by
-      exact (diagDynamicalSystem dSystemX dSystemX).mapMult t s (a, b)
-    rw [hEqu] at hab1
-    rw [hab2] at hab1
-    exact hab1
-  have hsWsubZ : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆ Z := by
-    rw [hMovesIn2] at hMovesIn
-    exact hMovesIn.trans hMovesIn3
-  exact hsZsubsW.trans hsWsubZ
-have hZInterDiag : (Set.diagonal X ∩ Z).Nonempty := by
-  simp only [Z]
-  apply (inRPMiffBackwardUOrbitClosHitsDiag dSystemX z U (hUOpen.mem_nhds hUContz)).mp
-  exact hzRP
-have hZClosed : IsClosed Z := by
-  apply isClosed_closure
-let hExistz := Set.inter_nonempty.mp hZInterDiag
-rcases hExistz with ⟨z, hz1, hz2⟩
-let W := {(diagDynamicalSystem dSystemX dSystemX).map s z | s : S}
-have hWinZ : W ⊆ Z := by
-  intro t ht
-  simp only [Set.mem_setOf_eq, W] at ht
-  rcases ht with ⟨s, hst⟩
-  rw [<- hst]
-  specialize hZInvariant s
-  rw [<- Set.mapsTo_iff_image_subset] at hZInvariant
-  specialize hZInvariant hz2
-  exact hZInvariant
-have hClosureWinZ : closure W ⊆ Z := by
-  apply closure_minimal
-  · exact hWinZ
-  · exact hZClosed
-have hWinDiag : W ⊆ Set.diagonal X := by
-  simp only [W]
-  intro t ht
-  simp only [Set.mem_setOf_eq] at ht
-  rcases ht with ⟨s, hs⟩
-  rw [<- hs]
-  simp only [Set.mem_diagonal_iff]
-  simp only [diagDynamicalSystem, Prod.map_fst, Prod.map_snd]
-  simp only [Set.mem_diagonal_iff] at hz1
-  rw [hz1]
-have hEveryPoint : ∀ t ∈ Set.diagonal X, ∀ U ∈ nhds t, (U ∩ W).Nonempty := by
-  intro t ht U hU
-  have hUNeigh := mem_nhds_prod_iff.mp hU
-  rcases hUNeigh with ⟨U1, hU1, U2, hU2, hU12⟩
-  let V := U1 ∩ U2
-  simp only [Set.mem_diagonal_iff] at ht
-  simp only [Set.mem_diagonal_iff] at hz1
-  rw [<- ht] at hU2
-  have hUNeight : V ∈ nhds t.1 := by
-    simp only [mem_nhds_iff]
-    simp only [mem_nhds_iff] at hU1
-    simp only [mem_nhds_iff] at hU2
-    rcases hU1 with ⟨W1, hW1a, hW1b, hW1c⟩
-    rcases hU2 with ⟨W2, hW2a, hW2b, hW2c⟩
-    use W1 ∩ W2
-    constructor
-    · apply Set.inter_subset_inter hW1a hW2a
-    constructor
-    · apply IsOpen.inter hW1b hW2b
-    · simp only [Set.mem_inter_iff]
-      constructor
-      · exact hW1c
-      · exact hW2c
-  have hExists : ∃ s : S, dSystemX.map s z.1 ∈ V := by
-    let hVExpand := mem_nhds_iff.mp hUNeight
-    rcases hVExpand with ⟨V1, hV1a, hV1b, hV1c⟩
-    have hV1Nonempty: V1.Nonempty := by
-      apply Set.nonempty_of_mem hV1c
-    have hVisit := minimalImpliesNonemptySetVisits hMin z.1 hV1b hV1Nonempty
-    unfold visitTimeSet at hVisit
-    simp only [Set.nonempty_def, Set.mem_preimage] at hVisit
-    rcases hVisit with ⟨s, hs⟩
-    use s
-    apply hV1a
-    exact hs
-  rcases hExists with ⟨s, hs⟩
-  simp only [Set.inter_nonempty, Prod.exists]
-  use dSystemX.map s z.1
-  use dSystemX.map s z.1
+(z : X × X) :
+(z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → Set.diagonal X ⊆
+  closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))
+∧
+(z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → Set.diagonal X ⊆
+  setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U)
+∧
+(z ∈ RP dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → Set.diagonal X ⊆
+  closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))
+∧
+(z ∈ RP dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → Set.diagonal X ⊆
+  setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U) := by
+have RPMwithInvOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → Set.diagonal X ⊆
+  closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
   constructor
-  · apply hU12
-    simp only [Set.mem_prod]
-    constructor
-    · have hVU1 : V ⊆ U1 := by
-        apply Set.inter_subset_left
-      apply hVU1
-      exact hs
-    · have hVU2 : V ⊆ U2 := by
-        apply Set.inter_subset_right
-      apply hVU2
-      exact hs
-  · simp only [Set.mem_setOf_eq, W]
-    use s
-    simp only [diagDynamicalSystem]
-    simp only [Prod.map, Prod.mk.injEq, true_and]
-    rw [hz1]
-have hWClosureContDiag : Set.diagonal X ⊆ closure W := by
-  intro t ht
-  specialize hEveryPoint t ht
-  apply mem_closure_iff_nhds.mpr
-  exact hEveryPoint
-exact hWClosureContDiag.trans hClosureWinZ
+  · intro hzRP U hUOpen hUContz
+    let Z := closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
+    have hZInvariant : ∀ s : S, (diagDynamicalSystem dSystemX dSystemX).map s '' Z ⊆ Z := by
+      intro s
+      let W := ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map (t * s) ⁻¹' U
+      have hZsubW : Z ⊆ closure W := by
+        have hSThick : isThick (Set.univ : Set S) := by
+          unfold isThick
+          intro F hF
+          have hSNonempty : Nonempty S := by
+            infer_instance
+          let s := Nonempty.some hSNonempty
+          use s
+          simp
+        let Ss := {t * s | t : S}
+        have hSsThick : isThick (Ss) := by
+          unfold isThick
+          intro F hF
+          simp only [Set.image_subset_iff, Set.preimage_setOf_eq, Ss]
+          use s
+          have hEquaN : Set.univ ⊆ {a | ∃ t, t * s = a * s} := by
+            intro u hu
+            simp
+          have hFUniv : F ⊆ Set.univ := by
+            simp
+          exact hFUniv.trans hEquaN
+        have hSEqua1 : closure
+          (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
+          = closure
+          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
+          apply forwardBackwardSetOrbClosCoincideInBronsSys
+          · apply inMinCommSystemURPairsDense
+            exact hMin
+          · exact hSThick
+          · exact hSThick
+          · exact hUOpen
+        have hSEqua2 : closure
+          (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U)
+          = closure (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Ss U) := by
+          apply forwardBackwardSetOrbClosCoincideInBronsSys
+          · apply inMinCommSystemURPairsDense
+            exact hMin
+          · exact hSThick
+          · exact hSsThick
+          · exact hUOpen
+        have hSEqua3 : Z = closure
+          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U) := by
+          simp only [Z]
+          apply Set.Subset.antisymm_iff.mpr
+          constructor
+          · apply closure_mono
+            unfold inverseSetOrbit
+            unfold inverseSetOrbitAlongASet
+            simp
+          · apply closure_mono
+            unfold inverseSetOrbit
+            unfold inverseSetOrbitAlongASet
+            simp
+        have hSEqua4 : closure W = closure
+          (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Ss U) := by
+          unfold inverseSetOrbitAlongASet
+          simp only [Set.coe_setOf, Set.mem_setOf_eq, W, Ss]
+          apply Set.Subset.antisymm_iff.mpr
+          constructor
+          · apply closure_mono
+            intro z hz
+            simp only [Set.mem_iUnion, Set.mem_preimage] at hz
+            rcases hz with ⟨r, hr⟩
+            simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop,
+              exists_exists_eq_and]
+            use r
+          · apply closure_mono
+            intro z hz
+            simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop,
+              exists_exists_eq_and] at hz
+            rcases hz with ⟨r, hr⟩
+            simp only [Set.mem_iUnion, Set.mem_preimage]
+            use r
+        have hZequalW : Z = closure W := by
+          rw [hSEqua3, hSEqua4, <- hSEqua2, <- hSEqua1]
+        rw [hZequalW]
+      have hsZsubsW : (diagDynamicalSystem dSystemX dSystemX).map s '' Z
+        ⊆ (diagDynamicalSystem dSystemX dSystemX).map s '' closure W := by
+        intro z hz
+        simp only [Set.mem_image, Prod.exists] at hz
+        rcases hz with ⟨a, b, hab1, hab2⟩
+        simp only [Set.mem_image, Prod.exists]
+        use a
+        use b
+        constructor
+        · apply hZsubW hab1
+        · exact hab2
+      have hMovesIn : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆
+        closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W) := by
+        apply moveInside
+      have hMovesIn1 : (diagDynamicalSystem dSystemX dSystemX).map s '' W
+        = ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
+        (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U) := by
+        simp only [W]
+        apply Set.image_iUnion
+      have hMovesIn2 : closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W)
+        = closure (⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
+        (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U)) := by
+        rw [hMovesIn1]
+      have hMovesIn3 : closure (⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
+        (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U))
+        ⊆ Z := by
+        simp only [Z]
+        unfold inverseSetOrbit
+        apply closure_mono
+        apply Set.iUnion_mono
+        intro t z hz
+        simp only [Set.mem_image, Set.mem_preimage, Prod.exists] at hz
+        rcases hz with ⟨a, b, hab1, hab2⟩
+        simp only [Set.mem_preimage]
+        have hEqu : (diagDynamicalSystem dSystemX dSystemX).map (t * s) (a, b)
+          = (diagDynamicalSystem dSystemX dSystemX).map t
+            ((diagDynamicalSystem dSystemX dSystemX).map s (a, b)) := by
+          exact (diagDynamicalSystem dSystemX dSystemX).mapMult t s (a, b)
+        rw [hEqu] at hab1
+        rw [hab2] at hab1
+        exact hab1
+      have hsWsubZ : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆ Z := by
+        rw [hMovesIn2] at hMovesIn
+        exact hMovesIn.trans hMovesIn3
+      exact hsZsubsW.trans hsWsubZ
+    have hZInterDiag : (Set.diagonal X ∩ Z).Nonempty := by
+      simp only [Z]
+      apply (inRPMiffBackwardUOrbitClosHitsDiag dSystemX z).mp hzRP U hUOpen hUContz
+    have hZClosed : IsClosed Z := by
+      apply isClosed_closure
+    let hExistz := Set.inter_nonempty.mp hZInterDiag
+    rcases hExistz with ⟨z, hz1, hz2⟩
+    let W := {(diagDynamicalSystem dSystemX dSystemX).map s z | s : S}
+    have hWinZ : W ⊆ Z := by
+      intro t ht
+      simp only [Set.mem_setOf_eq, W] at ht
+      rcases ht with ⟨s, hst⟩
+      rw [<- hst]
+      specialize hZInvariant s
+      rw [<- Set.mapsTo_iff_image_subset] at hZInvariant
+      specialize hZInvariant hz2
+      exact hZInvariant
+    have hClosureWinZ : closure W ⊆ Z := by
+      apply closure_minimal
+      · exact hWinZ
+      · exact hZClosed
+    have hWinDiag : W ⊆ Set.diagonal X := by
+      simp only [W]
+      intro t ht
+      simp only [Set.mem_setOf_eq] at ht
+      rcases ht with ⟨s, hs⟩
+      rw [<- hs]
+      simp only [Set.mem_diagonal_iff]
+      simp only [diagDynamicalSystem, Prod.map_fst, Prod.map_snd]
+      simp only [Set.mem_diagonal_iff] at hz1
+      rw [hz1]
+    have hEveryPoint : ∀ t ∈ Set.diagonal X, ∀ U ∈ nhds t, (U ∩ W).Nonempty := by
+      intro t ht U hU
+      have hUNeigh := mem_nhds_prod_iff.mp hU
+      rcases hUNeigh with ⟨U1, hU1, U2, hU2, hU12⟩
+      let V := U1 ∩ U2
+      simp only [Set.mem_diagonal_iff] at ht
+      simp only [Set.mem_diagonal_iff] at hz1
+      rw [<- ht] at hU2
+      have hUNeight : V ∈ nhds t.1 := by
+        simp only [mem_nhds_iff]
+        simp only [mem_nhds_iff] at hU1
+        simp only [mem_nhds_iff] at hU2
+        rcases hU1 with ⟨W1, hW1a, hW1b, hW1c⟩
+        rcases hU2 with ⟨W2, hW2a, hW2b, hW2c⟩
+        use W1 ∩ W2
+        constructor
+        · apply Set.inter_subset_inter hW1a hW2a
+        constructor
+        · apply IsOpen.inter hW1b hW2b
+        · simp only [Set.mem_inter_iff]
+          constructor
+          · exact hW1c
+          · exact hW2c
+      have hExists : ∃ s : S, dSystemX.map s z.1 ∈ V := by
+        let hVExpand := mem_nhds_iff.mp hUNeight
+        rcases hVExpand with ⟨V1, hV1a, hV1b, hV1c⟩
+        have hV1Nonempty: V1.Nonempty := by
+          apply Set.nonempty_of_mem hV1c
+        have hVisit := minimalImpliesNonemptySetVisits hMin z.1 hV1b hV1Nonempty
+        unfold visitTimeSet at hVisit
+        simp only [Set.nonempty_def, Set.mem_preimage] at hVisit
+        rcases hVisit with ⟨s, hs⟩
+        use s
+        apply hV1a
+        exact hs
+      rcases hExists with ⟨s, hs⟩
+      simp only [Set.inter_nonempty, Prod.exists]
+      use dSystemX.map s z.1
+      use dSystemX.map s z.1
+      constructor
+      · apply hU12
+        simp only [Set.mem_prod]
+        constructor
+        · have hVU1 : V ⊆ U1 := by
+            apply Set.inter_subset_left
+          apply hVU1
+          exact hs
+        · have hVU2 : V ⊆ U2 := by
+            apply Set.inter_subset_right
+          apply hVU2
+          exact hs
+      · simp only [Set.mem_setOf_eq, W]
+        use s
+        simp only [diagDynamicalSystem]
+        simp only [Prod.map, Prod.mk.injEq, true_and]
+        rw [hz1]
+    have hWClosureContDiag : Set.diagonal X ⊆ closure W := by
+      intro t ht
+      specialize hEveryPoint t ht
+      apply mem_closure_iff_nhds.mpr
+      exact hEveryPoint
+    exact hWClosureContDiag.trans hClosureWinZ
+  · sorry -- follows immediately from inRPMiffBackwardUOrbitClosHitsDiag
+refine ⟨?_, ?_, ?_, ?_⟩
+· exact RPMwithInvOrbit
+/- The remaining three statements can be derived easily from forwardBackwardSetOrbClosCoincideInBronsSys,
+forwardEqualsBackwardRPInMinCommSystem, and RPMwithInvOrbit -/
+· sorry
+· sorry
+· sorry
+
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
-acting semigroup, `RPM_Y ⊆ (π ⊗ π) RPM_X` -/
+acting semigroup, `RPM_Y ⊆ (π ⊗ π) RPM_X` and `RP_Y ⊆ (π ⊗ π) RP_X` -/
 theorem commMinRPIsInImageOfRP
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -4498,482 +4556,489 @@ theorem commMinRPIsInImageOfRP
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
-RPM dSystemY ⊆ (Prod.map π π) '' (RPM dSystemX) := by
-have hYMin : isMinimalSystem dSystemY := by
-  have hYFactorX : isFactor dSystemY dSystemX := by
-    unfold isFactor
-    use π
-  exact factorOfMinimalIsMinimal hMin hYFactorX
-unfold isFactorMap at hπ
-rcases hπ with ⟨hπCont, hπSurj, hπEquiv⟩
-have hComplement : ((Prod.map π π) '' (RPM dSystemX))ᶜ ⊆ (RPM dSystemY)ᶜ := by
-  intro z hz
-  let H := (Prod.map π π) ⁻¹' {z}
-  have hHCompact : IsCompact H := by
-    apply IsCompact.preimage_continuous
-    · simp
-    · apply Continuous.prodMap
-      · exact hπCont
-      · exact hπCont
-  have hfH : ∀ f ∈ H, f ∉ RPM dSystemX := by
-    intro f hf
-    by_contra
-    have hf1 : (Prod.map π π) f ∈ (Prod.map π π) '' RPM dSystemX := by
-      simp only [Set.mem_image, Prod.exists, Prod.map_apply]
-      use f.1
-      use f.2
-      constructor
-      · exact this
-      · rfl
-    simp only [Set.mem_preimage, Set.mem_singleton_iff, H] at hf
-    rw [<- hf] at hz
-    exact hz hf1
-  have hHS : ∀ f ∈ H, ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
-    ∧ f ∈ Vf ∧ IsOpen Vf ∧
-    Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
-    intro f hfInH
-    specialize hfH f hfInH
-    unfold RPM at hfH
-    have hExistDisj : ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
+RPM dSystemY ⊆ (Prod.map π π) '' (RPM dSystemX)
+∧
+RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) := by
+have goalRPM : RPM dSystemY ⊆ (Prod.map π π) '' (RPM dSystemX) := by
+  have hYMin : isMinimalSystem dSystemY := by
+    have hYFactorX : isFactor dSystemY dSystemX := by
+      unfold isFactor
+      use π
+    exact factorOfMinimalIsMinimal hMin hYFactorX
+  unfold isFactorMap at hπ
+  rcases hπ with ⟨hπCont, hπSurj, hπEquiv⟩
+  have hComplement : ((Prod.map π π) '' (RPM dSystemX))ᶜ ⊆ (RPM dSystemY)ᶜ := by
+    intro z hz
+    let H := (Prod.map π π) ⁻¹' {z}
+    have hHCompact : IsCompact H := by
+      apply IsCompact.preimage_continuous
+      · simp
+      · apply Continuous.prodMap
+        · exact hπCont
+        · exact hπCont
+    have hfH : ∀ f ∈ H, f ∉ RPM dSystemX := by
+      intro f hf
+      by_contra
+      have hf1 : (Prod.map π π) f ∈ (Prod.map π π) '' RPM dSystemX := by
+        simp only [Set.mem_image, Prod.exists, Prod.map_apply]
+        use f.1
+        use f.2
+        constructor
+        · exact this
+        · rfl
+      simp only [Set.mem_preimage, Set.mem_singleton_iff, H] at hf
+      rw [<- hf] at hz
+      exact hz hf1
+    have hHS : ∀ f ∈ H, ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
       ∧ f ∈ Vf ∧ IsOpen Vf ∧
-      Disjoint Vf (⋃ (s : S), ((Prod.map (dSystemX.map s) (dSystemX.map s)) '' αf)) := by
-      have hExistOneα : ∃ αf : Set (X × X), αf ∈ nhdsSet (Set.diagonal X) ∧
-        f ∉ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf := by
+      Disjoint (⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹' Vf) αf := by
+      intro f hfInH
+      specialize hfH f hfInH
+      unfold RPM at hfH
+      have hExistDisj : ∃ αf Vf : Set (X × X), Set.diagonal X ⊆ αf ∧ IsOpen αf
+        ∧ f ∈ Vf ∧ IsOpen Vf ∧
+        Disjoint Vf (⋃ (s : S), ((Prod.map (dSystemX.map s) (dSystemX.map s)) '' αf)) := by
+        have hExistOneα : ∃ αf : Set (X × X), αf ∈ nhdsSet (Set.diagonal X) ∧
+          f ∉ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf := by
+          by_contra hContra
+          simp only [not_exists, not_and, not_not] at hContra
+          have hfIn :  f ∈ ⋂ α ∈ nhdsSet (Set.diagonal X),
+            setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α := by
+            apply Set.mem_sInter.mpr
+            simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Set.mem_iInter]
+            intro a ha
+            specialize hContra a ha
+            exact hContra
+          exact hfH hfIn
+        rcases hExistOneα with ⟨αf1, hαf1a, hαf2a⟩
+        have hαfExOpen := mem_nhdsSet.mp hαf1a
+        rcases hαfExOpen with ⟨αf, hαf1, hαf2, hαf3⟩
+        use αf
         by_contra hContra
-        simp only [not_exists, not_and, not_not] at hContra
-        have hfIn :  f ∈ ⋂ α ∈ nhdsSet (Set.diagonal X),
-          setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α := by
-          apply Set.mem_sInter.mpr
-          simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Set.mem_iInter]
-          intro a ha
-          specialize hContra a ha
-          exact hContra
-        exact hfH hfIn
-      rcases hExistOneα with ⟨αf1, hαf1a, hαf2a⟩
-      have hαfExOpen := mem_nhdsSet.mp hαf1a
-      rcases hαfExOpen with ⟨αf, hαf1, hαf2, hαf3⟩
-      use αf
-      by_contra hContra
-      simp only [Mathlib.Tactic.Push.not_exists] at hContra
-      simp only [Set.disjoint_iUnion_right, not_and, not_forall] at hContra
-      have hfInOrbitClosure : f ∈ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf := by
-        unfold setOrbitClosure
-        simp only [mem_closure_iff]
-        intro Vf hVf1 hVf2
-        specialize hContra Vf hαf3 hαf2 hVf2 hVf1
-        rcases hContra with ⟨s, hs⟩
-        simp only [Set.not_disjoint_iff] at hs
-        rcases hs with ⟨z, hz1, hz2⟩
-        simp only [Set.inter_nonempty_iff_exists_right]
-        use z
-        constructor
-        · simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
-          simp only [Set.mem_image, Prod.exists, Prod.map_apply] at hz2
+        simp only [Mathlib.Tactic.Push.not_exists] at hContra
+        simp only [Set.disjoint_iUnion_right, not_and, not_forall] at hContra
+        have hfInOrbitClosure : f ∈ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf := by
+          unfold setOrbitClosure
+          simp only [mem_closure_iff]
+          intro Vf hVf1 hVf2
+          specialize hContra Vf hαf3 hαf2 hVf2 hVf1
+          rcases hContra with ⟨s, hs⟩
+          simp only [Set.not_disjoint_iff] at hs
+          rcases hs with ⟨z, hz1, hz2⟩
+          simp only [Set.inter_nonempty_iff_exists_right]
+          use z
+          constructor
+          · simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+            simp only [Set.mem_image, Prod.exists, Prod.map_apply] at hz2
+            use s
+            exact hz2
+          · exact hz1
+        have hαSubset : setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf
+          ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf1 := by
+          unfold setOrbitClosure
+          apply closure_mono
+          unfold setOrbit
+          simp only
+          intro z hz
+          simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
+          rcases hz with ⟨s, a, b, hs1, hs2⟩
+          simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
           use s
-          exact hz2
-        · exact hz1
-      have hαSubset : setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf
-        ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf1 := by
-        unfold setOrbitClosure
-        apply closure_mono
-        unfold setOrbit
-        simp only
-        intro z hz
-        simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
-        rcases hz with ⟨s, a, b, hs1, hs2⟩
-        simp only [Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
-        use s
-        use a
-        use b
-        constructor
-        · apply hαf1
-          exact hs1
-        · exact hs2
-      have hfOrbit :  f ∈ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf1 := by
-        exact hαSubset hfInOrbitClosure
-      exact hαf2a hfOrbit
-    rcases hExistDisj with ⟨αf, Vf, hDiag, hOpenα, hfInVf, hOpenVf, hDisjoint⟩
-    use αf
-    use Vf
-    constructor
-    · exact hDiag
-    constructor
-    · exact hOpenα
-    constructor
-    · exact hfInVf
-    constructor
-    · exact hOpenVf
-    · by_contra hContra
-      simp only [Set.disjoint_iUnion_left, not_forall] at hContra
-      rcases hContra with ⟨s, hsContra⟩
-      have hSomething : ∃ w : X × X, w ∈ (Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' Vf)
-        ∧ w ∈ αf := by
-        apply Set.not_disjoint_iff.mp
-        exact hsContra
-      rcases hSomething with ⟨w, hw1, hw2⟩
-      simp at hw1
-      have hw2Next : Prod.map (dSystemX.map s) (dSystemX.map s) w ∈
-        Prod.map (dSystemX.map s) (dSystemX.map s) '' αf := by
-        apply Set.mem_image_of_mem
-        exact hw2
-      simp only [Set.disjoint_iUnion_right] at hDisjoint
-      specialize hDisjoint s
-      have hNotDisjoint : ¬ Disjoint Vf (Prod.map (dSystemX.map s) (dSystemX.map s) '' αf) := by
-        apply Set.not_disjoint_iff.mpr
-        use Prod.map (dSystemX.map s) (dSystemX.map s) w
-      exact hNotDisjoint hDisjoint
-  choose α V hαConta hαOpen hVConta hVOpen hαVDisj using hHS
-  have hfCover : H ⊆ ⋃ f : X × X, ⋃ (h : f ∈ H), V f h := by
-    intro t ht
-    specialize hVConta t ht
-    simp only [Set.mem_iUnion, Prod.exists]
-    use t.1
-    use t.2
-    use ht
-  have hHCompact : IsCompact H := by
-    apply IsClosed.isCompact
-    apply IsClosed.preimage
-    · apply Continuous.prodMap
-      · exact hπCont
-      · exact hπCont
-    · simp
-  let NVee : H → Set (X × X) := fun f ↦ V f.1 f.2
-  have hFiniteCover : ∃ F ⊆ H, F.Finite ∧
-    H ⊆ ⋃ f : X × X, ⋃ (h1 : f ∈ H), ⋃ (_ : f ∈ F), V f h1 := by
-    have hCoverNew : H ⊆ ⋃ f : H, NVee f := by
-      simp only [Set.iUnion_coe_set]
-      exact hfCover
-    have hFiniteSubCase : ∃ G : Finset H, H ⊆ ⋃ f ∈ G, NVee f := by
-      apply IsCompact.elim_finite_subcover
-      · exact hHCompact
-      · simp [NVee]
-        simp [hVOpen]
-      · exact hCoverNew
-    rcases hFiniteSubCase with ⟨G, hG⟩
-    let F : Set (X × X) := Subtype.val '' (G : Set H)
-    use F
-    constructor
-    · simp [F]
-    constructor
-    · simp only [F]
-      apply Set.Finite.image
-      simp
-    simp only [Set.iUnion_coe_set, NVee] at hG
-    simp only [Set.mem_image, SetLike.mem_coe, Subtype.exists, exists_and_right, exists_eq_right,
-      Set.iUnion_exists, F]
-    intro h hhH
-    simp only [Set.subset_def] at hG
-    specialize hG h hhH
-    simp only [Set.mem_iUnion, exists_prop, Prod.exists] at hG
-    rcases hG with ⟨a1, a2, a3, a4, a5⟩
-    simp only [Set.mem_iUnion, exists_prop, exists_and_right, exists_and_left, Prod.exists]
-    use a1
-    use a2
-    use ⟨a3, a4⟩
-    use a3
-  rcases hFiniteCover with ⟨F, hFinH, hFfinite, hHSub⟩
-  have hExistOpen : ∃ U : Set (Y × Y), IsOpen U ∧ z ∈ U ∧
-    (Prod.map π π) ⁻¹' U ⊆ ⋃ f : X × X, ⋃ (h1 : f ∈ H), ⋃ (h2 : f ∈ F), V f h1 := by
-    apply existOpenNeighborhoodPreImageContainedIn
-    · apply Continuous.prodMap
-      · exact hπCont
-      · exact hπCont
-    · apply isOpen_sUnion
+          use a
+          use b
+          constructor
+          · apply hαf1
+            exact hs1
+          · exact hs2
+        have hfOrbit :  f ∈ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf1 := by
+          exact hαSubset hfInOrbitClosure
+        exact hαf2a hfOrbit
+      rcases hExistDisj with ⟨αf, Vf, hDiag, hOpenα, hfInVf, hOpenVf, hDisjoint⟩
+      use αf
+      use Vf
+      constructor
+      · exact hDiag
+      constructor
+      · exact hOpenα
+      constructor
+      · exact hfInVf
+      constructor
+      · exact hOpenVf
+      · by_contra hContra
+        simp only [Set.disjoint_iUnion_left, not_forall] at hContra
+        rcases hContra with ⟨s, hsContra⟩
+        have hSomething : ∃ w : X × X, w ∈ (Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' Vf)
+          ∧ w ∈ αf := by
+          apply Set.not_disjoint_iff.mp
+          exact hsContra
+        rcases hSomething with ⟨w, hw1, hw2⟩
+        simp at hw1
+        have hw2Next : Prod.map (dSystemX.map s) (dSystemX.map s) w ∈
+          Prod.map (dSystemX.map s) (dSystemX.map s) '' αf := by
+          apply Set.mem_image_of_mem
+          exact hw2
+        simp only [Set.disjoint_iUnion_right] at hDisjoint
+        specialize hDisjoint s
+        have hNotDisjoint : ¬ Disjoint Vf (Prod.map (dSystemX.map s) (dSystemX.map s) '' αf) := by
+          apply Set.not_disjoint_iff.mpr
+          use Prod.map (dSystemX.map s) (dSystemX.map s) w
+        exact hNotDisjoint hDisjoint
+    choose α V hαConta hαOpen hVConta hVOpen hαVDisj using hHS
+    have hfCover : H ⊆ ⋃ f : X × X, ⋃ (h : f ∈ H), V f h := by
       intro t ht
-      simp only [Set.mem_range, Prod.exists] at ht
-      rcases ht with ⟨a, b, hab⟩
-      rw [<- hab]
-      apply isOpen_sUnion
+      specialize hVConta t ht
+      simp only [Set.mem_iUnion, Prod.exists]
+      use t.1
+      use t.2
+      use ht
+    have hHCompact : IsCompact H := by
+      apply IsClosed.isCompact
+      apply IsClosed.preimage
+      · apply Continuous.prodMap
+        · exact hπCont
+        · exact hπCont
+      · simp
+    let NVee : H → Set (X × X) := fun f ↦ V f.1 f.2
+    have hFiniteCover : ∃ F ⊆ H, F.Finite ∧
+      H ⊆ ⋃ f : X × X, ⋃ (h1 : f ∈ H), ⋃ (_ : f ∈ F), V f h1 := by
+      have hCoverNew : H ⊆ ⋃ f : H, NVee f := by
+        simp only [Set.iUnion_coe_set]
+        exact hfCover
+      have hFiniteSubCase : ∃ G : Finset H, H ⊆ ⋃ f ∈ G, NVee f := by
+        apply IsCompact.elim_finite_subcover
+        · exact hHCompact
+        · simp [NVee]
+          simp [hVOpen]
+        · exact hCoverNew
+      rcases hFiniteSubCase with ⟨G, hG⟩
+      let F : Set (X × X) := Subtype.val '' (G : Set H)
+      use F
+      constructor
+      · simp [F]
+      constructor
+      · simp only [F]
+        apply Set.Finite.image
+        simp
+      simp only [Set.iUnion_coe_set, NVee] at hG
+      simp only [Set.mem_image, SetLike.mem_coe, Subtype.exists, exists_and_right, exists_eq_right,
+        Set.iUnion_exists, F]
+      intro h hhH
+      simp only [Set.subset_def] at hG
+      specialize hG h hhH
+      simp only [Set.mem_iUnion, exists_prop, Prod.exists] at hG
+      rcases hG with ⟨a1, a2, a3, a4, a5⟩
+      simp only [Set.mem_iUnion, exists_prop, exists_and_right, exists_and_left, Prod.exists]
+      use a1
+      use a2
+      use ⟨a3, a4⟩
+      use a3
+    rcases hFiniteCover with ⟨F, hFinH, hFfinite, hHSub⟩
+    have hExistOpen : ∃ U : Set (Y × Y), IsOpen U ∧ z ∈ U ∧
+      (Prod.map π π) ⁻¹' U ⊆ ⋃ f : X × X, ⋃ (h1 : f ∈ H), ⋃ (h2 : f ∈ F), V f h1 := by
+      apply existOpenNeighborhoodPreImageContainedIn
+      · apply Continuous.prodMap
+        · exact hπCont
+        · exact hπCont
+      · apply isOpen_sUnion
+        intro t ht
+        simp only [Set.mem_range, Prod.exists] at ht
+        rcases ht with ⟨a, b, hab⟩
+        rw [<- hab]
+        apply isOpen_sUnion
+        intro t1 ht1
+        simp only [Set.mem_range] at ht1
+        rcases ht1 with ⟨a1, ha1⟩
+        rw [<- ha1]
+        apply isOpen_sUnion
+        intro t2 ht2
+        simp only [Set.mem_range, exists_prop] at ht2
+        rcases ht2 with ⟨a2, ha2⟩
+        rw [<- ha2]
+        specialize hVOpen (a, b) a1
+        exact hVOpen
+      · have hHDef : H = (Prod.map π π) ⁻¹' {z} := by
+          rfl
+        rw [<- hHDef]
+        exact hHSub
+    rcases hExistOpen with ⟨U, hU1, hU2, hU3⟩
+    let β := ⋂ f : X × X, ⋂ (hfH : f ∈ H), ⋂ (hfF : f ∈ F), α f hfH
+    let Nα : F → Set (X × X) := fun f ↦ α f.1 (hFinH f.2)
+    have hβRedefined : β = ⋂ (f : X × X ) (hfF : f ∈ F), α f (hFinH hfF) := by
+      ext z
+      constructor
+      · intro hz
+        simp only [Set.mem_iInter, Prod.forall, β] at hz
+        simp only [Set.mem_iInter, Prod.forall]
+        intro a b hab
+        specialize hz a b (hFinH hab) hab
+        exact hz
+      · intro hz
+        simp only [Set.mem_iInter, Prod.forall] at hz
+        simp only [Set.mem_iInter, Prod.forall, β]
+        intro a b habH habF
+        specialize hz a b habF
+        exact hz
+    have hβRedefined2 : β = ⋂ f : F, Nα f := by
+      rw [hβRedefined]
+      ext z
+      constructor
+      · intro hz
+        simp only [Set.iInter_coe_set, Set.mem_iInter, Prod.forall]
+        simp only [Set.mem_iInter, Prod.forall] at hz
+        intro a b hab
+        specialize hz a b hab
+        exact hz
+      · intro hz
+        simp only [Set.iInter_coe_set, Set.mem_iInter, Prod.forall] at hz
+        simp only [Set.mem_iInter, Prod.forall]
+        intro a b hab
+        specialize hz a b hab
+        exact hz
+    have hβOpen : IsOpen β := by
+      rw [hβRedefined2]
+      apply Set.Finite.isOpen_sInter
+      · have hFFinite : Finite F := by
+          apply Set.Finite.to_subtype
+          exact hFfinite
+        apply Set.finite_range
+      · intro t ht
+        simp only [Set.mem_range, Subtype.exists, Prod.exists] at ht
+        rcases ht with ⟨a, b, hab1, hab2⟩
+        rw [<- hab2]
+        simp only [Nα]
+        specialize hαOpen (a, b) (hFinH hab1)
+        exact hαOpen
+    have hβContaDiag : Set.diagonal X ⊆ β := by
+      apply Set.subset_sInter
       intro t1 ht1
-      simp only [Set.mem_range] at ht1
-      rcases ht1 with ⟨a1, ha1⟩
-      rw [<- ha1]
-      apply isOpen_sUnion
+      simp only [Set.mem_range, Prod.exists] at ht1
+      rcases ht1 with ⟨a1, b1, hab1⟩
+      rw [<- hab1]
+      apply Set.subset_sInter
       intro t2 ht2
-      simp only [Set.mem_range, exists_prop] at ht2
+      simp only [Set.mem_range] at ht2
       rcases ht2 with ⟨a2, ha2⟩
       rw [<- ha2]
-      specialize hVOpen (a, b) a1
-      exact hVOpen
-    · have hHDef : H = (Prod.map π π) ⁻¹' {z} := by
-        rfl
-      rw [<- hHDef]
-      exact hHSub
-  rcases hExistOpen with ⟨U, hU1, hU2, hU3⟩
-  let β := ⋂ f : X × X, ⋂ (hfH : f ∈ H), ⋂ (hfF : f ∈ F), α f hfH
-  let Nα : F → Set (X × X) := fun f ↦ α f.1 (hFinH f.2)
-  have hβRedefined : β = ⋂ (f : X × X ) (hfF : f ∈ F), α f (hFinH hfF) := by
-    ext z
-    constructor
-    · intro hz
-      simp only [Set.mem_iInter, Prod.forall, β] at hz
-      simp only [Set.mem_iInter, Prod.forall]
-      intro a b hab
-      specialize hz a b (hFinH hab) hab
-      exact hz
-    · intro hz
-      simp only [Set.mem_iInter, Prod.forall] at hz
-      simp only [Set.mem_iInter, Prod.forall, β]
-      intro a b habH habF
-      specialize hz a b habF
-      exact hz
-  have hβRedefined2 : β = ⋂ f : F, Nα f := by
-    rw [hβRedefined]
-    ext z
-    constructor
-    · intro hz
-      simp only [Set.iInter_coe_set, Set.mem_iInter, Prod.forall]
-      simp only [Set.mem_iInter, Prod.forall] at hz
-      intro a b hab
-      specialize hz a b hab
-      exact hz
-    · intro hz
-      simp only [Set.iInter_coe_set, Set.mem_iInter, Prod.forall] at hz
-      simp only [Set.mem_iInter, Prod.forall]
-      intro a b hab
-      specialize hz a b hab
-      exact hz
-  have hβOpen : IsOpen β := by
-    rw [hβRedefined2]
-    apply Set.Finite.isOpen_sInter
-    · have hFFinite : Finite F := by
-        apply Set.Finite.to_subtype
-        exact hFfinite
-      apply Set.finite_range
-    · intro t ht
-      simp only [Set.mem_range, Subtype.exists, Prod.exists] at ht
-      rcases ht with ⟨a, b, hab1, hab2⟩
-      rw [<- hab2]
-      simp only [Nα]
-      specialize hαOpen (a, b) (hFinH hab1)
-      exact hαOpen
-  have hβContaDiag : Set.diagonal X ⊆ β := by
-    apply Set.subset_sInter
-    intro t1 ht1
-    simp only [Set.mem_range, Prod.exists] at ht1
-    rcases ht1 with ⟨a1, b1, hab1⟩
-    rw [<- hab1]
-    apply Set.subset_sInter
-    intro t2 ht2
-    simp only [Set.mem_range] at ht2
-    rcases ht2 with ⟨a2, ha2⟩
-    rw [<- ha2]
-    apply Set.subset_sInter
-    intro t3 ht3
-    simp only [Set.mem_range, exists_prop] at ht3
-    rcases ht3 with ⟨a3, ha3⟩
-    rw [<- ha3]
-    specialize hαConta (a1, b1)
-    have ha1b1H : (a1, b1) ∈ H := by
-      apply hFinH
-      exact a3
-    specialize hαConta ha1b1H
-    exact hαConta
-  have hDisjointβ0 : ∀ (f : X × X) (hfH : f ∈ H) (hfF : f ∈ F), Disjoint
-    (⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) β := by
-    intro f hfH hfF
-    have hβSub : β ⊆ α f hfH := by
-      intro z hz
-      simp only [Set.mem_iInter, Prod.forall, β] at hz
-      specialize hz f.1 f.2 hfH hfF
-      exact hz
-    apply Set.disjoint_of_subset_right hβSub
-    specialize hαVDisj f hfH
-    exact hαVDisj
-  have hDisjoinβ : Disjoint (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
-    Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) β := by
-    apply Set.disjoint_sUnion_left.mpr
-    intro t1 ht1
-    simp only [Set.mem_range, Prod.exists] at ht1
-    rcases ht1 with ⟨a, b, hab⟩
-    rw [<- hab]
-    apply Set.disjoint_sUnion_left.mpr
-    intro t2 ht2
-    simp only [Set.mem_range] at ht2
-    rcases ht2 with ⟨ha2, hb2⟩
-    rw [<- hb2]
-    apply Set.disjoint_sUnion_left.mpr
-    intro t3 ht3
-    simp only [Set.mem_range, exists_prop] at ht3
-    rcases ht3 with ⟨ha3, hb3⟩
-    rw [<- hb3]
-    specialize hDisjointβ0 (a, b) ha2 ha3
-    exact hDisjointβ0
-  have hβSubset : ((Prod.map π π) ⁻¹' ⋃ (s : S),
-    (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U) ⊆
-    (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
-    Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) := by
-    have hβSubset1 : ⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹'
-      (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) ⊆
+      apply Set.subset_sInter
+      intro t3 ht3
+      simp only [Set.mem_range, exists_prop] at ht3
+      rcases ht3 with ⟨a3, ha3⟩
+      rw [<- ha3]
+      specialize hαConta (a1, b1)
+      have ha1b1H : (a1, b1) ∈ H := by
+        apply hFinH
+        exact a3
+      specialize hαConta ha1b1H
+      exact hαConta
+    have hDisjointβ0 : ∀ (f : X × X) (hfH : f ∈ H) (hfF : f ∈ F), Disjoint
+      (⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) β := by
+      intro f hfH hfF
+      have hβSub : β ⊆ α f hfH := by
+        intro z hz
+        simp only [Set.mem_iInter, Prod.forall, β] at hz
+        specialize hz f.1 f.2 hfH hfF
+        exact hz
+      apply Set.disjoint_of_subset_right hβSub
+      specialize hαVDisj f hfH
+      exact hαVDisj
+    have hDisjoinβ : Disjoint (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
+      Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) β := by
+      apply Set.disjoint_sUnion_left.mpr
+      intro t1 ht1
+      simp only [Set.mem_range, Prod.exists] at ht1
+      rcases ht1 with ⟨a, b, hab⟩
+      rw [<- hab]
+      apply Set.disjoint_sUnion_left.mpr
+      intro t2 ht2
+      simp only [Set.mem_range] at ht2
+      rcases ht2 with ⟨ha2, hb2⟩
+      rw [<- hb2]
+      apply Set.disjoint_sUnion_left.mpr
+      intro t3 ht3
+      simp only [Set.mem_range, exists_prop] at ht3
+      rcases ht3 with ⟨ha3, hb3⟩
+      rw [<- hb3]
+      specialize hDisjointβ0 (a, b) ha2 ha3
+      exact hDisjointβ0
+    have hβSubset : ((Prod.map π π) ⁻¹' ⋃ (s : S),
+      (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U) ⊆
       (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
       Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) := by
-      intro z hz
-      simp only [Set.preimage_iUnion, Set.mem_iUnion, Set.mem_preimage, exists_prop,
-        exists_and_left, Prod.exists] at hz
-      rcases hz with ⟨s, x, y, hxy1, t, ht⟩
-      simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop, exists_and_left, Prod.exists]
-      use x
-      use y
-      constructor
-      · exact hxy1
-      · use t
-        use s
-    have hβSubset2 : ⋃ s : S, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
-      ((Prod.map π π) ⁻¹' U) ⊆
-      ⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
-      (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) := by
-      apply Set.sUnion_subset
-      intro w hw
-      simp only [Set.mem_range] at hw
-      rcases hw with ⟨s, hs⟩
-      rw [<- hs]
-      have hβSubsub : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' ((Prod.map π π) ⁻¹' U) ⊆
-        Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
-        (⋃ f, ⋃ (hfH : f ∈ H), ⋃ (_ : f ∈ F), V f hfH) := by
-        apply Set.preimage_mono
-        exact hU3
-      have hβSubsub2 : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
-        (⋃ f, ⋃ (hfH : f ∈ H), ⋃ (_ : f ∈ F), V f hfH) ⊆
+      have hβSubset1 : ⋃ (s : S), (Prod.map (dSystemX.map s) (dSystemX.map s)) ⁻¹'
+        (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) ⊆
+        (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), ⋃ (s : S),
+        Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' V f hfH) := by
+        intro z hz
+        simp only [Set.preimage_iUnion, Set.mem_iUnion, Set.mem_preimage, exists_prop,
+          exists_and_left, Prod.exists] at hz
+        rcases hz with ⟨s, x, y, hxy1, t, ht⟩
+        simp only [Set.mem_iUnion, Set.mem_preimage, exists_prop, exists_and_left, Prod.exists]
+        use x
+        use y
+        constructor
+        · exact hxy1
+        · use t
+          use s
+      have hβSubset2 : ⋃ s : S, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+        ((Prod.map π π) ⁻¹' U) ⊆
         ⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
         (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) := by
-        apply Set.subset_sUnion_of_mem
-        simp
-      exact hβSubsub.trans hβSubsub2
-    have hβSubset3 : ⋃ s : S, (Prod.map π π) ⁻¹'
-      (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹'U) ⊆
-      ⋃ s : S, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
-      ((Prod.map π π) ⁻¹' U) := by
-      apply Set.sUnion_subset
-      intro t ht
-      simp only [Set.mem_range] at ht
-      rcases ht with ⟨s, hs⟩
-      rw [<- hs]
-      have hβSub0 : Prod.map π π ⁻¹' (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U)
-        ⊆ Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U) := by
+        apply Set.sUnion_subset
+        intro w hw
+        simp only [Set.mem_range] at hw
+        rcases hw with ⟨s, hs⟩
+        rw [<- hs]
+        have hβSubsub : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' ((Prod.map π π) ⁻¹' U) ⊆
+          Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+          (⋃ f, ⋃ (hfH : f ∈ H), ⋃ (_ : f ∈ F), V f hfH) := by
+          apply Set.preimage_mono
+          exact hU3
+        have hβSubsub2 : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+          (⋃ f, ⋃ (hfH : f ∈ H), ⋃ (_ : f ∈ F), V f hfH) ⊆
+          ⋃ (s : S), Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+          (⋃ f : X × X, ⋃ (hfH : f ∈ H), ⋃ (hfF : f ∈ F), V f hfH) := by
+          apply Set.subset_sUnion_of_mem
+          simp
+        exact hβSubsub.trans hβSubsub2
+      have hβSubset3 : ⋃ s : S, (Prod.map π π) ⁻¹'
+        (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹'U) ⊆
+        ⋃ s : S, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹'
+        ((Prod.map π π) ⁻¹' U) := by
+        apply Set.sUnion_subset
+        intro t ht
+        simp only [Set.mem_range] at ht
+        rcases ht with ⟨s, hs⟩
+        rw [<- hs]
+        have hβSub0 : Prod.map π π ⁻¹' (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U)
+          ⊆ Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U) := by
+          intro z hz
+          simp only [Set.mem_preimage]
+          simp only [Set.mem_preimage] at hz
+          simp only [Prod.map]
+          simp only [Prod.map] at hz
+          have hEq1 : π (dSystemX.map s z.1) = dSystemY.map s (π z.1) := by
+            unfold isEquivariant at hπEquiv
+            specialize hπEquiv s
+            have hEq1a : (dSystemY.map s ∘ π) (z.1) = (π ∘ dSystemX.map s) (z.1) := by
+              apply congr_fun
+              exact hπEquiv
+            have hEq1b : π (dSystemX.map s z.1) = (π ∘ dSystemX.map s) (z.1) := by
+              simp
+            have hEq1c : dSystemY.map s (π z.1) = (dSystemY.map s ∘ π) (z.1) := by
+              simp
+            rw [hEq1b, hEq1c, hEq1a]
+          have hEq2 : π (dSystemX.map s z.2) = dSystemY.map s (π z.2) := by
+            unfold isEquivariant at hπEquiv
+            specialize hπEquiv s
+            have hEq2a : (dSystemY.map s ∘ π) (z.2) = (π ∘ dSystemX.map s) (z.2) := by
+              apply congr_fun
+              exact hπEquiv
+            have hEq2b : π (dSystemX.map s z.2) = (π ∘ dSystemX.map s) (z.2) := by
+              simp
+            have hEq2c : dSystemY.map s (π z.2) = (dSystemY.map s ∘ π) (z.2) := by
+              simp
+            rw [hEq2b, hEq2c, hEq2a]
+          rw [hEq1, hEq2]
+          exact hz
+        have hβSub1 : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U)
+          ⊆  ⋃ s, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U) := by
+          apply Set.subset_sUnion_of_mem
+          simp
+        exact hβSub0.trans hβSub1
+      have hβSubset4 : Prod.map π π ⁻¹' ⋃ s, Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U
+        ⊆ ⋃ s : S, (Prod.map π π) ⁻¹' (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹'U) := by
         intro z hz
+        simp only [Set.preimage_iUnion, Set.mem_iUnion, Set.mem_preimage] at hz
+        rcases hz with ⟨s, hs⟩
+        simp only [Set.mem_iUnion, Set.mem_preimage]
+        use s
+      exact ((hβSubset4.trans hβSubset3).trans hβSubset2).trans hβSubset1
+    have hDisjointβ10 : Disjoint ((Prod.map π π) ⁻¹' ⋃ (s : S),
+      (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U) β := by
+      apply Set.disjoint_of_subset_left hβSubset
+      exact hDisjoinβ
+    have hDisjointβ11 : Disjoint (⋃ (s : S), (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U)
+      ((Prod.map π π) '' β) := by
+      by_contra hContra
+      have hExistInBoth : ∃ z, z ∈ (⋃ (s : S), (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U)
+        ∧ z ∈ (Prod.map π π) '' β := by
+        apply Set.not_disjoint_iff.mp hContra
+      rcases hExistInBoth with ⟨z, hz1, hz2⟩
+      simp only [Set.mem_image, Prod.exists, Prod.map_apply] at hz2
+      rcases hz2 with ⟨a, b, hab1, hab2⟩
+      have hab3 : (a, b) ∈ (Prod.map π π) ⁻¹' ((⋃ (s : S),
+        (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U)) := by
         simp only [Set.mem_preimage]
-        simp only [Set.mem_preimage] at hz
-        simp only [Prod.map]
-        simp only [Prod.map] at hz
-        have hEq1 : π (dSystemX.map s z.1) = dSystemY.map s (π z.1) := by
-          unfold isEquivariant at hπEquiv
-          specialize hπEquiv s
-          have hEq1a : (dSystemY.map s ∘ π) (z.1) = (π ∘ dSystemX.map s) (z.1) := by
-            apply congr_fun
-            exact hπEquiv
-          have hEq1b : π (dSystemX.map s z.1) = (π ∘ dSystemX.map s) (z.1) := by
-            simp
-          have hEq1c : dSystemY.map s (π z.1) = (dSystemY.map s ∘ π) (z.1) := by
-            simp
-          rw [hEq1b, hEq1c, hEq1a]
-        have hEq2 : π (dSystemX.map s z.2) = dSystemY.map s (π z.2) := by
-          unfold isEquivariant at hπEquiv
-          specialize hπEquiv s
-          have hEq2a : (dSystemY.map s ∘ π) (z.2) = (π ∘ dSystemX.map s) (z.2) := by
-            apply congr_fun
-            exact hπEquiv
-          have hEq2b : π (dSystemX.map s z.2) = (π ∘ dSystemX.map s) (z.2) := by
-            simp
-          have hEq2c : dSystemY.map s (π z.2) = (dSystemY.map s ∘ π) (z.2) := by
-            simp
-          rw [hEq2b, hEq2c, hEq2a]
-        rw [hEq1, hEq2]
-        exact hz
-      have hβSub1 : Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U)
-        ⊆  ⋃ s, Prod.map (dSystemX.map s) (dSystemX.map s) ⁻¹' (Prod.map π π ⁻¹' U) := by
-        apply Set.subset_sUnion_of_mem
-        simp
-      exact hβSub0.trans hβSub1
-    have hβSubset4 : Prod.map π π ⁻¹' ⋃ s, Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U
-      ⊆ ⋃ s : S, (Prod.map π π) ⁻¹' (Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹'U) := by
-      intro z hz
-      simp only [Set.preimage_iUnion, Set.mem_iUnion, Set.mem_preimage] at hz
-      rcases hz with ⟨s, hs⟩
-      simp only [Set.mem_iUnion, Set.mem_preimage]
-      use s
-    exact ((hβSubset4.trans hβSubset3).trans hβSubset2).trans hβSubset1
-  have hDisjointβ10 : Disjoint ((Prod.map π π) ⁻¹' ⋃ (s : S),
-    (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U) β := by
-    apply Set.disjoint_of_subset_left hβSubset
-    exact hDisjoinβ
-  have hDisjointβ11 : Disjoint (⋃ (s : S), (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U)
-    ((Prod.map π π) '' β) := by
+        have hab4 : Prod.map π π (a, b) = z := by
+          rw [<- hab2]
+          simp
+        rw [hab4]
+        exact hz1
+      have hNotDisjoint : ¬ Disjoint (Prod.map π π ⁻¹' ⋃ s,
+        Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U) β := by
+        apply Set.not_disjoint_iff.mpr
+        use (a, b)
+      exact hNotDisjoint hDisjointβ10
+    have hExistZ : ∃ (Z : Set Y), Z.Nonempty ∧ IsOpen Z ∧ ((Z ×ˢ Z) ⊆ ((Prod.map π π) '' β)) := by
+      apply openProductInEntourageImage
+      · exact hπCont
+      · exact hπSurj
+      · apply mem_nhdsSet.mpr
+        use β
+    rcases hExistZ with ⟨Z, hZNonempty, hZOpen, hZConta⟩
+    have hDisjointZ : Disjoint ((⋃ s, Prod.map
+      (dSystemY.map s) (dSystemY.map s) ⁻¹' U)) (Z ×ˢ Z) := by
+      apply Set.disjoint_of_subset_right
+      · exact hZConta
+      · exact hDisjointβ11
     by_contra hContra
-    have hExistInBoth : ∃ z, z ∈ (⋃ (s : S), (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U)
-      ∧ z ∈ (Prod.map π π) '' β := by
-      apply Set.not_disjoint_iff.mp hContra
-    rcases hExistInBoth with ⟨z, hz1, hz2⟩
-    simp only [Set.mem_image, Prod.exists, Prod.map_apply] at hz2
-    rcases hz2 with ⟨a, b, hab1, hab2⟩
-    have hab3 : (a, b) ∈ (Prod.map π π) ⁻¹' ((⋃ (s : S),
-      (Prod.map (dSystemY.map s) (dSystemY.map s)) ⁻¹' U)) := by
-      simp only [Set.mem_preimage]
-      have hab4 : Prod.map π π (a, b) = z := by
-        rw [<- hab2]
-        simp
-      rw [hab4]
-      exact hz1
-    have hNotDisjoint : ¬ Disjoint (Prod.map π π ⁻¹' ⋃ s,
-      Prod.map (dSystemY.map s) (dSystemY.map s) ⁻¹' U) β := by
+    have hzInRP : z ∈ RPM dSystemY := by
+      simp only [Set.mem_compl_iff, not_not] at hContra
+      exact hContra
+    have hContainDiag : Set.diagonal Y ⊆ closure
+      (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) := by
+      apply (inMinCommxyInRPIffNhdOrbitClosContainsDiag dSystemY z (hMin := hYMin)).1.mp
+      · exact hzInRP
+      · exact hU1
+      · exact hU2
+    have hDisjointInverse : Disjoint
+      (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) (Z ×ˢ Z) := by
+      unfold inverseSetOrbit
+      exact hDisjointZ
+    have hZZOpen : IsOpen (Z ×ˢ Z) := by
+      apply IsOpen.prod
+      · exact hZOpen
+      · exact hZOpen
+    have hZCompClosed : IsClosed (Z ×ˢ Z)ᶜ := by
+      apply IsOpen.isClosed_compl hZZOpen
+    have hInverseSubset : inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U ⊆ (Z ×ˢ Z)ᶜ := by
+      apply Disjoint.subset_compl_right hDisjointInverse
+    have hInverseClosureSubset : closure
+      (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) ⊆ (Z ×ˢ Z)ᶜ := by
+      apply closure_minimal hInverseSubset hZCompClosed
+    have hDiagContainedCompl : Set.diagonal Y ⊆ (Z ×ˢ Z)ᶜ := by
+      exact hContainDiag.trans hInverseClosureSubset
+    have hDiagDisjointZ : Disjoint (Set.diagonal Y) (Z ×ˢ Z) := by
+      apply Set.subset_compl_iff_disjoint_right.mp hDiagContainedCompl
+    have hZContainz := Set.nonempty_def.mp hZNonempty
+    rcases hZContainz with ⟨z, hz⟩
+    have hNotDisjoint : ¬ Disjoint (Set.diagonal Y) (Z ×ˢ Z) := by
       apply Set.not_disjoint_iff.mpr
-      use (a, b)
-    exact hNotDisjoint hDisjointβ10
-  have hExistZ : ∃ (Z : Set Y), Z.Nonempty ∧ IsOpen Z ∧ ((Z ×ˢ Z) ⊆ ((Prod.map π π) '' β)) := by
-    apply openProductInEntourageImage
-    · exact hπCont
-    · exact hπSurj
-    · apply mem_nhdsSet.mpr
-      use β
-  rcases hExistZ with ⟨Z, hZNonempty, hZOpen, hZConta⟩
-  have hDisjointZ : Disjoint ((⋃ s, Prod.map
-    (dSystemY.map s) (dSystemY.map s) ⁻¹' U)) (Z ×ˢ Z) := by
-    apply Set.disjoint_of_subset_right
-    · exact hZConta
-    · exact hDisjointβ11
-  by_contra hContra
-  have hzInRP : z ∈ RPM dSystemY := by
-    simp only [Set.mem_compl_iff, not_not] at hContra
-    exact hContra
-  have hContainDiag : Set.diagonal Y ⊆ closure
-    (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) := by
-    apply commMinOrbContainDiagonalBackward
-    · exact hYMin
-    · exact hzInRP
-    · exact hU1
-    · exact hU2
-  have hDisjointInverse : Disjoint
-    (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) (Z ×ˢ Z) := by
-    unfold inverseSetOrbit
-    exact hDisjointZ
-  have hZZOpen : IsOpen (Z ×ˢ Z) := by
-    apply IsOpen.prod
-    · exact hZOpen
-    · exact hZOpen
-  have hZCompClosed : IsClosed (Z ×ˢ Z)ᶜ := by
-    apply IsOpen.isClosed_compl hZZOpen
-  have hInverseSubset : inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U ⊆ (Z ×ˢ Z)ᶜ := by
-    apply Disjoint.subset_compl_right hDisjointInverse
-  have hInverseClosureSubset : closure
-    (inverseSetOrbit (diagDynamicalSystem dSystemY dSystemY) U) ⊆ (Z ×ˢ Z)ᶜ := by
-    apply closure_minimal hInverseSubset hZCompClosed
-  have hDiagContainedCompl : Set.diagonal Y ⊆ (Z ×ˢ Z)ᶜ := by
-    exact hContainDiag.trans hInverseClosureSubset
-  have hDiagDisjointZ : Disjoint (Set.diagonal Y) (Z ×ˢ Z) := by
-    apply Set.subset_compl_iff_disjoint_right.mp hDiagContainedCompl
-  have hZContainz := Set.nonempty_def.mp hZNonempty
-  rcases hZContainz with ⟨z, hz⟩
-  have hNotDisjoint : ¬ Disjoint (Set.diagonal Y) (Z ×ˢ Z) := by
-    apply Set.not_disjoint_iff.mpr
-    use (z, z)
-    constructor
-    · unfold Set.diagonal
-      simp
-    · simp only [Set.mem_prod, and_self]
-      exact hz
-  exact hNotDisjoint hDiagDisjointZ
-exact Set.compl_subset_compl.mp hComplement
+      use (z, z)
+      constructor
+      · unfold Set.diagonal
+        simp
+      · simp only [Set.mem_prod, and_self]
+        exact hz
+    exact hNotDisjoint hDiagDisjointZ
+  exact Set.compl_subset_compl.mp hComplement
+refine ⟨?_, ?_⟩
+· exact goalRPM
+/- The remaining statement can be derived easily from
+forwardEqualsBackwardRPInMinCommSystem and goalRPM -/
+· sorry
 
-end Regional_proximality
+end Regional_proximality_in_min_comm_systems
 
 section Equicontinuity_and_regional_proximality
 
@@ -5149,6 +5214,13 @@ by
   have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
   exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
+
+/-- A dynamical system on `X` which acts by surjections is equicontinuous if and only
+if the regionally proximal relation is contained in the diagonal of `X × X` -/
+theorem equicontinuousIffRPTrivialIfSurjective
+(dSystem : DynamicalSystem S X)
+(hSurject : ∀ (s : S), Function.Surjective (dSystem.map s)) :
+RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by sorry
 
 /-- A dynamical system on `X` is equicontinuous if and only if the
 backward regionally proximal relation is contained in the diagonal of `X × X` -/
@@ -5404,30 +5476,36 @@ theorem minimalFactorEquicontinuousIffRPInFactorRelation
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
-RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY := by
-constructor
-· intro h1
-  unfold mapRelation at h1
-  have h1recast : Prod.map π π '' RPM dSystem ⊆ Set.diagonal Y := by
-    simp [h1]
-  have h2 : RPM dSystemY ⊆ Prod.map π π '' RPM dSystem := by
-    apply commMinRPIsInImageOfRP dSystem dSystemY
-    · exact hFactorMap
-    · exact hMin
-  have h3 : RPM dSystemY ⊆ Set.diagonal Y := by
-    exact h2.trans h1recast
-  exact (equicontinuousIffRPMTrivial dSystemY).mp h3
-· intro h1
-  unfold mapRelation
-  have h2 : RPM dSystemY ⊆ Set.diagonal Y := by
-    exact (equicontinuousIffRPMTrivial dSystemY).mpr h1
-  have h3 : Prod.map π π '' RPM dSystem ⊆ RPM dSystemY := by
-    apply imageOfRPMIsInRPM dSystem dSystemY
-    exact hFactorMap
-  have hGoal : Prod.map π π '' RPM dSystem ⊆ Set.diagonal Y := by
-    exact h3.trans h2
-  simp only [Set.image_subset_iff] at hGoal
-  exact hGoal
+(RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY)
+∧
+(RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY) := by
+have RPMgoal : RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY := by
+  constructor
+  · intro h1
+    unfold mapRelation at h1
+    have h1recast : Prod.map π π '' RPM dSystem ⊆ Set.diagonal Y := by
+      simp [h1]
+    have h2 : RPM dSystemY ⊆ Prod.map π π '' RPM dSystem := by
+      apply (commMinRPIsInImageOfRP dSystem dSystemY π (hπ := hFactorMap) (hMin := hMin)).1
+    have h3 : RPM dSystemY ⊆ Set.diagonal Y := by
+      exact h2.trans h1recast
+    exact (equicontinuousIffRPMTrivial dSystemY).mp h3
+  · intro h1
+    unfold mapRelation
+    have h2 : RPM dSystemY ⊆ Set.diagonal Y := by
+      exact (equicontinuousIffRPMTrivial dSystemY).mpr h1
+    have h3 : Prod.map π π '' RPM dSystem ⊆ RPM dSystemY := by
+      apply imageOfRPMIsInRPM dSystem dSystemY
+      exact hFactorMap
+    have hGoal : Prod.map π π '' RPM dSystem ⊆ Set.diagonal Y := by
+      exact h3.trans h2
+    simp only [Set.image_subset_iff] at hGoal
+    exact hGoal
+refine ⟨?_, ?_⟩
+· exact RPMgoal
+/- The remaining statement can be derived easily from
+forwardEqualsBackwardRPInMinCommSystem and RPMgoal -/
+· sorry
 
 /-- An ICER `I` of a minimal system `X` is equicontinuous iff `RP ⊆ I` -/
 theorem minimalICEREquicontinuousIffRPInICER
@@ -5435,7 +5513,9 @@ theorem minimalICEREquicontinuousIffRPInICER
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
 {I : Set (X × X)} (hI : isICER dSystem I) :
-isEquicontinuousICER dSystem hI ↔ RPM dSystem ⊆ I := by
+(isEquicontinuousICER dSystem hI ↔ RPM dSystem ⊆ I)
+∧
+(isEquicontinuousICER dSystem hI ↔ RP dSystem ⊆ I) := by
 have hQuotientNonempty:  Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
     nonemptyQuotient X hI.2.2
 have hQuotientT2 : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
@@ -5443,34 +5523,40 @@ have hQuotientT2 : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
 have hFactorMap : isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
     (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
     apply quotientMapIsFactorMap
-constructor
-· intro h1
-  have h3 : RPM dSystem ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+have RPMgoal : isEquicontinuousICER dSystem hI ↔ RPM dSystem ⊆ I := by
+  constructor
+  · intro h1
+    have h3 : RPM dSystem ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+      apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
+        (quotientDynamicalSystem dSystem hI) hFactorMap).1.mpr
+      · exact h1
+      · exact hMin
+    have h4 : mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) ⊆ I := by
+      intro t ht
+      unfold mapRelation at ht
+      · simp only [Set.mem_preimage, Set.mem_diagonal_iff, Prod.map_fst, Prod.map_snd] at ht
+        have h4a : (setToRelation I) t.1 t.2 := by
+          exact Quotient.eq.mp ht
+        unfold setToRelation at h4a
+        exact h4a
+    exact h3.trans h4
+  · intro h1
+    unfold isEquicontinuousICER
+    have h2 : I ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
+      intro t ht
+      have h2a : (setToRelation I) t.1 t.2 := by
+        unfold setToRelation
+        exact ht
+      apply Quotient.eq.mpr h2a
     apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
-      (quotientDynamicalSystem dSystem hI) hFactorMap).mpr
-    · exact h1
+      (quotientDynamicalSystem dSystem hI) hFactorMap).1.mp
+    · exact h1.trans h2
     · exact hMin
-  have h4 : mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) ⊆ I := by
-    intro t ht
-    unfold mapRelation at ht
-    · simp only [Set.mem_preimage, Set.mem_diagonal_iff, Prod.map_fst, Prod.map_snd] at ht
-      have h4a : (setToRelation I) t.1 t.2 := by
-        exact Quotient.eq.mp ht
-      unfold setToRelation at h4a
-      exact h4a
-  exact h3.trans h4
-· intro h1
-  unfold isEquicontinuousICER
-  have h2 : I ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
-    intro t ht
-    have h2a : (setToRelation I) t.1 t.2 := by
-      unfold setToRelation
-      exact ht
-    apply Quotient.eq.mpr h2a
-  apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
-    (quotientDynamicalSystem dSystem hI) hFactorMap).mp
-  · exact h1.trans h2
-  · exact hMin
+refine ⟨?_, ?_⟩
+· exact RPMgoal
+/- The remaining statement can be derived easily from
+forwardEqualsBackwardRPInMinCommSystem and RPMgoal -/
+· sorry
 
 end Equicontinuity_and_regional_proximality_with_S_commutative
 
@@ -5521,7 +5607,7 @@ theorem equiStructureRelationIsEquiICER
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
 isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) := by
-apply (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).mpr
+apply (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).1.mpr
 unfold equiStructureRelation
 simp only [Set.subset_sInter_iff]
 intro I hI
@@ -5529,7 +5615,7 @@ unfold setOfEquicontinuousICERS at hI
 rcases hI with ⟨hI1, hI2⟩
 unfold setOfICERS at hI1
 simp only [Set.mem_setOf_eq] at hI1
-apply (minimalICEREquicontinuousIffRPInICER hMin hI1).mp
+apply (minimalICEREquicontinuousIffRPInICER hMin hI1).1.mp
 exact hI2
 
 end Equicontinuous_structure_relation

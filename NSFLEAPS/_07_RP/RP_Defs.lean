@@ -609,333 +609,342 @@ by
 `(x,y) ∈ RP` if and only if `(x,y,y)` is in the `S^2` orbit closure of `(y,y,y)` -/
 theorem xyInRPIffxyyInyyyOrbClosure
 (hMin : isMinimalSystem dSystem) (x y : X) :
-(x,y) ∈ RP dSystem ↔
-(x,y,y) ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨y,y,y⟩ :=
+((x,y) ∈ RP dSystem ↔
+(x,y,y) ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨y,y,y⟩)
+∧
+((x,y) ∈ RPM dSystem ↔
+(x,y,y) ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨y,y,y⟩) :=
 by
-  constructor
-  · intro xyInRP
-    let f1 : (X × X) × S → (X × X) × (X × X) :=
-      fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a)
-    rcases (xyInRPIffUltraToSomewwxy dSystem x y).mp xyInRP with ⟨w,F,hf1Ftendstowwxy⟩
-    --(fun x ↦ match x with | (a, s) => (a, (diagDynamicalSystem dSystem dSystem).map s a))
-    let ww : X × X := ⟨w,w⟩
-    rcases (rightTopSemigroupContainsMinLeftIdeal (S := Ultrafilter (S × S))) with ⟨L,LMin⟩
-    have wwMapsToAnyab (a : X × X) :
-      ∃ (p : Ultrafilter (S × S)), p ∈ L ∧
-        (ultraAction (cornerSystem2 (dSystem := dSystem))).map p ww = a :=
-          minLeftIdealSurjectsOntoMinSystem (cornerSystem2 (dSystem := dSystem))
-            (minimalSystemImpliesMinimalcornerSystem2 hMin) LMin ww a
-    let f2 : (X × X) × S → Ultrafilter (S × S) :=
-      fun (⟨a,s⟩ : (X × X) × S) => Classical.choose (wwMapsToAnyab a)
-    have f2_property :
-      ∀ (as : (X × X) × S), (f2 as ∈ L) ∧
-        (ultraAction (cornerSystem2 (dSystem := dSystem))).map (f2 as) ww = as.1 :=
-          by
-            intro as
-            exact Classical.choose_spec (wwMapsToAnyab as.1)
-    have ultraSSisCompact := isCompact_univ (X := Ultrafilter (S × S))
-    have LisCompact : IsCompact L := minimalLeftIdealCompact LMin
-    have f2FonL : L ∈ Ultrafilter.map f2 F :=
-      by
-        rw [Ultrafilter.mem_map]
-        have hpre : f2 ⁻¹' L = Set.univ := by
-          ext as
-          constructor
-          · intro has
-            trivial
-          · simp [Set.preimage]
-            simp only [f2_property as]
-        rw [hpre]
-        exact Filter.univ_mem
-    rcases (IsCompact.ultrafilter_le_nhds LisCompact) (Ultrafilter.map f2 F)
-      (Filter.le_principal_iff.mpr f2FonL) with ⟨p,pInL,f2FTendsTop⟩
-    let f3 : Ultrafilter (S × S) → X × X :=
-      fun (q : Ultrafilter (S × S)) ↦
-        (ultraAction (cornerSystem2 (dSystem := dSystem))).map q ww
-    have f3continuous : Continuous f3 :=
-      ultraActionWithFixedxIsContinuous (cornerSystem2 (dSystem := dSystem)) ww
-    let π : (X × X) × (X × X) → X × X := Prod.fst
-    have πContinuous : Continuous π := continuous_fst
-    have f3f2ispif1 : f3 ∘ f2 = π ∘ f1 :=
-      by
-        ext pt
-        · simp only [Function.comp_apply]
-          unfold f1 f3 π
-          simp only [(f2_property pt).2]
-        · simp only [Function.comp_apply]
-          unfold f1 f3 π
+  have RPMgoal : (x,y) ∈ RPM dSystem ↔
+(x,y,y) ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨y,y,y⟩ :=
+  by
+    constructor
+    · intro xyInRP
+      let f1 : (X × X) × S → (X × X) × (X × X) :=
+        fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a)
+      rcases (xyInRPMIffUltraToSomewwxy dSystem x y).mp xyInRP with ⟨w,F,hf1Ftendstowwxy⟩
+      --(fun x ↦ match x with | (a, s) => (a, (diagDynamicalSystem dSystem dSystem).map s a))
+      let ww : X × X := ⟨w,w⟩
+      rcases (rightTopSemigroupContainsMinLeftIdeal (S := Ultrafilter (S × S))) with ⟨L,LMin⟩
+      have wwMapsToAnyab (a : X × X) :
+        ∃ (p : Ultrafilter (S × S)), p ∈ L ∧
+          (ultraAction (cornerSystem2 (dSystem := dSystem))).map p ww = a :=
+            minLeftIdealSurjectsOntoMinSystem (cornerSystem2 (dSystem := dSystem))
+              (minimalSystemImpliesMinimalcornerSystem2 hMin) LMin ww a
+      let f2 : (X × X) × S → Ultrafilter (S × S) :=
+        fun (⟨a,s⟩ : (X × X) × S) => Classical.choose (wwMapsToAnyab a)
+      have f2_property :
+        ∀ (as : (X × X) × S), (f2 as ∈ L) ∧
+          (ultraAction (cornerSystem2 (dSystem := dSystem))).map (f2 as) ww = as.1 :=
+            by
+              intro as
+              exact Classical.choose_spec (wwMapsToAnyab as.1)
+      have ultraSSisCompact := isCompact_univ (X := Ultrafilter (S × S))
+      have LisCompact : IsCompact L := minimalLeftIdealCompact LMin
+      have f2FonL : L ∈ Ultrafilter.map f2 F :=
+        by
+          rw [Ultrafilter.mem_map]
+          have hpre : f2 ⁻¹' L = Set.univ := by
+            ext as
+            constructor
+            · intro has
+              trivial
+            · simp [Set.preimage]
+              simp only [f2_property as]
+          rw [hpre]
+          exact Filter.univ_mem
+      rcases (IsCompact.ultrafilter_le_nhds LisCompact) (Ultrafilter.map f2 F)
+        (Filter.le_principal_iff.mpr f2FonL) with ⟨p,pInL,f2FTendsTop⟩
+      let f3 : Ultrafilter (S × S) → X × X :=
+        fun (q : Ultrafilter (S × S)) ↦
+          (ultraAction (cornerSystem2 (dSystem := dSystem))).map q ww
+      have f3continuous : Continuous f3 :=
+        ultraActionWithFixedxIsContinuous (cornerSystem2 (dSystem := dSystem)) ww
+      let π : (X × X) × (X × X) → X × X := Prod.fst
+      have πContinuous : Continuous π := continuous_fst
+      have f3f2ispif1 : f3 ∘ f2 = π ∘ f1 :=
+        by
+          ext pt
+          · simp only [Function.comp_apply]
+            unfold f1 f3 π
+            simp only [(f2_property pt).2]
+          · simp only [Function.comp_apply]
+            unfold f1 f3 π
+            simp only
+            simp only [(f2_property (pt)).2]
+      have f3f2FTendsToww : Filter.Tendsto (f3 ∘ f2) F (nhds ww) :=
+        by
+          simp only [f3f2ispif1]
+          exact Filter.Tendsto.comp (πContinuous.tendsto ⟨ww,⟨x,y⟩⟩) hf1Ftendstowwxy
+      let pww : X × X := (ultraAction (cornerSystem2 (dSystem := dSystem))).map p ww
+      have f3f2FTendsTopww : Filter.Tendsto (f3 ∘ f2) F (nhds pww) :=
+        Filter.Tendsto.comp (f3continuous.tendsto p) f2FTendsTop
+      have pwwIsww : pww = ww := tendsto_nhds_unique f3f2FTendsTopww f3f2FTendsToww
+      rcases (idempotentProductLifting (cornerSystem2 (dSystem := dSystem))
+        ww LMin pInL pwwIsww)
+          with ⟨q,qInL,pqIdempotent,qFixesww⟩
+      let f4 : (X × X) × S → X × X × X :=
+        fun (⟨a,s⟩ : (X × X) × S) ↦
+          (Equiv.prodAssoc X X X)
+            ⟨(diagDynamicalSystem dSystem dSystem).map s a,
+              (ultraAction (cornerSystem1 (dSystem := dSystem))).map ((f2 ⟨a,s⟩) * q) y⟩
+      let pqy : X := (ultraAction (cornerSystem1 (dSystem := dSystem))).map (p * q) y
+      let xypqy : X × X × X := ⟨x,⟨y,pqy⟩⟩
+      let wwy : X × X × X := ⟨w,⟨w,y⟩⟩
+      have f4TendsToxypqy : Filter.Tendsto f4 F (nhds xypqy) :=
+        by
+          unfold f4 xypqy
           simp only
-          simp only [(f2_property (pt)).2]
-    have f3f2FTendsToww : Filter.Tendsto (f3 ∘ f2) F (nhds ww) :=
-      by
-        simp only [f3f2ispif1]
-        exact Filter.Tendsto.comp (πContinuous.tendsto ⟨ww,⟨x,y⟩⟩) hf1Ftendstowwxy
-    let pww : X × X := (ultraAction (cornerSystem2 (dSystem := dSystem))).map p ww
-    have f3f2FTendsTopww : Filter.Tendsto (f3 ∘ f2) F (nhds pww) :=
-      Filter.Tendsto.comp (f3continuous.tendsto p) f2FTendsTop
-    have pwwIsww : pww = ww := tendsto_nhds_unique f3f2FTendsTopww f3f2FTendsToww
-    rcases (idempotentProductLifting (cornerSystem2 (dSystem := dSystem))
-      ww LMin pInL pwwIsww)
-        with ⟨q,qInL,pqIdempotent,qFixesww⟩
-    let f4 : (X × X) × S → X × X × X :=
-      fun (⟨a,s⟩ : (X × X) × S) ↦
-        (Equiv.prodAssoc X X X)
-          ⟨(diagDynamicalSystem dSystem dSystem).map s a,
-            (ultraAction (cornerSystem1 (dSystem := dSystem))).map ((f2 ⟨a,s⟩) * q) y⟩
-    let pqy : X := (ultraAction (cornerSystem1 (dSystem := dSystem))).map (p * q) y
-    let xypqy : X × X × X := ⟨x,⟨y,pqy⟩⟩
-    let wwy : X × X × X := ⟨w,⟨w,y⟩⟩
-    have f4TendsToxypqy : Filter.Tendsto f4 F (nhds xypqy) :=
-      by
-        unfold f4 xypqy
-        simp only
-        simp only [Prod.mk.eta, Equiv.prodAssoc_apply]
-        let p3 : (X × X) × (X × X) → X := Prod.fst ∘ Prod.snd
-        have p3cts : Continuous p3 := Continuous.comp continuous_fst continuous_snd
-        let p4 : (X × X) × (X × X) → X := Prod.snd ∘ Prod.snd
-        have p4cts : Continuous p4 := Continuous.comp continuous_snd continuous_snd
-        refine Filter.Tendsto.prodMk_nhds ?_ ?_
-        · have := Filter.Tendsto.comp (p3cts.tendsto ⟨ww,⟨x,y⟩⟩) hf1Ftendstowwxy
-          exact this
-        · refine Filter.Tendsto.prodMk_nhds ?_ ?_
-          · have := Filter.Tendsto.comp (p4cts.tendsto ⟨ww,⟨x,y⟩⟩) hf1Ftendstowwxy
+          simp only [Prod.mk.eta, Equiv.prodAssoc_apply]
+          let p3 : (X × X) × (X × X) → X := Prod.fst ∘ Prod.snd
+          have p3cts : Continuous p3 := Continuous.comp continuous_fst continuous_snd
+          let p4 : (X × X) × (X × X) → X := Prod.snd ∘ Prod.snd
+          have p4cts : Continuous p4 := Continuous.comp continuous_snd continuous_snd
+          refine Filter.Tendsto.prodMk_nhds ?_ ?_
+          · have := Filter.Tendsto.comp (p3cts.tendsto ⟨ww,⟨x,y⟩⟩) hf1Ftendstowwxy
             exact this
-          · let maprTorstarqy : Ultrafilter (S × S) → X :=
-              fun r ↦ (ultraAction (cornerSystem1 (dSystem := dSystem))).map (r * q) y
-            have maprTorstarqyCts : Continuous maprTorstarqy :=
-              by
-                unfold maprTorstarqy
-                simp only [(ultraAction (cornerSystem1 (dSystem := dSystem))).mapMult]
-                exact ultraActionWithFixedxIsContinuous
-                  (cornerSystem1 (dSystem := dSystem)) (((ultraAction cornerSystem1).map q y))
-            exact Filter.Tendsto.comp (maprTorstarqyCts.tendsto p) f2FTendsTop
-    let oCwwy := orbitClosure (cornerSystem3 (dSystem := dSystem)) wwy
-    have f4MapsToOrbitClosOfwwy :
-      Set.MapsTo f4 (Set.univ) oCwwy :=
-        by
-          unfold Set.MapsTo
-          intro ⟨⟨a,b⟩,s⟩ absInSetUniv
-          unfold f4
-          simp only
-          let pabqy :=
-            (ultraAction (cornerSystem1 (dSystem := dSystem))).map (f2 ((a, b), s) * q) y
-          let pabqwwy :=
-            (ultraAction (cornerSystem3 (dSystem := dSystem))).map (f2 ((a, b), s) * q) wwy
-          have rewriteEquality :
-            (Equiv.prodAssoc X X X)
-              ((diagDynamicalSystem dSystem dSystem).map s (a, b), pabqy) =
-                leftMap3 (dSystem := dSystem) s pabqwwy :=
-                  by
-                    unfold pabqy pabqwwy leftMap3
-                    simp only [ultraActionOnX3 (f2 ⟨⟨a,b⟩,s⟩ * q)]
-                    unfold i21 wwy
-                    simp only [Equiv.prodAssoc_apply, Prod.mk.injEq]
-                    simp only [(ultraAction (cornerSystem2 (dSystem := dSystem))).mapMult]
-                    unfold ww at qFixesww
-                    simp only [qFixesww]
-                    have pabwwIsab :
-                      (ultraAction (cornerSystem2 (dSystem := dSystem))).map
-                        (f2 ⟨⟨a,b⟩,s⟩) ⟨w,w⟩ = ⟨a,b⟩ := (f2_property ⟨⟨a,b⟩,s⟩).2
-                    simp only [pabwwIsab]
-                    unfold diagDynamicalSystem
-                    simp only [Prod.map_apply, and_self]
-          unfold pabqy at rewriteEquality
-          simp only [rewriteEquality]
-          have pabqwwyInOrbCloswwy :
-            (ultraAction cornerSystem3).map (f2 ((a, b), s) * q) wwy ∈ oCwwy :=
-              ultraActionInOrbitClosure
-                (cornerSystem3 (dSystem := dSystem)) (f2 ((a, b), s) * q) wwy
-          have leftMap3spabqwwyInleftMap3sOrbCloswwy :
-            leftMap3 (dSystem := dSystem) s
-              ((ultraAction (cornerSystem3 (dSystem := dSystem))).map (f2 ((a, b), s) * q) wwy) ∈
-                (leftMap3 (dSystem := dSystem) s) '' oCwwy :=
-                  Set.mem_image_of_mem (leftMap3 (dSystem := dSystem) s) pabqwwyInOrbCloswwy
-          have ocInvariance : (leftMap3 (dSystem := dSystem) s) '' oCwwy ⊆ oCwwy :=
-            by
-              let owwy := orbit (cornerSystem3 (dSystem := dSystem)) wwy
-              have leftMapOrbClosIsClosLeftMapOrb :=
-                imageClosureIsClosureImage (leftMap3Continuous (dSystem := dSystem) s) owwy
-              have orbitIsInv : (leftMap3 (dSystem := dSystem) s) '' owwy ⊆ owwy :=
+          · refine Filter.Tendsto.prodMk_nhds ?_ ?_
+            · have := Filter.Tendsto.comp (p4cts.tendsto ⟨ww,⟨x,y⟩⟩) hf1Ftendstowwxy
+              exact this
+            · let maprTorstarqy : Ultrafilter (S × S) → X :=
+                fun r ↦ (ultraAction (cornerSystem1 (dSystem := dSystem))).map (r * q) y
+              have maprTorstarqyCts : Continuous maprTorstarqy :=
                 by
-                  unfold owwy orbit
-                  intro ptx ptxInImage
-                  simp only [Set.mem_image, Set.mem_range, Prod.exists,
-                    exists_exists_exists_and_eq] at ptxInImage
-                  rcases ptxInImage with ⟨s2,t2,hst⟩
-                  have leftMapIntoCornerMult :
-                    (leftMap3 (dSystem := dSystem) s)
-                      ((cornerSystem3 (dSystem := dSystem)).map (s2, t2) wwy) =
-                        (cornerSystem3 (dSystem := dSystem)).map (s * s2, t2) wwy :=
-                          by
-                            unfold cornerSystem3 leftMap3
-                            simp only
-                            simp only [dSystem.mapMult]
-                  rw [leftMapIntoCornerMult] at hst
-                  rw [← hst]
-                  simp only [Set.mem_range, exists_apply_eq_apply]
-              unfold oCwwy orbitClosure
-              unfold owwy at leftMapOrbClosIsClosLeftMapOrb
-              rw [leftMapOrbClosIsClosLeftMapOrb]
-              apply closure_mono
-              exact orbitIsInv
-          have := ocInvariance leftMap3spabqwwyInleftMap3sOrbCloswwy
-          exact this
-    have xypqyInOrbitClosOfwwy :
-      xypqy ∈ oCwwy :=
-        by
-          have goalwithclos : xypqy ∈ closure oCwwy :=
-            by
-              apply mem_closure_of_tendsto f4TendsToxypqy
-              filter_upwards [Filter.univ_mem] with z
-              intro hz
-              exact f4MapsToOrbitClosOfwwy hz
-          have oCIsClosed : IsClosed oCwwy := isClosed_closure
-          simpa [oCIsClosed.closure_eq] using goalwithclos
-    let yy : X × X := ⟨y,y⟩
-    have yyyIsUR := xxxUniformlyRecurrent hMin y
-    have wwInOrbitClosyy :
-      ww ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) yy :=
-        diagonalOrbitVisits y w
-          ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
-    have OrbClosyyThenyInOrbClosyyy := liftTo3Right y yyyIsUR
-    have wwyInOrbClosyyTheny :
-      wwy ∈ (Equiv.prodAssoc X X X) ''
-        (orbitClosure (diagDynamicalSystem dSystem dSystem) yy ×ˢ {y}) :=
+                  unfold maprTorstarqy
+                  simp only [(ultraAction (cornerSystem1 (dSystem := dSystem))).mapMult]
+                  exact ultraActionWithFixedxIsContinuous
+                    (cornerSystem1 (dSystem := dSystem)) (((ultraAction cornerSystem1).map q y))
+              exact Filter.Tendsto.comp (maprTorstarqyCts.tendsto p) f2FTendsTop
+      let oCwwy := orbitClosure (cornerSystem3 (dSystem := dSystem)) wwy
+      have f4MapsToOrbitClosOfwwy :
+        Set.MapsTo f4 (Set.univ) oCwwy :=
           by
-            unfold wwy
-            unfold yy
-            simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Set.mem_singleton_iff,
-              Prod.mk.injEq, Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right,
-              exists_eq_right]
-            exact wwInOrbitClosyy
-    have wwyInOrbClosyyy :=
-      OrbClosyyThenyInOrbClosyyy wwyInOrbClosyyTheny
-    have xypqyInOrbClosyyy :=
-      orbitTransitivity wwyInOrbClosyyy xypqyInOrbitClosOfwwy
-    have xypqyIsUR :=
-      inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem)) yyyIsUR xypqyInOrbClosyyy
-    have yProxUnderS2Topqy :=
-      pointAndUltraImageAreProximal (cornerSystem1 (dSystem := dSystem)) y pqIdempotent
-    have yProxUnderSTopqy :=
-      cornerProxImpliesProx y pqy yProxUnderS2Topqy
-    have yyInOrbClosypqy :=
-      (minSystemOrbitClosProxPairContainsDiag hMin yProxUnderSTopqy) (Set.mem_diagonal y)
-    have xOrbClosypqyInOrbClosxypqy := liftTo3Left x xypqyIsUR
-    let xyy : X × X × X := ⟨x,⟨y,y⟩⟩
-    let ypqy : X × X := ⟨y,pqy⟩
-    have xyyInxOrbClosypqy :
-      xyy ∈ {x} ×ˢ orbitClosure (diagDynamicalSystem dSystem dSystem) ypqy :=
-        by
-          constructor
-          · unfold xyy
-            simp only [Set.mem_singleton_iff]
-          · exact yyInOrbClosypqy
-    have xyyInOrbClosxypqy :
-      xyy ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) xypqy :=
-        xOrbClosypqyInOrbClosxypqy xyyInxOrbClosypqy
-    exact orbitTransitivity xypqyInOrbClosyyy xyyInOrbClosxypqy
-  · intro xxyInOrbClosyyy
-    unfold RP
-    intro α hα
-    simp only [Set.mem_range] at hα
-    rcases hα with ⟨β, hβ⟩
-    rw [← hβ]
-    simp only [Set.mem_iInter]
-    intro βnbhd
-    unfold setOrbitClosure
-    simp only [mem_closure_iff]
-    intro U UOpen xyInU
-    let βSlice := {z | ⟨y,z⟩ ∈ β}
-    have βSliceIsNhdOfy : βSlice ∈ nhds y :=
-      by
-        have βnhdOfyy := (mem_nhdsSet_iff_forall.mp βnbhd) ⟨y, y⟩ (Set.mem_diagonal y)
-        rw [mem_nhds_prod_iff] at βnhdOfyy
-        rcases βnhdOfyy with ⟨V1, hV1, V2, hV2, V1V2inβ⟩
-        have hslice : V2 ⊆ βSlice := by
-          intro z hz
-          have yzInV1V2 : ⟨y,z⟩ ∈ V1 ×ˢ V2 := by
-            simp only [Set.mem_prod]
-            exact ⟨mem_of_mem_nhds hV1, hz⟩
-          unfold βSlice
-          simp only [Set.mem_setOf_eq]
-          exact V1V2inβ yzInV1V2
-        exact Filter.mem_of_superset hV2 hslice
-    rcases mem_nhds_iff.mp βSliceIsNhdOfy with ⟨W,WinβSlice,WOpen,yInW⟩
-    let UβSlice := (Equiv.prodAssoc X X X) '' U ×ˢ βSlice
-    have UβSliceIsnhdOfxyy : UβSlice ∈ nhds ⟨x,y,y⟩ :=
-      by
-        unfold UβSlice
-        apply mem_nhds_iff.mpr
-        use (Equiv.prodAssoc X X X) '' U ×ˢ W
-        constructor
-        · apply Set.image_mono
-          exact Set.prod_mono (fun ⦃a⦄ a_1 ↦ a_1) WinβSlice
-        · constructor
-          · have UWOpen : IsOpen (U ×ˢ W) :=
+            unfold Set.MapsTo
+            intro ⟨⟨a,b⟩,s⟩ absInSetUniv
+            unfold f4
+            simp only
+            let pabqy :=
+              (ultraAction (cornerSystem1 (dSystem := dSystem))).map (f2 ((a, b), s) * q) y
+            let pabqwwy :=
+              (ultraAction (cornerSystem3 (dSystem := dSystem))).map (f2 ((a, b), s) * q) wwy
+            have rewriteEquality :
+              (Equiv.prodAssoc X X X)
+                ((diagDynamicalSystem dSystem dSystem).map s (a, b), pabqy) =
+                  leftMap3 (dSystem := dSystem) s pabqwwy :=
+                    by
+                      unfold pabqy pabqwwy leftMap3
+                      simp only [ultraActionOnX3 (f2 ⟨⟨a,b⟩,s⟩ * q)]
+                      unfold i21 wwy
+                      simp only [Equiv.prodAssoc_apply, Prod.mk.injEq]
+                      simp only [(ultraAction (cornerSystem2 (dSystem := dSystem))).mapMult]
+                      unfold ww at qFixesww
+                      simp only [qFixesww]
+                      have pabwwIsab :
+                        (ultraAction (cornerSystem2 (dSystem := dSystem))).map
+                          (f2 ⟨⟨a,b⟩,s⟩) ⟨w,w⟩ = ⟨a,b⟩ := (f2_property ⟨⟨a,b⟩,s⟩).2
+                      simp only [pabwwIsab]
+                      unfold diagDynamicalSystem
+                      simp only [Prod.map_apply, and_self]
+            unfold pabqy at rewriteEquality
+            simp only [rewriteEquality]
+            have pabqwwyInOrbCloswwy :
+              (ultraAction cornerSystem3).map (f2 ((a, b), s) * q) wwy ∈ oCwwy :=
+                ultraActionInOrbitClosure
+                  (cornerSystem3 (dSystem := dSystem)) (f2 ((a, b), s) * q) wwy
+            have leftMap3spabqwwyInleftMap3sOrbCloswwy :
+              leftMap3 (dSystem := dSystem) s
+                ((ultraAction (cornerSystem3 (dSystem := dSystem))).map (f2 ((a, b), s) * q) wwy) ∈
+                  (leftMap3 (dSystem := dSystem) s) '' oCwwy :=
+                    Set.mem_image_of_mem (leftMap3 (dSystem := dSystem) s) pabqwwyInOrbCloswwy
+            have ocInvariance : (leftMap3 (dSystem := dSystem) s) '' oCwwy ⊆ oCwwy :=
               by
-                exact IsOpen.prod UOpen WOpen
-            exact (Homeomorph.prodAssoc X X X).isOpenMap (U ×ˢ W) UWOpen
-          · simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq,
-            Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right]
-            exact ⟨xyInU,yInW⟩
-    have orbitPtLandsInUβSlice :
-      ∃ (s : S × S), (cornerSystem3 (dSystem := dSystem)).map s ⟨y,y,y⟩ ∈ UβSlice :=
+                let owwy := orbit (cornerSystem3 (dSystem := dSystem)) wwy
+                have leftMapOrbClosIsClosLeftMapOrb :=
+                  imageClosureIsClosureImage (leftMap3Continuous (dSystem := dSystem) s) owwy
+                have orbitIsInv : (leftMap3 (dSystem := dSystem) s) '' owwy ⊆ owwy :=
+                  by
+                    unfold owwy orbit
+                    intro ptx ptxInImage
+                    simp only [Set.mem_image, Set.mem_range, Prod.exists,
+                      exists_exists_exists_and_eq] at ptxInImage
+                    rcases ptxInImage with ⟨s2,t2,hst⟩
+                    have leftMapIntoCornerMult :
+                      (leftMap3 (dSystem := dSystem) s)
+                        ((cornerSystem3 (dSystem := dSystem)).map (s2, t2) wwy) =
+                          (cornerSystem3 (dSystem := dSystem)).map (s * s2, t2) wwy :=
+                            by
+                              unfold cornerSystem3 leftMap3
+                              simp only
+                              simp only [dSystem.mapMult]
+                    rw [leftMapIntoCornerMult] at hst
+                    rw [← hst]
+                    simp only [Set.mem_range, exists_apply_eq_apply]
+                unfold oCwwy orbitClosure
+                unfold owwy at leftMapOrbClosIsClosLeftMapOrb
+                rw [leftMapOrbClosIsClosLeftMapOrb]
+                apply closure_mono
+                exact orbitIsInv
+            have := ocInvariance leftMap3spabqwwyInleftMap3sOrbCloswwy
+            exact this
+      have xypqyInOrbitClosOfwwy :
+        xypqy ∈ oCwwy :=
+          by
+            have goalwithclos : xypqy ∈ closure oCwwy :=
+              by
+                apply mem_closure_of_tendsto f4TendsToxypqy
+                filter_upwards [Filter.univ_mem] with z
+                intro hz
+                exact f4MapsToOrbitClosOfwwy hz
+            have oCIsClosed : IsClosed oCwwy := isClosed_closure
+            simpa [oCIsClosed.closure_eq] using goalwithclos
+      let yy : X × X := ⟨y,y⟩
+      have yyyIsUR := xxxUniformlyRecurrent hMin y
+      have wwInOrbitClosyy :
+        ww ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) yy :=
+          diagonalOrbitVisits y w
+            ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
+      have OrbClosyyThenyInOrbClosyyy := liftTo3Right y yyyIsUR
+      have wwyInOrbClosyyTheny :
+        wwy ∈ (Equiv.prodAssoc X X X) ''
+          (orbitClosure (diagDynamicalSystem dSystem dSystem) yy ×ˢ {y}) :=
+            by
+              unfold wwy
+              unfold yy
+              simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Set.mem_singleton_iff,
+                Prod.mk.injEq, Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right,
+                exists_eq_right]
+              exact wwInOrbitClosyy
+      have wwyInOrbClosyyy :=
+        OrbClosyyThenyInOrbClosyyy wwyInOrbClosyyTheny
+      have xypqyInOrbClosyyy :=
+        orbitTransitivity wwyInOrbClosyyy xypqyInOrbitClosOfwwy
+      have xypqyIsUR :=
+        inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem)) yyyIsUR xypqyInOrbClosyyy
+      have yProxUnderS2Topqy :=
+        pointAndUltraImageAreProximal (cornerSystem1 (dSystem := dSystem)) y pqIdempotent
+      have yProxUnderSTopqy :=
+        cornerProxImpliesProx y pqy yProxUnderS2Topqy
+      have yyInOrbClosypqy :=
+        (minSystemOrbitClosProxPairContainsDiag hMin yProxUnderSTopqy) (Set.mem_diagonal y)
+      have xOrbClosypqyInOrbClosxypqy := liftTo3Left x xypqyIsUR
+      let xyy : X × X × X := ⟨x,⟨y,y⟩⟩
+      let ypqy : X × X := ⟨y,pqy⟩
+      have xyyInxOrbClosypqy :
+        xyy ∈ {x} ×ˢ orbitClosure (diagDynamicalSystem dSystem dSystem) ypqy :=
+          by
+            constructor
+            · unfold xyy
+              simp only [Set.mem_singleton_iff]
+            · exact yyInOrbClosypqy
+      have xyyInOrbClosxypqy :
+        xyy ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) xypqy :=
+          xOrbClosypqyInOrbClosxypqy xyyInxOrbClosypqy
+      exact orbitTransitivity xypqyInOrbClosyyy xyyInOrbClosxypqy
+    · intro xxyInOrbClosyyy
+      unfold RPM
+      intro α hα
+      simp only [Set.mem_range] at hα
+      rcases hα with ⟨β, hβ⟩
+      rw [← hβ]
+      simp only [Set.mem_iInter]
+      intro βnbhd
+      unfold setOrbitClosure
+      simp only [mem_closure_iff]
+      intro U UOpen xyInU
+      let βSlice := {z | ⟨y,z⟩ ∈ β}
+      have βSliceIsNhdOfy : βSlice ∈ nhds y :=
         by
-          rcases mem_nhds_iff.mp UβSliceIsnhdOfxyy with ⟨V,VinUβSlice,VOpen,xyyInV⟩
-          unfold orbitClosure at xxyInOrbClosyyy
-          simp only [mem_closure_iff] at xxyInOrbClosyyy
-          specialize xxyInOrbClosyyy V VOpen xyyInV
-          rcases xxyInOrbClosyyy with ⟨pt,hpt1,hpt2⟩
-          unfold orbit at hpt2
-          simp only [Set.range] at hpt2
-          rcases hpt2 with ⟨s7,hs7⟩
-          use s7
-          rw [hs7]
-          exact VinUβSlice hpt1
-    rcases orbitPtLandsInUβSlice with ⟨s, hs⟩
-    have ys2yInβ : ⟨y,dSystem.map s.2 y⟩ ∈ β :=
-      by
-        unfold UβSlice cornerSystem3 leftMap3 rightMap3 at hs
-        simp only at hs
-        simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq, Prod.exists,
-          ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
-        rcases hs with ⟨hs1,hs2⟩
-        unfold βSlice at hs2
-        exact hs2
-    have s1ToPairInU :
-      (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ ∈ U :=
+          have βnhdOfyy := (mem_nhdsSet_iff_forall.mp βnbhd) ⟨y, y⟩ (Set.mem_diagonal y)
+          rw [mem_nhds_prod_iff] at βnhdOfyy
+          rcases βnhdOfyy with ⟨V1, hV1, V2, hV2, V1V2inβ⟩
+          have hslice : V2 ⊆ βSlice := by
+            intro z hz
+            have yzInV1V2 : ⟨y,z⟩ ∈ V1 ×ˢ V2 := by
+              simp only [Set.mem_prod]
+              exact ⟨mem_of_mem_nhds hV1, hz⟩
+            unfold βSlice
+            simp only [Set.mem_setOf_eq]
+            exact V1V2inβ yzInV1V2
+          exact Filter.mem_of_superset hV2 hslice
+      rcases mem_nhds_iff.mp βSliceIsNhdOfy with ⟨W,WinβSlice,WOpen,yInW⟩
+      let UβSlice := (Equiv.prodAssoc X X X) '' U ×ˢ βSlice
+      have UβSliceIsnhdOfxyy : UβSlice ∈ nhds ⟨x,y,y⟩ :=
+        by
+          unfold UβSlice
+          apply mem_nhds_iff.mpr
+          use (Equiv.prodAssoc X X X) '' U ×ˢ W
+          constructor
+          · apply Set.image_mono
+            exact Set.prod_mono (fun ⦃a⦄ a_1 ↦ a_1) WinβSlice
+          · constructor
+            · have UWOpen : IsOpen (U ×ˢ W) :=
+                by
+                  exact IsOpen.prod UOpen WOpen
+              exact (Homeomorph.prodAssoc X X X).isOpenMap (U ×ˢ W) UWOpen
+            · simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq,
+              Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right]
+              exact ⟨xyInU,yInW⟩
+      have orbitPtLandsInUβSlice :
+        ∃ (s : S × S), (cornerSystem3 (dSystem := dSystem)).map s ⟨y,y,y⟩ ∈ UβSlice :=
+          by
+            rcases mem_nhds_iff.mp UβSliceIsnhdOfxyy with ⟨V,VinUβSlice,VOpen,xyyInV⟩
+            unfold orbitClosure at xxyInOrbClosyyy
+            simp only [mem_closure_iff] at xxyInOrbClosyyy
+            specialize xxyInOrbClosyyy V VOpen xyyInV
+            rcases xxyInOrbClosyyy with ⟨pt,hpt1,hpt2⟩
+            unfold orbit at hpt2
+            simp only [Set.range] at hpt2
+            rcases hpt2 with ⟨s7,hs7⟩
+            use s7
+            rw [hs7]
+            exact VinUβSlice hpt1
+      rcases orbitPtLandsInUβSlice with ⟨s, hs⟩
+      have ys2yInβ : ⟨y,dSystem.map s.2 y⟩ ∈ β :=
         by
           unfold UβSlice cornerSystem3 leftMap3 rightMap3 at hs
           simp only at hs
           simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq, Prod.exists,
             ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
           rcases hs with ⟨hs1,hs2⟩
-          unfold diagDynamicalSystem Prod.map
-          simp only
-          exact hs1
-    have s1ToPairInOrbit :
-      (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ ∈
-        setOrbit (diagDynamicalSystem dSystem dSystem) β :=
+          unfold βSlice at hs2
+          exact hs2
+      have s1ToPairInU :
+        (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ ∈ U :=
           by
-            have applyDiags1 :=
-              Set.mem_image_of_mem ((diagDynamicalSystem dSystem dSystem).map s.1) ys2yInβ
-            have diags1βInβOrbit :
-              (diagDynamicalSystem dSystem dSystem).map s.1 '' β ⊆
-                setOrbit (diagDynamicalSystem dSystem dSystem) β :=
-                  by
-                    intro xpt hxpt
-                    unfold setOrbit Set.range
-                    simp only
-                    simp only [Set.mem_image] at hxpt
-                    rcases hxpt with ⟨bpt,hbpt1,hbpt2⟩
-                    use ⟨s.1,bpt,hbpt1⟩
-            exact diags1βInβOrbit applyDiags1
-          -- ys2yInβ : ⟨y,dSystem.map s.2 y⟩ in β
-          -- hit with (diagDynamicalSystem dSystem dSystem).map s.1 to see that
-          -- (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ in
-          --- set orbit of β
-    use (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩
-    exact ⟨s1ToPairInU,s1ToPairInOrbit⟩
+            unfold UβSlice cornerSystem3 leftMap3 rightMap3 at hs
+            simp only at hs
+            simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq, Prod.exists,
+              ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
+            rcases hs with ⟨hs1,hs2⟩
+            unfold diagDynamicalSystem Prod.map
+            simp only
+            exact hs1
+      have s1ToPairInOrbit :
+        (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ ∈
+          setOrbit (diagDynamicalSystem dSystem dSystem) β :=
+            by
+              have applyDiags1 :=
+                Set.mem_image_of_mem ((diagDynamicalSystem dSystem dSystem).map s.1) ys2yInβ
+              have diags1βInβOrbit :
+                (diagDynamicalSystem dSystem dSystem).map s.1 '' β ⊆
+                  setOrbit (diagDynamicalSystem dSystem dSystem) β :=
+                    by
+                      intro xpt hxpt
+                      unfold setOrbit Set.range
+                      simp only
+                      simp only [Set.mem_image] at hxpt
+                      rcases hxpt with ⟨bpt,hbpt1,hbpt2⟩
+                      use ⟨s.1,bpt,hbpt1⟩
+              exact diags1βInβOrbit applyDiags1
+            -- ys2yInβ : ⟨y,dSystem.map s.2 y⟩ in β
+            -- hit with (diagDynamicalSystem dSystem dSystem).map s.1 to see that
+            -- (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ in
+            --- set orbit of β
+      use (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩
+      exact ⟨s1ToPairInU,s1ToPairInOrbit⟩
+  refine ⟨?_, ?_⟩
+  · sorry --finish this with forwardEqualsBackwardRPInMinCommSystem and RPMGoal
+  · exact RPMgoal
 
 end RP_and_corner_dynamics
 
@@ -952,7 +961,7 @@ by
   intro x y z xyInRP yzInRP
   have yzzInOrbitCloszzz :
     (y,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
-      (xyInRPIffxyyInyyyOrbClosure hMin y z).mp yzInRP
+      (xyInRPIffxyyInyyyOrbClosure hMin y z).1.mp yzInRP
   have yyInOrbitCloszz :
     (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
       diagonalOrbitVisits z y
@@ -968,7 +977,7 @@ by
       (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
   have xyyInOrbitClosyyy :
     (x,y,y) ∈ orbitClosure cornerSystem3 (y,y,y) :=
-      (xyInRPIffxyyInyyyOrbClosure hMin x y).mp xyInRP
+      (xyInRPIffxyyInyyyOrbClosure hMin x y).1.mp xyInRP
   have zzInOrbitClosyy :
     (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
       diagonalOrbitVisits y z
@@ -986,7 +995,7 @@ by
     (x,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
       orbitTransitivity (orbitTransitivity (orbitTransitivity
         yzzInOrbitCloszzz yyyInOrbitClosyzz) xyyInOrbitClosyyy) xzzInOrbitClosxyy
-  exact (xyInRPIffxyyInyyyOrbClosure hMin x z).symm.mp xzzInOrbitCloszzz
+  exact (xyInRPIffxyyInyyyOrbClosure hMin x z).1.symm.mp xzzInOrbitCloszzz
 
 /-- The regionally proximal relation of a minimal dynamical system
 is an ICER -/
@@ -998,9 +1007,9 @@ by
   unfold isEquivalenceRelation
   simp only [(equivalenceRelationSetForm (RP dSystem))]
   refine ⟨?_,?_,?_,?_,?_⟩
-  · exact RPisInvariant dSystem
+  · exact RPInCommSemiIsInvariant dSystem
   · exact RPisClosed dSystem
-  · exact RPisReflexiveIfNondegen dSystem (minimalImpliesNondegen hMin)
+  · exact RPisReflexive dSystem
   · exact RPisSymmetric dSystem
   · exact minimalImpliesRPisTransitive hMin
 
@@ -1013,11 +1022,11 @@ by
   ext x
   constructor
   · intro hx
-    exact (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).mp
+    exact (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).2.mp
       (equiStructureRelationIsEquiICER dSystem hMin) hx
   · intro hx
     have RPisEquiICER : isEquicontinuousICER dSystem (RPisICER hMin) :=
-      (minimalICEREquicontinuousIffRPInICER hMin (RPisICER hMin)).symm.mp subset_rfl
+      (minimalICEREquicontinuousIffRPInICER hMin (RPisICER hMin)).2.symm.mp subset_rfl
     have RPinSetOfEquiICERS : RP dSystem ∈ setOfEquicontinuousICERS dSystem := by
       unfold setOfEquicontinuousICERS
       use RPisICER hMin
@@ -1044,7 +1053,7 @@ by
       have yxInRP := (RPisSymmetric dSystem) hxyInRP
       have yxxInOrbClosxxx :
         ⟨y,x,x⟩ ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ :=
-          (xyInRPIffxyyInyyyOrbClosure hMin y x).mp yxInRP
+          (xyInRPIffxyyInyyyOrbClosure hMin y x).1.mp yxInRP
       have yxxIsUR : isUniformlyRecurrent (cornerSystem3 (dSystem := dSystem)) ⟨y,x,x⟩ :=
         inOrbitClosOfURPointImpliesUR (cornerSystem3 (dSystem := dSystem))
           (xxxUniformlyRecurrent hMin x) yxxInOrbClosxxx
