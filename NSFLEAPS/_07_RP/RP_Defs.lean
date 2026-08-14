@@ -1181,22 +1181,3 @@ theorem RPIsStrongSInvariant
   · sorry
 
 end Corollaries
-
-section Natural_extensions
-
--- Under construction
-
-/-- When `X` is both a minimal S and T system and actions commute, `RP_S = RP_T` -/
-theorem forTwoMinCommActionsRPsAreSame
-{T} [CommSemigroup T] [Nonempty T] {dSystemT : DynamicalSystem T X}
-(hMin : isMinimalSystem dSystem) (hMinT : isMinimalSystem dSystemT) :
-∀ (s : S) (t : T), (dSystem.map s) ∘ (dSystemT.map t) = (dSystemT.map t) ∘ (dSystem.map s) →
-  RP dSystem = RP dSystemT := by sorry
-
---def grothendieckGroup := Algebra.GrothendieckGroup (WithOne S)
-
-/- The Grothendieck group of a commutative semigroup S -/
--- theorem theGrothendieckGroupExists :
--- ∃ (G : Type*) [CommGroup G]
-
-end Natural_extensions

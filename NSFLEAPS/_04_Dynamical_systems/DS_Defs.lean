@@ -83,6 +83,22 @@ DynamicalSystem T X :=
   mapCont := fun (t : T) ↦ dSystem.mapCont (φ t)
 }
 
+/-- A dynamical system satisfies `isSurjectiveSystem` if all
+elements of the acting semigroup act by surjections -/
+def isSurjectiveSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :=
+∀ s : S, Function.Surjective (dSystem.map s)
+
+/-- A dynamical system satisfies `homeoSystem` if all
+elements of the acting semigroup act by homeomorphisms -/
+def isHomeoSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :=
+∀ s : S, IsHomeomorph (dSystem.map s)
+
 end Structures
 
 section Invariant_sets
@@ -2844,7 +2860,7 @@ theorem minimalCommActionIsSurjective
 {S} [commSemi : CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
-∀ s : S, Function.Surjective (dSystem.map s) :=
+isSurjectiveSystem dSystem :=
 by
   intro s y
   let sX := (dSystem.map s) '' Set.univ
@@ -5290,7 +5306,7 @@ by
 if the regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivialIfSurjective
 (dSystem : DynamicalSystem S X)
-(hSurject : ∀ (s : S), Function.Surjective (dSystem.map s)) :
+(hSurject : isSurjectiveSystem dSystem) :
 RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by sorry
 
 /-- A dynamical system on `X` is equicontinuous if and only if the
