@@ -3,6 +3,7 @@ import NSFLEAPS._02_Semigroups.SG_Defs
 
 import Mathlib.Topology.UniformSpace.Equicontinuity
 import Mathlib.Topology.UniformSpace.OfCompactT2
+import Mathlib.Topology.Category.TopCat.OpenNhds
 
 /- The following namespace line gives all definitions, theorems, etc... a prefix of `DS.` -/
 -- DGG: I've decided not to use the namespace.  It probably won't be helpful for us.
@@ -4028,11 +4029,15 @@ theorem xyInRPMIffUltraToSomewwxy
     Filter.Tendsto (fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a))
       F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) := by
 let φ := fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a)
+have hφDef : φ = fun (⟨a,s⟩ : (X × X) × S) ↦
+    (a, (diagDynamicalSystem dSystem dSystem).map s a) := by
+    rfl
 constructor
 · intro hAssumption
-  have hMapPrep : ∀ Z ∈ nhds (x, y), ∀ α ∈ nhdsSet (Set.diagonal X), ∃ t : (X × X) × S,
+  rw [<- hφDef]
+  have hMapPrep : ∀ α ∈ nhdsSet (Set.diagonal X), ∀ Z ∈ nhds (x, y), ∃ t : (X × X) × S,
     φ t ∈ α ×ˢ Z := by
-    intro Z hZ α hα
+    intro α hα Z hZ
     have hRP := (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mp hAssumption
     rcases (mem_nhds_iff.mp hZ) with ⟨Z', hZ'1, hZ'2, hZ'3⟩
     rcases (mem_nhdsSet.mp hα) with ⟨α', hα'1, hα'2, hα'3⟩
@@ -4049,12 +4054,43 @@ constructor
     · simp only [φ]
       apply hZ'1
       exact hs
-  choose ψ hψ1 hψ2 using hMapPrep
-  sorry
+  choose ρ hρ1 hρ2 using hMapPrep
+  let P := (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets
+  let le_rel : P → P → Prop := fun ⟨(U1, U2), _⟩ ⟨(V1, V2), _⟩ ↦ V1 ⊆ U1 ∧ V2 ⊆ U2
+  let inst : Preorder P := {
+    le := le_rel
+    lt := fun a b ↦ le_rel a b ∧ ¬ le_rel b a
+    le_refl := fun ⟨(U1, U2), _⟩ ↦ ⟨fun _ hx ↦ hx, fun _ hx ↦ hx⟩
+    le_trans := fun _ _ _ h1 h2 ↦ ⟨fun _ hx ↦ h1.1 (h2.1 hx), fun _ hx ↦ h1.2 (h2.2 hx)⟩
+    lt_iff_le_not_ge := fun _ _ ↦ Iff.rfl
+  }
+  let Q : Filter P := Filter.atTop
+  have hQNeBot : Q.NeBot := by
+    sorry
+  rcases Ultrafilter.exists_le Q with ⟨G, hG⟩
+  let ψ : P → (X × X) × S := fun p ↦ ρ p.1.1 p.2.1 p.1.2 p.2.2
+  let F := Filter.map ψ (Ultrafilter.toFilter G)
+  have hF_neBot : F.NeBot := by
+    sorry
+  have hF_max : ∀ (G : Filter ((X × X) × S)), G.NeBot → G ≤ F → F ≤ G := by
+    sorry
+  let F_ultra : Ultrafilter ((X × X) × S) := ⟨F, hF_neBot, hF_max⟩
+  let q := (Ultrafilter.extend φ) F_ultra
+  have hConv : q ∈ (Set.diagonal X) ×ˢ {x} ×ˢ {y} := by
+    sorry
+  use q.1.1
+  use F_ultra
+  simp only [Set.diagonal, Set.singleton_prod_singleton, Set.mem_prod, Set.mem_setOf_eq,
+    Set.mem_singleton_iff] at hConv
+  rcases hConv with ⟨hConv1, hConv2⟩
+  have hq : (q.1.1, q.1.1) = q.1 := by
+    nth_rw 2 [hConv1]
+  rw [hq, <- hConv2]
+  simp only [Prod.mk.eta]
+  simp only [Filter.Tendsto, ge_iff_le]
+  apply ultrafilter_extend_eq_iff.mp
+  simp [q]
 · intro hAssumption
-  have hφDef : φ = fun (⟨a,s⟩ : (X × X) × S) ↦
-    (a, (diagDynamicalSystem dSystem dSystem).map s a) := by
-    rfl
   rw [<- hφDef] at hAssumption
   apply (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mpr
   intro Z α hZOpen hxy hαOpen hαDiag
