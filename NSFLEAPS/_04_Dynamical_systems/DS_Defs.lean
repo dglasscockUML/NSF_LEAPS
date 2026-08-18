@@ -100,6 +100,15 @@ def isHomeoSystem
 (dSystem : DynamicalSystem S X) :=
 ∀ s : S, IsHomeomorph (dSystem.map s)
 
+/-- A homeo system is a surjective system -/
+theorem homeoSystemIsSurjectiveSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+isSurjectiveSystem dSystem := by
+  intro s
+  exact IsHomeomorph.surjective (hHomeo s)
+
 end Structures
 
 section Invariant_sets
@@ -566,6 +575,18 @@ def isFactorMap
 (π : X → Y) :
 Prop :=
 Continuous π ∧ Function.Surjective π ∧ isEquivariant dSystemX.map dSystemY.map π
+
+/-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
+if it is a equivariant homeomorphism -/
+def isIsomorphism
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
+Prop :=
+IsHomeomorph π ∧ isEquivariant dSystemX.map dSystemY.map π
 
 /-- Given a map f : X → Y, the map relation is the subset of X × X
 consisting of those points (x1,x2) such that f(x1) = f(x2) -/

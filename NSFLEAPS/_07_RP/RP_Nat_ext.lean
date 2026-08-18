@@ -163,3 +163,88 @@ theorem extendedActionRPisActionRP
 {dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
 RP dSystem = RP (groGroupDynamicalSystem hHomeo) :=
 by sorry
+
+
+def natExtSet
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set ((groGroup S) → X) :=
+{ φ : (groGroup S) → X | ∀ (g : groGroup S) (s : S), φ ((groGroupHom s) * g) = dSystem.map s (φ g)}
+
+theorem natExtSetIsCompact
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+IsCompact (natExtSet dSystem) :=
+by sorry
+
+instance
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} :
+CompactSpace ↑(natExtSet dSystem) := isCompact_iff_compactSpace.mp (natExtSetIsCompact dSystem)
+
+theorem natExtSetIsNonempty
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {hSurject : isSurjectiveSystem dSystem} :
+Set.Nonempty (natExtSet dSystem) :=
+by sorry
+
+instance natExtSetIsNonemptyInstance
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {hSurject : isSurjectiveSystem dSystem} :
+Nonempty ↑(natExtSet dSystem) := by sorry
+
+def natExtGroSystem
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+DynamicalSystem (groGroup S) (natExtSet dSystem) :=
+by sorry
+
+def natExtSystem
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+DynamicalSystem S (natExtSet dSystem) :=
+by sorry
+
+def natExtFactorMap
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+natExtSet dSystem → X := fun (φ : natExtSet dSystem) ↦ φ.1 1
+
+theorem natExtFactorMapIsFactorMap
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+isFactorMap (natExtSystem hSurject) dSystem (natExtFactorMap dSystem) :=
+by sorry
+
+
+theorem natExtUniversalProperty
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
+∀ (dSystemV : DynamicalSystem S V),
+∀ (ρ : V → X) (ρIsFactor : isFactorMap dSystemV dSystem ρ) (hHomeoV : isHomeoSystem dSystemV),
+∃ (ξ : V → natExtSet dSystem) (ξIsFactor : isFactorMap dSystemV (natExtSystem hSurject) ξ),
+ρ = (natExtFactorMap dSystem) ∘ ξ := by sorry
+
+
+theorem natExtFactorMapIsIsomIfHomeoAction
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := homeoSystemIsSurjectiveSystem hHomeo)
+isIsomorphism (natExtSystem (homeoSystemIsSurjectiveSystem hHomeo)) dSystem (natExtFactorMap dSystem) :=
+by sorry
