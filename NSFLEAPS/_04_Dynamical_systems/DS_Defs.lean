@@ -4077,6 +4077,8 @@ constructor
       exact hs
   choose ρ hρ1 hρ2 using hMapPrep
   let P := (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets
+  have hPDefined : P = (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets := by
+    rfl
   let le_rel : P → P → Prop := fun ⟨(U1, U2), _⟩ ⟨(V1, V2), _⟩ ↦ V1 ⊆ U1 ∧ V2 ⊆ U2
   let inst : Preorder P := {
     le := le_rel
@@ -4087,7 +4089,67 @@ constructor
   }
   let Q : Filter P := Filter.atTop
   have hQNeBot : Q.NeBot := by
-    sorry
+    unfold Q
+    apply Filter.atTop_neBot_iff.mpr
+    constructor
+    · apply Set.nonempty_iff_univ_nonempty.mpr
+      apply Set.nonempty_def.mpr
+      let A := ((Set.univ : Set X) ×ˢ (Set.univ : Set X), (Set.univ : Set X) ×ˢ (Set.univ : Set X))
+      have hAinP : A ∈ P := by
+        simp only [Set.mem_prod, Filter.mem_sets, P]
+        constructor
+        · simp only [nhdsSet, Filter.mem_sSup, Set.mem_image, Set.mem_diagonal_iff, Prod.exists,
+          exists_eq_left', forall_exists_index, forall_apply_eq_imp_iff]
+          intro a
+          simp only [mem_nhds_iff]
+          use A.1
+          constructor
+          · simp
+          constructor
+          · apply IsOpen.prod
+            · apply isOpen_univ
+            · apply isOpen_univ
+          · simp [A]
+        · apply mem_nhds_iff.mpr
+          use A.2
+          constructor
+          · simp
+          constructor
+          · apply IsOpen.prod
+            · exact isOpen_univ
+            · exact isOpen_univ
+          · simp [A]
+      use ⟨A, hAinP⟩
+      simp
+    · unfold IsDirectedOrder
+      constructor
+      intro a b
+      have hainP : Subtype.val a ∈ P := by
+        simp
+      have hbinP : b ∈ Subtype.val ⁻¹' P := by
+        simp
+      simp [hPDefined] at hainP
+      let c := ((a.1.1 ∩ b.1.1), (a.1.2 ∩ b.1.2))
+      have hcinP : c ∈ P := by
+        simp [P]
+        simp [c]
+        constructor
+        · constructor
+          · sorry
+          · sorry
+        · constructor
+          · sorry
+          · sorry
+      use ⟨c, hcinP⟩
+      constructor
+      · simp only [c]
+        constructor
+        · apply Set.inter_subset_left
+        · apply Set.inter_subset_left
+      · simp only [c]
+        constructor
+        · apply Set.inter_subset_right
+        · apply Set.inter_subset_right
   rcases Ultrafilter.exists_le Q with ⟨G, hG⟩
   let ψ : P → (X × X) × S := fun p ↦ ρ p.1.1 p.2.1 p.1.2 p.2.2
   let F := Filter.map ψ (Ultrafilter.toFilter G)
