@@ -332,32 +332,30 @@ simpa
 
 end Delta_sets
 
+section Bohr_prelims
+
+/-
+theorem hausGroupSuffCondition
+{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T]
+{topSemi : Continuous fun (⟨s,t⟩ : T × T) ↦ s * t}
+{S : Set T} [CompactSpace S] {subSemi : ∀ (s t : T), s ∈ S → t ∈ S → s * t ∈ S} :
+1 ∈ S → (∀ (s : T), s ∈ S → s * s = s → s = 1) →
+-/
+-- IsCompact S ∧ IsT2Space S ∧
+-- formulate: "is compact Hausdorff topological group with identity 1"
+
+
+end Bohr_prelims
+
 
 section Bohr_sets
 
-/-- A set `A ⊆ S` is Bohr_0 if there exists a minimal, equicontinuous
-action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
-a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
 def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
---∃ (n : ℕ), ∃ (X : Type n), 1+1=2
-∃ (X : Type*) (_ : TopologicalSpace X)
-(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(x : X) (U : Set X) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A
-
-def isBohrZerov2
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S)
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem) :
-Prop :=
-∃ (x : X) (U : Set X) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A
-
-/- theorem [Semigroup S] : \exists X : Type*,
-\forall A : Set S, \forall Y : Type*, isBohrZero X A \iff isBohrZero Y A -/
+Prop := ∃ (k : ℕ) (φ : S → (Fin k → UnitAddCircle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) + (φ t)) (U : Set (Fin k → UnitAddCircle))
+  (_ : IsOpen U) (_ : 0 ∈ U),
+  Set.preimage φ U ⊆ A
 
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
 theorem bohrZeroIsMonotone
@@ -366,18 +364,53 @@ theorem bohrZeroIsMonotone
 isBohrZero B := by
 sorry
 
--- The family of Bohr_0 subsets of a semigroup
-/- def bohrZeroFamily
+/-- The family of Bohr_0 subsets of a semigroup -/
+def bohrZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isBohrZero A}
   upward_closed := by
     intro A B hA hAB
     exact bohrZeroIsMonotone hA hAB
-} -/
+}
+
+
+theorem dynamicalBohrZeroCharacterization
+{S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
+isBohrZero A ↔ ∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A :=
+by sorry
+
+/- A set `A ⊆ S` is Bohr_0 if there exists a minimal, equicontinuous
+action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
+a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
+/-
+def isBohrZero_old
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+--∃ (n : ℕ), ∃ (X : Type n), 1+1=2
+∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(x : X) (U : Set X) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A
+-/
+
+/-
+def isBohrZerov2_old
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S)
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem) :
+Prop :=
+∃ (x : X) (U : Set X) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A
+-/
 
 -- The family of Bohr_0 subsets of a semigroup
-def bohrZeroFamily
+/- def bohrZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | ∃ (X : Type*) (_ : TopologicalSpace X)
@@ -389,7 +422,7 @@ visitTimeSet dSystem x U ⊆ A}
     intro A B hA hAB
     exact bohrZeroIsMonotone hA hAB
 }
-
+-/
 
 /-- A set `A ⊆ S` is a set of Bohr recurrence if for all minimal, equicontinuous
 actions of `S` on a compact, Hausdorff space `X`, all points `x ∈ X` and

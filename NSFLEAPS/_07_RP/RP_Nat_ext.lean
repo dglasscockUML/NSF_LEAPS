@@ -218,7 +218,7 @@ def natExtFactorMap
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-natExtSet dSystem → X := fun (φ : natExtSet dSystem) ↦ φ.1 1
+(natExtSet dSystem) → X := fun (φ : natExtSet dSystem) ↦ φ.1 1
 
 theorem natExtFactorMapIsFactorMap
 {S} [CommSemigroup S] [Nonempty S]
@@ -245,6 +245,33 @@ theorem natExtFactorMapIsIsomIfHomeoAction
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
-letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := homeoSystemIsSurjectiveSystem hHomeo)
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := homeoSystemIsSurjectiveSystem hHomeo)
 isIsomorphism (natExtSystem (homeoSystemIsSurjectiveSystem hHomeo)) dSystem (natExtFactorMap dSystem) :=
+by sorry
+
+
+theorem natExtMinimalIffSystemIsMinimal
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=   natExtSetIsNonemptyInstance (hSurject := hSurject)
+isMinimalSystem dSystem ↔ isMinimalSystem (natExtSystem hSurject) :=
+by sorry
+
+-- DGG: This is supposed to be Corollary 6.8.
+-- DGG: Not sure how to formulate this in Lean.  Probably not important.
+-- theorem natExtForMinCommutativeActions
+-- {S} [CommSemigroup S] [Nonempty S]
+-- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+
+theorem pullBackOfRPThruNatExtFactorIsRP
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+Set.preimage (Prod.map (natExtFactorMap dSystem) (natExtFactorMap dSystem)) (RP dSystem) =
+  RP (natExtSystem (minimalCommActionIsSurjective hMin)) :=
 by sorry

@@ -33,6 +33,7 @@ import Mathlib.Topology.Compactification.StoneCech
 import Mathlib.Topology.Algebra.Semigroup
 import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Baire.LocallyCompactRegular
+import Mathlib.Topology.Instances.AddCircle.Real
 
 import Mathlib.Combinatorics.Hindman
 
