@@ -334,6 +334,61 @@ end Delta_sets
 
 section Bohr_prelims
 
+/- ChatGPT helped me write the following -/
+
+theorem existsTwoSidedInvInCompactSubmonoid
+{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
+(S : Submonoid T) (hSComp : IsCompact (S : Set T))
+(hSIdemp : ∀ (x : S), x * x = x → x = 1) :
+∀ (x : S), ∃ (y : S), (x * y = 1) ∧ (y * x = 1) := by sorry
+
+noncomputable
+def invFromCompactSubmonoid
+{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
+(S : Submonoid T) (hSComp : IsCompact (S : Set T))
+(hSIdemp : ∀ (x : S), x * x = x → x = 1) :
+Inv S :=
+{
+  inv x :=
+  Classical.choose
+    (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)
+}
+
+noncomputable
+def groupFromCompactSubmonoid
+{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
+(S : Submonoid T) (hSComp : IsCompact (S : Set T))
+(hSIdemp : ∀ (x : S), x * x = x → x = 1) :
+Group S := by
+letI : Inv S := invFromCompactSubmonoid S hSComp hSIdemp
+exact Group.ofLeftAxioms
+  mul_assoc
+  one_mul
+  (by
+    intro x
+    exact
+      (Classical.choose_spec
+        (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)).2)
+
+theorem groupFromCompactSubmonoidHasContinuousInv
+{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
+(S : Submonoid T) (hSComp : IsCompact (S : Set T))
+(hSIdemp : ∀ (x : S), x * x = x → x = 1) :
+letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
+ContinuousInv S := by sorry
+
+theorem groupFromCompactSubmonoidIsTopologicalGroup
+{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
+(S : Submonoid T) (hSComp : IsCompact (S : Set T))
+(hSIdemp : ∀ (x : S), x * x = x → x = 1) :
+letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
+IsTopologicalGroup S := by sorry
+
+-- def compactCommSubsemiOfCXXIsSubmonoid
+-- {X : Type*} [TopologicalSpace X] [T2Space X] [CompactSpace X]
+-- {S : Subsemigroup }
+
+
 /-
 theorem hausGroupSuffCondition
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T]
@@ -380,9 +435,16 @@ theorem dynamicalBohrZeroCharacterization
 isBohrZero A ↔ ∃ (X : Type*) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : IsOpen U),
+(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (xInU : x ∈ U) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A :=
-by sorry
+by
+  constructor
+  · intro hBZA
+    unfold isBohrZero at hBZA
+    -- X will be type Set (Fin k → UnitAddCircle)
+    -- This type will be in Type, so in Type u_2 ??
+    sorry
+  · sorry
 
 /- A set `A ⊆ S` is Bohr_0 if there exists a minimal, equicontinuous
 action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
