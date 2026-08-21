@@ -3668,7 +3668,26 @@ theorem RPisReflexive
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isReflexive (RP dSystem) := sorry
+isReflexive (RP dSystem) := by
+unfold isReflexive
+unfold Reflexive
+intro x
+unfold setToRelation
+unfold RP
+simp only [Set.mem_iInter]
+intro α hα
+apply subset_closure
+simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+have hsExi : ∃ s : S, True := by
+  simp
+rcases hsExi with ⟨s, hs⟩
+use s
+simp only [diagDynamicalSystem, Prod.map_apply]
+simp only [mem_nhdsSet] at hα
+rcases hα with ⟨u, hu1, hu2, hu3⟩
+apply hu1
+apply hu3
+simp only [Set.mem_diagonal_iff]
 
 
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
