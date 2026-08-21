@@ -3655,7 +3655,13 @@ theorem RPisClosed
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-IsClosed (RP dSystem) := sorry
+IsClosed (RP dSystem) := by
+unfold RP
+apply isClosed_iInter
+intro U
+apply isClosed_iInter
+intro hU
+exact isClosed_closure
 
 /-- If `SX` is dense in `X` (a basic nondegeneracy criterion), then `RP` is reflexive -/
 theorem RPisReflexive
