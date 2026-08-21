@@ -4049,260 +4049,282 @@ theorem xyInRPMIffUltraToSomewwxy
 ⟨x,y⟩ ∈ RPM dSystem ↔ ∃ (w : X) (F : Ultrafilter ((X × X) × S)),
     Filter.Tendsto (fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a))
       F (nhds ⟨⟨w,w⟩,⟨x,y⟩⟩) := by
-sorry
--- let φ := fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a)
--- have hφDef : φ = fun (⟨a,s⟩ : (X × X) × S) ↦
---     (a, (diagDynamicalSystem dSystem dSystem).map s a) := by
---     rfl
--- constructor
--- · intro hAssumption
---   rw [<- hφDef]
---   have hMapPrep : ∀ α ∈ nhdsSet (Set.diagonal X), ∀ Z ∈ nhds (x, y), ∃ t : (X × X) × S,
---     φ t ∈ α ×ˢ Z := by
---     intro α hα Z hZ
---     have hRP := (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mp hAssumption
---     rcases (mem_nhds_iff.mp hZ) with ⟨Z', hZ'1, hZ'2, hZ'3⟩
---     rcases (mem_nhdsSet.mp hα) with ⟨α', hα'1, hα'2, hα'3⟩
---     specialize hRP Z' α' hZ'2 hZ'3 hα'2 hα'3
---     rcases Set.inter_nonempty.mp hRP with ⟨z, hz1, hz2⟩
---     simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz2
---     rcases hz2 with ⟨s, hs⟩
---     use (z, s)
---     simp only [Set.mem_prod]
---     constructor
---     · simp only [φ]
---       apply hα'1
---       exact hz1
---     · simp only [φ]
---       apply hZ'1
---       exact hs
---   choose ρ hρ1 hρ2 using hMapPrep
---   let P := (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets
---   have hPDefined : P = (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets := by
---     rfl
---   let le_rel : P → P → Prop := fun ⟨(U1, U2), _⟩ ⟨(V1, V2), _⟩ ↦ V1 ⊆ U1 ∧ V2 ⊆ U2
---   letI inst : Preorder P := {
---     le := le_rel
---     lt := fun a b ↦ le_rel a b ∧ ¬ le_rel b a
---     le_refl := fun ⟨(U1, U2), _⟩ ↦ ⟨fun _ hx ↦ hx, fun _ hx ↦ hx⟩
---     le_trans := fun _ _ _ h1 h2 ↦ ⟨fun _ hx ↦ h1.1 (h2.1 hx), fun _ hx ↦ h1.2 (h2.2 hx)⟩
---     lt_iff_le_not_ge := fun _ _ ↦ Iff.rfl
---   }
---   have hPdirected : IsDirected P le_rel := by
---     constructor
---     intro a b
---     have hainP : Subtype.val a ∈ P := by
---       simp
---     have hbinP : Subtype.val b ∈ P := by
---       simp
---     let c := ((a.1.1 ∩ b.1.1), (a.1.2 ∩ b.1.2))
---     have hcinP : c ∈ P := by
---       simp only [Set.mem_prod, Filter.mem_sets, P]
---       simp only [Filter.inter_mem_iff, c]
---       constructor
---       · constructor
---         · simp only [hPDefined] at hainP
---           exact hainP.1
---         · exact hbinP.1
---       · constructor
---         · exact hainP.2
---         · exact hbinP.2
---     use ⟨c, hcinP⟩
---     constructor
---     · simp only [c]
---       constructor
---       · apply Set.inter_subset_left
---       · apply Set.inter_subset_left
---     · simp only [c]
---       constructor
---       · apply Set.inter_subset_right
---       · apply Set.inter_subset_right
---   have hPNonempty : Nonempty P := by
---     apply Set.nonempty_iff_univ_nonempty.mpr
---     apply Set.nonempty_def.mpr
---     let A := ((Set.univ : Set X) ×ˢ (Set.univ : Set X), (Set.univ : Set X) ×ˢ (Set.univ : Set X))
---     have hAinP : A ∈ P := by
---       simp only [Set.mem_prod, Filter.mem_sets, P]
---       constructor
---       · simp only [nhdsSet, Filter.mem_sSup, Set.mem_image, Set.mem_diagonal_iff, Prod.exists,
---           exists_eq_left', forall_exists_index, forall_apply_eq_imp_iff]
---         intro a
---         simp only [mem_nhds_iff]
---         use A.1
---         constructor
---         · simp
---         constructor
---         · apply IsOpen.prod
---           · apply isOpen_univ
---           · apply isOpen_univ
---         · simp [A]
---       · apply mem_nhds_iff.mpr
---         use A.2
---         constructor
---         · simp
---         constructor
---         · apply IsOpen.prod
---           · exact isOpen_univ
---           · exact isOpen_univ
---         · simp [A]
---     use ⟨A, hAinP⟩
---     simp
---   let Q : Filter P := Filter.atTop
---   have hQNeBot : Q.NeBot := by
---     unfold Q
---     apply Filter.atTop_neBot_iff.mpr
---     constructor
---     · exact hPNonempty
---     · exact hPdirected
---   rcases Ultrafilter.exists_le Q with ⟨G, hG⟩
---   let ψ : P → (X × X) × S := fun p ↦ ρ p.1.1 p.2.1 p.1.2 p.2.2
---   let F := Ultrafilter.map ψ G
---   let q := (Ultrafilter.extend φ) F
---   have hqDef : (Ultrafilter.extend φ) F = q := by rfl
---   let Z := (Set.diagonal X) ×ˢ {x} ×ˢ {y}
---   have hZDef : Z = (Set.diagonal X) ×ˢ {x} ×ˢ {y} := by rfl
---   have hZClosed : IsClosed Z := by
---     apply IsClosed.prod
---     · apply isClosed_diagonal
---     · apply IsClosed.prod
---       · simp
---       · simp
---   have hMapProp : ∀ b : P, φ (ψ b) ∈ b.1.1 ×ˢ b.1.2 := by
---     intro b
---     have hb11 : b.1.1 ∈ nhdsSet (Set.diagonal X) := by
---       exact b.2.1
---     have hb12 : b.1.2 ∈ nhds (x, y) := by
---       exact b.2.2
---     simp [φ]
---     constructor
---     · simp [ψ]
---       specialize hρ1 b.1.1 hb11 b.1.2 hb12
---       simp [φ] at hρ1
---       exact hρ1
---     · simp [ψ]
---       specialize hρ2 b.1.1 hb11 b.1.2 hb12
---       simp [φ] at hρ2
---       exact hρ2
---   have hConvPre : Filter.map φ F ≤ nhdsSet Z := by
---     sorry
-    -- intro W hW
-    -- have hWEx : ∃ W1 ∈ nhdsSet (Set.diagonal X), ∃ W2 ∈ nhdsSet ({x} ×ˢ {y}), W1 ×ˢ W2 ⊆ W := by
-    --   sorry
-    -- rcases hWEx with ⟨W1, hWa1, W2, hWa2, hWa12⟩
-    -- simp
-    -- simp [F]
-    -- have hinQ : ψ ⁻¹' (φ ⁻¹' W) ∈ Q := by
-      -- sorry
-      -- simp only [Q]
-      -- apply Filter.mem_atTop_sets.mpr
-      -- simp
-      -- have h10 : ψ ⁻¹' (φ ⁻¹' W1 ×ˢ W2) ⊆ ψ ⁻¹' (φ ⁻¹' W) := by
-      --   apply Set.preimage_mono
-      --   apply Set.preimage_mono
-      --   exact hWa12
-      -- have hExistUPrep : ∃ U : P, U ∈ ψ ⁻¹' (φ ⁻¹' W1 ×ˢ W2) := by
-      --   simp
-      --   use W1
-      --   use W2
-      --   have hWinP : (W1, W2) ∈ P := by
-      --     simp [P]
-      --     constructor
-      --     · exact hWa1
-      --     · simp at hWa2
-      --       exact hWa2
-      --   use hWinP
-      --   constructor
-      --   · specialize hMapProp ⟨(W1, W2), hWinP⟩
-      --     exact hMapProp.1
-      --   · specialize hMapProp ⟨(W1, W2), hWinP⟩
-      --     exact hMapProp.2
-      -- have hExistU : ∃ U : P, U ∈ ψ ⁻¹' (φ ⁻¹' W) := by
-      --   rcases hExistUPrep with ⟨U, hU⟩
-      --   use U
-      --   apply h10
-      --   exact hU
-      -- rcases hExistU with ⟨U, hU⟩
-      -- use U.1.1
-      -- use U.1.2
-      -- use U.2
-      -- intro T1 T2 hTa hTb
-      -- simp at hU
-      -- specialize hMapProp ⟨(T1, T2), hTa⟩
-      -- sorry
-    --apply hG hinQ
---   have h_neBot : (Filter.map φ F).NeBot := by
---     have heqUl : Filter.map φ F = Ultrafilter.map φ F := by
---       rfl
---     rw [heqUl]
---     apply Ultrafilter.neBot
---   have hConv : q ∈ (Set.diagonal X) ×ˢ {x} ×ˢ {y} := by
---     have h_lim : Filter.map φ F ≤ nhds q := by
---       simp only [ultrafilter_extend_eq_iff, Ultrafilter.coe_map] at hqDef
---       exact hqDef
---     have hNotDisj : ¬ Disjoint (nhdsSet Z) (nhds q) := by
---       intro h_disj
---       have h_bot : Filter.map φ F ≤ ⊥ := by
---         calc Filter.map φ F ≤  nhdsSet Z ⊓ nhds q := le_inf hConvPre h_lim
---         _ = ⊥ := h_disj.eq_bot
---       have heqbot : Filter.map φ F = ⊥ := by
---         apply eq_bot_iff.mpr h_bot
---       exact h_neBot.ne heqbot
---     simp only [<- hZDef]
---     have hZclosure : closure Z = Z := by
---       exact IsClosed.closure_eq hZClosed
---     rw [<- hZclosure]
---     by_contra hContra
---     have hDisWrong : Disjoint (nhdsSet Z) (nhds q)  := by
---       rw [disjoint_comm]
---       apply disjoint_nhds_nhdsSet.mpr
---       exact hContra
---     exact hNotDisj hDisWrong
---   use q.1.1
---   use F
---   simp only [Set.diagonal, Set.singleton_prod_singleton, Set.mem_prod, Set.mem_setOf_eq,
---     Set.mem_singleton_iff] at hConv
---   rcases hConv with ⟨hConv1, hConv2⟩
---   have hq : (q.1.1, q.1.1) = q.1 := by
---     nth_rw 2 [hConv1]
---   rw [hq, <- hConv2]
---   simp only [Prod.mk.eta]
---   simp only [Filter.Tendsto, ge_iff_le]
---   apply ultrafilter_extend_eq_iff.mp
---   simp [q]
--- · intro hAssumption
---   rw [<- hφDef] at hAssumption
---   apply (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mpr
---   intro Z α hZOpen hxy hαOpen hαDiag
---   simp only [Filter.Tendsto] at hAssumption
---   rcases hAssumption with ⟨w, F, hwF⟩
---   have hNhds : α ×ˢ Z ∈ nhds ((w, w), (x, y)) := by
---     apply prod_mem_nhds
---     · apply mem_nhds_iff.mpr
---       use α
---       constructor
---       · simp
---       constructor
---       · exact hαOpen
---       · apply hαDiag
---         simp
---     · apply mem_nhds_iff.mpr
---       use Z
---   have hPreimage : φ ⁻¹' (α ×ˢ Z) ∈ F := by
---     apply hwF
---     exact hNhds
---   have hNonempty : (φ ⁻¹' (α ×ˢ Z)).Nonempty := by
---     apply Ultrafilter.nonempty_of_mem hPreimage
---   have hExist := Set.nonempty_def.mp hNonempty
---   rcases hExist with ⟨t, ht⟩
---   simp only [Set.mem_preimage, Set.mem_prod] at ht
---   simp only [φ] at ht
---   rcases ht with ⟨ht1, ht2⟩
---   apply Set.inter_nonempty.mpr
---   use t.1
---   constructor
---   · exact ht1
---   · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
---     use t.2
+let φ := fun (⟨a,s⟩ : (X × X) × S) ↦ (a, (diagDynamicalSystem dSystem dSystem).map s a)
+have hφDef : φ = fun (⟨a,s⟩ : (X × X) × S) ↦
+    (a, (diagDynamicalSystem dSystem dSystem).map s a) := by
+    rfl
+constructor
+· intro hAssumption
+  rw [<- hφDef]
+  have hMapPrep : ∀ α ∈ nhdsSet (Set.diagonal X), ∀ Z ∈ nhds (x, y), ∃ t : (X × X) × S,
+    φ t ∈ α ×ˢ Z := by
+    intro α hα Z hZ
+    have hRP := (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mp hAssumption
+    rcases (mem_nhds_iff.mp hZ) with ⟨Z', hZ'1, hZ'2, hZ'3⟩
+    rcases (mem_nhdsSet.mp hα) with ⟨α', hα'1, hα'2, hα'3⟩
+    specialize hRP Z' α' hZ'2 hZ'3 hα'2 hα'3
+    rcases Set.inter_nonempty.mp hRP with ⟨z, hz1, hz2⟩
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz2
+    rcases hz2 with ⟨s, hs⟩
+    use (z, s)
+    simp only [Set.mem_prod]
+    constructor
+    · simp only [φ]
+      apply hα'1
+      exact hz1
+    · simp only [φ]
+      apply hZ'1
+      exact hs
+  choose ρ hρ1 hρ2 using hMapPrep
+  let P := (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets
+  have hPDefined : P = (nhdsSet (Set.diagonal X)).sets ×ˢ (nhds (x, y)).sets := by
+    rfl
+  let le_rel : P → P → Prop := fun ⟨(U1, U2), _⟩ ⟨(V1, V2), _⟩ ↦ V1 ⊆ U1 ∧ V2 ⊆ U2
+  letI inst : Preorder P := {
+    le := le_rel
+    lt := fun a b ↦ le_rel a b ∧ ¬ le_rel b a
+    le_refl := fun ⟨(U1, U2), _⟩ ↦ ⟨fun _ hx ↦ hx, fun _ hx ↦ hx⟩
+    le_trans := fun _ _ _ h1 h2 ↦ ⟨fun _ hx ↦ h1.1 (h2.1 hx), fun _ hx ↦ h1.2 (h2.2 hx)⟩
+    lt_iff_le_not_ge := fun _ _ ↦ Iff.rfl
+  }
+  have hPdirected : IsDirected P le_rel := by
+    constructor
+    intro a b
+    have hainP : Subtype.val a ∈ P := by
+      simp
+    have hbinP : Subtype.val b ∈ P := by
+      simp
+    let c := ((a.1.1 ∩ b.1.1), (a.1.2 ∩ b.1.2))
+    have hcinP : c ∈ P := by
+      simp only [Set.mem_prod, Filter.mem_sets, P]
+      simp only [Filter.inter_mem_iff, c]
+      constructor
+      · constructor
+        · simp only [hPDefined] at hainP
+          exact hainP.1
+        · exact hbinP.1
+      · constructor
+        · exact hainP.2
+        · exact hbinP.2
+    use ⟨c, hcinP⟩
+    constructor
+    · simp only [c]
+      constructor
+      · apply Set.inter_subset_left
+      · apply Set.inter_subset_left
+    · simp only [c]
+      constructor
+      · apply Set.inter_subset_right
+      · apply Set.inter_subset_right
+  have hPNonempty : Nonempty P := by
+    apply Set.nonempty_iff_univ_nonempty.mpr
+    apply Set.nonempty_def.mpr
+    let A := ((Set.univ : Set X) ×ˢ (Set.univ : Set X), (Set.univ : Set X) ×ˢ (Set.univ : Set X))
+    have hAinP : A ∈ P := by
+      simp only [Set.mem_prod, Filter.mem_sets, P]
+      constructor
+      · simp only [nhdsSet, Filter.mem_sSup, Set.mem_image, Set.mem_diagonal_iff, Prod.exists,
+          exists_eq_left', forall_exists_index, forall_apply_eq_imp_iff]
+        intro a
+        simp only [mem_nhds_iff]
+        use A.1
+        constructor
+        · simp
+        constructor
+        · apply IsOpen.prod
+          · apply isOpen_univ
+          · apply isOpen_univ
+        · simp [A]
+      · apply mem_nhds_iff.mpr
+        use A.2
+        constructor
+        · simp
+        constructor
+        · apply IsOpen.prod
+          · exact isOpen_univ
+          · exact isOpen_univ
+        · simp [A]
+    use ⟨A, hAinP⟩
+    simp
+  let Q : Filter P := Filter.atTop
+  have hQNeBot : Q.NeBot := by
+    unfold Q
+    apply Filter.atTop_neBot_iff.mpr
+    constructor
+    · exact hPNonempty
+    · exact hPdirected
+  rcases Ultrafilter.exists_le Q with ⟨G, hG⟩
+  let ψ : P → (X × X) × S := fun p ↦ ρ p.1.1 p.2.1 p.1.2 p.2.2
+  let F := Ultrafilter.map ψ G
+  let q := (Ultrafilter.extend φ) F
+  have hqDef : (Ultrafilter.extend φ) F = q := by rfl
+  let Z := (Set.diagonal X) ×ˢ {x} ×ˢ {y}
+  have hZDef : Z = (Set.diagonal X) ×ˢ {x} ×ˢ {y} := by rfl
+  have hZClosed : IsClosed Z := by
+    apply IsClosed.prod
+    · apply isClosed_diagonal
+    · apply IsClosed.prod
+      · simp
+      · simp
+  have hMapProp : ∀ b : P, φ (ψ b) ∈ b.1.1 ×ˢ b.1.2 := by
+    intro b
+    have hb11 : b.1.1 ∈ nhdsSet (Set.diagonal X) := by
+      exact b.2.1
+    have hb12 : b.1.2 ∈ nhds (x, y) := by
+      exact b.2.2
+    simp only [Set.mem_prod, φ]
+    constructor
+    · simp only [ψ]
+      specialize hρ1 b.1.1 hb11 b.1.2 hb12
+      simp only [φ] at hρ1
+      exact hρ1
+    · simp only [ψ]
+      specialize hρ2 b.1.1 hb11 b.1.2 hb12
+      simp only [φ] at hρ2
+      exact hρ2
+  have hConvPre : Filter.map φ F ≤ nhdsSet Z := by
+    intro W hW
+    have hWEx : ∃ W1 ∈ nhdsSet (Set.diagonal X), ∃ W2 ∈ nhdsSet ({x} ×ˢ {y}), W1 ×ˢ W2 ⊆ W := by
+      have hDiagCompact : IsCompact (Set.diagonal X) := by
+        apply isCompact_diagonal
+      have hxyCompact : IsCompact ({x} ×ˢ {y}) := by
+        simp
+      rw [IsCompact.nhdsSet_prod_eq hDiagCompact hxyCompact] at hW
+      rcases hW with ⟨t1, ht1a, t2, ht2a, ht12⟩
+      simp only [Filter.mem_comap] at ht1a
+      rcases ht1a with ⟨W1, hW1a, hW1b⟩
+      simp only [Set.singleton_prod_singleton, nhdsSet_singleton, Filter.mem_comap] at ht2a
+      rcases ht2a with ⟨W2, hW2a, hW2b⟩
+      use W1
+      constructor
+      · exact hW1a
+      use W2
+      constructor
+      · simp only [Set.singleton_prod_singleton, nhdsSet_singleton]
+        exact hW2a
+      · rw [ht12]
+        simp only [Set.subset_inter_iff]
+        constructor
+        · have hTrans1 : W1 ×ˢ W2 ⊆ Prod.fst ⁻¹' W1 := by
+            intro k hk
+            simp only [Set.mem_preimage]
+            simp only [Set.mem_prod] at hk
+            rcases hk with ⟨hk1, hk2⟩
+            exact hk1
+          exact hTrans1.trans hW1b
+        · have hTrans2 : W1 ×ˢ W2 ⊆ Prod.snd ⁻¹' W2 := by
+            intro k hk
+            simp only [Set.mem_preimage]
+            simp only [Set.mem_prod] at hk
+            rcases hk with ⟨hk1, hk2⟩
+            exact hk2
+          exact hTrans2.trans hW2b
+    rcases hWEx with ⟨W1, hWa1, W2, hWa2, hWa12⟩
+    simp only [Filter.mem_map, Ultrafilter.mem_coe]
+    simp only [Ultrafilter.mem_map, F]
+    have hinQ : ψ ⁻¹' (φ ⁻¹' W) ∈ Q := by
+      simp only [Q]
+      apply Filter.mem_atTop_sets.mpr
+      simp only [ge_iff_le, Set.mem_preimage, Subtype.forall, Prod.forall, Subtype.exists,
+        Prod.exists]
+      have h10 : ψ ⁻¹' (φ ⁻¹' W1 ×ˢ W2) ⊆ ψ ⁻¹' (φ ⁻¹' W) := by
+        apply Set.preimage_mono
+        apply Set.preimage_mono
+        exact hWa12
+      use W1
+      use W2
+      have hWinP : (W1, W2) ∈ P := by
+        simp only [Set.mem_prod, Filter.mem_sets, P]
+        constructor
+        · exact hWa1
+        · simp only [Set.singleton_prod_singleton, nhdsSet_singleton] at hWa2
+          exact hWa2
+      use hWinP
+      intro a b hab1 hab2
+      specialize hMapProp ⟨(a, b), hab1⟩
+      simp only [Set.mem_prod] at hMapProp
+      rcases hMapProp with ⟨hMapProp1, hMapProp2⟩
+      let hin1 := hab2.1 hMapProp1
+      let hin2 := hab2.2 hMapProp2
+      apply hWa12
+      simp only [Set.mem_prod]
+      constructor
+      · exact hin1
+      · exact hin2
+    apply hG hinQ
+  have h_neBot : (Filter.map φ F).NeBot := by
+    have heqUl : Filter.map φ F = Ultrafilter.map φ F := by
+      rfl
+    rw [heqUl]
+    apply Ultrafilter.neBot
+  have hConv : q ∈ (Set.diagonal X) ×ˢ {x} ×ˢ {y} := by
+    have h_lim : Filter.map φ F ≤ nhds q := by
+      simp only [ultrafilter_extend_eq_iff, Ultrafilter.coe_map] at hqDef
+      exact hqDef
+    have hNotDisj : ¬ Disjoint (nhdsSet Z) (nhds q) := by
+      intro h_disj
+      have h_bot : Filter.map φ F ≤ ⊥ := by
+        calc Filter.map φ F ≤  nhdsSet Z ⊓ nhds q := le_inf hConvPre h_lim
+        _ = ⊥ := h_disj.eq_bot
+      have heqbot : Filter.map φ F = ⊥ := by
+        apply eq_bot_iff.mpr h_bot
+      exact h_neBot.ne heqbot
+    simp only [<- hZDef]
+    have hZclosure : closure Z = Z := by
+      exact IsClosed.closure_eq hZClosed
+    rw [<- hZclosure]
+    by_contra hContra
+    have hDisWrong : Disjoint (nhdsSet Z) (nhds q)  := by
+      rw [disjoint_comm]
+      apply disjoint_nhds_nhdsSet.mpr
+      exact hContra
+    exact hNotDisj hDisWrong
+  use q.1.1
+  use F
+  simp only [Set.diagonal, Set.singleton_prod_singleton, Set.mem_prod, Set.mem_setOf_eq,
+    Set.mem_singleton_iff] at hConv
+  rcases hConv with ⟨hConv1, hConv2⟩
+  have hq : (q.1.1, q.1.1) = q.1 := by
+    nth_rw 2 [hConv1]
+  rw [hq, <- hConv2]
+  simp only [Prod.mk.eta]
+  simp only [Filter.Tendsto, ge_iff_le]
+  apply ultrafilter_extend_eq_iff.mp
+  simp [q]
+· intro hAssumption
+  rw [<- hφDef] at hAssumption
+  apply (inRPMiffBackwardUOrbitClosInterNeighDiag dSystem (x, y)).mpr
+  intro Z α hZOpen hxy hαOpen hαDiag
+  simp only [Filter.Tendsto] at hAssumption
+  rcases hAssumption with ⟨w, F, hwF⟩
+  have hNhds : α ×ˢ Z ∈ nhds ((w, w), (x, y)) := by
+    apply prod_mem_nhds
+    · apply mem_nhds_iff.mpr
+      use α
+      constructor
+      · simp
+      constructor
+      · exact hαOpen
+      · apply hαDiag
+        simp
+    · apply mem_nhds_iff.mpr
+      use Z
+  have hPreimage : φ ⁻¹' (α ×ˢ Z) ∈ F := by
+    apply hwF
+    exact hNhds
+  have hNonempty : (φ ⁻¹' (α ×ˢ Z)).Nonempty := by
+    apply Ultrafilter.nonempty_of_mem hPreimage
+  have hExist := Set.nonempty_def.mp hNonempty
+  rcases hExist with ⟨t, ht⟩
+  simp only [Set.mem_preimage, Set.mem_prod] at ht
+  simp only [φ] at ht
+  rcases ht with ⟨ht1, ht2⟩
+  apply Set.inter_nonempty.mpr
+  use t.1
+  constructor
+  · exact ht1
+  · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+    use t.2
 
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RPM_X ⊆ RPM_Y` -/
 theorem imageOfRPMIsInRPM
