@@ -31,14 +31,17 @@ import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Continuous
 import Mathlib.Topology.Compactification.StoneCech
 import Mathlib.Topology.Algebra.Semigroup
+import Mathlib.Topology.Algebra.Group.Defs
 import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.AddCircle.Real
+
 
 import Mathlib.Combinatorics.Hindman
 
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.Group.WithOne.Defs
+import Mathlib.Algebra.Group.MinimalAxioms
 import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.GroupTheory.MonoidLocalization.GrothendieckGroup
