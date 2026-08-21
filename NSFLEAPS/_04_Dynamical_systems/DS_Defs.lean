@@ -3508,7 +3508,139 @@ theorem RPisSymmetric
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isSymmetric (RP dSystem) := sorry
+isSymmetric (RP dSystem) := by
+unfold isSymmetric
+unfold Symmetric
+intro x y hxy
+unfold setToRelation
+unfold setToRelation at hxy
+simp only [RP, Set.mem_iInter]
+simp only [RP, Set.mem_iInter] at hxy
+intro α hα
+let β := α ∩ Prod.swap '' α
+have hProdS : Prod.swap '' α ∈ nhdsSet (Set.diagonal X) := by
+  simp only [mem_nhdsSet, Set.exists_subset_image_iff]
+  simp only [mem_nhdsSet] at hα
+  rcases hα with ⟨u, hu1, hu2, hu3⟩
+  use u
+  constructor
+  · exact hu1
+  constructor
+  · have hEq : Prod.swap '' u = Prod.swap ⁻¹' u := by
+      apply Set.Subset.antisymm_iff.mpr
+      constructor
+      · intro z hz
+        simp only [Set.mem_preimage]
+        simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk] at hz
+        rcases hz with ⟨a, b, hab1, hab2⟩
+        simp only [<- hab2, Prod.swap_prod_mk]
+        exact hab1
+      · intro z hz
+        simp only [Set.mem_preimage] at hz
+        simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk]
+        use z.2
+        use z.1
+        constructor
+        · exact hz
+        · rfl
+    rw [hEq]
+    apply IsOpen.preimage
+    · apply continuous_swap
+    · exact hu2
+  · intro z hz
+    specialize hu3 hz
+    simp at hz
+    simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk]
+    use z.1
+    use z.2
+    constructor
+    · exact hu3
+    · have hzE : z = (z.1, z.2) := by rfl
+      nth_rw 3 [hzE]
+      simp [hz]
+have hβNei : β ∈ nhdsSet (Set.diagonal X) := by
+  rcases (mem_nhdsSet.mp hProdS) with ⟨γ, hγ1, hγ2, hγ3⟩
+  rcases (mem_nhdsSet.mp hα) with ⟨θ, hθ1, hθ2, hθ3⟩
+  simp only [mem_nhdsSet]
+  use θ ∩ γ
+  constructor
+  · unfold β
+    apply Set.inter_subset_inter hθ1 hγ1
+  constructor
+  · apply IsOpen.inter hθ2 hγ2
+  · apply Set.subset_inter_iff.mpr
+    constructor
+    · exact hθ3
+    · exact hγ3
+specialize hxy β hβNei
+have hβSym : β = Prod.swap '' β := by
+  simp only [β]
+  have h1 : Prod.swap '' (α ∩ Prod.swap '' α) =
+    Prod.swap '' α ∩ (Prod.swap '' (Prod.swap '' α)) := by
+    apply Set.image_inter Prod.swap_injective
+  have h2 : (Prod.swap '' (Prod.swap '' α)) = α := by
+    apply Set.Subset.antisymm_iff.mpr
+    constructor
+    · intro z hz
+      simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq,
+        true_and, exists_eq_right] at hz
+      rcases hz with ⟨a, b, hab1, hab2⟩
+      rw [<- hab2]
+      exact hab1
+    · intro z hz
+      simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq,
+        true_and, exists_eq_right]
+      use z.2
+      use z.1
+  rw [h2] at h1
+  rw [h1]
+  apply Set.inter_comm
+have hβProdSwapOrb : Prod.swap '' closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β)
+  ⊆ closure (Prod.swap '' (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β)) := by
+  apply image_closure_subset_closure_image
+  exact continuous_swap
+have hβ1 : Prod.swap '' (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β)
+  ⊆ inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β := by
+  intro z hz
+  simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk] at hz
+  rcases hz with ⟨a, b, hab1, hab2⟩
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hab1
+  rcases hab1 with ⟨s, hs⟩
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+  rw [<- hab2]
+  use s
+  simp only [diagDynamicalSystem, Prod.map_apply]
+  simp only [diagDynamicalSystem, Prod.map_apply] at hs
+  rw [hβSym] at hs
+  simp only [Set.mem_image, Prod.exists, Prod.swap_prod_mk, Prod.mk.injEq, ↓existsAndEq, true_and,
+    exists_eq_right] at hs
+  exact hs
+have hβ2 : closure (Prod.swap '' (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β))
+  ⊆ closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β) := by
+  apply closure_mono
+  exact hβ1
+have hinβ : (y, x) ∈ closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β) := by
+  have hyxProd : (y, x) ∈ Prod.swap ''
+    (closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β)) := by
+    simp only [Prod.swap, Set.mem_image, Prod.mk.injEq, Prod.exists, ↓existsAndEq, true_and,
+      exists_eq_right]
+    exact hxy
+  apply hβ2
+  apply hβProdSwapOrb
+  exact hyxProd
+have hSub : β ⊆ α := by
+  apply Set.inter_subset_left
+have hSubOrb : closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β)
+  ⊆ closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) α) := by
+  apply closure_mono
+  intro z hz
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
+  rcases hz with ⟨s, hs⟩
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+  use s
+  apply hSub hs
+apply hSubOrb
+exact hinβ
 
 /-- The regionally proximal relation is invariant under the diagonal
 action by `S`, provided that `S` is commutative -/
