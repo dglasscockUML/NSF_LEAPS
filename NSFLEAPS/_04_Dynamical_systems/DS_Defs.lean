@@ -1299,6 +1299,17 @@ visitTimeSet (diagDynamicalSystem dSystemX dSystemY) (x,y) (U ×ˢ V) := by
   simpa
 exact subset_antisymm h1 h2
 
+/-- Given a factor map `π : X → Y` of systems, `x ∈ X`, and `V ⊆ Y`,
+`R(x, π⁻¹ V) = R(π x, V)` -/
+theorem visitTimesThruFactorMap
+{dSystemX : DynamicalSystem S X}
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y}
+{π : X → Y}
+(hπFactorMap : isFactorMap dSystemX dSystemY π)
+(x : X) (V : Set Y) :
+visitTimeSet dSystemX x (π ⁻¹' V) = visitTimeSet dSystemY (π x) V := by sorry
+
 end Return_time_sets
 
 

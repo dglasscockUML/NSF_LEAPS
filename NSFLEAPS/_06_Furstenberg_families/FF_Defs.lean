@@ -368,27 +368,84 @@ Family S :=
     exact dcSIsMonotone hA hAB
 }
 
--- DGG: There is difficulty proving the following.  Problem is with the universe
--- level meta-variables.  See note in partial proof.
-/-- A set `A ⊆ S` is a `dcS` set if and only if it contains the times of
-returns of a point to a neighborhood of itself in a minimal `S`-system -/
-theorem dcSCharacterization
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isdcSSet A ↔ ∃ (X : Type*) (_ : TopologicalSpace X)
+/-- If a set `A ⊆ S` is a `dcS` set, then it contains the times of
+returns of a point to a neighborhood of itself in a minimal `S`-system.
+(Note that the compact Hausdorff space `X` has the same type as `S`.) -/
+theorem isdcSSetImpliesVisitsFromCompactHausdorffSpace
+{S : Type u} [Semigroup S] [Nonempty S] (A : Set S) :
+isdcSSet A → ∃ (X : Type u) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
-(x : X) (U : Set X) (xInU : x ∈ U) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A := by sorry
-/-
-  constructor
-  · intro hdcSA
-    obtain ⟨p, hp, U, hU1, hU2, hU3⟩ := hdcSA
-    let X := orbitClosure (ultrafilterSystem S) p
-    use X -- there is a problem here.  X has type "Type u_1" but should have "Type u_2"
-    -- higher level: if S is very complicated, this orbit closure will be, too
-    -- and so if u_2 is small, we won't be able to prove this.
-  · sorry
--/
+(x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A := by
+  intro hdcSA
+  obtain ⟨p, hp, U, hU1, hU2, hU3⟩ := hdcSA
+  let X := orbitClosure (ultrafilterSystem S) p
+  have Xprops := orbitClosureIsNonemptyCompactT2InvariantSubset (ultrafilterSystem S) p
+  use X
+  use inferInstance
+  letI csX : CompactSpace ↑X := isCompact_iff_compactSpace.mp Xprops.2.1
+  use csX
+  use inferInstance
+  letI nonX : Nonempty ↑X := Set.Nonempty.coe_sort Xprops.1
+  use nonX
+  let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) Xprops
+  use dSystem
+  have XisMinSubset := orbitClosureOfURPointIsMinimalSubset
+    (ultrafilterSystem S) ((ultrafilterMinimalIffUnifRec p).mp hp)
+  have dSystemIsMin : isMinimalSystem dSystem :=
+    (minimalSubsetIffMinimalSubsystem (ultrafilterSystem S) Xprops).mp XisMinSubset
+  use dSystemIsMin
+  have pinX : p ∈ X :=
+    URPointBelongsToOrbitClosure (ultrafilterSystem S) ((ultrafilterMinimalIffUnifRec p).mp hp)
+  use ⟨p, pinX⟩
+  let V : Set ↑X := {x : ↑X | x.1 ∈ U}
+  have Vnonempty : V.Nonempty := by
+    use ⟨p, pinX⟩
+    exact hU2
+  use V
+  use by exact hU2
+  have Vopen : IsOpen V := by
+    simpa [V] using hU1.preimage continuous_subtype_val
+  use Vopen
+  have visitInVisit : visitTimeSet dSystem ⟨p, pinX⟩ V ⊆
+    visitTimeSet (ultrafilterSystem S) p U := by
+      intro s hs
+      unfold visitTimeSet at hs
+      unfold visitTimeSet
+      exact Set.mem_preimage.mpr hs
+  exact Set.Subset.trans visitInVisit hU3
+
+/-- If a set `A ⊆ S` contains the times of returns of a point to a
+neighborhood of itself in a minimal `S`-system, then it is a `dcS` set.
+(Note that there are two universe-level metavariables here, one for `S`
+and the other for `X`.) -/
+theorem returnTimesImpliesdcS
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+(∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
+(x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
+  intro hA
+  obtain ⟨X,_,_,_,_,dSystem,hMin,x,U,xInU,Uopen,AhasVisits⟩ := hA
+  let fmap := fun p ↦ (ultraAction dSystem).map p x
+  have uFactorMap : isFactorMap (ultrafilterSystem S) dSystem fmap :=
+    ultraFactorMap dSystem ((minimalIffDenseOrbits dSystem).mp hMin x)
+  obtain ⟨p,hp,pUR⟩ :=liftUniformRecurrentPoint
+    uFactorMap x (minimalImpliesUniformlyRecurrent dSystem (hMin := hMin) x)
+  use p
+  use (ultrafilterMinimalIffUnifRec p).mpr pUR
+  use fmap ⁻¹' U
+  use Continuous.isOpen_preimage uFactorMap.1 U Uopen
+  have fmappinU : fmap p ∈ U := by
+    rw [hp]
+    exact xInU
+  use fmappinU
+  have preimageVisits := visitTimesThruFactorMap uFactorMap p U
+  rw [hp] at preimageVisits
+  rw [preimageVisits]
+  exact AhasVisits
 
 end dcS_sets
 
