@@ -332,6 +332,128 @@ simpa
 
 end Delta_sets
 
+section dcS_sets
+
+/-- A subset `A` of a semigroup `S` is a dcS set (dynamically central syndetic)
+if there exists a minimal ultrafilter `p` and an open set `U ⊆ βS` containing `p`
+such that the times of visits of `p` to `U` is contained in `A` -/
+def isdcSSet
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (p : Ultrafilter S) (_ : isMinimalUltrafilter p),
+∃ (U : Set (Ultrafilter S)) (_ : IsOpen U) (_ : p ∈ U),
+visitTimeSet (ultrafilterSystem S) p U ⊆ A
+
+/-- The property of being a `dcS` set is upward closed -/
+theorem dcSIsMonotone
+{S : Type*} [Semigroup S] [Nonempty S]
+{A B : Set S} (hA : isdcSSet A) (hAB : A ⊆ B) :
+isdcSSet B := by
+obtain ⟨p, hp, U, hU1, hU2, hU3⟩ := hA
+use p
+use hp
+use U
+use hU1
+use hU2
+exact Set.Subset.trans hU3 hAB
+
+/-- The family of `dcS` sets -/
+def dcSFamily
+{S : Type*} [Semigroup S] [Nonempty S] :
+Family S :=
+{
+  sets := {A : Set S | isdcSSet A}
+  upward_closed := by
+    intro A B hA hAB
+    exact dcSIsMonotone hA hAB
+}
+
+-- DGG: There is difficulty proving the following.  Problem is with the universe
+-- level meta-variables.  See note in partial proof.
+/-- A set `A ⊆ S` is a `dcS` set if and only if it contains the times of
+returns of a point to a neighborhood of itself in a minimal `S`-system -/
+theorem dcSCharacterization
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isdcSSet A ↔ ∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
+(x : X) (U : Set X) (xInU : x ∈ U) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A := by sorry
+/-
+  constructor
+  · intro hdcSA
+    obtain ⟨p, hp, U, hU1, hU2, hU3⟩ := hdcSA
+    let X := orbitClosure (ultrafilterSystem S) p
+    use X -- there is a problem here.  X has type "Type u_1" but should have "Type u_2"
+    -- higher level: if S is very complicated, this orbit closure will be, too
+    -- and so if u_2 is small, we won't be able to prove this.
+  · sorry
+-/
+
+end dcS_sets
+
+section central_sets
+
+/-- A subset `A` of a semigroup `S` is a central set if it belongs to a
+minimal idempotent ultrafilter on `S` -/
+def isCentral
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (p : Ultrafilter S) (_ : isMinimalUltrafilter p) (_ : p * p = p), A ∈ p
+
+/-- The property of being a `central` set is upward closed -/
+theorem centralIsMonotone
+{S : Type*} [Semigroup S] [Nonempty S]
+{A B : Set S} (hA : isCentral A) (hAB : A ⊆ B) :
+isCentral B := by
+obtain ⟨p, hp, hip, rest⟩ := hA
+use p
+use hp
+use hip
+exact Filter.mem_of_superset rest hAB
+
+/-- The family of `central` sets -/
+def centralFamily
+{S : Type*} [Semigroup S] [Nonempty S] :
+Family S :=
+{
+  sets := {A : Set S | isCentral A}
+  upward_closed := by
+    intro A B hA hAB
+    exact centralIsMonotone hA hAB
+}
+
+-- DGG: Same universe-level metavariable problem here.  There are two ULMs
+-- in the theorem centralCharacterizations: u_1 (type of S) and u_2 (type of X)
+-- We may be able to prove 1 iff 3 without any such problems.
+/-- The following are equivalent:
+  1. A is central
+  2. A = R(x,U), where x is proximal to an S-uniformly recurrent point in the open set U
+  3. A contains the intersection of a dcS set with a thick set -/
+theorem centralCharacterizations
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+let one := isCentral A
+let two := ∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (x y : X) (hy : isUniformlyRecurrent dSystem y)
+(hprox : proximal dSystem x y) (U : Set X) (yInU : y ∈ U) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A
+let three := ∃ (B : Set S) (_ : isdcSSet B),
+∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A
+(one → two) ∧ (two → three) ∧ (three → one) := by
+  intro one two three
+  refine ⟨?_, ?_, ?_⟩
+  · unfold one two
+    intro hA
+    sorry -- There will be a problem proving this in the way I want.  I want to use
+    -- X = βM_S, but this will be of Type u_1, whereas I need it to be of Type u_2
+  · unfold two three
+    sorry
+  · unfold three one
+    sorry
+
+end central_sets
+
 section Bohr_prelims
 
 /- ChatGPT helped me write the following -/
