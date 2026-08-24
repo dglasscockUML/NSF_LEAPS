@@ -342,3 +342,12 @@ have hUOpen : IsOpen U := by
   apply isOpen_compl_iff.mpr
   exact h1
 use U
+
+/-- If `y ∈ U ⊆ X`, there is `V ⊆ U` and `α ⊆ X^2` containing the diagonal
+such that if `(x,z) ∈ α` and `z ∈ V`, then `x ∈ U` -/
+theorem nbhdOfDiagForcesOtherSetContainment
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+{y : X} {U : Set X} (hyU : y ∈ U) :
+∃ (V : Set X) (_ : IsOpen V) (_ : y ∈ V),
+∃ (α : Set (X × X)) (_ : IsOpen α) (_ : Set.diagonal X ⊆ α),
+∀ (x z : X), ⟨x,z⟩ ∈ α → z ∈ V → x ∈ U := by sorry

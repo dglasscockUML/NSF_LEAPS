@@ -416,17 +416,19 @@ visitTimeSet dSystem x U ⊆ A := by
       exact Set.mem_preimage.mpr hs
   exact Set.Subset.trans visitInVisit hU3
 
-/-- If a set `A ⊆ S` contains the times of returns of a point to a
-neighborhood of itself in a minimal `S`-system, then it is a `dcS` set.
+/-- If a set `A ⊆ S` contains the times of returns of a `UR` point to a
+neighborhood of itself in an `S`-system, then it is a `dcS` set.
 (Note that there are two universe-level metavariables here, one for `S`
 and the other for `X`.) -/
 theorem returnTimesImpliesdcS
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 (∃ (X : Type*) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
-(x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
+(dSystem : DynamicalSystem S X) (x : X) (xUR : isUniformlyRecurrent dSystem x)
+(U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by sorry
+/- Rewrite this proof.  It was originally for minimal systems.  Now I want
+it for UR points.
   intro hA
   obtain ⟨X,_,_,_,_,dSystem,hMin,x,U,xInU,Uopen,AhasVisits⟩ := hA
   let fmap := fun p ↦ (ultraAction dSystem).map p x
@@ -446,6 +448,7 @@ visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
   rw [hp] at preimageVisits
   rw [preimageVisits]
   exact AhasVisits
+-/
 
 end dcS_sets
 
@@ -480,34 +483,61 @@ Family S :=
     exact centralIsMonotone hA hAB
 }
 
--- DGG: Same universe-level metavariable problem here.  There are two ULMs
--- in the theorem centralCharacterizations: u_1 (type of S) and u_2 (type of X)
--- We may be able to prove 1 iff 3 without any such problems.
-/-- The following are equivalent:
+/- The following theorems taken together show that TFAE:
   1. A is central
   2. A = R(x,U), where x is proximal to an S-uniformly recurrent point in the open set U
   3. A contains the intersection of a dcS set with a thick set -/
-theorem centralCharacterizations
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-let one := isCentral A
-let two := ∃ (X : Type*) (_ : TopologicalSpace X)
+
+/-- If `A ⊆ S` is central, then `A = R(x,U)` where `x` is proximal
+to an `S`-uniformly recurrent point in the open set `U` -/
+theorem centralSetsAreVisitsOfPtToProxURPoint
+{S : Type u} [Semigroup S] [Nonempty S] (A : Set S) :
+isCentral A → ∃ (X : Type u) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (x y : X) (hy : isUniformlyRecurrent dSystem y)
 (hprox : proximal dSystem x y) (U : Set X) (yInU : y ∈ U) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A
-let three := ∃ (B : Set S) (_ : isdcSSet B),
-∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A
-(one → two) ∧ (two → three) ∧ (three → one) := by
-  intro one two three
-  refine ⟨?_, ?_, ?_⟩
-  · unfold one two
-    intro hA
-    sorry -- There will be a problem proving this in the way I want.  I want to use
-    -- X = βM_S, but this will be of Type u_1, whereas I need it to be of Type u_2
-  · unfold two three
-    sorry
-  · unfold three one
-    sorry
+visitTimeSet dSystem x U ⊆ A := by sorry
+
+
+/-- If `A = R(x,U)` where `x` is proximal to an `S`-uniformly
+recurrent point in the open set `U`, then `A` contains `dcS` intersect `thick` -/
+theorem visitsOfPtToProxURPointAredcSCapThick
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+(∃ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (x y : X) (_ : isUniformlyRecurrent dSystem y)
+(_ : proximal dSystem x y) (U : Set X) (_ : y ∈ U) (_ : IsOpen U),
+visitTimeSet dSystem x U ⊆ A) → (∃ (B : Set S) (_ : isdcSSet B),
+∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) := by
+  intro hA
+  obtain ⟨X,Xts,Xcs,Xt2,Xnon,dSystem,x,y,yIsUR,xyProx,U,yInU,UIsOpen,visitTimesInA⟩ := hA
+  obtain ⟨V,VIsOpen,yInV,α,αIsOpen,αContainsDiag,VαProp⟩ := nbhdOfDiagForcesOtherSetContainment yInU
+  let yToV := visitTimeSet dSystem y V
+  use yToV
+  have yToVisdcS : isdcSSet yToV := by
+    apply returnTimesImpliesdcS
+    use X, Xts, Xcs, Xt2, Xnon, dSystem, y, yIsUR, V, yInV, VIsOpen
+  use yToVisdcS
+  let xyToα := visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α
+  use xyToα
+  have xyToαThick : isThick xyToα :=
+    proxPairVisitsDiagAlongThickSet dSystem xyProx α αIsOpen αContainsDiag
+  use xyToαThick
+  let xToU := visitTimeSet dSystem x U
+  have visitContainment : yToV ∩ xyToα ⊆ xToU := by
+    intro s ⟨hs1,hs2⟩
+    apply VαProp (dSystem.map s x) (dSystem.map s y)
+    · exact hs2
+    · exact hs1
+  exact Set.Subset.trans visitContainment visitTimesInA
+
+
+/-- Sets of the form `dcS` intersect `thick` are central -/
+theorem dcSCapThickIsCentral
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+(∃ (B : Set S) (_ : isdcSSet B),
+∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) → isCentral A := by sorry
+
 
 end central_sets
 

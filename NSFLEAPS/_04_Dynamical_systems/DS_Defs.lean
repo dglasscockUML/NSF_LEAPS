@@ -3501,6 +3501,15 @@ have h4 :  (π (dSystem.map s x), π (dSystem.map s y))
 rw [h4]
 simpa
 
+/-- A proximal pair `(x,y)` visits every open neighborhood `α` of the
+diagonal in `X^2` along a thick set -/
+theorem proxPairVisitsDiagAlongThickSet
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {x y : X} (hProx : proximal dSystem x y) :
+∀ (α : Set (X × X)) (_ : IsOpen α) (_ : Set.diagonal X ⊆ α),
+isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := sorry
+
 end Proximality
 
 section Regional_proximality_basics
