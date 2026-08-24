@@ -1308,7 +1308,28 @@ theorem visitTimesThruFactorMap
 {π : X → Y}
 (hπFactorMap : isFactorMap dSystemX dSystemY π)
 (x : X) (V : Set Y) :
-visitTimeSet dSystemX x (π ⁻¹' V) = visitTimeSet dSystemY (π x) V := by sorry
+visitTimeSet dSystemX x (π ⁻¹' V) = visitTimeSet dSystemY (π x) V := by
+rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
+unfold isEquivariant at hπ3
+have hComp : ∀ s : S, ∀ x : X, dSystemY.map s (π x) = π (dSystemX.map s x) := by
+  intro s x
+  specialize hπ3 s
+  have hI := congr_fun hπ3 x
+  exact hI
+apply Set.Subset.antisymm_iff.mpr
+constructor
+· intro s hs
+  simp only [visitTimeSet, Set.mem_preimage] at hs
+  simp only [visitTimeSet, Set.mem_preimage]
+  specialize hComp s x
+  simp only [hComp]
+  exact hs
+· intro s hs
+  simp only [visitTimeSet, Set.mem_preimage] at hs
+  simp only [visitTimeSet, Set.mem_preimage]
+  specialize hComp s x
+  simp only [<- hComp]
+  exact hs
 
 end Return_time_sets
 
