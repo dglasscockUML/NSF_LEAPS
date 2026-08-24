@@ -3726,7 +3726,67 @@ theorem RPInCommSemiIsInvariant
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := sorry
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := by
+let dDiag := diagDynamicalSystem dSystem dSystem
+have hdDiagDef : dDiag = diagDynamicalSystem dSystem dSystem := by
+  rfl
+simp only [isInvariantSet]
+intro s
+unfold RP
+simp only [Set.mapsTo_iInter]
+intro α hα
+let β := (dDiag.map s) ⁻¹' α
+have hβ : β ∈ nhdsSet (Set.diagonal X) := by
+  simp only [mem_nhdsSet]
+  simp only [mem_nhdsSet] at hα
+  rcases hα with ⟨u, hu1, hu2, hu3⟩
+  let v := dDiag.map s ⁻¹' u
+  use v
+  constructor
+  · simp only [v, β]
+    apply Set.preimage_mono hu1
+  constructor
+  · apply IsOpen.preimage
+    · exact dDiag.mapCont s
+    · exact hu2
+  · simp only [v]
+    intro z hz
+    simp only [Set.mem_preimage]
+    apply hu3
+    simp only [diagDynamicalSystem, Set.mem_diagonal_iff, Prod.map_fst, Prod.map_snd, dDiag]
+    simp only [Set.mem_diagonal_iff] at hz
+    rw [hz]
+simp only [<- hdDiagDef]
+apply Set.mapsTo_iff_image_subset.mpr
+have hInc : (dDiag.map s) '' (⋂ α ∈ nhdsSet (Set.diagonal X), closure (inverseSetOrbit dDiag α))
+  ⊆ (dDiag.map s) '' (closure (inverseSetOrbit dDiag β)) := by
+  apply Set.image_mono
+  intro t ht
+  simp only [Set.mem_iInter] at ht
+  specialize ht β hβ
+  exact ht
+apply Set.Subset.trans hInc
+have hMov : closure (dDiag.map s '' (inverseSetOrbit dDiag β))
+  = dDiag.map s '' closure (inverseSetOrbit dDiag β) := by
+  rw [imageClosureIsClosureImage]
+  exact dDiag.mapCont s
+rw [<- hMov]
+apply closure_mono
+unfold inverseSetOrbit
+intro t ht
+simp only [Set.mem_iUnion, Set.mem_preimage]
+simp only [Set.mem_image, Set.mem_iUnion, Set.mem_preimage, Prod.exists] at ht
+rcases ht with ⟨a, b, hab1, hab2⟩
+rcases hab1 with ⟨r, hr⟩
+rw [<- hab2]
+use r
+simp only [<- dDiag.mapMult r s]
+have hrs : r * s = s * r := by
+  apply mul_comm
+rw [hrs]
+simp only [dDiag.mapMult]
+simp only [Set.mem_preimage, β] at hr
+exact hr
 
 /-- The regionally proximal relation is closed -/
 theorem RPisClosed
