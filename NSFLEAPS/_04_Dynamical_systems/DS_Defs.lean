@@ -3456,8 +3456,6 @@ unfold proximal
 intro α hα
 let β := (Prod.map π π) ⁻¹' α
 have h1 : β ∈ nhdsSet (Set.diagonal X) := by
-  --unfold nhdsSet
-  --unfold nhdsSet at hα
   rcases hπ with ⟨hπ1, hπ2, hπ3⟩
   simp only [β]
   apply mem_nhdsSet_iff_exists.mpr
@@ -3529,7 +3527,46 @@ theorem proxPairVisitsDiagAlongThickSet
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {x y : X} (hProx : proximal dSystem x y) :
 ∀ (α : Set (X × X)) (_ : IsOpen α) (_ : Set.diagonal X ⊆ α),
-isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := sorry
+isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := by
+let dDiag := diagDynamicalSystem dSystem dSystem
+have hdDiagDef : dDiag = diagDynamicalSystem dSystem dSystem := by
+  rfl
+simp only [isThick, Set.image_subset_iff]
+intro α hαOpen hαDiag F hFFin
+have hFFinType : Finite F := by
+  apply Set.Finite.to_subtype hFFin
+let β := ⋂ f : F, (dDiag.map f) ⁻¹' α
+have hβOpen : IsOpen β := by
+  apply isOpen_iInter_of_finite
+  intro f
+  apply IsOpen.preimage
+  · exact dDiag.mapCont f
+  · exact hαOpen
+have hβDiag : Set.diagonal X ⊆ β := by
+  intro z hz
+  simp only [Set.iInter_coe_set, Set.mem_iInter, Set.mem_preimage, β]
+  intro f hf
+  simp only [diagDynamicalSystem, Prod.map, dDiag]
+  simp only [Set.mem_diagonal_iff] at hz
+  rw [hz]
+  apply hαDiag
+  simp
+have hβNeig : β ∈ nhdsSet (Set.diagonal X) := by
+  simp only [mem_nhdsSet]
+  use β
+unfold proximal at hProx
+specialize hProx β hβNeig
+rcases hProx with ⟨s, hs⟩
+use s
+simp only [visitTimeSet]
+simp only [diagDynamicalSystem, Prod.map_apply]
+intro f hf
+simp only [Set.mem_preimage]
+simp only [Set.iInter_coe_set, Set.mem_iInter, Set.mem_preimage, β] at hs
+specialize hs f hf
+simp only [diagDynamicalSystem, Prod.map_apply, dDiag] at hs
+simp only [dSystem.mapMult]
+exact hs
 
 end Proximality
 
