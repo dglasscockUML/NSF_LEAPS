@@ -4438,8 +4438,6 @@ apply closure_mono
 exact xOrbitInSetOrbit
 -/
 
--- DGG: I updated the statement here to match the paper, but the proof now
--- needs to be updated.
 /-- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures open
 neighborhoods of `(x,y)` intersect the diagonal -/
 theorem inRPMiffBackwardUOrbitClosHitsDiag
@@ -4496,11 +4494,63 @@ constructor
     apply Set.subset_compl_iff_disjoint_right.mp
     simp only [Set.compl_subset_compl, α]
     apply subset_closure
-  have hαNotDisjoint : ¬ Disjoint α (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+  have hαNotDisjoint : ¬ Disjoint α
+    (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
     apply Set.not_disjoint_iff_nonempty_inter.mpr
     exact hUEv
   exact hαNotDisjoint hαInverseInter
-· sorry
+· intro hz
+  simp only [RPM, Set.mem_iInter]
+  intro α hαNeigh
+  simp only [setOrbitClosure]
+  simp only [mem_closure_iff]
+  intro U hUOpen hUz
+  specialize hz U hUOpen hUz
+  let dDiag := diagDynamicalSystem dSystemX dSystemX
+  have hdDiagDef : dDiag = diagDynamicalSystem dSystemX dSystemX := by
+    rfl
+  rw [<- hdDiagDef]
+  rw [<- hdDiagDef] at hz
+  have hαInter : (α ∩ inverseSetOrbit dDiag U).Nonempty := by
+    by_contra hContra
+    have hDisj : Disjoint α (inverseSetOrbit dDiag U) := by
+      simp only [Set.not_nonempty_iff_eq_empty] at hContra
+      simp only [Set.disjoint_iff_inter_eq_empty]
+      exact hContra
+    simp only [mem_nhdsSet] at hαNeigh
+    rcases hαNeigh with ⟨u, hu1, hu2, hu3⟩
+    have hDisj2 : Disjoint u (inverseSetOrbit dDiag U) := by
+      apply Set.disjoint_of_subset_left hu1 hDisj
+    have hSubComp : inverseSetOrbit dDiag U ⊆ uᶜ := by
+      apply Set.subset_compl_iff_disjoint_left.mpr hDisj2
+    have hSubClosed : closure (inverseSetOrbit dDiag U) ⊆ uᶜ := by
+      apply closure_minimal
+      · exact hSubComp
+      · simp only [isClosed_compl_iff]
+        exact hu2
+    have hDisj3 : Disjoint (Set.diagonal X) (closure (inverseSetOrbit dDiag U)) := by
+      apply Set.subset_compl_iff_disjoint_left.mp
+      apply Set.Subset.trans hSubClosed
+      simp only [Set.compl_subset_compl]
+      exact hu3
+    apply Set.not_disjoint_iff_nonempty_inter.mpr at hz
+    exact hz hDisj3
+  simp only [Set.inter_nonempty, Prod.exists]
+  simp only [Set.inter_nonempty, Prod.exists] at hαInter
+  rcases hαInter with ⟨a, b, hab1, hab2⟩
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hab2
+  rcases hab2 with ⟨s, hs⟩
+  use dSystemX.map s a
+  use dSystemX.map s b
+  constructor
+  · exact hs
+  · simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+    use s
+    use a
+    use b
+    constructor
+    · exact hab1
+    · rfl
 
 lemma inRPMiffBackwardUOrbitClosInterNeighDiag
 {S : Type*} [Semigroup S] [Nonempty S]
