@@ -251,6 +251,15 @@ setOrbitClosure dSystem A ⊆ setOrbitClosure dSystem B := by
   apply closure_mono
   exact h1
 
+/-- If A ⊆ B, then S⁻¹ A ⊆ S⁻¹ B -/
+lemma inverseSetOrbitMono
+(dSystem : DynamicalSystem S X) (A : Set X) (B : Set X) (hAB : A ⊆ B) :
+inverseSetOrbit dSystem A ⊆ inverseSetOrbit dSystem B := by
+simp only [inverseSetOrbit, Set.iUnion_subset_iff]
+intro s
+apply Set.subset_iUnion_of_subset s
+apply Set.preimage_mono hAB
+
 /-- When `S` acts on `X`, if `y` is in the orbit closure of `x` and `z` is
 in the orbit closure of `y`, then `z` is in the orbit closure of `x`. -/
 theorem orbitTransitivity
@@ -3827,7 +3836,6 @@ apply hu1
 apply hu3
 simp only [Set.mem_diagonal_iff]
 
-
 /-- For `π : X → Y` a factor map of systems, `(π ⊗ π) RP_X ⊆ RP_Y` -/
 theorem imageOfRPIsInRP
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -3836,8 +3844,80 @@ theorem imageOfRPIsInRP
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 (π : X → Y) {hπ : isFactorMap dSystemX dSystemY π} :
-(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY := by sorry
-
+(Prod.map π π) '' (RP dSystemX) ⊆ RP dSystemY := by
+let dDiagX := diagDynamicalSystem dSystemX dSystemX
+let dDiagY := diagDynamicalSystem dSystemY dSystemY
+have hdDiagXDef : dDiagX = diagDynamicalSystem dSystemX dSystemX := by
+  rfl
+have hdDiagYDef : dDiagY = diagDynamicalSystem dSystemY dSystemY := by
+  rfl
+have hProdCont : Continuous (Prod.map π π) := by
+  rcases hπ with ⟨hπ1, hπ2⟩
+  apply Continuous.prodMap
+  · exact hπ1
+  · exact hπ1
+unfold RP
+rw [<- hdDiagXDef, <- hdDiagYDef]
+simp only [Set.subset_iInter_iff]
+intro β hβ
+let α := (Prod.map π π) ⁻¹' β
+have hαNeigh : α ∈ nhdsSet (Set.diagonal X) := by
+  simp only [mem_nhdsSet]
+  simp only [mem_nhdsSet] at hβ
+  rcases hβ with ⟨u, hu1, hu2, hu3⟩
+  let v := (Prod.map π π) ⁻¹' u
+  use v
+  constructor
+  · apply Set.preimage_mono hu1
+  constructor
+  · apply IsOpen.preimage hProdCont hu2
+  · intro z hz
+    simp only [Set.mem_preimage, Prod.map, v]
+    simp only [Set.mem_diagonal_iff] at hz
+    rw [hz]
+    apply hu3
+    simp only [Set.mem_diagonal_iff]
+have hSub : (Prod.map π π) '' ⋂ γ ∈ nhdsSet (Set.diagonal X), closure (inverseSetOrbit dDiagX γ)
+  ⊆ (Prod.map π π) '' closure (inverseSetOrbit dDiagX α) := by
+  apply Set.image_mono
+  intro z hz
+  simp only [Set.mem_iInter] at hz
+  specialize hz α hαNeigh
+  exact hz
+apply Set.Subset.trans hSub
+rw [imageClosureIsClosureImage hProdCont]
+apply closure_mono
+have hSub2 : Prod.map π π '' inverseSetOrbit dDiagX α
+  ⊆ inverseSetOrbit dDiagY (Prod.map π π '' α) := by
+  intro z hz
+  simp only [Set.mem_image, Prod.exists, Prod.map_apply] at hz
+  rcases hz with ⟨a, b, hab1, hab2⟩
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage, Set.mem_image, Prod.exists,
+    Prod.map_apply]
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hab1
+  rcases hab1 with ⟨s, hs⟩
+  use s
+  use dSystemX.map s a
+  use dSystemX.map s b
+  constructor
+  · exact hs
+  · simp only [<- hab2]
+    rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+    unfold isEquivariant at hπ3
+    specialize hπ3 s
+    simp only [diagDynamicalSystem, Prod.map_apply, Prod.mk.injEq, dDiagY]
+    constructor
+    · have h1a := congr_fun hπ3 a
+      have h1Goal : dSystemY.map s (π a) =  π (dSystemX.map s a) := by
+        exact h1a
+      rw [h1Goal]
+    · have h1b := congr_fun hπ3 b
+      have h2Goal : dSystemY.map s (π b) =  π (dSystemX.map s b) := by
+        exact h1b
+      rw [h2Goal]
+apply Set.Subset.trans hSub2
+apply inverseSetOrbitMono
+simp [α]
 
 /-- A pair `(x,y) ∈ RP` if and only if orbit closure of open
 neighborhoods of `(x,y)` intersect the diagonal -/
