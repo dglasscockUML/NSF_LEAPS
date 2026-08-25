@@ -3926,8 +3926,103 @@ theorem inRPiffForwardUOrbitClosHitsDiag
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X) (z : X × X) :
 z ∈ RP dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.diagonal X ∩
-  setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U).Nonempty := by sorry
-
+  setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U).Nonempty := by
+let dDiag := diagDynamicalSystem dSystemX dSystemX
+have hdDiagDef : dDiag = diagDynamicalSystem dSystemX dSystemX := by
+  rfl
+unfold RP
+rw [<- hdDiagDef]
+constructor
+· intro hz U hUOpen hzU
+  unfold RP at hz
+  by_contra hContra
+  have hDisj : Disjoint (Set.diagonal X) (setOrbitClosure dDiag U) := by
+    by_contra hContraIn
+    simp only [Set.not_disjoint_iff_nonempty_inter] at hContraIn
+    exact hContra hContraIn
+  let α := (setOrbitClosure dDiag U)ᶜ
+  have hαNeigh : α ∈ nhdsSet (Set.diagonal X) := by
+    simp only [mem_nhdsSet]
+    use α
+    constructor
+    · simp only [subset_refl]
+    constructor
+    · apply isClosed_compl_iff.mp
+      simp only [compl_compl, α]
+      apply isClosed_closure
+    · apply Disjoint.subset_compl_right hDisj
+  simp only [Set.mem_iInter] at hz
+  specialize hz α hαNeigh
+  simp only [mem_closure_iff] at hz
+  specialize hz U hUOpen hzU
+  simp only [inverseSetOrbit] at hz
+  have hInter : ((setOrbit dDiag U) ∩ α).Nonempty := by
+    simp only [Set.inter_nonempty, Set.mem_iUnion, Set.mem_preimage, Prod.exists] at hz
+    rcases hz with ⟨a, b, hab1, s, hab2⟩
+    simp only [Set.inter_nonempty, Prod.exists]
+    use dSystemX.map s a
+    use dSystemX.map s b
+    constructor
+    · simp only [setOrbit, diagDynamicalSystem, Set.mem_range, Prod.exists, Subtype.exists,
+      exists_prop, Prod.map_apply, Prod.mk.injEq, dDiag]
+      use s
+      use a
+      use b
+    · exact hab2
+  have hNotInter : Disjoint (setOrbit dDiag U) α := by
+    have hInc : setOrbit dDiag U ⊆ setOrbitClosure dDiag U := by
+      apply subset_closure
+    have hComp : setOrbitClosure dDiag U = αᶜ := by
+      simp [α]
+    rw [hComp] at hInc
+    simp only [Set.subset_compl_iff_disjoint_right] at hInc
+    exact hInc
+  apply Set.not_disjoint_iff_nonempty_inter.mpr at hInter
+  exact hInter hNotInter
+· intro hz
+  simp only [Set.mem_iInter]
+  intro α hα
+  simp only [mem_nhdsSet] at hα
+  rcases hα with ⟨u, hu1, hu2, hu3⟩
+  simp only [mem_closure_iff]
+  intro U hUOpen hUz
+  simp only [inverseSetOrbit]
+  simp only [Set.inter_nonempty, Set.mem_iUnion, Set.mem_preimage, Prod.exists]
+  specialize hz U hUOpen hUz
+  have hαInter : (α ∩ setOrbit dDiag U).Nonempty := by
+    by_contra hContra
+    have hDisj : Disjoint α (setOrbit dDiag U) := by
+      by_contra hContraIn
+      simp only [Set.not_disjoint_iff_nonempty_inter] at hContraIn
+      exact hContra hContraIn
+    have hDisju := Set.disjoint_of_subset_left hu1 hDisj
+    apply Set.subset_compl_iff_disjoint_left.mpr at hDisju
+    have hOrbClos : setOrbitClosure dDiag U ⊆ uᶜ := by
+      unfold setOrbitClosure
+      apply closure_minimal
+      · exact hDisju
+      · simp only [isClosed_compl_iff]
+        exact hu2
+    have hDisjDiag : Disjoint (Set.diagonal X) (setOrbitClosure dDiag U) := by
+      have hDisMore : Disjoint (Set.diagonal X) uᶜ := by
+        simp only [Set.disjoint_compl_right_iff_subset]
+        exact hu3
+      apply Set.disjoint_of_subset_right hOrbClos hDisMore
+    simp only [Set.disjoint_iff_inter_eq_empty] at hDisjDiag
+    simp only [Set.nonempty_iff_ne_empty, ne_eq] at hz
+    exact hz hDisjDiag
+  simp only [Set.inter_nonempty, Prod.exists] at hαInter
+  rcases hαInter with ⟨a, b, hab1, hab2⟩
+  simp only [setOrbit, diagDynamicalSystem, Set.mem_range, Prod.exists, Subtype.exists, exists_prop,
+    Prod.map_apply, Prod.mk.injEq, dDiag] at hab2
+  rcases hab2 with ⟨s, c, d, hcd1, hcd2, hcd3⟩
+  use c
+  use d
+  constructor
+  · exact hcd1
+  · use s
+    simp only [diagDynamicalSystem, Prod.map_apply, hcd2, hcd3, dDiag]
+    exact hab1
 
 /-- The backward regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RPM
