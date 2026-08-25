@@ -424,31 +424,44 @@ theorem returnTimesImpliesdcS
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 (∃ (X : Type*) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (x : X) (xUR : isUniformlyRecurrent dSystem x)
+(dSystem : DynamicalSystem S X) (x : X) (_ : isUniformlyRecurrent dSystem x)
 (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by sorry
-/- Rewrite this proof.  It was originally for minimal systems.  Now I want
-it for UR points.
+visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
   intro hA
-  obtain ⟨X,_,_,_,_,dSystem,hMin,x,U,xInU,Uopen,AhasVisits⟩ := hA
-  let fmap := fun p ↦ (ultraAction dSystem).map p x
-  have uFactorMap : isFactorMap (ultrafilterSystem S) dSystem fmap :=
-    ultraFactorMap dSystem ((minimalIffDenseOrbits dSystem).mp hMin x)
+  obtain ⟨X,_,_,_,_,dSystem,x,xUR,U,xInU,Uopen,AhasVisits⟩ := hA
+  let Z := orbitClosure dSystem x
+  have xInZ := URPointBelongsToOrbitClosure dSystem xUR
+  let V : Set ↑Z := {z : ↑Z | z.1 ∈ U}
+  have Vnonempty : V.Nonempty := by
+    use ⟨x, xInZ⟩
+    exact xInU
+  have Vopen : IsOpen V := by
+    simpa [V] using Uopen.preimage continuous_subtype_val
+  have Zpresystem : isNonemptyCompactT2InvariantSubset dSystem Z :=
+    orbitClosureIsNonemptyCompactT2InvariantSubset dSystem x
+  let dSystemZ := fromNonemptyCompactT2InvariantSubsetToSystem dSystem Zpresystem
+  let _ : Nonempty ↥Z := (fun ⟨x, xInZ⟩ => ⟨⟨x, xInZ⟩⟩) Zpresystem.1
+  let _ : CompactSpace ↥Z := isCompact_iff_compactSpace.mp Zpresystem.2.1
+  have hZmin : isMinimalSystem dSystemZ := (minimalSubsetIffMinimalSubsystem
+    dSystem Zpresystem).mp (orbitClosureOfURPointIsMinimalSubset dSystem xUR)
+  have := (minimalIffDenseOrbits dSystemZ).mp hZmin ⟨x,xInZ⟩
+  let fmap := fun p ↦ (ultraAction dSystemZ).map p ⟨x,xInZ⟩
+  have uFactorMap : isFactorMap (ultrafilterSystem S) dSystemZ fmap :=
+    ultraFactorMap dSystemZ ((minimalIffDenseOrbits dSystemZ).mp hZmin ⟨x,xInZ⟩)
   obtain ⟨p,hp,pUR⟩ :=liftUniformRecurrentPoint
-    uFactorMap x (minimalImpliesUniformlyRecurrent dSystem (hMin := hMin) x)
+    uFactorMap ⟨x,xInZ⟩ (minimalImpliesUniformlyRecurrent dSystemZ (hMin := hZmin) ⟨x,xInZ⟩)
   use p
   use (ultrafilterMinimalIffUnifRec p).mpr pUR
-  use fmap ⁻¹' U
-  use Continuous.isOpen_preimage uFactorMap.1 U Uopen
-  have fmappinU : fmap p ∈ U := by
+  use fmap ⁻¹' V
+  use Continuous.isOpen_preimage uFactorMap.1 V Vopen
+  have fmappinV : fmap p ∈ V := by
     rw [hp]
     exact xInU
-  use fmappinU
-  have preimageVisits := visitTimesThruFactorMap uFactorMap p U
+  use fmappinV
+  have preimageVisits := visitTimesThruFactorMap uFactorMap p V
   rw [hp] at preimageVisits
   rw [preimageVisits]
   exact AhasVisits
--/
 
 end dcS_sets
 
@@ -496,8 +509,43 @@ isCentral A → ∃ (X : Type u) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (x y : X) (hy : isUniformlyRecurrent dSystem y)
 (hprox : proximal dSystem x y) (U : Set X) (yInU : y ∈ U) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A := by sorry
-
+visitTimeSet dSystem x U = A := by
+  intro hA
+  obtain ⟨p,pMin,pIdemp,Ainp⟩ := hA
+  letI : SemigroupHom (WithOne.coe : S → WithOne S) := by sorry
+  let dSystemMS := homDynamicalSystem (WithOne.coe : S → WithOne S) (ultrafilterSystem (WithOne S))
+  let de := (pure : WithOne S → Ultrafilter (WithOne S)) (1 : WithOne S)
+  let pde := (ultraAction dSystemMS).map p de
+  have deProxpde : proximal dSystemMS de pde := pointAndUltraImageAreProximal dSystemMS de pIdemp
+  have pdeIsUR : isUniformlyRecurrent dSystemMS pde :=
+    minUltraImageIsUniformlyRecurrent dSystemMS de pMin
+  let iAbar := {q : Ultrafilter (WithOne S) | WithOne.coe '' A ∈ q}
+  have visitsToiAisA : visitTimeSet dSystemMS de iAbar = A := by
+    ext s
+    calc
+      s ∈ visitTimeSet dSystemMS de iAbar ↔ dSystemMS.map s de ∈ iAbar := by sorry
+      _ ↔ (pure : WithOne S → Ultrafilter (WithOne S)) (WithOne.coe s) ∈ iAbar := by sorry
+      _ ↔ WithOne.coe s ∈ WithOne.coe '' A := by sorry
+      _ ↔ s ∈ A := by sorry
+  have sufficient := visitTimeSetInUltraImpliesUltraActInClosure dSystemMS de iAbar p
+  have iAbarclosed : iAbar = closure iAbar := by sorry
+  have iAbaropen : IsOpen iAbar := by sorry
+  rw [←iAbarclosed] at sufficient
+  have pdeIniAbar : pde ∈ iAbar := by
+    apply sufficient
+    rw [visitsToiAisA]
+    exact Ainp
+  use Ultrafilter (WithOne S)
+  use by infer_instance
+  use by infer_instance
+  use by infer_instance
+  use by infer_instance
+  use dSystemMS
+  use de
+  use pde
+  use pdeIsUR
+  use deProxpde
+  use iAbar
 
 /-- If `A = R(x,U)` where `x` is proximal to an `S`-uniformly
 recurrent point in the open set `U`, then `A` contains `dcS` intersect `thick` -/
