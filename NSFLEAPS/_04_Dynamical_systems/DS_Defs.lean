@@ -5050,42 +5050,6 @@ theorem forwardEqualsBackwardRPInMinCommSystem
 (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
 RP dSystem = RPM dSystem := by sorry
 
---Instead of moveInside, can we not use imageClosureIsClosureImage from TP_Defs?
---This lemma really has nothing to do with commutative semigroups, right?
-/-- For any `s ∈ S`, `s closure U ⊆ closure s U` -/
-lemma moveInside
-{S : Type*} [CommSemigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-(U : Set X) (s : S) :
-(dSystemX.map s) '' closure U ⊆ closure (dSystemX.map s '' U) := by
-intro x hx
-simp only [Set.mem_image] at hx
-rcases hx with ⟨v, hv1, hv2⟩
-apply mem_closure_iff.mpr
-intro W hW1 hW2
-have hNeigh : v ∈ (dSystemX.map s) ⁻¹' W := by
-  simp only [Set.mem_preimage]
-  rw [hv2]
-  exact hW2
-have hPreWOpen : IsOpen ((dSystemX.map s) ⁻¹' W) := by
-  apply IsOpen.preimage
-  · exact dSystemX.mapCont s
-  · exact hW1
-have hGoal : ((dSystemX.map s) ⁻¹' W ∩ U).Nonempty := by
-  apply mem_closure_iff.mp hv1
-  · exact hPreWOpen
-  · exact hNeigh
-let hExist := Set.inter_nonempty.mp hGoal
-rcases hExist with ⟨t, ht1, ht2⟩
-simp only [Set.mem_preimage] at ht1
-apply Set.inter_nonempty.mpr
-use dSystemX.map s t
-constructor
-· exact ht1
-· simp only [Set.mem_image]
-  use t
-
 -- DGG: I updated the statement of the theorem, but now the proof needs to be fixed.
 
 /-- If a point `z ∈ X × X` is in `RPM`, then for every neighborhood `U` of `z`,
@@ -5205,7 +5169,8 @@ have RPMwithInvOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U �
         · exact hab2
       have hMovesIn : (diagDynamicalSystem dSystemX dSystemX).map s '' closure W ⊆
         closure ((diagDynamicalSystem dSystemX dSystemX).map s '' W) := by
-        apply moveInside
+        rw [imageClosureIsClosureImage]
+        exact (diagDynamicalSystem dSystemX dSystemX).mapCont s
       have hMovesIn1 : (diagDynamicalSystem dSystemX dSystemX).map s '' W
         = ⋃ t : S, (diagDynamicalSystem dSystemX dSystemX).map s ''
         (((diagDynamicalSystem dSystemX dSystemX).map (t * s)) ⁻¹' U) := by
