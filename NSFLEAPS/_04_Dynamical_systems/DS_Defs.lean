@@ -1308,7 +1308,28 @@ theorem visitTimesThruFactorMap
 {π : X → Y}
 (hπFactorMap : isFactorMap dSystemX dSystemY π)
 (x : X) (V : Set Y) :
-visitTimeSet dSystemX x (π ⁻¹' V) = visitTimeSet dSystemY (π x) V := by sorry
+visitTimeSet dSystemX x (π ⁻¹' V) = visitTimeSet dSystemY (π x) V := by
+rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
+unfold isEquivariant at hπ3
+have hComp : ∀ s : S, ∀ x : X, dSystemY.map s (π x) = π (dSystemX.map s x) := by
+  intro s x
+  specialize hπ3 s
+  have hI := congr_fun hπ3 x
+  exact hI
+apply Set.Subset.antisymm_iff.mpr
+constructor
+· intro s hs
+  simp only [visitTimeSet, Set.mem_preimage] at hs
+  simp only [visitTimeSet, Set.mem_preimage]
+  specialize hComp s x
+  simp only [hComp]
+  exact hs
+· intro s hs
+  simp only [visitTimeSet, Set.mem_preimage] at hs
+  simp only [visitTimeSet, Set.mem_preimage]
+  specialize hComp s x
+  simp only [<- hComp]
+  exact hs
 
 end Return_time_sets
 
@@ -3435,8 +3456,6 @@ unfold proximal
 intro α hα
 let β := (Prod.map π π) ⁻¹' α
 have h1 : β ∈ nhdsSet (Set.diagonal X) := by
-  --unfold nhdsSet
-  --unfold nhdsSet at hα
   rcases hπ with ⟨hπ1, hπ2, hπ3⟩
   simp only [β]
   apply mem_nhdsSet_iff_exists.mpr
@@ -3508,7 +3527,46 @@ theorem proxPairVisitsDiagAlongThickSet
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {x y : X} (hProx : proximal dSystem x y) :
 ∀ (α : Set (X × X)) (_ : IsOpen α) (_ : Set.diagonal X ⊆ α),
-isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := sorry
+isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := by
+let dDiag := diagDynamicalSystem dSystem dSystem
+have hdDiagDef : dDiag = diagDynamicalSystem dSystem dSystem := by
+  rfl
+simp only [isThick, Set.image_subset_iff]
+intro α hαOpen hαDiag F hFFin
+have hFFinType : Finite F := by
+  apply Set.Finite.to_subtype hFFin
+let β := ⋂ f : F, (dDiag.map f) ⁻¹' α
+have hβOpen : IsOpen β := by
+  apply isOpen_iInter_of_finite
+  intro f
+  apply IsOpen.preimage
+  · exact dDiag.mapCont f
+  · exact hαOpen
+have hβDiag : Set.diagonal X ⊆ β := by
+  intro z hz
+  simp only [Set.iInter_coe_set, Set.mem_iInter, Set.mem_preimage, β]
+  intro f hf
+  simp only [diagDynamicalSystem, Prod.map, dDiag]
+  simp only [Set.mem_diagonal_iff] at hz
+  rw [hz]
+  apply hαDiag
+  simp
+have hβNeig : β ∈ nhdsSet (Set.diagonal X) := by
+  simp only [mem_nhdsSet]
+  use β
+unfold proximal at hProx
+specialize hProx β hβNeig
+rcases hProx with ⟨s, hs⟩
+use s
+simp only [visitTimeSet]
+simp only [diagDynamicalSystem, Prod.map_apply]
+intro f hf
+simp only [Set.mem_preimage]
+simp only [Set.iInter_coe_set, Set.mem_iInter, Set.mem_preimage, β] at hs
+specialize hs f hf
+simp only [diagDynamicalSystem, Prod.map_apply, dDiag] at hs
+simp only [dSystem.mapMult]
+exact hs
 
 end Proximality
 
@@ -3668,7 +3726,67 @@ theorem RPInCommSemiIsInvariant
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
-isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := sorry
+isInvariantSet (diagDynamicalSystem dSystem dSystem) (RP dSystem) := by
+let dDiag := diagDynamicalSystem dSystem dSystem
+have hdDiagDef : dDiag = diagDynamicalSystem dSystem dSystem := by
+  rfl
+simp only [isInvariantSet]
+intro s
+unfold RP
+simp only [Set.mapsTo_iInter]
+intro α hα
+let β := (dDiag.map s) ⁻¹' α
+have hβ : β ∈ nhdsSet (Set.diagonal X) := by
+  simp only [mem_nhdsSet]
+  simp only [mem_nhdsSet] at hα
+  rcases hα with ⟨u, hu1, hu2, hu3⟩
+  let v := dDiag.map s ⁻¹' u
+  use v
+  constructor
+  · simp only [v, β]
+    apply Set.preimage_mono hu1
+  constructor
+  · apply IsOpen.preimage
+    · exact dDiag.mapCont s
+    · exact hu2
+  · simp only [v]
+    intro z hz
+    simp only [Set.mem_preimage]
+    apply hu3
+    simp only [diagDynamicalSystem, Set.mem_diagonal_iff, Prod.map_fst, Prod.map_snd, dDiag]
+    simp only [Set.mem_diagonal_iff] at hz
+    rw [hz]
+simp only [<- hdDiagDef]
+apply Set.mapsTo_iff_image_subset.mpr
+have hInc : (dDiag.map s) '' (⋂ α ∈ nhdsSet (Set.diagonal X), closure (inverseSetOrbit dDiag α))
+  ⊆ (dDiag.map s) '' (closure (inverseSetOrbit dDiag β)) := by
+  apply Set.image_mono
+  intro t ht
+  simp only [Set.mem_iInter] at ht
+  specialize ht β hβ
+  exact ht
+apply Set.Subset.trans hInc
+have hMov : closure (dDiag.map s '' (inverseSetOrbit dDiag β))
+  = dDiag.map s '' closure (inverseSetOrbit dDiag β) := by
+  rw [imageClosureIsClosureImage]
+  exact dDiag.mapCont s
+rw [<- hMov]
+apply closure_mono
+unfold inverseSetOrbit
+intro t ht
+simp only [Set.mem_iUnion, Set.mem_preimage]
+simp only [Set.mem_image, Set.mem_iUnion, Set.mem_preimage, Prod.exists] at ht
+rcases ht with ⟨a, b, hab1, hab2⟩
+rcases hab1 with ⟨r, hr⟩
+rw [<- hab2]
+use r
+simp only [<- dDiag.mapMult r s]
+have hrs : r * s = s * r := by
+  apply mul_comm
+rw [hrs]
+simp only [dDiag.mapMult]
+simp only [Set.mem_preimage, β] at hr
+exact hr
 
 /-- The regionally proximal relation is closed -/
 theorem RPisClosed
