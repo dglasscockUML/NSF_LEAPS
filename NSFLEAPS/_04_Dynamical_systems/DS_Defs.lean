@@ -6423,9 +6423,9 @@ have RPMgoal : isEquicontinuousICER dSystem hI ↔ RPM dSystem ⊆ I := by
     · exact hMin
 refine ⟨?_, ?_⟩
 · exact RPMgoal
-/- The remaining statement can be derived easily from
-forwardEqualsBackwardRPInMinCommSystem and RPMgoal -/
-· sorry
+· rw [forwardEqualsBackwardRPInMinCommSystem dSystem]
+  · exact RPMgoal
+  · exact hMin
 
 end Equicontinuity_and_regional_proximality_with_S_commutative
 
