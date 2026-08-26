@@ -4558,7 +4558,51 @@ lemma inRPMiffBackwardUOrbitClosInterNeighDiag
 (dSystemX : DynamicalSystem S X) (z : X × X) :
 z ∈ RPM dSystemX ↔ ∀ (U α : Set (X × X)), IsOpen U → z ∈ U → IsOpen α → Set.diagonal X ⊆ α → (α ∩
   (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)).Nonempty := by
-sorry
+constructor
+· intro hz
+  have hIm := (inRPMiffBackwardUOrbitClosHitsDiag dSystemX z).mp hz
+  intro U α hUOpen hUz hαOpen hαContDiag
+  specialize hIm U hUOpen hUz
+  by_contra hContra
+  simp only [Set.not_nonempty_iff_eq_empty] at hContra
+  apply Set.disjoint_iff_inter_eq_empty.mpr at hContra
+  apply Set.subset_compl_iff_disjoint_left.mpr at hContra
+  have hClosSub : closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) ⊆ αᶜ := by
+    apply closure_minimal
+    · exact hContra
+    · simp only [isClosed_compl_iff]
+      exact hαOpen
+  have hClosSub2 :  closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
+    ⊆ (Set.diagonal X)ᶜ := by
+    apply Set.Subset.trans hClosSub
+    simp only [Set.compl_subset_compl]
+    exact hαContDiag
+  apply Set.subset_compl_iff_disjoint_left.mp at hClosSub2
+  apply Set.disjoint_iff_inter_eq_empty.mp at hClosSub2
+  apply Set.nonempty_iff_ne_empty.mp at hIm
+  exact hIm hClosSub2
+· intro hz
+  apply (inRPMiffBackwardUOrbitClosHitsDiag dSystemX z).mpr
+  intro U hUOpen hUz
+  specialize hz U
+  by_contra hContra
+  simp only [Set.nonempty_iff_ne_empty, ne_eq, not_not] at hContra
+  let α := (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U))ᶜ
+  have hαOpen : IsOpen α := by
+    simp [α]
+  have hαContDiag : Set.diagonal X ⊆ α := by
+    apply Set.subset_compl_iff_disjoint_right.mpr
+    apply Set.disjoint_iff_inter_eq_empty.mpr
+    exact hContra
+  specialize hz α hUOpen hUz hαOpen hαContDiag
+  have hαEmp : α ∩ (closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)) = ∅ := by
+    simp [α]
+  have hSub : (α ∩ inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
+    ⊆ α ∩ closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+    apply Set.inter_subset_inter_right
+    apply subset_closure
+  have hNew := Set.Nonempty.mono hSub hz
+  simp [α] at hNew
 
 /-- A point `(x,y)` belongs to `RPM` iff there exists `w ∈ X` and an ultrafilter `F` on
 `X × X × S` whose pushforward under `(x,y,s) ↦ (x,y,sx,sy)` limits to `(w,w,x,y)` -/
