@@ -6372,9 +6372,9 @@ have RPMgoal : RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystem
     exact hGoal
 refine ⟨?_, ?_⟩
 · exact RPMgoal
-/- The remaining statement can be derived easily from
-forwardEqualsBackwardRPInMinCommSystem and RPMgoal -/
-· sorry
+· rw [forwardEqualsBackwardRPInMinCommSystem dSystem]
+  · exact RPMgoal
+  · exact hMin
 
 /-- An ICER `I` of a minimal system `X` is equicontinuous iff `RP ⊆ I` -/
 theorem minimalICEREquicontinuousIffRPInICER
