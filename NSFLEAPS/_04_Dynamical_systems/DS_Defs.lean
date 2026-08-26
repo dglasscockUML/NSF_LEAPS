@@ -5389,13 +5389,24 @@ have RPMwithInvOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U �
       apply mem_closure_iff_nhds.mpr
       exact hEveryPoint
     exact hWClosureContDiag.trans hClosureWinZ
-  · sorry -- follows immediately from inRPMiffBackwardUOrbitClosHitsDiag
+  · simp only [inRPMiffBackwardUOrbitClosHitsDiag]
+    intro h1 U hUOpen hUz
+    specialize h1 U hUOpen hUz
+    have hExistx : ∃ x : X, true := by
+      simp only [exists_const]
+    rcases hExistx with ⟨x⟩
+    simp only [Set.inter_nonempty, Set.mem_diagonal_iff, Prod.exists, exists_eq_left']
+    use x
+    apply h1
+    simp only [Set.mem_diagonal_iff]
 refine ⟨?_, ?_, ?_, ?_⟩
 · exact RPMwithInvOrbit
 /- The remaining three statements can be derived easily from forwardBackwardSetOrbClosCoincideInBronsSys,
 forwardEqualsBackwardRPInMinCommSystem, and RPMwithInvOrbit -/
 · sorry
-· sorry
+· rw [forwardEqualsBackwardRPInMinCommSystem]
+  · exact RPMwithInvOrbit
+  · exact hMin
 · sorry
 
 
@@ -5887,9 +5898,13 @@ have goalRPM : RPM dSystemY ⊆ (Prod.map π π) '' (RPM dSystemX) := by
   exact Set.compl_subset_compl.mp hComplement
 refine ⟨?_, ?_⟩
 · exact goalRPM
-/- The remaining statement can be derived easily from
-forwardEqualsBackwardRPInMinCommSystem and goalRPM -/
-· sorry
+· rw [forwardEqualsBackwardRPInMinCommSystem dSystemY]
+  · rw [forwardEqualsBackwardRPInMinCommSystem dSystemX]
+    · exact goalRPM
+    · exact hMin
+  · apply factorOfMinimalIsMinimal hMin
+    unfold isFactor
+    use π
 
 end Regional_proximality_in_min_comm_systems
 
