@@ -221,7 +221,7 @@ instance
 contains a minimal left ideal -/
 theorem thickClosureContainsIdeal
 {S : Type*} [Semigroup S] [Nonempty S]
-(H : Set S) {hH : isThick H} :
+{H : Set S} (hH : isThick H) :
 ∃ (L : Set (Ultrafilter S)),
 isMinLeftIdeal L ∧ L ⊆ closure ((pure : S → Ultrafilter S) '' H) :=
 by sorry
@@ -507,12 +507,15 @@ theorem centralSetsAreVisitsOfPtToProxURPoint
 {S : Type u} [Semigroup S] [Nonempty S] (A : Set S) :
 isCentral A → ∃ (X : Type u) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (x y : X) (hy : isUniformlyRecurrent dSystem y)
-(hprox : proximal dSystem x y) (U : Set X) (yInU : y ∈ U) (_ : IsOpen U),
+(dSystem : DynamicalSystem S X) (x y : X) (_ : isUniformlyRecurrent dSystem y)
+(_ : proximal dSystem x y) (U : Set X) (_ : y ∈ U) (_ : IsOpen U),
 visitTimeSet dSystem x U = A := by
   intro hA
   obtain ⟨p,pMin,pIdemp,Ainp⟩ := hA
-  letI : SemigroupHom (WithOne.coe : S → WithOne S) := by sorry
+  letI : SemigroupHom (WithOne.coe : S → WithOne S) :=
+  {
+    hom_prop := fun s1 s2 ↦ WithOne.coe_mul s1 s2
+  }
   let dSystemMS := homDynamicalSystem (WithOne.coe : S → WithOne S) (ultrafilterSystem (WithOne S))
   let de := (pure : WithOne S → Ultrafilter (WithOne S)) (1 : WithOne S)
   let pde := (ultraAction dSystemMS).map p de
@@ -523,13 +526,21 @@ visitTimeSet dSystem x U = A := by
   have visitsToiAisA : visitTimeSet dSystemMS de iAbar = A := by
     ext s
     calc
-      s ∈ visitTimeSet dSystemMS de iAbar ↔ dSystemMS.map s de ∈ iAbar := by sorry
-      _ ↔ (pure : WithOne S → Ultrafilter (WithOne S)) (WithOne.coe s) ∈ iAbar := by sorry
-      _ ↔ WithOne.coe s ∈ WithOne.coe '' A := by sorry
-      _ ↔ s ∈ A := by sorry
+      s ∈ visitTimeSet dSystemMS de iAbar ↔ dSystemMS.map s de ∈ iAbar := Eq.to_iff rfl
+      _ ↔ (pure : WithOne S → Ultrafilter (WithOne S)) (WithOne.coe s) ∈ iAbar := by
+        have : dSystemMS.map s de = pure ↑s := by
+          unfold de dSystemMS
+          exact Ultrafilter.eq_of_le fun ⦃U⦄ a ↦ a
+        rw [this]
+      _ ↔ WithOne.coe s ∈ WithOne.coe '' A := by
+        unfold iAbar
+        exact Set.MapsTo.mem_iff (fun ⦃x⦄ a ↦ a) fun ⦃x⦄ a ↦ a
+      _ ↔ s ∈ A := Function.Injective.mem_set_image WithOne.coe_injective
   have sufficient := visitTimeSetInUltraImpliesUltraActInClosure dSystemMS de iAbar p
-  have iAbarclosed : iAbar = closure iAbar := by sorry
-  have iAbaropen : IsOpen iAbar := by sorry
+  have iAbarclosed : iAbar = closure iAbar := by
+    have := ultrafilter_isClosed_basic (WithOne.coe '' A)
+    exact (closure_eq_iff_isClosed.mpr this).symm
+  have iAbaropen : IsOpen iAbar := ultrafilter_isOpen_basic (WithOne.coe '' A)
   rw [←iAbarclosed] at sufficient
   have pdeIniAbar : pde ∈ iAbar := by
     apply sufficient
@@ -555,10 +566,10 @@ theorem visitsOfPtToProxURPointAredcSCapThick
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (x y : X) (_ : isUniformlyRecurrent dSystem y)
 (_ : proximal dSystem x y) (U : Set X) (_ : y ∈ U) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A) → (∃ (B : Set S) (_ : isdcSSet B),
+visitTimeSet dSystem x U = A) → (∃ (B : Set S) (_ : isdcSSet B),
 ∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) := by
   intro hA
-  obtain ⟨X,Xts,Xcs,Xt2,Xnon,dSystem,x,y,yIsUR,xyProx,U,yInU,UIsOpen,visitTimesInA⟩ := hA
+  obtain ⟨X,Xts,Xcs,Xt2,Xnon,dSystem,x,y,yIsUR,xyProx,U,yInU,UIsOpen,visitTimesIsA⟩ := hA
   obtain ⟨V,VIsOpen,yInV,α,αIsOpen,αContainsDiag,VαProp⟩ := nbhdOfDiagForcesOtherSetContainment yInU
   let yToV := visitTimeSet dSystem y V
   use yToV
@@ -577,14 +588,66 @@ visitTimeSet dSystem x U ⊆ A) → (∃ (B : Set S) (_ : isdcSSet B),
     apply VαProp (dSystem.map s x) (dSystem.map s y)
     · exact hs2
     · exact hs1
-  exact Set.Subset.trans visitContainment visitTimesInA
+  rw [←visitTimesIsA]
+  exact visitContainment
+
+/-- A `dcS` subset of `S` belongs to a syndetic, idempotent filter on `S` -/
+lemma dcSBelongsToSyndeticIdempotentFilter
+{S : Type*} [Semigroup S] [Nonempty S] {A : Set S} (hA : isdcSSet A) :
+∃ (F : Set (Set S)) (_ : F.Nonempty)
+(_ : ∀ (A B : Set S), A ∈ F → B ∈ F → A ∩ B ∈ F)
+(_ : ∀ (A B : Set S), A ∈ F → A ⊆ B → B ∈ F)
+(_ : ∀ (A : Set S), A ∈ F → isSyndetic A)
+(_ : ∀ (A : Set S), A ∈ F → {s : S | (s * ·) ⁻¹' A ∈ F} ∈ F),
+A ∈ F := by sorry
 
 
 /-- Sets of the form `dcS` intersect `thick` are central -/
 theorem dcSCapThickIsCentral
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 (∃ (B : Set S) (_ : isdcSSet B),
-∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) → isCentral A := by sorry
+∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) → isCentral A := by
+  intro iA
+  obtain ⟨B,BisdcS,H,HisThick,BcapHinA⟩ := iA
+  obtain ⟨F,FNonempty,FFilter,FUpclosed,Fsyndetic,Fidemp,BinF⟩ :=
+    dcSBelongsToSyndeticIdempotentFilter BisdcS
+  let Fclos := ⋂ (A ∈ F), {p : Ultrafilter S | A ∈ p}
+  have FclosClosed : IsClosed Fclos := by
+    refine isClosed_biInter ?_
+    intro A hA
+    exact ultrafilter_isClosed_basic A
+  have FclosCompact : IsCompact Fclos := IsClosed.isCompact FclosClosed
+  have Fsubsemi : isSubsemigroup Fclos := by
+    intro p hp q hq
+    unfold Fclos
+    apply Set.mem_iInter.mpr
+    intro A hA hA2
+    simp only [Set.mem_range, exists_prop] at hA2
+    rw [←hA2.2]
+    specialize Fidemp A hA2.1
+    apply (ultraProductDescription p q A).mpr
+    have : ∀ (s : S), (fun x ↦ s * x) ⁻¹' A ∈ F → (fun x ↦ s * x) ⁻¹' A ∈ q := by
+      intro s hs
+      unfold Fclos at hq
+      have := Set.mem_iInter.mp hq ((fun x ↦ s * x) ⁻¹' A)
+      have := Set.mem_iInter.mp this hs
+      exact this
+    have h9 : {s | (fun x ↦ s * x) ⁻¹' A ∈ F} ⊆ {s | (fun x ↦ s * x) ⁻¹' A ∈ q} := by
+      exact Set.setOf_subset_setOf_of_imp this
+    have h10 : {s | (fun x ↦ s * x) ⁻¹' A ∈ q} ∈ F := FUpclosed
+      {s | (fun x ↦ s * x) ⁻¹' A ∈ F} {s | (fun x ↦ s * x) ⁻¹' A ∈ q} Fidemp h9
+    have := Set.mem_iInter.mp hp {s | (fun x ↦ s * x) ⁻¹' A ∈ q}
+    exact Set.mem_iInter.mp this h10
+  obtain ⟨L,LminIdeal,LinHclos⟩ := thickClosureContainsIdeal HisThick
+  let FcapL := Fclos ∩ L
+  have FcapLnonempety : FcapL.Nonempty := by sorry
+  have FcapLcompact : IsCompact FcapL := by sorry
+  have FcapLsubsemi: isSubsemigroup FcapL := by sorry
+  obtain ⟨p,pInFcapL,pIdemp⟩ := compactSubsemigroupContainsIdempotent FcapL
+    (hTsemi := FcapLsubsemi) (hTcompact := FcapLcompact) (hTnonempty := FcapLnonempety)
+  have Ainp : A ∈ p := by sorry
+  have pMin : isMinimalUltrafilter p := by sorry
+  use p, pMin, pIdemp
 
 
 end central_sets
