@@ -5142,7 +5142,113 @@ theorem forwardEqualsBackwardRPInMinCommSystem
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
-RP dSystem = RPM dSystem := by sorry
+RP dSystem = RPM dSystem := by
+simp only [Set.Subset.antisymm_iff]
+constructor
+· intro z hz
+  simp only [inRPiffForwardUOrbitClosHitsDiag] at hz
+  simp only [inRPMiffBackwardUOrbitClosHitsDiag]
+  intro U hUOpen hUz
+  specialize hz U hUOpen hUz
+  have hEq : setOrbitClosure (diagDynamicalSystem dSystem dSystem) U
+    = closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U) := by
+    have hEq0 : (setOrbit (diagDynamicalSystem dSystem dSystem) U)
+      = (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U) := by
+      apply Set.Subset.antisymm_iff.mpr
+      constructor
+      · intro z hz
+        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
+        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_image, Prod.exists]
+        rcases hz with ⟨s, a, b, hab1, hab2⟩
+        use s
+        use a
+        use b
+      · intro z hz
+        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_image, Prod.exists] at hz
+        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+        rcases hz with ⟨s, a, b, hab1, hab2⟩
+        use s
+        use a
+        use b
+    have hEq1 : inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U
+      = inverseSetOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U := by
+      simp only [Set.Subset.antisymm_iff]
+      constructor
+      · intro z hz
+        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_preimage]
+        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
+        rcases hz with ⟨s, hs⟩
+        use s
+      · intro z hz
+        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_preimage] at hz
+        rcases hz with ⟨s, hs⟩
+        use s
+    unfold setOrbitClosure
+    rw [hEq0, hEq1]
+    apply forwardBackwardSetOrbClosCoincideInBronsSys dSystem
+    · apply inMinCommSystemURPairsDense hMin
+    · simp only [isThick, Set.subset_univ, exists_const, implies_true]
+    · simp only [isThick, Set.subset_univ, exists_const, implies_true]
+    · exact hUOpen
+  rw [<- hEq]
+  exact hz
+· intro z hz
+  simp only [inRPiffForwardUOrbitClosHitsDiag]
+  simp only [inRPMiffBackwardUOrbitClosHitsDiag] at hz
+  intro U hUOpen hUz
+  specialize hz U hUOpen hUz
+  have hEq : setOrbitClosure (diagDynamicalSystem dSystem dSystem) U
+    = closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U) := by
+    have hEq0 : setOrbit (diagDynamicalSystem dSystem dSystem) U
+      = setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U := by
+      apply Set.Subset.antisymm_iff.mpr
+      constructor
+      · intro z hz
+        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
+        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_image, Prod.exists]
+        rcases hz with ⟨s, a, b, hab1, hab2⟩
+        use s
+        use a
+        use b
+      · intro z hz
+        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_image, Prod.exists] at hz
+        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+        rcases hz with ⟨s, a, b, hab1, hab2⟩
+        use s
+        use a
+        use b
+    have hEq1 : inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U
+      = inverseSetOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U := by
+      simp only [Set.Subset.antisymm_iff]
+      constructor
+      · intro z hz
+        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_preimage]
+        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
+        rcases hz with ⟨s, hs⟩
+        use s
+      · intro z hz
+        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+          Set.mem_iUnion, Set.mem_preimage] at hz
+        rcases hz with ⟨s, hs⟩
+        use s
+    unfold setOrbitClosure
+    rw [hEq0, hEq1]
+    apply forwardBackwardSetOrbClosCoincideInBronsSys dSystem
+    · apply inMinCommSystemURPairsDense hMin
+    · simp only [isThick, Set.subset_univ, exists_const, implies_true]
+    · simp only [isThick, Set.subset_univ, exists_const, implies_true]
+    · exact hUOpen
+  rw [hEq]
+  exact hz
 
 -- DGG: I updated the statement of the theorem, but now the proof needs to be fixed.
 
