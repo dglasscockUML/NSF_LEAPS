@@ -217,13 +217,22 @@ instance
 {S : Type*} [Semigroup S] : Semigroup (Ultrafilter S) :=
   Ultrafilter.semigroup
 
-/-- The ultrafilter closure of a thick subset of a semigroup
+/-- The closure in `βS` of a thick subset of a semigroup `S`
 contains a minimal left ideal -/
 theorem thickClosureContainsIdeal
 {S : Type*} [Semigroup S] [Nonempty S]
 {H : Set S} (hH : isThick H) :
 ∃ (L : Set (Ultrafilter S)),
 isMinLeftIdeal L ∧ L ⊆ closure ((pure : S → Ultrafilter S) '' H) :=
+by sorry
+
+/-- The closure in `βS` of a syndetic subset of a semigroup `S`
+has non-empty intersection with every left ideal -/
+theorem syndeticClosureMeetsEveryIdeal
+{S : Type*} [Semigroup S] [Nonempty S]
+{A : Set S} (hA : isSyndetic A) :
+∀ (L : Set (Ultrafilter S)),
+isLeftIdeal L → (L ∩ closure ((pure : S → Ultrafilter S) '' A)).Nonempty :=
 by sorry
 
 /-- If `H ⊆ S` is thick, there exists a minimal idempotent `p ∈ βS` such that
@@ -640,13 +649,110 @@ theorem dcSCapThickIsCentral
     exact Set.mem_iInter.mp this h10
   obtain ⟨L,LminIdeal,LinHclos⟩ := thickClosureContainsIdeal HisThick
   let FcapL := Fclos ∩ L
-  have FcapLnonempety : FcapL.Nonempty := by sorry
-  have FcapLcompact : IsCompact FcapL := by sorry
-  have FcapLsubsemi: isSubsemigroup FcapL := by sorry
+  let FcapL2 := L ∩ Fclos
+  have FcapL2nonempety : FcapL2.Nonempty := by
+    unfold FcapL2 Fclos
+    apply IsCompact.inter_iInter_nonempty
+    · exact minimalLeftIdealCompact LminIdeal
+    · intro A
+      refine isClosed_iInter ?_
+      intro AinF
+      exact ultrafilter_isClosed_basic A
+    · intro FiniteSubsetS
+      let C := ⋂ i ∈ FiniteSubsetS, ⋂ (_ : i ∈ F), i
+      let filterF : Filter S :=
+      {
+        sets := F
+        univ_sets := by -- F is nonempty together with upclosed.
+          obtain ⟨a,ha⟩ := FNonempty
+          exact FUpclosed a Set.univ ha (Set.subset_univ a)
+        sets_of_superset := by --FUpclosed
+          intro x y hx hxy
+          exact FUpclosed x y hx hxy
+        inter_sets := by -- FFilter
+          intro x y hx hy
+          exact FFilter x y hx hy
+      }
+      have CinF : C ∈ F := by
+        apply (Filter.mem_sets (f := filterF)).mpr
+        unfold C
+        refine (Filter.biInter_finset_mem (f := filterF) FiniteSubsetS).2 ?_
+        intro i hi
+        refine (Filter.iInter_mem (f := filterF)).2 ?_
+        intro hiF
+        apply Filter.mem_sets.mp
+        exact hiF
+      have hC : {p | C ∈ p} ⊆ -- NOTE: THIS IS AN EQUALITY BUT REVERSE IS NOT NEEDED AND IS ANNOYING
+        ⋂ i ∈ FiniteSubsetS, ⋂ (_ : i ∈ F), {p : Ultrafilter S | i ∈ p} := by
+          intro p
+          simp only [Set.mem_iInter, Set.mem_setOf_eq]
+          intro hp G hG GinF
+          have : ⋂ i ∈ FiniteSubsetS, ⋂ (_ : i ∈ F), i ⊆ G := by
+            apply Set.iInter_subset_of_subset G
+            exact
+              Set.iInter₂_subset_of_subset hG (FUpclosed G G GinF fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦
+                a_1
+          exact Filter.mem_of_superset hp this
+      have : isSyndetic C := Fsyndetic C CinF
+      have hsubset : (L ∩ {p | C ∈ p}) ⊆
+        (L ∩ ⋂ i ∈ FiniteSubsetS, ⋂ (_ : i ∈ F), {p | i ∈ p}) := by
+          exact Set.inter_subset_inter (fun ⦃a⦄ a_1 ↦ a_1) hC
+      apply Set.Nonempty.mono (ht := hsubset)
+      have rwclospure :
+        closure ((pure : S → Ultrafilter S) '' C) = {p | C ∈ p} := by
+          rw [superset_antisymm_iff]
+          constructor
+          · intro p hp
+            rw [TopologicalSpace.IsTopologicalBasis.mem_closure_iff ultrafilterBasis_is_basis]
+            intro U hU pinU
+            obtain ⟨E,hE⟩ := hU
+            have CcapEinp : C ∩ E ∈ p := by
+              rw [←hE] at pinU
+              simp only [Set.mem_setOf_eq] at pinU
+              simp only [Set.mem_setOf_eq] at hp
+              exact Filter.inter_mem hp pinU
+            obtain ⟨t,htC,htE⟩ := Ultrafilter.nonempty_of_mem CcapEinp
+            have ptinU : pure t ∈ U := by
+              rw [←hE]
+              exact Set.mem_setOf.mpr htE
+            have ptinC : pure t ∈ (pure : S → Ultrafilter S) '' C := by
+              exact Set.mem_image_of_mem pure htC
+            use pure t
+            exact ⟨ptinU,ptinC⟩
+          · apply closure_minimal
+            · intro d hd
+              obtain ⟨s,hs1,hs2⟩ := hd
+              exact Set.mem_of_eq_of_mem (id (Eq.symm hs2)) hs1
+            · exact ultrafilter_isClosed_basic C
+      rw [←rwclospure]
+      exact syndeticClosureMeetsEveryIdeal this L LminIdeal.1
+  have FcapLnonempty : FcapL.Nonempty := Set.inter_nonempty_iff_exists_right.mpr FcapL2nonempety
+  have FcapLcompact : IsCompact FcapL := by
+    have := minimalLeftIdealCompact LminIdeal
+    exact IsCompact.inter_left this FclosClosed
+  have FcapLsubsemi: isSubsemigroup FcapL := by
+    intro p hp q hq
+    refine ⟨?_,?_⟩
+    · exact Fsubsemi p hp.1 q hq.1
+    · have := LminIdeal.1.2 p
+      apply this
+      exact Set.mem_image_of_mem (fun x ↦ p * x) hq.2
   obtain ⟨p,pInFcapL,pIdemp⟩ := compactSubsemigroupContainsIdempotent FcapL
-    (hTsemi := FcapLsubsemi) (hTcompact := FcapLcompact) (hTnonempty := FcapLnonempety)
-  have Ainp : A ∈ p := by sorry
-  have pMin : isMinimalUltrafilter p := by sorry
+    (hTsemi := FcapLsubsemi) (hTcompact := FcapLcompact) (hTnonempty := FcapLnonempty)
+  have BcapHinp : B ∩ H ∈ p := by
+    have := Set.mem_iInter.mp pInFcapL.1 B
+    have BinP := Set.mem_iInter.mp this BinF
+    have pinHclos : p ∈ closure (pure '' H) := LinHclos pInFcapL.2
+    have HinP : H ∈ p := by
+      exact (memClosurePureIff H p).mp pinHclos
+    exact Filter.inter_mem BinP HinP
+  have Ainp : A ∈ p := by
+    exact Filter.mem_of_superset BcapHinp BcapHinA
+  have pMin : isMinimalUltrafilter p := by
+    use L
+    constructor
+    · exact LminIdeal
+    · exact pInFcapL.2
   use p, pMin, pIdemp
 
 
