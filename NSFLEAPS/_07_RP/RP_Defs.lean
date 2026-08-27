@@ -913,8 +913,8 @@ by
           by
             unfold UβSlice cornerSystem3 leftMap3 rightMap3 at hs
             simp only at hs
-            simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq, Prod.exists,
-              ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
+            simp only [Equiv.prodAssoc_apply, Set.mem_image, Set.mem_prod, Prod.mk.injEq,
+              Prod.exists, ↓existsAndEq, and_true, exists_eq_right_right, exists_eq_right] at hs
             rcases hs with ⟨hs1,hs2⟩
             unfold diagDynamicalSystem Prod.map
             simp only
@@ -943,7 +943,9 @@ by
       use (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩
       exact ⟨s1ToPairInU,s1ToPairInOrbit⟩
   refine ⟨?_, ?_⟩
-  · sorry --finish this with forwardEqualsBackwardRPInMinCommSystem and RPMGoal
+  · rw [forwardEqualsBackwardRPInMinCommSystem]
+    · exact RPMgoal
+    · exact hMin
   · exact RPMgoal
 
 end RP_and_corner_dynamics
@@ -1156,17 +1158,28 @@ isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)) := by
     exact syndeticIsMonotone imageOfVisitsIsSyndetic imageOfVisitsIsContainedInTarget
   refine ⟨?_, ?_⟩
   · exact RPgoal
-/- The remaining statement can be derived easily from
-forwardEqualsBackwardRPInMinCommSystem and RPgoal -/
-  · sorry
+  · rw [<- forwardEqualsBackwardRPInMinCommSystem]
+    · exact RPgoal
+    · exact hMin
 
 /-- In a minimal commutative system, the equicontinuous structure relation
 is strongly `S`-invariant -/
 theorem equiStructureRelationIsStrongSInvariant
 (hMin : isMinimalSystem dSystem) :
 equiStructureRelation dSystem =
-  inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (equiStructureRelation dSystem) :=
-  by sorry
+  inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (equiStructureRelation dSystem) := by
+apply Set.Subset.antisymm_iff.mpr
+constructor
+· unfold equiStructureRelation
+  have hSub : setOrbit (diagDynamicalSystem dSystem dSystem) (⋂₀ setOfEquicontinuousICERS dSystem)
+    ⊆ (⋂₀ setOfEquicontinuousICERS dSystem) := by
+    sorry
+  intro z hz
+  simp only [inverseSetOrbit]
+  simp
+  simp at hz
+  sorry
+· sorry
 
 /-- In a minimal commutative system, `RP` and `RPM` are strongly `S`-invariant -/
 theorem RPIsStrongSInvariant
@@ -1174,10 +1187,16 @@ theorem RPIsStrongSInvariant
 (RP dSystem = inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (RP dSystem))
 ∧
 (RPM dSystem = inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (RP dSystem)) := by
-  have RPgoal : RP dSystem = inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (RP dSystem) := by
-    sorry
+  have RPgoal : RP dSystem
+    = inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (RP dSystem) := by
+    rw [RPisEquiStructureRelation]
+    · apply equiStructureRelationIsStrongSInvariant
+      exact hMin
+    · exact hMin
   refine ⟨?_, ?_⟩
   · exact RPgoal
-  · sorry
+  · rw [<- forwardEqualsBackwardRPInMinCommSystem]
+    · exact RPgoal
+    · exact hMin
 
 end Corollaries

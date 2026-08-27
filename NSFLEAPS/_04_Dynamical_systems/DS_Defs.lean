@@ -6206,6 +6206,10 @@ by
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
   exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
 
+-- The proof of this theorem as shown in Auslander and Dai is quite involved. It needs
+-- to use distalality and proximality
+-- If we just need this theorem for commutative S and minimal X, then maybe we don't need
+-- to formalize this general statement
 /-- A dynamical system on `X` which acts by surjections is equicontinuous if and only
 if the regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivialIfSurjective
