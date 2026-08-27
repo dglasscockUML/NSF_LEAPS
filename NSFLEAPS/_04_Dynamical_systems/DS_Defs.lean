@@ -5137,6 +5137,53 @@ end Regional_proximality_basics
 
 section Regional_proximality_in_min_comm_systems
 
+lemma inverseSetOrbitRedefined
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X) (U : Set (X × X)) :
+inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U
+= inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U := by
+simp only [Set.Subset.antisymm_iff]
+constructor
+· intro z hz
+  simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+    Set.mem_iUnion, Set.mem_preimage]
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
+  rcases hz with ⟨s, hs⟩
+  use s
+· intro z hz
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+  simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+    Set.mem_iUnion, Set.mem_preimage] at hz
+  rcases hz with ⟨s, hs⟩
+  use s
+
+lemma setOrbitRedefined
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X) (U : Set (X × X)) :
+setOrbit (diagDynamicalSystem dSystemX dSystemX) U
+= setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) (Set.univ : Set S) U := by
+apply Set.Subset.antisymm_iff.mpr
+constructor
+· intro z hz
+  simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
+  simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+    Set.mem_iUnion, Set.mem_image, Prod.exists]
+  rcases hz with ⟨s, a, b, hab1, hab2⟩
+  use s
+  use a
+  use b
+· intro z hz
+  simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
+    Set.mem_iUnion, Set.mem_image, Prod.exists] at hz
+  simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
+  rcases hz with ⟨s, a, b, hab1, hab2⟩
+  use s
+  use a
+  use b
+
+
 /-- In minimal systems with a commutative acting semigroup, `RP = RPM` -/
 theorem forwardEqualsBackwardRPInMinCommSystem
 {S : Type*} [CommSemigroup S] [Nonempty S]
@@ -5154,40 +5201,10 @@ constructor
     = closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U) := by
     have hEq0 : (setOrbit (diagDynamicalSystem dSystem dSystem) U)
       = (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U) := by
-      apply Set.Subset.antisymm_iff.mpr
-      constructor
-      · intro z hz
-        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
-        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_image, Prod.exists]
-        rcases hz with ⟨s, a, b, hab1, hab2⟩
-        use s
-        use a
-        use b
-      · intro z hz
-        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_image, Prod.exists] at hz
-        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
-        rcases hz with ⟨s, a, b, hab1, hab2⟩
-        use s
-        use a
-        use b
+      apply setOrbitRedefined
     have hEq1 : inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U
       = inverseSetOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U := by
-      simp only [Set.Subset.antisymm_iff]
-      constructor
-      · intro z hz
-        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_preimage]
-        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
-        rcases hz with ⟨s, hs⟩
-        use s
-      · intro z hz
-        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
-        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_preimage] at hz
-        rcases hz with ⟨s, hs⟩
-        use s
+      apply inverseSetOrbitRedefined
     unfold setOrbitClosure
     rw [hEq0, hEq1]
     apply forwardBackwardSetOrbClosCoincideInBronsSys dSystem
@@ -5206,40 +5223,10 @@ constructor
     = closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U) := by
     have hEq0 : setOrbit (diagDynamicalSystem dSystem dSystem) U
       = setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U := by
-      apply Set.Subset.antisymm_iff.mpr
-      constructor
-      · intro z hz
-        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop] at hz
-        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_image, Prod.exists]
-        rcases hz with ⟨s, a, b, hab1, hab2⟩
-        use s
-        use a
-        use b
-      · intro z hz
-        simp only [setOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_image, Prod.exists] at hz
-        simp only [setOrbit, Set.mem_range, Prod.exists, Subtype.exists, exists_prop]
-        rcases hz with ⟨s, a, b, hab1, hab2⟩
-        use s
-        use a
-        use b
+      apply setOrbitRedefined
     have hEq1 : inverseSetOrbit (diagDynamicalSystem dSystem dSystem) U
       = inverseSetOrbitAlongASet (diagDynamicalSystem dSystem dSystem) (Set.univ : Set S) U := by
-      simp only [Set.Subset.antisymm_iff]
-      constructor
-      · intro z hz
-        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_preimage]
-        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
-        rcases hz with ⟨s, hs⟩
-        use s
-      · intro z hz
-        simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
-        simp only [inverseSetOrbitAlongASet, Set.iUnion_coe_set, Set.mem_univ, Set.iUnion_true,
-          Set.mem_iUnion, Set.mem_preimage] at hz
-        rcases hz with ⟨s, hs⟩
-        use s
+      apply inverseSetOrbitRedefined
     unfold setOrbitClosure
     rw [hEq0, hEq1]
     apply forwardBackwardSetOrbClosCoincideInBronsSys dSystem
@@ -5249,8 +5236,6 @@ constructor
     · exact hUOpen
   rw [hEq]
   exact hz
-
--- DGG: I updated the statement of the theorem, but now the proof needs to be fixed.
 
 /-- If a point `z ∈ X × X` is in `RPM`, then for every neighborhood `U` of `z`,
 the closure of `S⁻¹U` contains the diagonal of `X × X` -/
@@ -5505,16 +5490,48 @@ have RPMwithInvOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U �
     use x
     apply h1
     simp only [Set.mem_diagonal_iff]
+have RPMwithForOrbit : z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U →
+  Set.diagonal X ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U := by
+  constructor
+  · intro hz U hUOpen hUz
+    apply RPMwithInvOrbit.mp at hz
+    specialize hz U hUOpen hUz
+    unfold setOrbitClosure
+    rw [setOrbitRedefined]
+    rw [inverseSetOrbitRedefined] at hz
+    have hEq : closure (setOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Set.univ U)
+      = closure (inverseSetOrbitAlongASet (diagDynamicalSystem dSystemX dSystemX) Set.univ U) := by
+      apply forwardBackwardSetOrbClosCoincideInBronsSys
+      · apply inMinCommSystemURPairsDense hMin
+      · simp [isThick]
+      · simp [isThick]
+      · exact hUOpen
+    rw [hEq]
+    exact hz
+  · intro hz
+    simp only [RPMwithInvOrbit]
+    intro U hUOpen hUz
+    specialize hz U hUOpen hUz
+    unfold setOrbitClosure at hz
+    have hEq : closure (inverseSetOrbit (diagDynamicalSystem dSystemX dSystemX) U)
+      = closure (setOrbit (diagDynamicalSystem dSystemX dSystemX) U) := by
+      simp only [inverseSetOrbitRedefined, setOrbitRedefined]
+      rw [forwardBackwardSetOrbClosCoincideInBronsSys]
+      · apply inMinCommSystemURPairsDense hMin
+      · simp only [isThick, Set.subset_univ, exists_const, implies_true]
+      · simp only [isThick, Set.subset_univ, exists_const, implies_true]
+      · exact hUOpen
+    rw [hEq]
+    exact hz
 refine ⟨?_, ?_, ?_, ?_⟩
 · exact RPMwithInvOrbit
-/- The remaining three statements can be derived easily from forwardBackwardSetOrbClosCoincideInBronsSys,
-forwardEqualsBackwardRPInMinCommSystem, and RPMwithInvOrbit -/
-· sorry
+· exact RPMwithForOrbit
 · rw [forwardEqualsBackwardRPInMinCommSystem]
   · exact RPMwithInvOrbit
   · exact hMin
-· sorry
-
+· rw [forwardEqualsBackwardRPInMinCommSystem]
+  · exact RPMwithForOrbit
+  · exact hMin
 
 /-- For `π : X → Y` a factor map of minimal systems with a commutative
 acting semigroup, `RPM_Y ⊆ (π ⊗ π) RPM_X` and `RP_Y ⊆ (π ⊗ π) RP_X` -/
