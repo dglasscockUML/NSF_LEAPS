@@ -15,7 +15,7 @@ visitTimeSet dSystem x U ∈ F →
 ∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
 contrapose
 intro h1
-simp at h1
+simp only [not_exists, not_and, not_forall] at h1
 have hU1 : IsCompact U := by
   apply hU.isCompact
 have h2 : ∀ y ∈ U, ∃ W : Set X, IsOpen W ∧ y ∈ W ∧ visitTimeSet dSystem x W ∉ F := by
@@ -34,11 +34,58 @@ have h2 : ∀ y ∈ U, ∃ W : Set X, IsOpen W ∧ y ∈ W ∧ visitTimeSet dSys
     exact hUsub
   have hV3 : visitTimeSet dSystem x V ∈ F := by
     apply F.upward_closed (visitTimeSet dSystem x W)
-    apply h
-    apply hUV_visitTime
+    · apply h
+    · apply hUV_visitTime
   exact hV2 hV3
 choose f hf using h2
-sorry
+let g : U → Set X := fun y ↦ f y y.2
+have hgOpen : ∀ y : U, IsOpen (g y) := by
+  simp only [Subtype.forall, g]
+  intro y hy
+  specialize hf y hy
+  exact hf.1
+have hExistFin : ∃ G : Finset U, U ⊆ ⋃ y ∈ G, g y := by
+  apply IsCompact.elim_finite_subcover
+  · exact hU1
+  · exact hgOpen
+  · intro x hxU
+    simp only [Set.iUnion_coe_set, Set.mem_iUnion]
+    use x
+    use hxU
+    simp only [g]
+    specialize hf x hxU
+    exact hf.2.1
+rcases hExistFin with ⟨G, hG⟩
+have hSub : visitTimeSet dSystem x U ⊆ ⋃ y : G, visitTimeSet dSystem x (g y) := by
+  simp only [visitTimeSet]
+  intro s hs
+  simp only [Set.mem_preimage] at hs
+  simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop]
+  have hSub1 := hG hs
+  simp only [Set.iUnion_coe_set, Set.mem_iUnion, exists_prop] at hSub1
+  rcases hSub1 with ⟨t, ht1, ht2, ht3⟩
+  use t
+  use ht1
+have hNo : ∀ y : G, visitTimeSet dSystem x (g y) ∉ F := by
+  intro y
+  simp only [g]
+  specialize hf y y.1.2
+  exact hf.2.2
+by_contra hContra
+have hGCard : G.card > 0 := by
+  simp
+  sorry
+have hIn : ⋃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
+  apply F.upward_closed (visitTimeSet dSystem x U) (⋃ y : G, visitTimeSet dSystem x (g y))
+  · exact hContra
+  · exact hSub
+have hExistOne : ∃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
+  unfold isPRFamily at hF
+  specialize hF (⋃ y : G, visitTimeSet dSystem x (g y)) hIn ⟨G.card, hGCard⟩
+  sorry
+rcases hExistOne with ⟨y, hy⟩
+specialize hNo y
+exact hNo hy
 
 end Abstract_results
 
