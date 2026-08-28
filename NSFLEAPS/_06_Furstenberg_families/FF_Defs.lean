@@ -843,7 +843,16 @@ theorem bohrZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isBohrZero A) (hAB : A ⊆ B) :
 isBohrZero B := by
-sorry
+unfold isBohrZero
+unfold isBohrZero at hA
+rcases hA with ⟨k, φ, h1, h2, h3, h4, h5⟩
+use k
+use φ
+use h1
+use h2
+use h3
+use h4
+apply Set.Subset.trans h5 hAB
 
 /-- The family of Bohr_0 subsets of a semigroup -/
 def bohrZeroFamily
