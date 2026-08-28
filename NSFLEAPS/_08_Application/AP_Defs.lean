@@ -18,7 +18,7 @@ sorry
 /-- Familymeet is monotone -/
 -- We will move this theorem to FA_Theorems file later
 theorem familyMeetIsMonotonic
-{S : Type*} (F G H : Family S) (hGH : G ⊆ H): F ⋏ G ⊆ F ⋏ H := by
+{S : Type*} (F G H : Family S) (hGH : G ⊆ H) : F ⋏ G ⊆ F ⋏ H := by
 sorry
 
 /-- This lemma helps us unfold the definition of FamilyMeet -/
