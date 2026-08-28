@@ -655,7 +655,7 @@ lemma dcSBelongsToSyndeticIdempotentFilter
 (_ : ∀ (A B : Set S), A ∈ F → A ⊆ B → B ∈ F)
 (_ : ∀ (A : Set S), A ∈ F → isSyndetic A)
 (_ : ∀ (A : Set S), A ∈ F → {s : S | (s * ·) ⁻¹' A ∈ F} ∈ F),
-A ∈ F := by sorry
+A ∈ F := by sorry --Define F to be up-closure of all R(x,U), where V is open nbhd of p
 
 
 /-- Sets of the form `dcS` intersect `thick` are central -/
