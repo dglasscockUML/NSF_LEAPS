@@ -655,8 +655,67 @@ lemma dcSBelongsToSyndeticIdempotentFilter
 (_ : ∀ (A B : Set S), A ∈ F → A ⊆ B → B ∈ F)
 (_ : ∀ (A : Set S), A ∈ F → isSyndetic A)
 (_ : ∀ (A : Set S), A ∈ F → {s : S | (s * ·) ⁻¹' A ∈ F} ∈ F),
-A ∈ F := by sorry --Define F to be up-closure of all R(x,U), where V is open nbhd of p
-
+A ∈ F := by --Define F to be up-closure of all R(x,U), where V is open nbhd of p
+  obtain ⟨p,pMin,U,UOpen,pInU,visitsInA⟩ := hA
+  let F := {B : Set S | ∃ (V : Set (Ultrafilter S)) (_ : IsOpen V)
+    (_ : p ∈ V), visitTimeSet (ultrafilterSystem S) p V ⊆ B}
+  use F
+  have AinF : A ∈ F := by
+    use U
+  use Set.nonempty_of_mem AinF
+  have Ffilt : ∀ (A B : Set S), A ∈ F → B ∈ F → A ∩ B ∈ F := by
+    intro A B hA hB
+    obtain ⟨V1,V1Open,pInV1,visitsInA⟩ := hA
+    obtain ⟨V2,V2Open,pInV2,visitsInB⟩ := hB
+    let V := V1 ∩ V2
+    have Vopen : IsOpen V := by
+      exact IsOpen.inter V1Open V2Open
+    have pinV : p ∈ V := by
+      exact Set.mem_inter pInV1 pInV2
+    have interrw : (visitTimeSet (ultrafilterSystem S) p V1) ∩
+      (visitTimeSet (ultrafilterSystem S) p V2) =
+        visitTimeSet (ultrafilterSystem S) p V := by
+          exact Eq.symm (Set.Subset.antisymm (fun ⦃a⦄ a_1 ↦ a_1) fun ⦃a⦄ a_1 ↦ a_1)
+    have easy : (visitTimeSet (ultrafilterSystem S) p V1) ∩
+      (visitTimeSet (ultrafilterSystem S) p V2) ⊆ A ∩ B := by
+        exact Set.inter_subset_inter visitsInA visitsInB
+    rw [interrw] at easy
+    use V
+  use Ffilt
+  have Fup : ∀ (A B : Set S), A ∈ F → A ⊆ B → B ∈ F := by
+    intro A B hA hAB
+    obtain ⟨V,VOpen,pInV,visitsInA⟩ := hA
+    use V
+    use VOpen
+    use pInV
+    use subset_trans visitsInA hAB
+  use Fup
+  have Fsynd : ∀ A ∈ F, isSyndetic A := by
+    intro A hA
+    obtain ⟨V,VOpen,pInV,visitsInA⟩ := hA
+    have pUR := (ultrafilterMinimalIffUnifRec p).mp pMin
+    specialize pUR V (IsOpen.mem_nhds VOpen pInV)
+    exact syndeticIsMonotone pUR visitsInA
+  use Fsynd
+  have Fidemp : ∀ A ∈ F, {s | (fun x ↦ s * x) ⁻¹' A ∈ F} ∈ F := by
+    intro A hA
+    obtain ⟨V,VOpen,pInV,visitsInA⟩ := hA
+    have visitsinF : visitTimeSet (ultrafilterSystem S) p V ∈ F := by use V
+    have visitsInpreset : visitTimeSet (ultrafilterSystem S) p V ⊆
+      {s | (fun x ↦ s * x) ⁻¹' A ∈ F} := by
+        intro s hs
+        simp only [Set.mem_setOf_eq]
+        let invV := ((ultrafilterSystem S).map s) ⁻¹' V
+        have invVopen : IsOpen invV := by
+          exact Continuous.isOpen_preimage ((ultrafilterSystem S).mapCont s) V VOpen
+        have pininvV : p ∈ invV := by
+          exact Set.mem_preimage.mpr hs
+        use invV, invVopen, pininvV
+        rw [← visitsToPreimages (ultrafilterSystem S) p V s]
+        exact Set.preimage_mono visitsInA
+    exact Fup (visitTimeSet (ultrafilterSystem S) p V)
+      {s | (fun x ↦ s * x) ⁻¹' A ∈ F} visitsinF visitsInpreset
+  use Fidemp
 
 /-- Sets of the form `dcS` intersect `thick` are central -/
 theorem dcSCapThickIsCentral
