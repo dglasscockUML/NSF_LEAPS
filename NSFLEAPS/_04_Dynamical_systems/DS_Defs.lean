@@ -6193,6 +6193,13 @@ exact hGoal
 UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
 by sorry -/
 
+theorem homSystemOfEquicontinuousSystemIsEquicontinuous
+{T} [Semigroup T] [Nonempty T]
+(φ : T → S) [hSemiHom : SemigroupHom φ]
+{dSystem : DynamicalSystem S X} (_ : isEquicontinuousSystem dSystem) :
+isEquicontinuousSystem (homDynamicalSystem φ dSystem) :=
+by sorry
+
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
 def isEquicontinuousICER

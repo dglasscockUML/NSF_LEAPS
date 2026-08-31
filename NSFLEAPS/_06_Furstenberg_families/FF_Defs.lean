@@ -1,5 +1,6 @@
 import NSFLEAPS._03_Family_algebra.FA_Theorems
 import NSFLEAPS._05_Ultrafilters.UF_Defs
+import NSFLEAPS._06_Furstenberg_families.FF_CXX
 
 section Abstract_results
 
@@ -902,12 +903,14 @@ exact Group.ofLeftAxioms
       (Classical.choose_spec
         (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)).2)
 
+-- Should this be theorem or instance?
 theorem groupFromCompactSubmonoidHasContinuousInv
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
 letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
 ContinuousInv S := by sorry
+
 
 theorem groupFromCompactSubmonoidIsTopologicalGroup
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
@@ -916,9 +919,6 @@ theorem groupFromCompactSubmonoidIsTopologicalGroup
 letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
 IsTopologicalGroup S := by sorry
 
--- def compactCommSubsemiOfCXXIsSubmonoid
--- {X : Type*} [TopologicalSpace X] [T2Space X] [CompactSpace X]
--- {S : Subsemigroup }
 
 
 /-
@@ -931,16 +931,58 @@ theorem hausGroupSuffCondition
 -- IsCompact S ∧ IsT2Space S ∧
 -- formulate: "is compact Hausdorff topological group with identity 1"
 
+-- theorem: if A ⊆ C(X,X) consists of surjections, then so does its closure
+
+-- theorem: if S ⊆ C(X,X) is a subsemigroup, then so is its closure
+
+-- theorem: if S ⊆ C(X,X) is a subsemigroup and consists of surjections,
+-- then any idempotent it contains is equal to Id_X
+
+-- def: given S ⊆ C(X,X) is a subsemigroup consists of surjections with,
+-- overline S compact, get group (overline S) with 1 = id_X
+
+-- theorem: if the maps in A ⊆ C(X,X) commute, then the maps in its closure commute
+
+-- def: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
+-- overline S compact, get commgroup (overline S)
+
+-- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
+-- overline S compact, get ContinuousInv (overline S)
+
+-- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
+-- overline S compact, get IsTopologicalGroup (overline S)
+
+noncomputable
+def commGroupFromSurjectiveSubsemiOfCXX
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Set (ContinuousMap.End X)}
+(hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
+(hSsubsemi : Subsemigroup (ContinuousMap.End X))
+(hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
+(hScompactclos : IsCompact (closure S)) :
+CommGroup (closure S) := by sorry
+
+theorem isTopologicalGroupFromSurjectiveSubsemiOfCXX
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Set (ContinuousMap.End X)}
+(hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
+(hSsubsemi : Subsemigroup (ContinuousMap.End X))
+(hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
+(hScompactclos : IsCompact (closure S)) :
+letI : CommGroup (closure S) := commGroupFromSurjectiveSubsemiOfCXX hSsurject hSsubsemi hScomm hScompactclos
+IsTopologicalGroup (closure S) := by sorry
 
 end Bohr_prelims
 
 
 section Bohr_sets
 
+/-- A subset `A ⊆ S` is Bohr_0 if there exists a semigroup homomorphism
+`ϕ : S → T^d` and an open set `U ⊆ T^d` containing `0` such that `A ⊇ ϕ ⁻¹ U`. -/
 def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := ∃ (k : ℕ) (φ : S → (Fin k → UnitAddCircle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) + (φ t)) (U : Set (Fin k → UnitAddCircle))
+Prop := ∃ (d : ℕ) (φ : S → (Fin d → UnitAddCircle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) + (φ t)) (U : Set (Fin d → UnitAddCircle))
   (_ : IsOpen U) (_ : 0 ∈ U),
   Set.preimage φ U ⊆ A
 
@@ -970,6 +1012,18 @@ def bohrZeroFamily
     exact bohrZeroIsMonotone hA hAB
 }
 
+/-- The `d`-torus acting on itself.  Note that UnitAddCircle is AddCommGroup,
+but we require that the acting semigroup in DynamicalSystem is multiplicative,
+hence the conversion -/
+def torusDynamicalSystem
+(d : ℕ) :
+DynamicalSystem (Multiplicative (Fin d → UnitAddCircle)) (Fin d → UnitAddCircle) :=
+by sorry
+
+theorem torusDSIsEquicontinuous
+(d : ℕ) :
+isEquicontinuousSystem (torusDynamicalSystem d) :=
+by sorry
 
 theorem dynamicalBohrZeroCharacterization
 {S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
@@ -981,9 +1035,25 @@ visitTimeSet dSystem x U ⊆ A :=
 by
   constructor
   · intro hBZA
-    unfold isBohrZero at hBZA
-    -- X will be type Set (Fin k → UnitAddCircle)
-    -- This type will be in Type, so in Type u_2 ??
+    obtain ⟨d,φ,φHom,U,UisOpen,zeroInU,preimageUinA⟩ := hBZA
+    let ψ : S → Multiplicative (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
+    letI : SemigroupHom ψ := by sorry -- use φHom
+    let homTorusDS := homDynamicalSystem ψ (torusDynamicalSystem d)
+    have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous ψ (torusDSIsEquicontinuous d)
+    let x : Fin d → UnitAddCircle := 0
+    let X := orbitClosure (homDynamicalSystem ψ (torusDynamicalSystem d)) x
+    let V := {z : X | z.1 ∈ U}
+    have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
+    let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
+    letI : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
+    letI : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
+    have xInX : x ∈ X := by sorry -- A UR point is in its orbit closure
+    have hMin : isMinimalSystem dSystem := by sorry -- orbit closure of UR point is minimal
+    have hEqui : isEquicontinuousSystem dSystem := by sorry --
+    have VisOpen : IsOpen V := by sorry -- V is relatively open in X
+    have xInV : ⟨x,xInX⟩ ∈ V := by sorry
+    have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A := by sorry
+    use ULift X
     sorry
   · sorry
 
