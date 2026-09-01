@@ -957,7 +957,7 @@ def commGroupFromSurjectiveSubsemiOfCXX
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
 (hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
-(hSsubsemi : Subsemigroup (ContinuousMap.End X))
+(hSsubsemi : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S)
 (hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
 (hScompactclos : IsCompact (closure S)) :
 CommGroup (closure S) := by sorry
@@ -966,7 +966,7 @@ theorem isTopologicalGroupFromSurjectiveSubsemiOfCXX
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
 (hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
-(hSsubsemi : Subsemigroup (ContinuousMap.End X))
+(hSsubsemi : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S)
 (hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
 (hScompactclos : IsCompact (closure S)) :
 letI : CommGroup (closure S) := commGroupFromSurjectiveSubsemiOfCXX hSsurject hSsubsemi hScomm hScompactclos
@@ -1012,7 +1012,7 @@ def bohrZeroFamily
     exact bohrZeroIsMonotone hA hAB
 }
 
-/-- The `d`-torus acting on itself.  Note that UnitAddCircle is AddCommGroup,
+/- The `d`-torus acting on itself.  Note that UnitAddCircle is AddCommGroup,
 but we require that the acting semigroup in DynamicalSystem is multiplicative,
 hence the conversion -/
 def torusDynamicalSystem
@@ -1025,77 +1025,128 @@ theorem torusDSIsEquicontinuous
 isEquicontinuousSystem (torusDynamicalSystem d) :=
 by sorry
 
-theorem dynamicalBohrZeroCharacterization
+/-- If `A ⊆ S` is Bohr_0, then there exists a minimal, equicontinuous dynamical
+system `X`, a point `x`, and an open set `U` containing `x` so that `R(x,U) ⊆ A`. -/
+theorem bohrZeroSetsContainEquiReturns
 {S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
-isBohrZero A ↔ ∃ (X : Type*) (_ : TopologicalSpace X)
+isBohrZero A → ∃ (X : Type) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
 (_ : isMinimalSystem dSystem) (x : X) (U : Set X) (xInU : x ∈ U) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A :=
 by
-  constructor
-  · intro hBZA
-    obtain ⟨d,φ,φHom,U,UisOpen,zeroInU,preimageUinA⟩ := hBZA
-    let ψ : S → Multiplicative (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
-    letI : SemigroupHom ψ := by sorry -- use φHom
-    let homTorusDS := homDynamicalSystem ψ (torusDynamicalSystem d)
-    have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous ψ (torusDSIsEquicontinuous d)
-    let x : Fin d → UnitAddCircle := 0
-    let X := orbitClosure (homDynamicalSystem ψ (torusDynamicalSystem d)) x
-    let V := {z : X | z.1 ∈ U}
-    have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
-    let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
-    letI : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
-    letI : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
-    have xInX : x ∈ X := by sorry -- A UR point is in its orbit closure
-    have hMin : isMinimalSystem dSystem := by sorry -- orbit closure of UR point is minimal
-    have hEqui : isEquicontinuousSystem dSystem := by sorry --
-    have VisOpen : IsOpen V := by sorry -- V is relatively open in X
-    have xInV : ⟨x,xInX⟩ ∈ V := by sorry
-    have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A := by sorry
-    use ULift X
-    sorry
-  · sorry
+  intro hBZA
+  obtain ⟨d,φ,φHom,U,UisOpen,zeroInU,preimageUinA⟩ := hBZA
+  let ψ : S → Multiplicative (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
+  letI : SemigroupHom ψ := by sorry -- use φHom
+  let torusDS := torusDynamicalSystem d
+  let homTorusDS := homDynamicalSystem ψ torusDS
+  have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous ψ (torusDSIsEquicontinuous d)
+  let x : Fin d → UnitAddCircle := 0
+  let X := orbitClosure homTorusDS x
+  let V := {z : X | z.1 ∈ U} --V is X ∩ U, interpreted as a subset of X
+  have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
+  let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
+  letI : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
+  letI : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
+  have xInX : x ∈ X := by sorry -- A UR point is in its orbit closure
+  have hMin : isMinimalSystem dSystem := by sorry -- orbit closure of UR point is minimal
+  have hEqui : isEquicontinuousSystem dSystem := by sorry --
+  have VisOpen : IsOpen V := by sorry -- V is relatively open in X
+  have xInV : ⟨x,xInX⟩ ∈ V := by sorry
+  have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A := by sorry
+  use X
+  use by infer_instance
+  use by infer_instance
+  use by infer_instance
+  use by infer_instance
+  use dSystem
+  use hEqui
+  use hMin
+  use ⟨x,xInX⟩
+  use V
 
-/- A set `A ⊆ S` is Bohr_0 if there exists a minimal, equicontinuous
-action of `S` on a compact, Hausdorff space `X`, a point `x ∈ X` and
-a neighborhood `U` of `x` such that `R(x,U) ⊆ A` -/
-/-
-def isBohrZero_old
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
---∃ (n : ℕ), ∃ (X : Type n), 1+1=2
-∃ (X : Type*) (_ : TopologicalSpace X)
-(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(x : X) (U : Set X) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A
--/
+/-- If `A ⊆ S` is a set containing a set of returns of a point to a neighborhood
+in a minimal, equicontinuous system, then `A` is Bohr_0. -/
+theorem equiReturnsAreBohrZero
+{S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
+(∃ (X : Type*) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X)
+(_ : Nonempty X) (dSystem : DynamicalSystem S X)
+(_ : isEquicontinuousSystem dSystem) (_ : isMinimalSystem dSystem) (x : X)
+(U : Set X) (xInU : x ∈ U) (_ : IsOpen U), visitTimeSet dSystem x U ⊆ A) →
+isBohrZero A := by
+  intro h
+  obtain ⟨X,_,_,_,_,dSystem,hEqui,hMin,x,U,xInU,UOpen,visitsxUinA⟩ := h
+  let i : S → (ContinuousMap.End X) := fun (s : S) ↦ ⟨dSystem.map s, dSystem.mapCont s⟩
+  have iHom : SemigroupHom i := by sorry
+  let iS := i '' Set.univ
+  have dSystemSurjective := minimalCommActionIsSurjective hMin
+  have iSSurjective : ∀ (f : (ContinuousMap.End X)), f ∈ iS → Function.Surjective f :=
+    by sorry -- use dSystemSurjective
+  have iSSemi : ∀ (f g : (ContinuousMap.End X)), f ∈ iS → g ∈ iS → f * g ∈ iS := by sorry
+  have iSComm : ∀ (f g : (ContinuousMap.End X)), f ∈ iS → g ∈ iS → f * g = g * f := by sorry
+  have iSEqui := UniformEquicontinuous (fun (s : S) ↦ (i s).1) -- Image of S under i is equi. fam.
+  let iSClos := closure iS
+  have iSClosCompact : IsCompact iSClos := by sorry --Arzela-Ascoli
+  let iSClosGroup :=
+    commGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
+  have iSClosGroupIsTopGroup :=
+    isTopologicalGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
+  sorry
 
-/-
-def isBohrZerov2_old
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S)
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem) :
-Prop :=
-∃ (x : X) (U : Set X) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A
--/
+/- The `d`-torus acting on itself.  Note that UnitAddCircle is AddCommGroup,
+but we require that the acting semigroup in DynamicalSystem is multiplicative,
+hence the conversion.  The universe-level meta variable is for convenient lifting
+in the proof below -/
+-- def torusDynamicalSystem.{u_1}
+-- (d : ℕ) :
+-- DynamicalSystem (Multiplicative (Fin d → UnitAddCircle)) (ULift.{u_1, 0} (Fin d → UnitAddCircle)) :=
+-- by sorry
 
--- The family of Bohr_0 subsets of a semigroup
-/- def bohrZeroFamily
-(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
-{
-  sets := {A : Set S | ∃ (X : Type*) (_ : TopologicalSpace X)
-(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(x : X) (U : Set X) (_ : IsOpen U),
-visitTimeSet dSystem x U ⊆ A}
-  upward_closed := by
-    intro A B hA hAB
-    exact bohrZeroIsMonotone hA hAB
-}
--/
+/- DGG: For now abandoned attempt to do the dynamical bohr set characterization
+as a biconditional. The metavariables would require us to use "ULift" to prove
+the forward direction.  This would work, but would be technically quite
+distracting for no apparent gain. -/
+-- theorem dynamicalBohrZeroCharacterization
+-- {S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
+-- isBohrZero A ↔ ∃ (X : Type*) (_ : TopologicalSpace X)
+-- (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+-- (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+-- (_ : isMinimalSystem dSystem) (x : X) (U : Set X) (xInU : x ∈ U) (_ : IsOpen U),
+-- visitTimeSet dSystem x U ⊆ A :=
+-- by
+--   constructor
+--   · intro hBZA
+--     obtain ⟨d,φ,φHom,U,UisOpen,zeroInU,preimageUinA⟩ := hBZA
+--     let ψ : S → Multiplicative (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
+--     letI : SemigroupHom ψ := by sorry -- use φHom
+--     let highTorusDS := highTorusDynamicalSystem.{u_2} d
+--     let homTorusDS := homDynamicalSystem ψ highTorusDS
+--     have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous ψ highTorusDS
+--     let x : ULift.{u_2, 0} (Fin d → UnitAddCircle) := 0
+--     let X := orbitClosure homTorusDS x
+--     let V := {z : X | z.1.down ∈ U} --V is X ∩ U, interpreted as a subset of X
+--     have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
+--     let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
+--     letI : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
+--     letI : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
+--     have xInX : x ∈ X := by sorry -- A UR point is in its orbit closure
+--     have hMin : isMinimalSystem dSystem := by sorry -- orbit closure of UR point is minimal
+--     have hEqui : isEquicontinuousSystem dSystem := by sorry --
+--     have VisOpen : IsOpen V := by sorry -- V is relatively open in X
+--     have xInV : ⟨x,xInX⟩ ∈ V := by sorry
+--     have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A := by sorry
+--     use X
+--     use by infer_instance
+--     use by infer_instance
+--     use by infer_instance
+--     use by infer_instance
+--     use dSystem
+--     use hEqui
+--     use hMin
+--     use ⟨x,xInX⟩
+--     use V
+--   · sorry
 
 /-- A set `A ⊆ S` is a set of Bohr recurrence if for all minimal, equicontinuous
 actions of `S` on a compact, Hausdorff space `X`, all points `x ∈ X` and
