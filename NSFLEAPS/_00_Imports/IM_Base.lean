@@ -32,10 +32,13 @@ import Mathlib.Topology.Continuous
 import Mathlib.Topology.Compactification.StoneCech
 import Mathlib.Topology.Algebra.Semigroup
 import Mathlib.Topology.Algebra.Group.Defs
+import Mathlib.Topology.Algebra.ContinuousMonoidHom
+import Mathlib.Topology.Algebra.PontryaginDual
 import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.AddCircle.Real
 
+import Mathlib.Analysis.Complex.Circle
 
 import Mathlib.Combinatorics.Hindman
 

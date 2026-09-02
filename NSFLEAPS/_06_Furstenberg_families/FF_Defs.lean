@@ -972,6 +972,38 @@ theorem isTopologicalGroupFromSurjectiveSubsemiOfCXX
 letI : CommGroup (closure S) := commGroupFromSurjectiveSubsemiOfCXX hSsurject hSsubsemi hScomm hScompactclos
 IsTopologicalGroup (closure S) := by sorry
 
+-- I have my doubts that the following is available in Mathlib.  That may be a problem for us.
+theorem PontryaginDual.exists_apply_ne_one
+    {X : Type*}
+    [TopologicalSpace X]
+    [CompactSpace X]
+    [T2Space X]
+    [CommGroup X]
+    [IsTopologicalGroup X]
+    {x : X}
+    (hx : x ≠ 1) :
+    ∃ χ : PontryaginDual X, χ x ≠ 1 := by
+  sorry
+
+-- The following should be do-able given PontryaginDual.exists_apply_ne_one
+theorem openPreimageInOpenSubsetTopCommGroup
+    {X : Type*}
+    [TopologicalSpace X]
+    [CompactSpace X]
+    [T2Space X]
+    [CommGroup X]
+    [IsTopologicalGroup X]
+    {W : Set X}
+    (hW : IsOpen W)
+    (hWone : 1 ∈ W) :
+    ∃ (d : ℕ)
+    (φ : X → (Fin d → Circle))
+    (φHom : ∀ (x y : X), φ (x * y) = (φ x) * (φ y))
+    (U : Set (Fin d → Circle))
+    (_ : IsOpen U)
+    (_ : 1 ∈ U),
+    φ ⁻¹' U ⊆ W := by sorry
+
 end Bohr_prelims
 
 
@@ -981,9 +1013,9 @@ section Bohr_sets
 `ϕ : S → T^d` and an open set `U ⊆ T^d` containing `0` such that `A ⊇ ϕ ⁻¹ U`. -/
 def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := ∃ (d : ℕ) (φ : S → (Fin d → UnitAddCircle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) + (φ t)) (U : Set (Fin d → UnitAddCircle))
-  (_ : IsOpen U) (_ : 0 ∈ U),
+Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
+  (_ : IsOpen U) (_ : 1 ∈ U),
   Set.preimage φ U ⊆ A
 
 /-- If `A ⊆ S` is Bohr_0 and `A ⊆ B`, then `B` is Bohr_0. -/
@@ -1017,7 +1049,7 @@ but we require that the acting semigroup in DynamicalSystem is multiplicative,
 hence the conversion -/
 def torusDynamicalSystem
 (d : ℕ) :
-DynamicalSystem (Multiplicative (Fin d → UnitAddCircle)) (Fin d → UnitAddCircle) :=
+DynamicalSystem (Fin d → Circle) (Fin d → Circle) :=
 by sorry
 
 theorem torusDSIsEquicontinuous
@@ -1037,12 +1069,12 @@ visitTimeSet dSystem x U ⊆ A :=
 by
   intro hBZA
   obtain ⟨d,φ,φHom,U,UisOpen,zeroInU,preimageUinA⟩ := hBZA
-  let ψ : S → Multiplicative (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
-  letI : SemigroupHom ψ := by sorry -- use φHom
+  --let ψ : S → (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
+  letI : SemigroupHom φ := by sorry -- use φHom
   let torusDS := torusDynamicalSystem d
-  let homTorusDS := homDynamicalSystem ψ torusDS
-  have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous ψ (torusDSIsEquicontinuous d)
-  let x : Fin d → UnitAddCircle := 0
+  let homTorusDS := homDynamicalSystem φ torusDS
+  have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous φ (torusDSIsEquicontinuous d)
+  let x : Fin d → Circle := 1
   let X := orbitClosure homTorusDS x
   let V := {z : X | z.1 ∈ U} --V is X ∩ U, interpreted as a subset of X
   have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
@@ -1077,14 +1109,15 @@ theorem equiReturnsAreBohrZero
 isBohrZero A := by
   intro h
   obtain ⟨X,_,_,_,_,dSystem,hEqui,hMin,x,U,xInU,UOpen,visitsxUinA⟩ := h
-  let i : S → (ContinuousMap.End X) := fun (s : S) ↦ ⟨dSystem.map s, dSystem.mapCont s⟩
+  let CXXEnd := ContinuousMap.End X
+  let i : S → CXXEnd := fun (s : S) ↦ ⟨dSystem.map s, dSystem.mapCont s⟩
   have iHom : SemigroupHom i := by sorry
   let iS := i '' Set.univ
   have dSystemSurjective := minimalCommActionIsSurjective hMin
-  have iSSurjective : ∀ (f : (ContinuousMap.End X)), f ∈ iS → Function.Surjective f :=
+  have iSSurjective : ∀ (f : CXXEnd), f ∈ iS → Function.Surjective f :=
     by sorry -- use dSystemSurjective
-  have iSSemi : ∀ (f g : (ContinuousMap.End X)), f ∈ iS → g ∈ iS → f * g ∈ iS := by sorry
-  have iSComm : ∀ (f g : (ContinuousMap.End X)), f ∈ iS → g ∈ iS → f * g = g * f := by sorry
+  have iSSemi : ∀ (f g : CXXEnd), f ∈ iS → g ∈ iS → f * g ∈ iS := by sorry
+  have iSComm : ∀ (f g : CXXEnd), f ∈ iS → g ∈ iS → f * g = g * f := by sorry
   have iSEqui := UniformEquicontinuous (fun (s : S) ↦ (i s).1) -- Image of S under i is equi. fam.
   let iSClos := closure iS
   have iSClosCompact : IsCompact iSClos := by sorry --Arzela-Ascoli
@@ -1092,6 +1125,15 @@ isBohrZero A := by
     commGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
   have iSClosGroupIsTopGroup :=
     isTopologicalGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
+  let ξ : iSClos → X := fun (f : iSClos) ↦ f.1 x
+  have ξCont : Continuous ξ := by sorry
+  let W := ξ ⁻¹' U
+  have WOpen : IsOpen W := ξCont.isOpen_preimage U UOpen
+  have oneinW : 1 ∈ W := by sorry
+  have oneIsId : (1 : CXXEnd).toContinuousMap = ContinuousMap.id X := by sorry
+  have invWinRxU : i ⁻¹' W ⊆ visitTimeSet dSystem x U := by sorry
+  letI : CompactSpace iSClos := by sorry
+  have := openPreimageInOpenSubsetTopCommGroup (X := iSClos) WOpen oneinW
   sorry
 
 /- The `d`-torus acting on itself.  Note that UnitAddCircle is AddCommGroup,
