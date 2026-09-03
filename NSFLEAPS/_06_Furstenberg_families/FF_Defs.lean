@@ -1004,6 +1004,43 @@ theorem openPreimageInOpenSubsetTopCommGroup
     (_ : 1 ∈ U),
     φ ⁻¹' U ⊆ W := by sorry
 
+theorem compactClosureOfUniformEquicontinuous
+    {X S : Type*}
+    [TopologicalSpace X]
+    [CompactSpace X]
+    [T2Space X]
+    [Nonempty X]
+    (i : S → ContinuousMap.End X)
+    (hi : UniformEquicontinuous fun s x => (i s).1 x) :
+    IsCompact (closure (Set.range i)) := by
+
+  let 𝔖 : Set (Set X) := {K | IsCompact K}
+
+  let CXXEnd := ContinuousMap.End X
+
+  apply ArzelaAscoli.isCompact_closure_of_isClosedEmbedding
+      (𝔖 := 𝔖)
+      (F := fun f : CXXEnd => (f.1 : X → X))
+      (s := Set.range i)
+  · intro K hK
+    exact hK
+  · have hclemb :
+    Topology.IsClosedEmbedding
+      (ContinuousMap.toUniformOnFunIsCompact ∘ ContinuousMap.End.toContinuousMap :
+        CXXEnd → UniformOnFun X X {K : Set X | IsCompact K}) := by sorry
+    simpa [𝔖, ContinuousMap.toUniformOnFunIsCompact] using hclemb
+  · intro K hK
+    have hrange :
+    Equicontinuous
+      (fun f : ↥(Set.range i) => (f.1 : X → X)) := by sorry
+        --rw [Set.image_univ] -- if this lemma rewrites to range
+        --exact (equicontinuous_iff_range.mp hi)
+    exact hrange.equicontinuousOn K
+  · intro K hK x hx
+    refine ⟨Set.univ, isCompact_univ, ?_⟩
+    intro f hf
+    simp
+
 end Bohr_prelims
 
 
@@ -1068,8 +1105,7 @@ isBohrZero A → ∃ (X : Type) (_ : TopologicalSpace X)
 visitTimeSet dSystem x U ⊆ A :=
 by
   intro hBZA
-  obtain ⟨d,φ,φHom,U,UisOpen,zeroInU,preimageUinA⟩ := hBZA
-  --let ψ : S → (Fin d → UnitAddCircle) := fun (s : S) ↦ φ s
+  obtain ⟨d,φ,φHom,U,UisOpen,oneinU,preimageUinA⟩ := hBZA
   letI : SemigroupHom φ := by sorry -- use φHom
   let torusDS := torusDynamicalSystem d
   let homTorusDS := homDynamicalSystem φ torusDS
@@ -1111,30 +1147,71 @@ isBohrZero A := by
   obtain ⟨X,_,_,_,_,dSystem,hEqui,hMin,x,U,xInU,UOpen,visitsxUinA⟩ := h
   let CXXEnd := ContinuousMap.End X
   let i : S → CXXEnd := fun (s : S) ↦ ⟨dSystem.map s, dSystem.mapCont s⟩
-  have iHom : SemigroupHom i := by sorry
-  let iS := i '' Set.univ
+  have iHom : ∀ (s t : S), i (s * t) = (i s) * (i t) := by
+    intro s t
+    refine ContinuousMap.End.End.ext ?_
+    intro x
+    rw [ContinuousMap.End.mul_apply (i s) (i t) x]
+    unfold i
+    simp only [ContinuousMap.coe_mk]
+    rw [dSystem.mapMult]
+  let iS := Set.range i
   have dSystemSurjective := minimalCommActionIsSurjective hMin
-  have iSSurjective : ∀ (f : CXXEnd), f ∈ iS → Function.Surjective f :=
-    by sorry -- use dSystemSurjective
-  have iSSemi : ∀ (f g : CXXEnd), f ∈ iS → g ∈ iS → f * g ∈ iS := by sorry
-  have iSComm : ∀ (f g : CXXEnd), f ∈ iS → g ∈ iS → f * g = g * f := by sorry
-  have iSEqui := UniformEquicontinuous (fun (s : S) ↦ (i s).1) -- Image of S under i is equi. fam.
+  have iSSurjective : ∀ (f : CXXEnd), f ∈ iS → Function.Surjective f := by
+    intro f hf
+    obtain ⟨s, hs1, hs2⟩ := hf
+    unfold i
+    simp only [ContinuousMap.coe_mk]
+    exact dSystemSurjective s
+  have iSSemi : ∀ (f g : CXXEnd), f ∈ iS → g ∈ iS → f * g ∈ iS := by
+    intro f g hf hg
+    obtain ⟨s, hs1, hs2⟩ := hf
+    obtain ⟨t, ht1, ht2⟩ := hg
+    rw [←iHom s t]
+    exact Set.mem_range_self (s * t)
+  have iSComm : ∀ (f g : CXXEnd), f ∈ iS → g ∈ iS → f * g = g * f := by
+    intro f g hf hg
+    obtain ⟨s, hs1, hs2⟩ := hf
+    obtain ⟨t, ht1, ht2⟩ := hg
+    rw [←iHom s t]
+    rw [←iHom t s]
+    have Scomm : s * t = t * s := mul_comm s t
+    exact congrArg i Scomm
+  have iSEqui : UniformEquicontinuous (fun (s : S) ↦ (i s).1) := by sorry -- Image of S under i is equi. fam.
   let iSClos := closure iS
-  have iSClosCompact : IsCompact iSClos := by sorry --Arzela-Ascoli
+  have iSClosCompact : IsCompact iSClos := compactClosureOfUniformEquicontinuous i iSEqui --Arzela-Ascoli
   let iSClosGroup :=
     commGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
   have iSClosGroupIsTopGroup :=
     isTopologicalGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
   let ξ : iSClos → X := fun (f : iSClos) ↦ f.1 x
-  have ξCont : Continuous ξ := by sorry
+  have ξCont : Continuous ξ := by
+    let eval := fun (f : C(X,X)) ↦ f x
+    let eval2 : CXXEnd → X := eval ∘ ContinuousMap.End.toContinuousMap
+    have evalcont : Continuous eval := by
+      exact continuous_eval_const x
+    have eval2cont : Continuous eval2 := by
+      sorry
+    exact eval2cont.comp continuous_subtype_val
   let W := ξ ⁻¹' U
   have WOpen : IsOpen W := ξCont.isOpen_preimage U UOpen
   have oneinW : 1 ∈ W := by sorry
   have oneIsId : (1 : CXXEnd).toContinuousMap = ContinuousMap.id X := by sorry
   have invWinRxU : i ⁻¹' W ⊆ visitTimeSet dSystem x U := by sorry
   letI : CompactSpace iSClos := by sorry
-  have := openPreimageInOpenSubsetTopCommGroup (X := iSClos) WOpen oneinW
-  sorry
+  obtain ⟨d,ψ,ψHom,V,VisOpen,oneInV,preimageVinW⟩ :=
+    openPreimageInOpenSubsetTopCommGroup (X := iSClos) WOpen oneinW
+  let j : S → iSClos :=
+    fun (s : S) ↦ ⟨i s, subset_closure (Set.mem_range_self s)⟩
+  have jHom : ∀ (s t : S), j (s * t) = (j s) * (j t) := by sorry
+  let φ := ψ ∘ j
+  have φHom : ∀ (s t : S), φ (s * t) = (φ s) * (φ t) := by sorry
+  have φpreimInA : φ ⁻¹' V ⊆ A :=
+    calc φ ⁻¹' V ⊆ j ⁻¹' (ψ ⁻¹' V) := by rfl
+    _ ⊆ j ⁻¹' W := Set.preimage_mono preimageVinW
+    _ ⊆ visitTimeSet dSystem x U := Set.preimage_subset_iff.mpr fun a a_1 ↦ a_1
+    _ ⊆ A := LE.le.subset visitsxUinA
+  use d, φ, φHom, V, VisOpen, oneInV, φpreimInA
 
 /- The `d`-torus acting on itself.  Note that UnitAddCircle is AddCommGroup,
 but we require that the acting semigroup in DynamicalSystem is multiplicative,
