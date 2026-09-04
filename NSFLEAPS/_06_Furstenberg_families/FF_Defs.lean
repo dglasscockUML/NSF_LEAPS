@@ -903,7 +903,9 @@ exact Group.ofLeftAxioms
       (Classical.choose_spec
         (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)).2)
 
--- Should this be theorem or instance?
+/- The group above has a continuous inverse.  This is a standard fact: any
+compact Hausdorff group with a continuous multiplication has a continuous
+inverse. -/
 theorem groupFromCompactSubmonoidHasContinuousInv
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
@@ -911,7 +913,7 @@ theorem groupFromCompactSubmonoidHasContinuousInv
 letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
 ContinuousInv S := by sorry
 
-
+/- Put the pieces above together. -/
 theorem groupFromCompactSubmonoidIsTopologicalGroup
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
@@ -921,7 +923,7 @@ IsTopologicalGroup S := by sorry
 
 
 
-/-
+/- OLD
 theorem hausGroupSuffCondition
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T]
 {topSemi : Continuous fun (⟨s,t⟩ : T × T) ↦ s * t}
@@ -930,6 +932,7 @@ theorem hausGroupSuffCondition
 -/
 -- IsCompact S ∧ IsT2Space S ∧
 -- formulate: "is compact Hausdorff topological group with identity 1"
+
 
 -- theorem: if A ⊆ C(X,X) consists of surjections, then so does its closure
 
@@ -1042,16 +1045,88 @@ theorem compactClosureOfUniformEquicontinuous
         CXXEnd → UniformOnFun X X {K : Set X | IsCompact K}) := by sorry
     simpa [𝔖, ContinuousMap.toUniformOnFunIsCompact] using hclemb
   · intro K hK
-    have hrange :
-    Equicontinuous
-      (fun f : ↥(Set.range i) => (f.1 : X → X)) := by sorry
-        --rw [Set.image_univ] -- if this lemma rewrites to range
-        --exact (equicontinuous_iff_range.mp hi)
+    have hrange : Equicontinuous (fun f : ↥(Set.range i) => (f.1 : X → X)) :=
+      by
+        classical
+        let j : ↥(Set.range i) → S :=
+          fun f => Classical.choose f.property
+
+        have hj (f : ↥(Set.range i)) : i (j f) = f.1 :=
+          Classical.choose_spec f.property
+        have hfamily :
+          ((fun s x => (i s).1 x) ∘ j)
+            =
+          (fun f : ↥(Set.range i) => (f.1 : X → X)) := by
+            funext f x
+            change (i (j f)).1 x = f.1 x
+            rw [hj f]
+        rw [← hfamily]
+        exact hi.equicontinuous.comp j
     exact hrange.equicontinuousOn K
   · intro K hK x hx
     refine ⟨Set.univ, isCompact_univ, ?_⟩
     intro f hf
     simp
+
+ #check UniformOnFun.uniformSpace_eq_inf_precomp_of_cover
+
+/- This is the application of ArzelaAscoli that we need.  ArzelaAscoli is stated in
+general terms in Mathlib. -/
+theorem compactClosureOfUniformEquicontinuousv2
+    {X S : Type*}
+    [TopologicalSpace X]
+    [CompactSpace X]
+    [T2Space X]
+    [Nonempty X]
+    (i : S → C(X,X))
+    (hi : UniformEquicontinuous fun s x => (i s).1 x) :
+    IsCompact (closure (Set.range i)) := by
+
+  let 𝔖 : Set (Set X) := {K | IsCompact K}
+  let CXXEnd := C(X,X)
+  apply ArzelaAscoli.isCompact_closure_of_isClosedEmbedding
+      (𝔖 := 𝔖)
+      (F := fun f : CXXEnd => (f.1 : X → X))
+      (s := Set.range i)
+  · intro K hK
+    exact hK
+  · have hclemb :
+    Topology.IsClosedEmbedding (ContinuousMap.toUniformOnFunIsCompact :
+      CXXEnd → UniformOnFun X X {K : Set X | IsCompact K}) :=
+        by
+          constructor
+          · exact
+              ContinuousMap.isUniformEmbedding_toUniformOnFunIsCompact.isEmbedding
+          · sorry
+            /-rw [ContinuousMap.range_toUniformOnFunIsCompact]
+            exact
+              UniformOnFun.isClosed_setOfPred_continuous
+                CompactlyCoherentSpace.isCoherentWith -/
+    simpa [𝔖, ContinuousMap.toUniformOnFunIsCompact] using hclemb
+  · intro K hK
+    have hrange : Equicontinuous (fun f : ↥(Set.range i) => (f.1 : X → X)) :=
+      by
+        classical
+        let j : ↥(Set.range i) → S :=
+          fun f => Classical.choose f.property
+
+        have hj (f : ↥(Set.range i)) : i (j f) = f.1 :=
+          Classical.choose_spec f.property
+        have hfamily :
+          ((fun s x => (i s).1 x) ∘ j)
+            =
+          (fun f : ↥(Set.range i) => (f.1 : X → X)) := by
+            funext f x
+            change (i (j f)).1 x = f.1 x
+            rw [hj f]
+            exact (congrFun rfl ∘ j) f
+        rw [← hfamily]
+        exact hi.equicontinuous.comp j
+    exact hrange.equicontinuousOn K
+  · intro K hK x hx
+    refine ⟨Set.univ, isCompact_univ, ?_⟩
+    intro f hf
+    simp only [ContinuousMap.toFun_eq_coe, Set.mem_univ]
 
 end Bohr_prelims
 
