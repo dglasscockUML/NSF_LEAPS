@@ -1138,7 +1138,26 @@ DynamicalSystem (Fin d → Circle) (Fin d → Circle) :=
 
 lemma easyAlgebraLemma
 {G : Type*} [CommGroup G] (x y z : G) :
-(z * x)⁻¹ * (z * y) = x⁻¹ * y := by sorry
+(z * x)⁻¹ * (z * y) = x⁻¹ * y := by --aesop also works!
+  have stepone : (z * x)⁻¹ = x⁻¹ * z⁻¹ := by
+    exact DivisionMonoid.mul_inv_rev z x
+  have steptwo : (z * x)⁻¹ * (z * y) = (x⁻¹ * z⁻¹) * (z * y) := by
+    rw [stepone]
+  have stepthree : (x⁻¹ * z⁻¹) * (z * y) = ((x⁻¹ * z⁻¹) * z) * y := by
+    exact Eq.symm (mul_assoc (x⁻¹ * z⁻¹) z y)
+  have stepfour : (x⁻¹ * z⁻¹) * z = x⁻¹ * (z⁻¹ * z) := by
+    exact mul_assoc x⁻¹ z⁻¹ z
+  have stepfive : ((x⁻¹ * z⁻¹) * z) * y = (x⁻¹ * (z⁻¹ * z)) * y := by
+    rw [stepfour]
+  have stepsix : z⁻¹ * z = 1 := by
+    exact inv_mul_cancel z
+  have : (z * x)⁻¹ * (z * y) = x⁻¹ * y := by
+    rw [steptwo]
+    rw [stepthree]
+    rw [stepfive]
+    rw [stepsix]
+    simp only [mul_one]
+  rw [this]
 
 theorem torusDSIsEquicontinuous
 (d : ℕ) :
@@ -1162,25 +1181,6 @@ by
     apply hVsub
     change (i * p.1)⁻¹ * (i * p.2) ∈ V
     rw [easyAlgebraLemma p.1 p.2 i]
-    -- have stepone : (i * p.1)⁻¹ = p.1⁻¹ * i⁻¹ := by
-    --   exact DivisionMonoid.mul_inv_rev i p.1
-    -- have steptwo : (i * p.1)⁻¹ * (i * p.2) = (p.1⁻¹ * i⁻¹) * (i * p.2) := by
-    --   rw [stepone]
-    -- have stepthree : (p.1⁻¹ * i⁻¹) * (i * p.2) = ((p.1⁻¹ * i⁻¹) * i) * p.2 := by
-    --   exact Eq.symm (mul_assoc (p.1⁻¹ * i⁻¹) i p.2)
-    -- have stepfour : (p.1⁻¹ * i⁻¹) * i = p.1⁻¹ * (i⁻¹ * i) := by
-    --   exact mul_assoc p.1⁻¹ i⁻¹ i
-    -- have stepfive : ((p.1⁻¹ * i⁻¹) * i) * p.2 = (p.1⁻¹ * (i⁻¹ * i)) * p.2 := by
-    --   rw [stepfour]
-    -- have stepsix : i⁻¹ * i = 1 := by
-    --   exact inv_mul_cancel i
-    -- have : (i * p.1)⁻¹ * (i * p.2) = p.1⁻¹ * p.2 := by
-    --   rw [steptwo]
-    --   rw [stepthree]
-    --   rw [stepfive]
-    --   rw [stepsix]
-    --   simp only [mul_one]
-    -- rw [this]
     exact hp
   have βInNhds : β ∈ nhds (a, a) := by
     exact (nhds_le_uniformity a) hβu
