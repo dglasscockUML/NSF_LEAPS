@@ -3375,7 +3375,7 @@ closure (setOrbitAlongASet (diagDynamicalSystem dSystem dSystem) A W)
 
 end Minimality_and_UR_with_commutivity
 
-section Proximality
+section Proximality_and_distality
 
 variable {S : Type*} [Semigroup S] [Nonempty S]
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -3578,7 +3578,26 @@ isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := by
   simp only [dSystem.mapMult]
   exact hs
 
-end Proximality
+/-- A system is distal if there are no non-diagonal proximal pairs -/
+def isDistalSystem
+(dSystem : DynamicalSystem S X) : Prop :=
+∀ (x y : X), proximal dSystem x y → x = y
+
+/-- A hom system from a distal system is distal -/
+theorem homSystemOfDistalSystemIsDistal
+{T} [Semigroup T] [Nonempty T]
+(φ : T → S) [hSemiHom : SemigroupHom φ]
+{dSystem : DynamicalSystem S X} (hDistal : isDistalSystem dSystem) :
+isDistalSystem (homDynamicalSystem φ dSystem) :=
+by
+  intro x y hxy
+  apply hDistal x y
+  intro α hα
+  obtain ⟨t,ht⟩ := hxy α hα
+  use φ t
+  exact ht
+
+end Proximality_and_distality
 
 section Regional_proximality_basics
 
@@ -6192,6 +6211,15 @@ by
     exact Filter.mem_of_superset h6 h5
   exact hGoal
 
+/-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
+nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
+dynamical system. (DGG: v2 is the form I need it in later.) -/
+theorem subsystemOfEquicontinuousIsEquicontinuousv2
+{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := sorry
+
 
 /- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
 -- This seems unnecessary.  Typeclass is finding it properly.
@@ -6468,6 +6496,22 @@ RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
 end Equicontinuity_and_regional_proximality
 
 section Equicontinuity_and_regional_proximality_with_S_commutative
+
+/-- Minimal, equicontinuous systems with a commutative acting semigroup
+are distal -/
+theorem equicontinuousMinCommSystemsAreDistal
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+isEquicontinuousSystem dSystem → isDistalSystem dSystem := by sorry
+
+/-- In a minimal, distal system with a commutative acting semigroup,
+the semigroup acts by homeomorphisms -/
+theorem semigroupActsByHomeosOnMinCommDistalSystems
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+isDistalSystem dSystem → isHomeoSystem dSystem := by sorry
 
 /- Note the following generalizes equicontinuousIffRPTrivial by
 applying the following to the identity map --/

@@ -760,7 +760,7 @@ theorem dcSCapThickIsCentral
       have := Set.mem_iInter.mp this hs
       exact this
     have h9 : {s | (fun x ↦ s * x) ⁻¹' A ∈ F} ⊆ {s | (fun x ↦ s * x) ⁻¹' A ∈ q} := by
-      exact Set.setOf_subset_setOf_of_imp this
+      exact Set.ofPred_subset_ofPred_of_imp this
     have h10 : {s | (fun x ↦ s * x) ⁻¹' A ∈ q} ∈ F := FUpclosed
       {s | (fun x ↦ s * x) ⁻¹' A ∈ F} {s | (fun x ↦ s * x) ⁻¹' A ∈ q} Fidemp h9
     have := Set.mem_iInter.mp hp {s | (fun x ↦ s * x) ⁻¹' A ∈ q}
@@ -832,7 +832,7 @@ theorem dcSCapThickIsCentral
             obtain ⟨t,htC,htE⟩ := Ultrafilter.nonempty_of_mem CcapEinp
             have ptinU : pure t ∈ U := by
               rw [←hE]
-              exact Set.mem_setOf.mpr htE
+              exact Set.mem_ofPred.mpr htE
             have ptinC : pure t ∈ (pure : S → Ultrafilter S) '' C := by
               exact Set.mem_image_of_mem pure htC
             use pure t
@@ -931,18 +931,6 @@ theorem groupFromCompactSubmonoidIsTopologicalGroup
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
 letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
 IsTopologicalGroup S := by sorry
-
-
-
-/- OLD
-theorem hausGroupSuffCondition
-{T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T]
-{topSemi : Continuous fun (⟨s,t⟩ : T × T) ↦ s * t}
-{S : Set T} [CompactSpace S] {subSemi : ∀ (s t : T), s ∈ S → t ∈ S → s * t ∈ S} :
-1 ∈ S → (∀ (s : T), s ∈ S → s * s = s → s = 1) →
--/
--- IsCompact S ∧ IsT2Space S ∧
--- formulate: "is compact Hausdorff topological group with identity 1"
 
 
 -- theorem: if A ⊆ C(X,X) consists of surjections, then so does its closure
@@ -1148,6 +1136,10 @@ DynamicalSystem (Fin d → Circle) (Fin d → Circle) :=
     exact fun s ↦ (uniformContinuous_mul_left s).continuous
 }
 
+lemma easyAlgebraLemma
+{G : Type*} [CommGroup G] (x y z : G) :
+(z * x)⁻¹ * (z * y) = x⁻¹ * y := by sorry
+
 theorem torusDSIsEquicontinuous
 (d : ℕ) :
 isEquicontinuousSystem (torusDynamicalSystem d) :=
@@ -1169,35 +1161,60 @@ by
     intro p hp i
     apply hVsub
     change (i * p.1)⁻¹ * (i * p.2) ∈ V
-    have stepone : (i * p.1)⁻¹ = p.1⁻¹ * i⁻¹ := by
-      exact DivisionMonoid.mul_inv_rev i p.1
-    have steptwo : (i * p.1)⁻¹ * (i * p.2) = (p.1⁻¹ * i⁻¹) * (i * p.2) := by
-      rw [stepone]
-    have stepthree : (p.1⁻¹ * i⁻¹) * (i * p.2) = ((p.1⁻¹ * i⁻¹) * i) * p.2 := by
-      exact Eq.symm (mul_assoc (p.1⁻¹ * i⁻¹) i p.2)
-    have stepfour : (p.1⁻¹ * i⁻¹) * i = p.1⁻¹ * (i⁻¹ * i) := by
-      exact mul_assoc p.1⁻¹ i⁻¹ i
-    have stepfive : ((p.1⁻¹ * i⁻¹) * i) * p.2 = (p.1⁻¹ * (i⁻¹ * i)) * p.2 := by
-      rw [stepfour]
-    have stepsix : i⁻¹ * i = 1 := by
-      exact inv_mul_cancel i
-    have : (i * p.1)⁻¹ * (i * p.2) = p.1⁻¹ * p.2 := by
-      rw [steptwo]
-      rw [stepthree]
-      rw [stepfive]
-      rw [stepsix]
-      simp only [mul_one]
-    rw [this]
+    rw [easyAlgebraLemma p.1 p.2 i]
+    -- have stepone : (i * p.1)⁻¹ = p.1⁻¹ * i⁻¹ := by
+    --   exact DivisionMonoid.mul_inv_rev i p.1
+    -- have steptwo : (i * p.1)⁻¹ * (i * p.2) = (p.1⁻¹ * i⁻¹) * (i * p.2) := by
+    --   rw [stepone]
+    -- have stepthree : (p.1⁻¹ * i⁻¹) * (i * p.2) = ((p.1⁻¹ * i⁻¹) * i) * p.2 := by
+    --   exact Eq.symm (mul_assoc (p.1⁻¹ * i⁻¹) i p.2)
+    -- have stepfour : (p.1⁻¹ * i⁻¹) * i = p.1⁻¹ * (i⁻¹ * i) := by
+    --   exact mul_assoc p.1⁻¹ i⁻¹ i
+    -- have stepfive : ((p.1⁻¹ * i⁻¹) * i) * p.2 = (p.1⁻¹ * (i⁻¹ * i)) * p.2 := by
+    --   rw [stepfour]
+    -- have stepsix : i⁻¹ * i = 1 := by
+    --   exact inv_mul_cancel i
+    -- have : (i * p.1)⁻¹ * (i * p.2) = p.1⁻¹ * p.2 := by
+    --   rw [steptwo]
+    --   rw [stepthree]
+    --   rw [stepfive]
+    --   rw [stepsix]
+    --   simp only [mul_one]
+    -- rw [this]
     exact hp
   have βInNhds : β ∈ nhds (a, a) := by
     exact (nhds_le_uniformity a) hβu
   exact Filter.mem_of_superset βInNhds βSubset
 
+theorem torusDSIsDistal
+(d : ℕ) :
+isDistalSystem (torusDynamicalSystem d) := by
+  intro x y hxy
+  apply inv_mul_eq_one.mp
+  apply pure_le_nhds_iff.mp
+  have closetoone : ∀ U ∈ nhds 1, x⁻¹ * y ∈ U := by
+    intro U hU
+    let T := Fin d → Circle
+    let β : Set (T × T) := {p | p.1⁻¹ * p.2 ∈ U}
+    have hβu : β ∈ uniformity T := by
+      rw [uniformity_eq_comap_inv_mul_nhds_one]
+      simp only [Filter.mem_comap]
+      use U
+      exact ⟨hU, by trivial⟩
+    have := hxy β
+    have hβn : β ∈ nhdsSet (Set.diagonal T) := nhdsSet_diagonal_le_uniformity hβu
+    obtain ⟨s, hs⟩ := hxy β hβn
+    unfold torusDynamicalSystem β at hs
+    simp only at hs
+    change (s * x)⁻¹ * (s * y) ∈ U at hs
+    rw [easyAlgebraLemma x y s] at hs
+    exact hs
+  exact closetoone
 
 /-- If `A ⊆ S` is Bohr_0, then there exists a minimal, equicontinuous dynamical
 system `X`, a point `x`, and an open set `U` containing `x` so that `R(x,U) ⊆ A`. -/
 theorem bohrZeroSetsContainEquiReturns
-{S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
+{S : Type*} [CommSemigroup S] [SNonempty : Nonempty S] (A : Set S) :
 isBohrZero A → ∃ (X : Type) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
@@ -1206,23 +1223,64 @@ visitTimeSet dSystem x U ⊆ A :=
 by
   intro hBZA
   obtain ⟨d,φ,φHom,U,UisOpen,oneinU,preimageUinA⟩ := hBZA
-  let : SemigroupHom φ := by sorry -- use φHom
+  have φSemiHom : SemigroupHom φ :=
+  {
+    hom_prop := φHom
+  }
   let torusDS := torusDynamicalSystem d
   let homTorusDS := homDynamicalSystem φ torusDS
-  have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous φ (torusDSIsEquicontinuous d)
+  have homTorusDSisEqui :=
+    homSystemOfEquicontinuousSystemIsEquicontinuous φ (torusDSIsEquicontinuous d)
+  have homTorusDSisDistal : isDistalSystem homTorusDS :=
+    homSystemOfDistalSystemIsDistal φ (torusDSIsDistal d)
   let x : Fin d → Circle := 1
   let X := orbitClosure homTorusDS x
   let V := {z : X | z.1 ∈ U} --V is X ∩ U, interpreted as a subset of X
+  have VisOpen : IsOpen V := UisOpen.preimage continuous_subtype_val
   have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
   let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
-  let : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
-  let : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
-  have xInX : x ∈ X := by sorry -- A UR point is in its orbit closure
-  have hMin : isMinimalSystem dSystem := by sorry -- orbit closure of UR point is minimal
-  have hEqui : isEquicontinuousSystem dSystem := by sorry --
-  have VisOpen : IsOpen V := by sorry -- V is relatively open in X
-  have xInV : ⟨x,xInX⟩ ∈ V := by sorry
-  have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A := by sorry
+  have : CompactSpace ↑(orbitClosure homTorusDS x) := by
+    apply isCompact_iff_compactSpace.mp
+    apply IsClosed.isCompact
+    apply isClosed_closure
+  have : Nonempty ↑(orbitClosure homTorusDS x) := by
+    apply Set.Nonempty.to_subtype
+    have SNonempty2 : Nonempty S := SNonempty
+    obtain ⟨s⟩ := SNonempty2
+    have : homTorusDS.map s x ∈ orbitClosure homTorusDS x := by
+      apply subset_closure
+      use s
+    exact ⟨homTorusDS.map s x, this⟩
+  have xUR := distalImpliesSemisimple homTorusDS homTorusDSisDistal x
+  have xInX : x ∈ X := URPointBelongsToOrbitClosure homTorusDS xUR
+  have hMin : isMinimalSystem dSystem :=
+    (minimalSubsetIffMinimalSubsystem homTorusDS orbClosPresystem).mp
+      (orbitClosureOfURPointIsMinimalSubset homTorusDS xUR)
+  have hEqui : isEquicontinuousSystem dSystem := subsystemOfEquicontinuousIsEquicontinuousv2 homTorusDSisEqui orbClosPresystem
+  have xInV : ⟨x,xInX⟩ ∈ V := by
+    unfold V
+    simp only [Set.mem_ofPred_eq]
+    exact oneinU
+  have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A :=
+    calc
+      visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ visitTimeSet homTorusDS x U := by
+        intro s hs
+        unfold V visitTimeSet at hs
+        simp only [Set.mem_preimage] at hs
+        exact hs
+      _ ⊆ φ ⁻¹' U := by
+        intro t ht
+        unfold visitTimeSet at ht
+        simp only [Set.mem_preimage] at ht
+        unfold homTorusDS homDynamicalSystem at ht
+        simp only at ht
+        unfold torusDS at ht
+        unfold torusDynamicalSystem at ht
+        simp only at ht
+        unfold x at ht
+        simp only [mul_one] at ht
+        exact ht
+      _ ⊆ A := preimageUinA
   use X
   use by infer_instance
   use by infer_instance
@@ -1284,7 +1342,7 @@ isBohrZero A := by
   let iSClos := closure iS
   --Arzela-Ascoli
   have iSClosCompact : IsCompact iSClos := compactClosureOfUniformEquicontinuous i iSEqui
-  letI : CompactSpace iSClos := isCompact_iff_compactSpace.mp iSClosCompact
+  let : CompactSpace iSClos := isCompact_iff_compactSpace.mp iSClosCompact
   let iSClosGroup :=
     commGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
   have iSClosGroupIsTopGroup :=
@@ -1346,7 +1404,7 @@ isBohrZero A := by
     calc φ ⁻¹' V ⊆ j ⁻¹' (ψ ⁻¹' V) := by rfl
     _ ⊆ j ⁻¹' W := Set.preimage_mono preimageVinW
     _ ⊆ visitTimeSet dSystem x U := Set.preimage_subset_iff.mpr fun a a_1 ↦ a_1
-    _ ⊆ A := LE.le.subset visitsxUinA
+    _ ⊆ A := visitsxUinA
   use d, φ, φHom, V, VisOpen, oneInV, φpreimInA
 
 /-- A set `A ⊆ S` is a set of Bohr recurrence if for all minimal, equicontinuous

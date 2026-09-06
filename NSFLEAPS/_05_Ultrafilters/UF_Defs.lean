@@ -1442,4 +1442,11 @@ by
   use q
   refine ⟨hq1, by rw [pqu] ; exact hu2, qxx⟩
 
+
+/-- In a distal system, every point is uniformly recurrent -/
+theorem distalImpliesSemisimple :
+isDistalSystem dSystem → ∀ (x : X), isUniformlyRecurrent dSystem x :=
+by sorry
+
+
 end Ultrafilter_action_theorems
