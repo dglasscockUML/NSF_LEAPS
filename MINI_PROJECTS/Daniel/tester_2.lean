@@ -12,7 +12,7 @@ def upclosed (F : Set (Set α)) : Prop :=
 theorem dual_is_upclosed (F : Set (Set α)) : upclosed (dual F) := by
   unfold upclosed dual
   intro A B A_in_dual A_in_B C C_in_F
-  simp only [Set.mem_setOf_eq] at A_in_dual
+  simp only [Set.mem_ofPred_eq] at A_in_dual
   have A_cap_C_nonempty : (A ∩ C).Nonempty := A_in_dual C C_in_F
   have A_cap_C_in_B_cap_C : A ∩ C ⊆ B ∩ C := Set.inter_subset_inter_left C A_in_B
   exact Set.Nonempty.mono A_cap_C_in_B_cap_C A_cap_C_nonempty

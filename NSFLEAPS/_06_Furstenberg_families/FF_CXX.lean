@@ -17,7 +17,7 @@ instance : CoeFun (End X) (fun _ => X → X) where
   coe f := f.toContinuousMap
 
 @[ext]
-theorem End.ext {f g : End X} (h : ∀ x, f x = g x) : f = g := by
+theorem ext {f g : End X} (h : ∀ x, f x = g x) : f = g := by
   cases f with
   | mk f =>
     cases g with
@@ -52,7 +52,7 @@ theorem mul_apply (f g : End X) (x : X) :
 instance : TopologicalSpace (End X) :=
   TopologicalSpace.induced
     (fun f : End X => f.toContinuousMap)
-    inferInstance
+    ContinuousMap.compactOpen
 
 theorem continuous_toContinuousMap :
     Continuous (fun f : End X => f.toContinuousMap) :=
@@ -71,6 +71,9 @@ instance [T2Space X] : T2Space (End X) := by
 instance [LocallyCompactSpace X] : ContinuousMul (End X) where
   continuous_mul := by
     rw [continuous_induced_rng]
+    change Continuous
+      (fun p : End X × End X =>
+        p.1.toContinuousMap.comp p.2.toContinuousMap)
     simpa only [Function.comp_apply] using
       (continuous_toContinuousMap.comp continuous_fst).compCM
         (continuous_toContinuousMap.comp continuous_snd)

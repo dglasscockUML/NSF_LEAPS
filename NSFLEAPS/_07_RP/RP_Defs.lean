@@ -1,5 +1,7 @@
 import NSFLEAPS._05_Ultrafilters.UF_Defs
 
+/-! This is a module docstring -/
+
 variable {S} [CommSemigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 variable {dSystem : DynamicalSystem S X}
@@ -863,7 +865,7 @@ by
               simp only [Set.mem_prod]
               exact ⟨mem_of_mem_nhds hV1, hz⟩
             unfold βSlice
-            simp only [Set.mem_setOf_eq]
+            simp only [Set.mem_ofPred_eq]
             exact V1V2inβ yzInV1V2
           exact Filter.mem_of_superset hV2 hslice
       rcases mem_nhds_iff.mp βSliceIsNhdOfy with ⟨W,WinβSlice,WOpen,yInW⟩
@@ -957,47 +959,48 @@ section RP_is_EQ_relation
 theorem minimalImpliesRPisTransitive
 (hMin : isMinimalSystem dSystem) :
 isTransitive (RP dSystem) :=
-by
-  unfold isTransitive
-  unfold setToRelation
-  intro x y z xyInRP yzInRP
-  have yzzInOrbitCloszzz :
-    (y,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
-      (xyInRPIffxyyInyyyOrbClosure hMin y z).1.mp yzInRP
-  have yyInOrbitCloszz :
-    (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
-      diagonalOrbitVisits z y
-        ((subset_of_eq (minimalImpliesFullOrbitClosure hMin z).symm) (Set.mem_univ z))
-  have yyyInyTimesOrbitCloszz :
-    (y,y,y) ∈ ({y} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨z,z⟩) :=
-      by
-        constructor
-        · simp only [Set.mem_singleton_iff]
-        · exact yyInOrbitCloszz
-  have yyyInOrbitClosyzz :
-    (y,y,y) ∈ orbitClosure cornerSystem3 (y,z,z) :=
-      (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
-  have xyyInOrbitClosyyy :
-    (x,y,y) ∈ orbitClosure cornerSystem3 (y,y,y) :=
-      (xyInRPIffxyyInyyyOrbClosure hMin x y).1.mp xyInRP
-  have zzInOrbitClosyy :
-    (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
-      diagonalOrbitVisits y z
-        ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
-  have xzzInxTimesOrbitClosyy :
-    (x,z,z) ∈ ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,y⟩) :=
-      by
-        constructor
-        · simp only [Set.mem_singleton_iff]
-        · exact zzInOrbitClosyy
-  have xzzInOrbitClosxyy :
-    (x,z,z) ∈ orbitClosure cornerSystem3 (x,y,y) :=
-      (liftTo3Left x (xyyUniformlyRecurrent hMin x y)) xzzInxTimesOrbitClosyy
-  have xzzInOrbitCloszzz :
-    (x,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
-      orbitTransitivity (orbitTransitivity (orbitTransitivity
-        yzzInOrbitCloszzz yyyInOrbitClosyzz) xyyInOrbitClosyyy) xzzInOrbitClosxyy
-  exact (xyInRPIffxyyInyyyOrbClosure hMin x z).1.symm.mp xzzInOrbitCloszzz
+{
+  trans := by
+    intro x y z xyInRP yzInRP
+    have yzzInOrbitCloszzz :
+      (y,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
+        (xyInRPIffxyyInyyyOrbClosure hMin y z).1.mp yzInRP
+    have yyInOrbitCloszz :
+      (y,y) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (z,z) :=
+        diagonalOrbitVisits z y
+          ((subset_of_eq (minimalImpliesFullOrbitClosure hMin z).symm) (Set.mem_univ z))
+    have yyyInyTimesOrbitCloszz :
+      (y,y,y) ∈ ({y} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨z,z⟩) :=
+        by
+          constructor
+          · simp only [Set.mem_singleton_iff]
+          · exact yyInOrbitCloszz
+    have yyyInOrbitClosyzz :
+      (y,y,y) ∈ orbitClosure cornerSystem3 (y,z,z) :=
+        (liftTo3Left y (xyyUniformlyRecurrent hMin y z)) yyyInyTimesOrbitCloszz
+    have xyyInOrbitClosyyy :
+      (x,y,y) ∈ orbitClosure cornerSystem3 (y,y,y) :=
+        (xyInRPIffxyyInyyyOrbClosure hMin x y).1.mp xyInRP
+    have zzInOrbitClosyy :
+      (z,z) ∈ orbitClosure (diagDynamicalSystem dSystem dSystem) (y,y) :=
+        diagonalOrbitVisits y z
+          ((subset_of_eq (minimalImpliesFullOrbitClosure hMin y).symm) (Set.mem_univ y))
+    have xzzInxTimesOrbitClosyy :
+      (x,z,z) ∈ ({x} : Set X) ×ˢ (orbitClosure (diagDynamicalSystem dSystem dSystem) ⟨y,y⟩) :=
+        by
+          constructor
+          · simp only [Set.mem_singleton_iff]
+          · exact zzInOrbitClosyy
+    have xzzInOrbitClosxyy :
+      (x,z,z) ∈ orbitClosure cornerSystem3 (x,y,y) :=
+        (liftTo3Left x (xyyUniformlyRecurrent hMin x y)) xzzInxTimesOrbitClosyy
+    have xzzInOrbitCloszzz :
+      (x,z,z) ∈ orbitClosure cornerSystem3 (z,z,z) :=
+        orbitTransitivity (orbitTransitivity (orbitTransitivity
+          yzzInOrbitCloszzz yyyInOrbitClosyzz) xyyInOrbitClosyyy) xzzInOrbitClosxyy
+    exact (xyInRPIffxyyInyyyOrbClosure hMin x z).1.symm.mp xzzInOrbitCloszzz
+}
+
 
 /-- The regionally proximal relation of a minimal dynamical system
 is an ICER -/
@@ -1057,7 +1060,7 @@ isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)) := by
       isSyndetic (ϕ '' visitTimeSet (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ (V ×ˢ U ×ˢ U)) :=
       by
         rcases UIsNonempty with ⟨z,hz⟩
-        have yxInRP := (RPisSymmetric dSystem) hxyInRP
+        have yxInRP := (RPisSymmetric dSystem).symm x y hxyInRP
         have yxxInOrbClosxxx :
           ⟨y,x,x⟩ ∈ orbitClosure (cornerSystem3 (dSystem := dSystem)) ⟨x,x,x⟩ :=
             (xyInRPIffxyyInyyyOrbClosure hMin y x).1.mp yxInRP
@@ -1121,7 +1124,7 @@ isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)) := by
             unfold ϕ
             intro y
             exact ⟨(Classical.arbitrary S, y), rfl⟩
-        letI : SemigroupHom ϕ :=
+        let : SemigroupHom ϕ :=
           {
             hom_prop :=
               by
@@ -1168,18 +1171,18 @@ theorem equiStructureRelationIsStrongSInvariant
 (hMin : isMinimalSystem dSystem) :
 equiStructureRelation dSystem =
   inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (equiStructureRelation dSystem) := by
-apply Set.Subset.antisymm_iff.mpr
-constructor
-· unfold equiStructureRelation
-  have hSub : setOrbit (diagDynamicalSystem dSystem dSystem) (⋂₀ setOfEquicontinuousICERS dSystem)
-    ⊆ (⋂₀ setOfEquicontinuousICERS dSystem) := by
-    sorry
-  intro z hz
-  simp only [inverseSetOrbit]
-  simp
-  simp at hz
-  sorry
-· sorry
+    apply Set.Subset.antisymm_iff.mpr
+    constructor
+    · unfold equiStructureRelation
+      have hSub : setOrbit (diagDynamicalSystem dSystem dSystem) (⋂₀ setOfEquicontinuousICERS dSystem)
+        ⊆ (⋂₀ setOfEquicontinuousICERS dSystem) := by
+        sorry
+      intro z hz
+      simp only [inverseSetOrbit]
+      simp
+      simp at hz
+      sorry
+    · sorry
 
 /-- In a minimal commutative system, `RP` and `RPM` are strongly `S`-invariant -/
 theorem RPIsStrongSInvariant

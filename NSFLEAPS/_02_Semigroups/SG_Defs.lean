@@ -1,5 +1,7 @@
 import NSFLEAPS._00_Imports.IM_Base
 
+/-! This is a module docstring. -/
+
 -- We may want to assume [Nonempty S] throughout, but I've not implemented that yet.
 
 structure SemigroupLeftIdeal
@@ -128,48 +130,48 @@ theorem surjImgOfSyndeticIsSyndetic
 (φ : S → T) [hSemiHom : SemigroupHom φ] (hSurj : Function.Surjective φ)
 {A : Set S} (hA : isSyndetic A) :
 isSyndetic (φ '' A) := by
-obtain ⟨F, hF1, hF2⟩ := hA
-use φ '' F
-constructor
-· apply hF1.image φ
-intro t
-obtain ⟨s, hs⟩ := hSurj t
-specialize hF2 s
-obtain ⟨e, he1, he2⟩ := hF2
-use φ (e)
-constructor
-· simp only [Set.mem_image]
-  · use e
-rw [<- hs]
-rw [<- hSemiHom.hom_prop]
-simp only [Set.mem_image]
-use e * s
+  obtain ⟨F, hF1, hF2⟩ := hA
+  use φ '' F
+  constructor
+  · apply hF1.image φ
+  intro t
+  obtain ⟨s, hs⟩ := hSurj t
+  specialize hF2 s
+  obtain ⟨e, he1, he2⟩ := hF2
+  use φ (e)
+  constructor
+  · simp only [Set.mem_image]
+    · use e
+  rw [<- hs]
+  rw [<- hSemiHom.hom_prop]
+  simp only [Set.mem_image]
+  use e * s
 
 /-- Shift of a syndetic set is syndetic -/
 lemma shiftSyndeticIsSyndetic
 {S} [Semigroup S] [Nonempty S]
 {A : Set S} (hA : isSyndetic A)
 {s : S} : isSyndetic ((s * · ) '' A) := by
-obtain ⟨F, hF1, hF2⟩ := hA
-unfold isSyndetic
-let E :=  (s * ·) '' F
-use E
-constructor
-· apply Set.Finite.image
-  apply hF1
-intro r
-specialize hF2 r
-obtain ⟨f, hf1, hf2⟩ := hF2
-use s * f
-constructor
-· unfold E
+  obtain ⟨F, hF1, hF2⟩ := hA
+  unfold isSyndetic
+  let E :=  (s * ·) '' F
+  use E
+  constructor
+  · apply Set.Finite.image
+    apply hF1
+  intro r
+  specialize hF2 r
+  obtain ⟨f, hf1, hf2⟩ := hF2
+  use s * f
+  constructor
+  · unfold E
+    simp only [Set.mem_image]
+    use f
   simp only [Set.mem_image]
-  use f
-simp only [Set.mem_image]
-use f * r
-constructor
-· exact hf2
-simp only [mul_assoc]
+  use f * r
+  constructor
+  · exact hf2
+  simp only [mul_assoc]
 
 /-- A syndetic set in a semigroup is not empty -/
 lemma syndeticSetIsNonEmpty {S} [Semigroup S] [hSNonempty : Nonempty S]
@@ -206,18 +208,18 @@ lemma syndeticThickIntersect
 (hASyndetic : isSyndetic A)
 (hBThick : isThick B) :
 (A ∩ B).Nonempty := by
-unfold isSyndetic at hASyndetic
-unfold isThick at hBThick
-rcases hASyndetic with ⟨F, hF1, hF2⟩
-specialize hBThick F hF1
-rcases hBThick with ⟨s, hs⟩
-specialize hF2 s
-rcases hF2 with ⟨f, hf1, hf2⟩
-apply Set.inter_nonempty.mpr
-use f * s
-constructor
-· exact hf2
-· have hIn : f * s ∈ (fun x ↦ x * s) '' F := by
-    simp only [Set.mem_image]
-    use f
-  apply hs hIn
+  unfold isSyndetic at hASyndetic
+  unfold isThick at hBThick
+  rcases hASyndetic with ⟨F, hF1, hF2⟩
+  specialize hBThick F hF1
+  rcases hBThick with ⟨s, hs⟩
+  specialize hF2 s
+  rcases hF2 with ⟨f, hf1, hf2⟩
+  apply Set.inter_nonempty.mpr
+  use f * s
+  constructor
+  · exact hf2
+  · have hIn : f * s ∈ (fun x ↦ x * s) '' F := by
+      simp only [Set.mem_image]
+      use f
+    apply hs hIn

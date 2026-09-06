@@ -1,5 +1,7 @@
 import NSFLEAPS._04_Dynamical_systems.DS_Defs
 
+/-! This is a module docstring -/
+
 /- This file is intended to keep the code describing the dynamical system {0,1}^S with the shift -/
 
 /- A general note: Bool is a type with terms `true` and `false`.
@@ -64,8 +66,8 @@ noncomputable
 def indicator
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 S → Bool := by
-classical
-exact fun s => decide (s ∈ A)
+    classical
+    exact fun s => decide (s ∈ A)
 
 /-- For a set `S`, a boolean value val, and `s ∈ S`, the cylinder set
 `[value]_s` is the set of functions `S → Bool` whose value at `s` is `val` -/

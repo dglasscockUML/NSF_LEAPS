@@ -2,6 +2,8 @@ import NSFLEAPS._03_Family_algebra.FA_Theorems
 import NSFLEAPS._05_Ultrafilters.UF_Defs
 import NSFLEAPS._06_Furstenberg_families.FF_CXX
 
+/-! This is a module docstring -/
+
 section Abstract_results
 
 /-- If `R(x,U) ∈ F` and `F` is a partition regular family, then there exists
@@ -14,79 +16,79 @@ theorem visitTimeConcentrationForPRFamily
 (F : Family S) {hF : isPRFamily F} :
 visitTimeSet dSystem x U ∈ F →
 ∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
-contrapose
-intro h1
-simp only [not_exists, not_and, not_forall] at h1
-have hU1 : IsCompact U := by
-  apply hU.isCompact
-have h2 : ∀ y ∈ U, ∃ W : Set X, IsOpen W ∧ y ∈ W ∧ visitTimeSet dSystem x W ∉ F := by
-  intro y hy
-  specialize h1 y hy
-  obtain ⟨V, hV1, hV2⟩ := h1
-  rcases (mem_nhds_iff.mp hV1) with ⟨W, hUsub, hUopen, hyU⟩
-  use W
-  constructor
-  · exact hUopen
-  constructor
-  · exact hyU
-  by_contra h
-  have hUV_visitTime : visitTimeSet dSystem x W ⊆ visitTimeSet dSystem x V := by
-    apply visitTimesMono
-    exact hUsub
-  have hV3 : visitTimeSet dSystem x V ∈ F := by
-    apply F.upward_closed (visitTimeSet dSystem x W)
-    · apply h
-    · apply hUV_visitTime
-  exact hV2 hV3
-choose f hf using h2
-let g : U → Set X := fun y ↦ f y y.2
-have hgOpen : ∀ y : U, IsOpen (g y) := by
-  simp only [Subtype.forall, g]
-  intro y hy
-  specialize hf y hy
-  exact hf.1
-have hExistFin : ∃ G : Finset U, U ⊆ ⋃ y ∈ G, g y := by
-  apply IsCompact.elim_finite_subcover
-  · exact hU1
-  · exact hgOpen
-  · intro x hxU
-    simp only [Set.iUnion_coe_set, Set.mem_iUnion]
-    use x
-    use hxU
+  contrapose
+  intro h1
+  simp only [not_exists, not_and, not_forall] at h1
+  have hU1 : IsCompact U := by
+    apply hU.isCompact
+  have h2 : ∀ y ∈ U, ∃ W : Set X, IsOpen W ∧ y ∈ W ∧ visitTimeSet dSystem x W ∉ F := by
+    intro y hy
+    specialize h1 y hy
+    obtain ⟨V, hV1, hV2⟩ := h1
+    rcases (mem_nhds_iff.mp hV1) with ⟨W, hUsub, hUopen, hyU⟩
+    use W
+    constructor
+    · exact hUopen
+    constructor
+    · exact hyU
+    by_contra h
+    have hUV_visitTime : visitTimeSet dSystem x W ⊆ visitTimeSet dSystem x V := by
+      apply visitTimesMono
+      exact hUsub
+    have hV3 : visitTimeSet dSystem x V ∈ F := by
+      apply F.upward_closed (visitTimeSet dSystem x W)
+      · apply h
+      · apply hUV_visitTime
+    exact hV2 hV3
+  choose f hf using h2
+  let g : U → Set X := fun y ↦ f y y.2
+  have hgOpen : ∀ y : U, IsOpen (g y) := by
+    simp only [Subtype.forall, g]
+    intro y hy
+    specialize hf y hy
+    exact hf.1
+  have hExistFin : ∃ G : Finset U, U ⊆ ⋃ y ∈ G, g y := by
+    apply IsCompact.elim_finite_subcover
+    · exact hU1
+    · exact hgOpen
+    · intro x hxU
+      simp only [Set.iUnion_coe_set, Set.mem_iUnion]
+      use x
+      use hxU
+      simp only [g]
+      specialize hf x hxU
+      exact hf.2.1
+  rcases hExistFin with ⟨G, hG⟩
+  have hSub : visitTimeSet dSystem x U ⊆ ⋃ y : G, visitTimeSet dSystem x (g y) := by
+    simp only [visitTimeSet]
+    intro s hs
+    simp only [Set.mem_preimage] at hs
+    simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop]
+    have hSub1 := hG hs
+    simp only [Set.iUnion_coe_set, Set.mem_iUnion, exists_prop] at hSub1
+    rcases hSub1 with ⟨t, ht1, ht2, ht3⟩
+    use t
+    use ht1
+  have hNo : ∀ y : G, visitTimeSet dSystem x (g y) ∉ F := by
+    intro y
     simp only [g]
-    specialize hf x hxU
-    exact hf.2.1
-rcases hExistFin with ⟨G, hG⟩
-have hSub : visitTimeSet dSystem x U ⊆ ⋃ y : G, visitTimeSet dSystem x (g y) := by
-  simp only [visitTimeSet]
-  intro s hs
-  simp only [Set.mem_preimage] at hs
-  simp only [Set.mem_iUnion, Set.mem_preimage, Subtype.exists, exists_prop]
-  have hSub1 := hG hs
-  simp only [Set.iUnion_coe_set, Set.mem_iUnion, exists_prop] at hSub1
-  rcases hSub1 with ⟨t, ht1, ht2, ht3⟩
-  use t
-  use ht1
-have hNo : ∀ y : G, visitTimeSet dSystem x (g y) ∉ F := by
-  intro y
-  simp only [g]
-  specialize hf y y.1.2
-  exact hf.2.2
-by_contra hContra
-have hGCard : G.card > 0 := by
-  simp
-  sorry
-have hIn : ⋃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
-  apply F.upward_closed (visitTimeSet dSystem x U) (⋃ y : G, visitTimeSet dSystem x (g y))
-  · exact hContra
-  · exact hSub
-have hExistOne : ∃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
-  unfold isPRFamily at hF
-  specialize hF (⋃ y : G, visitTimeSet dSystem x (g y)) hIn ⟨G.card, hGCard⟩
-  sorry
-rcases hExistOne with ⟨y, hy⟩
-specialize hNo y
-exact hNo hy
+    specialize hf y y.1.2
+    exact hf.2.2
+  by_contra hContra
+  have hGCard : G.card > 0 := by
+    simp
+    sorry
+  have hIn : ⋃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
+    apply F.upward_closed (visitTimeSet dSystem x U) (⋃ y : G, visitTimeSet dSystem x (g y))
+    · exact hContra
+    · exact hSub
+  have hExistOne : ∃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
+    unfold isPRFamily at hF
+    specialize hF (⋃ y : G, visitTimeSet dSystem x (g y)) hIn ⟨G.card, hGCard⟩
+    sorry
+  rcases hExistOne with ⟨y, hy⟩
+  specialize hNo y
+  exact hNo hy
 
 end Abstract_results
 
@@ -116,38 +118,45 @@ def thickFamily
 theorem thickIffComplementNotSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 isThick A ↔ ¬isSyndetic Aᶜ := by
-constructor
--- prove the only if direction
-· intro hA
-  by_contra hAc
-  obtain ⟨F, hF1, hF2⟩ := hAc
-  specialize hA F hF1
-  obtain ⟨s, hs⟩ := hA
-  specialize hF2 s
-  have h1 : ∀ f ∈ F, f * s ∈ A := by
-    intro f hf0
-    apply hs
-    exact ⟨f, hf0, rfl⟩
-  obtain ⟨f, hf1, hf2⟩ := hF2
-  specialize h1 f hf1
-  exact hf2 h1
--- prove the if direction
-· contrapose
-  intro hA_nThick
-  have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
-    exact hA_nThick
-  have hA4 : ∃ F : Set S, (F.Finite ∧ ∀ s : S, ¬(· * s) '' F ⊆ A) := by
-    push_neg at hA1
-    exact hA1
-  obtain ⟨F, hF1, hF2⟩ := hA4
-  use F
   constructor
-  · apply hF1
-  · intro s
+  -- prove the only if direction
+  · intro hA
+    by_contra hAc
+    obtain ⟨F, hF1, hF2⟩ := hAc
+    specialize hA F hF1
+    obtain ⟨s, hs⟩ := hA
     specialize hF2 s
-    have hA5 : ((fun x ↦ x * s) '' F ∩ Aᶜ).Nonempty := by
-      simpa [Set.subset_def, Set.ext_iff] using hF2
-    simpa using hA5
+    have h1 : ∀ f ∈ F, f * s ∈ A := by
+      intro f hf0
+      apply hs
+      exact ⟨f, hf0, rfl⟩
+    obtain ⟨f, hf1, hf2⟩ := hF2
+    specialize h1 f hf1
+    exact hf2 h1
+  -- prove the if direction
+  · contrapose
+    intro hA_nThick
+    have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
+      exact hA_nThick
+    have hA4 : ∃ F : Set S, (F.Finite ∧ ∀ s : S, ¬(· * s) '' F ⊆ A) := by
+      push Not at hA1
+      exact hA1
+    obtain ⟨F, hF1, hF2⟩ := hA4
+    use F
+    constructor
+    · apply hF1
+    · intro s
+      specialize hF2 s
+      have hA5 : ((fun x ↦ x * s) '' F ∩ Aᶜ).Nonempty := by
+        simp only [Set.image_inter_nonempty_iff, Set.preimage_compl]
+        sorry
+      simp only [Set.mem_compl_iff]
+      obtain ⟨fs,hfs1,hfs2⟩ := hA5
+      obtain ⟨f,hf1,hf2⟩ := hfs1
+      use f
+      rw [←hf2] at hfs2
+      simp only at hfs2
+      exact ⟨hf1,hfs2⟩
 
 /-- The families of syndetic sets and thick sets are dual -/
 -- This used to work but something happens upstream now dualEquivForm no longer work
@@ -155,24 +164,24 @@ constructor
 theorem dualSyndeticThick
 {S : Type*} [Semigroup S] [Nonempty S] :
 (syndeticFamily S)* = (thickFamily S) :=
-by sorry
-  -- ext A
-  -- have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
-  --   famDualAlt (syndeticFamily S)
-  -- rw [dualEquivForm]
-  -- change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
-  -- unfold syndeticFamily
-  -- unfold thickFamily
-  -- simp only [Set.mem_setOf_eq]
-  -- exact Iff.symm (thickIffComplementNotSyndetic A)
+  by sorry
+    -- ext A
+    -- have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
+    --   famDualAlt (syndeticFamily S)
+    -- rw [dualEquivForm]
+    -- change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
+    -- unfold syndeticFamily
+    -- unfold thickFamily
+    -- simp only [Set.mem_ofPred_eq]
+    -- exact Iff.symm (thickIffComplementNotSyndetic A)
 
 /-- Dual of thick family is syndetic family -/
 theorem dualThickSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] :
 (thickFamily S)* = (syndeticFamily S) := by
-rw [<- dualSyndeticThick]
-sorry
---apply dual_dual_smth_smth
+  rw [<- dualSyndeticThick]
+  sorry
+  --apply dual_dual_smth_smth
 
 /-- If A is a thick set and K is a finite set of a semigroup S,
 then ⋂ k ∈ K, (k * ·) ⁻¹' A is thick -/
@@ -181,33 +190,33 @@ theorem inverseDilateCapOfThickIsThick
 (A : Set S) {hA : isThick A}
 (K : Set S) {KIsFinite : K.Finite} :
 isThick (⋂ k ∈ K, (k * ·) ⁻¹' A) := by
-intro F hF
-let E := (⋃ k ∈ K, (k * ·) '' F)
-have hFinite: ∀ k ∈ K, ((k * ·) '' F).Finite := by
-  intro k hk
-  apply hF.image (k * ·)
-have hEFinite: E.Finite := by
-  apply KIsFinite.biUnion hFinite
-specialize hA E hEFinite
-obtain ⟨s, hs⟩ := hA
-use s
-intro a ha
-simp only [Set.mem_iInter]
-intro i hi
-simp only [Set.mem_preimage]
-obtain ⟨b, hb1, hb2⟩ := ha
-have hb3 : b * s = a:= by
-  simp only at hb2
-  exact hb2
-rw [<- hb3]
-apply hs
-unfold E
-simp only [Set.mem_image, Set.mem_iUnion, exists_prop, exists_exists_and_exists_and_eq_and]
-use i
-simp only [hi, true_and]
-use b
-simp only [hb1, true_and]
-apply Semigroup.mul_assoc
+  intro F hF
+  let E := (⋃ k ∈ K, (k * ·) '' F)
+  have hFinite: ∀ k ∈ K, ((k * ·) '' F).Finite := by
+    intro k hk
+    apply hF.image (k * ·)
+  have hEFinite: E.Finite := by
+    apply KIsFinite.biUnion hFinite
+  specialize hA E hEFinite
+  obtain ⟨s, hs⟩ := hA
+  use s
+  intro a ha
+  simp only [Set.mem_iInter]
+  intro i hi
+  simp only [Set.mem_preimage]
+  obtain ⟨b, hb1, hb2⟩ := ha
+  have hb3 : b * s = a:= by
+    simp only at hb2
+    exact hb2
+  rw [<- hb3]
+  apply hs
+  unfold E
+  simp only [Set.mem_image, Set.mem_iUnion, exists_prop, exists_exists_and_exists_and_eq_and]
+  use i
+  simp only [hi, true_and]
+  use b
+  simp only [hb1, true_and]
+  apply Semigroup.mul_assoc
 
 -- I changed the hypothesis of this theorem from Semigroup S to Monoid S.
 -- The purpose is to have access to Finset.prod function ∏ which is only available for Monoid
@@ -217,47 +226,47 @@ theorem commDilateCapOfThickIsThick
 (A : Set S) {hA : isThick A}
 (K : Set S) {KIsFinite : K.Finite} :
 isThick (⋂ k ∈ K, (k * ·) '' A) := by
-intro F hF
-let p : S := ∏ x ∈ KIsFinite.toFinset, x
-classical
-let f : S → S := fun k ↦ ∏ x ∈ KIsFinite.toFinset.erase k, x
-let Q := ⋂ x ∈ f '' K, (x * ·) ⁻¹' A
-have hqThick : isThick (Q) := by
-  apply inverseDilateCapOfThickIsThick
-  · exact hA
-  exact KIsFinite.image f
-specialize hqThick F hF
-obtain ⟨s, hs⟩ := hqThick
-use p * s
-intro b hb
-obtain ⟨a, ha1, ha2⟩ := hb
-have hb2 : b = a * (p * s) := by
-  rw [<- ha2]
--- redefine the goal
-have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
-  intro k hk
-  have ha_in_Q : a * s ∈ Q := by
-    exact hs ⟨a, ha1, rfl⟩
-  have hQ : ∀ q ∈ Q, ∀ x ∈ f '' K, x * q ∈ A := by
-    unfold Q
-    simp
-  specialize hQ (a * s) ha_in_Q
-  specialize hQ (f k) ⟨k, hk, rfl⟩
-  have hk1 : k ∈ KIsFinite.toFinset := by
-    simpa using hk
-  have hp : k * f (k) = p := by
-    classical
-    simpa using (Finset.mul_prod_erase (s := KIsFinite.toFinset) (f := fun x => x) hk1)
-  rw [<- hp] at hb2
-  have hb_rewrite: b = k * ((f k) * (a * s)) := by
-    simp [hb2, mul_comm, mul_left_comm, mul_assoc]
-  simp only [Set.mem_image]
-  use ((f k) * (a * s))
-  constructor
-  · exact hQ
-  rw [hb_rewrite]
--- finishing the proof
-simpa [Set.mem_iInter] using goal_redefined
+  intro F hF
+  let p : S := ∏ x ∈ KIsFinite.toFinset, x
+  classical
+  let f : S → S := fun k ↦ ∏ x ∈ KIsFinite.toFinset.erase k, x
+  let Q := ⋂ x ∈ f '' K, (x * ·) ⁻¹' A
+  have hqThick : isThick (Q) := by
+    apply inverseDilateCapOfThickIsThick
+    · exact hA
+    exact KIsFinite.image f
+  specialize hqThick F hF
+  obtain ⟨s, hs⟩ := hqThick
+  use p * s
+  intro b hb
+  obtain ⟨a, ha1, ha2⟩ := hb
+  have hb2 : b = a * (p * s) := by
+    rw [<- ha2]
+  -- redefine the goal
+  have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
+    intro k hk
+    have ha_in_Q : a * s ∈ Q := by
+      exact hs ⟨a, ha1, rfl⟩
+    have hQ : ∀ q ∈ Q, ∀ x ∈ f '' K, x * q ∈ A := by
+      unfold Q
+      simp
+    specialize hQ (a * s) ha_in_Q
+    specialize hQ (f k) ⟨k, hk, rfl⟩
+    have hk1 : k ∈ KIsFinite.toFinset := by
+      simpa using hk
+    have hp : k * f (k) = p := by
+      classical
+      simpa using (Finset.mul_prod_erase (s := KIsFinite.toFinset) (f := fun x => x) hk1)
+    rw [<- hp] at hb2
+    have hb_rewrite: b = k * ((f k) * (a * s)) := by
+      simp [hb2, mul_comm, mul_left_comm, mul_assoc]
+    simp only [Set.mem_image]
+    use ((f k) * (a * s))
+    constructor
+    · exact hQ
+    rw [hb_rewrite]
+  -- finishing the proof
+  simpa [Set.mem_iInter] using goal_redefined
 
 /-- This instance makes the semigroup structure on βS "canonical" by
 making it available to typeclass inference -/
@@ -272,7 +281,7 @@ theorem thickClosureContainsIdeal
 {H : Set S} (hH : isThick H) :
 ∃ (L : Set (Ultrafilter S)),
 isMinLeftIdeal L ∧ L ⊆ closure ((pure : S → Ultrafilter S) '' H) :=
-by sorry
+  by sorry
 
 /-- The closure in `βS` of a syndetic subset of a semigroup `S`
 has non-empty intersection with every left ideal -/
@@ -281,7 +290,7 @@ theorem syndeticClosureMeetsEveryIdeal
 {A : Set S} (hA : isSyndetic A) :
 ∀ (L : Set (Ultrafilter S)),
 isLeftIdeal L → (L ∩ closure ((pure : S → Ultrafilter S) '' A)).Nonempty :=
-by sorry
+  by sorry
 
 /-- If `H ⊆ S` is thick, there exists a minimal idempotent `p ∈ βS` such that
 for all finite `F ⊆ S`, `∩ f ∈ F, f⁻¹H ∈ p` -/
@@ -290,7 +299,7 @@ theorem minIdempotentWitnessesShiftIntersectionLargeness
 (H : Set S) {hH : isThick H} :
 ∃ (p : Ultrafilter S), isMinimalUltrafilter p ∧ p * p = p ∧
 ∀ (F : Set S), F.Finite → (⋂ f ∈ F, (leftMult f) ⁻¹' H) ∈ p :=
-by sorry
+  by sorry
 
 
 end Syndetic_and_thick_sets
@@ -310,19 +319,19 @@ theorem deltaZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDeltaZero A) (hAB : A ⊆ B) :
 isDeltaZero B := by
-intro k
-specialize hA k
-obtain ⟨s, hs⟩ := hA
-use s
-intro i j hij
-specialize hs i j hij
-simp only [Set.mem_image] at hs
-obtain ⟨x, hx1, hx2⟩ := hs
-simp only [Set.mem_image]
-use x
-constructor
-· exact hAB hx1
-· exact hx2
+  intro k
+  specialize hA k
+  obtain ⟨s, hs⟩ := hA
+  use s
+  intro i j hij
+  specialize hs i j hij
+  simp only [Set.mem_image] at hs
+  obtain ⟨x, hx1, hx2⟩ := hs
+  simp only [Set.mem_image]
+  use x
+  constructor
+  · exact hAB hx1
+  · exact hx2
 
 /-- The family of Delta_0 subsets of a semigroup -/
 def deltaZeroFamily
@@ -346,17 +355,17 @@ theorem deltaIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isDelta A) (hAB : A ⊆ B) :
 isDelta B := by
-obtain ⟨s, hs⟩ := hA
-use s
-intro i j hij
-specialize hs i j hij
-simp only [Set.mem_image] at hs
-obtain ⟨x, hx1, hx2⟩ := hs
-simp only [Set.mem_image]
-use x
-constructor
-· exact hAB hx1
-· exact hx2
+  obtain ⟨s, hs⟩ := hA
+  use s
+  intro i j hij
+  specialize hs i j hij
+  simp only [Set.mem_image] at hs
+  obtain ⟨x, hx1, hx2⟩ := hs
+  simp only [Set.mem_image]
+  use x
+  constructor
+  · exact hAB hx1
+  · exact hx2
 
 /-- The family of Delta subsets of a semigroup -/
 def deltaFamily
@@ -372,20 +381,20 @@ def deltaFamily
 theorem deltaFamilyContainedInDeltaZeroFamily
 {S : Type*} [Semigroup S] [Nonempty S] :
 deltaFamily S ⊆ deltaZeroFamily S := by
-intro A hA
-obtain ⟨x, hx⟩ := hA
-simp only [SetLike.mem_coe]
-have reduce_goal: isDeltaZero A → A ∈ deltaZeroFamily S := by
-  intro hA2
+  intro A hA
+  obtain ⟨x, hx⟩ := hA
+  simp only [SetLike.mem_coe]
+  have reduce_goal: isDeltaZero A → A ∈ deltaZeroFamily S := by
+    intro hA2
+    simpa
+  apply reduce_goal
+  unfold isDeltaZero
+  intro k
+  let s : Fin k → S := fun i ↦ x (i)
+  use s
+  intro i j hij
+  specialize hx i j hij
   simpa
-apply reduce_goal
-unfold isDeltaZero
-intro k
-let s : Fin k → S := fun i ↦ x (i)
-use s
-intro i j hij
-specialize hx i j hij
-simpa
 
 end Delta_sets
 
@@ -406,13 +415,13 @@ theorem dcSIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isdcSSet A) (hAB : A ⊆ B) :
 isdcSSet B := by
-obtain ⟨p, hp, U, hU1, hU2, hU3⟩ := hA
-use p
-use hp
-use U
-use hU1
-use hU2
-exact Set.Subset.trans hU3 hAB
+  obtain ⟨p, hp, U, hU1, hU2, hU3⟩ := hA
+  use p
+  use hp
+  use U
+  use hU1
+  use hU2
+  exact Set.Subset.trans hU3 hAB
 
 /-- The family of `dcS` sets -/
 def dcSFamily
@@ -441,10 +450,10 @@ visitTimeSet dSystem x U ⊆ A := by
   have Xprops := orbitClosureIsNonemptyCompactT2InvariantSubset (ultrafilterSystem S) p
   use X
   use inferInstance
-  letI csX : CompactSpace ↑X := isCompact_iff_compactSpace.mp Xprops.2.1
+  let csX : CompactSpace ↑X := isCompact_iff_compactSpace.mp Xprops.2.1
   use csX
   use inferInstance
-  letI nonX : Nonempty ↑X := Set.Nonempty.coe_sort Xprops.1
+  let nonX : Nonempty ↑X := Set.Nonempty.coe_sort Xprops.1
   use nonX
   let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) Xprops
   use dSystem
@@ -463,7 +472,8 @@ visitTimeSet dSystem x U ⊆ A := by
   use V
   use by exact hU2
   have Vopen : IsOpen V := by
-    simpa [V] using hU1.preimage continuous_subtype_val
+    sorry
+    --simpa [V] using hU1.preimage continuous_subtype_val
   use Vopen
   have visitInVisit : visitTimeSet dSystem ⟨p, pinX⟩ V ⊆
     visitTimeSet (ultrafilterSystem S) p U := by
@@ -493,7 +503,8 @@ visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
     use ⟨x, xInZ⟩
     exact xInU
   have Vopen : IsOpen V := by
-    simpa [V] using Uopen.preimage continuous_subtype_val
+    sorry
+    --simpa [V] using Uopen.preimage continuous_subtype_val
   have Zpresystem : isNonemptyCompactT2InvariantSubset dSystem Z :=
     orbitClosureIsNonemptyCompactT2InvariantSubset dSystem x
   let dSystemZ := fromNonemptyCompactT2InvariantSubsetToSystem dSystem Zpresystem
@@ -536,11 +547,11 @@ theorem centralIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isCentral A) (hAB : A ⊆ B) :
 isCentral B := by
-obtain ⟨p, hp, hip, rest⟩ := hA
-use p
-use hp
-use hip
-exact Filter.mem_of_superset rest hAB
+  obtain ⟨p, hp, hip, rest⟩ := hA
+  use p
+  use hp
+  use hip
+  exact Filter.mem_of_superset rest hAB
 
 /-- The family of `central` sets -/
 def centralFamily
@@ -569,7 +580,7 @@ isCentral A → ∃ (X : Type u) (_ : TopologicalSpace X)
 visitTimeSet dSystem x U = A := by
   intro hA
   obtain ⟨p,pMin,pIdemp,Ainp⟩ := hA
-  letI : SemigroupHom (WithOne.coe : S → WithOne S) :=
+  let : SemigroupHom (WithOne.coe : S → WithOne S) :=
   {
     hom_prop := fun s1 s2 ↦ WithOne.coe_mul s1 s2
   }
@@ -705,7 +716,7 @@ A ∈ F := by --Define F to be up-closure of all R(x,U), where V is open nbhd of
     have visitsInpreset : visitTimeSet (ultrafilterSystem S) p V ⊆
       {s | (fun x ↦ s * x) ⁻¹' A ∈ F} := by
         intro s hs
-        simp only [Set.mem_setOf_eq]
+        simp only [Set.mem_ofPred_eq]
         let invV := ((ultrafilterSystem S).map s) ⁻¹' V
         have invVopen : IsOpen invV := by
           exact Continuous.isOpen_preimage ((ultrafilterSystem S).mapCont s) V VOpen
@@ -792,7 +803,7 @@ theorem dcSCapThickIsCentral
       have hC : {p | C ∈ p} ⊆ -- NOTE: THIS IS AN EQUALITY BUT REVERSE IS NOT NEEDED AND IS ANNOYING
         ⋂ i ∈ FiniteSubsetS, ⋂ (_ : i ∈ F), {p : Ultrafilter S | i ∈ p} := by
           intro p
-          simp only [Set.mem_iInter, Set.mem_setOf_eq]
+          simp only [Set.mem_iInter, Set.mem_ofPred_eq]
           intro hp G hG GinF
           have : ⋂ i ∈ FiniteSubsetS, ⋂ (_ : i ∈ F), i ⊆ G := by
             apply Set.iInter_subset_of_subset G
@@ -815,8 +826,8 @@ theorem dcSCapThickIsCentral
             obtain ⟨E,hE⟩ := hU
             have CcapEinp : C ∩ E ∈ p := by
               rw [←hE] at pinU
-              simp only [Set.mem_setOf_eq] at pinU
-              simp only [Set.mem_setOf_eq] at hp
+              simp only [Set.mem_ofPred_eq] at pinU
+              simp only [Set.mem_ofPred_eq] at hp
               exact Filter.inter_mem hp pinU
             obtain ⟨t,htC,htE⟩ := Ultrafilter.nonempty_of_mem CcapEinp
             have ptinU : pure t ∈ U := by
@@ -893,15 +904,15 @@ def groupFromCompactSubmonoid
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
 Group S := by
-letI : Inv S := invFromCompactSubmonoid S hSComp hSIdemp
-exact Group.ofLeftAxioms
-  mul_assoc
-  one_mul
-  (by
-    intro x
-    exact
-      (Classical.choose_spec
-        (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)).2)
+  let : Inv S := invFromCompactSubmonoid S hSComp hSIdemp
+  exact Group.ofLeftAxioms
+    mul_assoc
+    one_mul
+    (by
+      intro x
+      exact
+        (Classical.choose_spec
+          (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)).2)
 
 /- The group above has a continuous inverse.  This is a standard fact: any
 compact Hausdorff group with a continuous multiplication has a continuous
@@ -1020,113 +1031,66 @@ theorem openPreimageInOpenSubsetTopCommGroup
 /- This is the application of ArzelaAscoli that we need.  ArzelaAscoli is stated in
 general terms in Mathlib. -/
 theorem compactClosureOfUniformEquicontinuous
-    {X S : Type*}
-    [TopologicalSpace X]
-    [CompactSpace X]
-    [T2Space X]
-    [Nonempty X]
-    (i : S → ContinuousMap.End X)
-    (hi : UniformEquicontinuous fun s x => (i s).1 x) :
+    {X S : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+    (i : S → ContinuousMap.End X) (hi : UniformEquicontinuous fun s x => (i s).1 x) :
     IsCompact (closure (Set.range i)) := by
-
-  let 𝔖 : Set (Set X) := {K | IsCompact K}
-
-  let CXXEnd := ContinuousMap.End X
-
-  apply ArzelaAscoli.isCompact_closure_of_isClosedEmbedding
-      (𝔖 := 𝔖)
-      (F := fun f : CXXEnd => (f.1 : X → X))
-      (s := Set.range i)
-  · intro K hK
-    exact hK
-  · have hclemb :
-    Topology.IsClosedEmbedding
-      (ContinuousMap.toUniformOnFunIsCompact ∘ ContinuousMap.End.toContinuousMap :
-        CXXEnd → UniformOnFun X X {K : Set X | IsCompact K}) := by sorry
-    simpa [𝔖, ContinuousMap.toUniformOnFunIsCompact] using hclemb
-  · intro K hK
-    have hrange : Equicontinuous (fun f : ↥(Set.range i) => (f.1 : X → X)) :=
-      by
-        classical
-        let j : ↥(Set.range i) → S :=
-          fun f => Classical.choose f.property
-
-        have hj (f : ↥(Set.range i)) : i (j f) = f.1 :=
-          Classical.choose_spec f.property
-        have hfamily :
-          ((fun s x => (i s).1 x) ∘ j)
-            =
-          (fun f : ↥(Set.range i) => (f.1 : X → X)) := by
-            funext f x
-            change (i (j f)).1 x = f.1 x
-            rw [hj f]
-        rw [← hfamily]
-        exact hi.equicontinuous.comp j
-    exact hrange.equicontinuousOn K
-  · intro K hK x hx
-    refine ⟨Set.univ, isCompact_univ, ?_⟩
-    intro f hf
-    simp
-
- #check UniformOnFun.uniformSpace_eq_inf_precomp_of_cover
-
-/- This is the application of ArzelaAscoli that we need.  ArzelaAscoli is stated in
-general terms in Mathlib. -/
-theorem compactClosureOfUniformEquicontinuousv2
-    {X S : Type*}
-    [TopologicalSpace X]
-    [CompactSpace X]
-    [T2Space X]
-    [Nonempty X]
-    (i : S → C(X,X))
-    (hi : UniformEquicontinuous fun s x => (i s).1 x) :
-    IsCompact (closure (Set.range i)) := by
-
-  let 𝔖 : Set (Set X) := {K | IsCompact K}
-  let CXXEnd := C(X,X)
-  apply ArzelaAscoli.isCompact_closure_of_isClosedEmbedding
-      (𝔖 := 𝔖)
-      (F := fun f : CXXEnd => (f.1 : X → X))
-      (s := Set.range i)
-  · intro K hK
-    exact hK
-  · have hclemb :
-    Topology.IsClosedEmbedding (ContinuousMap.toUniformOnFunIsCompact :
-      CXXEnd → UniformOnFun X X {K : Set X | IsCompact K}) :=
-        by
-          constructor
-          · exact
-              ContinuousMap.isUniformEmbedding_toUniformOnFunIsCompact.isEmbedding
-          · sorry
-            /-rw [ContinuousMap.range_toUniformOnFunIsCompact]
-            exact
-              UniformOnFun.isClosed_setOfPred_continuous
-                CompactlyCoherentSpace.isCoherentWith -/
-    simpa [𝔖, ContinuousMap.toUniformOnFunIsCompact] using hclemb
-  · intro K hK
-    have hrange : Equicontinuous (fun f : ↥(Set.range i) => (f.1 : X → X)) :=
-      by
-        classical
-        let j : ↥(Set.range i) → S :=
-          fun f => Classical.choose f.property
-
-        have hj (f : ↥(Set.range i)) : i (j f) = f.1 :=
-          Classical.choose_spec f.property
-        have hfamily :
-          ((fun s x => (i s).1 x) ∘ j)
-            =
-          (fun f : ↥(Set.range i) => (f.1 : X → X)) := by
-            funext f x
-            change (i (j f)).1 x = f.1 x
-            rw [hj f]
-            exact (congrFun rfl ∘ j) f
-        rw [← hfamily]
-        exact hi.equicontinuous.comp j
-    exact hrange.equicontinuousOn K
-  · intro K hK x hx
-    refine ⟨Set.univ, isCompact_univ, ?_⟩
-    intro f hf
-    simp only [ContinuousMap.toFun_eq_coe, Set.mem_univ]
+      let 𝔖 : Set (Set X) := {K | IsCompact K}
+      let CXXEnd := ContinuousMap.End X
+      apply ArzelaAscoli.isCompact_closure_of_isClosedEmbedding
+          (𝔖 := 𝔖)
+          (F := fun f : CXXEnd => (f.1 : X → X))
+          (s := Set.range i)
+      · intro K hK
+        exact hK
+      · have hclembCXX :
+        Topology.IsClosedEmbedding
+          (ContinuousMap.toUniformOnFunIsCompact :
+            C(X,X) → UniformOnFun X X {K : Set X | IsCompact K}) := by
+              constructor
+              · exact
+                  ContinuousMap.isUniformEmbedding_toUniformOnFunIsCompact.isEmbedding
+              · rw [ContinuousMap.range_toUniformOnFunIsCompact]
+                exact
+                  UniformOnFun.isClosed_setOfPred_continuous
+                    CompactlyCoherentSpace.isCoherentWith
+        have hEnd :
+            Topology.IsClosedEmbedding
+              (ContinuousMap.End.toContinuousMap :
+                CXXEnd → C(X,X)) := by
+          exact
+            ContinuousMap.End.homeomorphContinuousMap.isHomeomorph.isClosedEmbedding
+        have hclemb :
+            Topology.IsClosedEmbedding
+              (ContinuousMap.toUniformOnFunIsCompact ∘
+                ContinuousMap.End.toContinuousMap :
+                CXXEnd → UniformOnFun X X {K : Set X | IsCompact K}) := by
+          exact hclembCXX.comp hEnd
+        change Topology.IsClosedEmbedding
+          (ContinuousMap.toUniformOnFunIsCompact ∘ ContinuousMap.End.toContinuousMap :
+            CXXEnd → UniformOnFun X X {K : Set X | IsCompact K})
+        exact hclemb
+      · intro K hK
+        have hrange : Equicontinuous (fun f : ↥(Set.range i) => (f.1 : X → X)) :=
+          by
+            classical
+            let j : ↥(Set.range i) → S :=
+              fun f => Classical.choose f.property
+            have hj (f : ↥(Set.range i)) : i (j f) = f.1 :=
+              Classical.choose_spec f.property
+            have hfamily :
+              ((fun s x => (i s).1 x) ∘ j)
+                =
+              (fun f : ↥(Set.range i) => (f.1 : X → X)) := by
+                funext f x
+                change (i (j f)).1 x = f.1 x
+                rw [hj f]
+            rw [← hfamily]
+            exact hi.equicontinuous.comp j
+        exact hrange.equicontinuousOn K
+      · intro K hK x hx
+        refine ⟨Set.univ, isCompact_univ, ?_⟩
+        intro f hf
+        simp
 
 end Bohr_prelims
 
@@ -1147,16 +1111,16 @@ theorem bohrZeroIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isBohrZero A) (hAB : A ⊆ B) :
 isBohrZero B := by
-unfold isBohrZero
-unfold isBohrZero at hA
-rcases hA with ⟨k, φ, h1, h2, h3, h4, h5⟩
-use k
-use φ
-use h1
-use h2
-use h3
-use h4
-apply Set.Subset.trans h5 hAB
+  unfold isBohrZero
+  unfold isBohrZero at hA
+  rcases hA with ⟨k, φ, h1, h2, h3, h4, h5⟩
+  use k
+  use φ
+  use h1
+  use h2
+  use h3
+  use h4
+  apply Set.Subset.trans h5 hAB
 
 /-- The family of Bohr_0 subsets of a semigroup -/
 def bohrZeroFamily
@@ -1181,7 +1145,7 @@ DynamicalSystem (Fin d → Circle) (Fin d → Circle) :=
     intro s t x
     exact mul_assoc s t x
   mapCont := by
-    exact fun s ↦ continuous_mul_left s
+    exact fun s ↦ (uniformContinuous_mul_left s).continuous
 }
 
 theorem torusDSIsEquicontinuous
@@ -1193,7 +1157,7 @@ by
   simp only [Set.mem_image, Set.mem_diagonal_iff, Prod.exists, exists_eq_left'] at temp
   obtain ⟨a, ha⟩ := temp
   rw [←ha]
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   rw [uniformity_eq_comap_inv_mul_nhds_one] at αUniformity
   obtain ⟨V, hV, hVsub⟩ := αUniformity
   let β : Set (T × T) := {p | p.1⁻¹ * p.2 ∈ V}
@@ -1242,7 +1206,7 @@ visitTimeSet dSystem x U ⊆ A :=
 by
   intro hBZA
   obtain ⟨d,φ,φHom,U,UisOpen,oneinU,preimageUinA⟩ := hBZA
-  letI : SemigroupHom φ := by sorry -- use φHom
+  let : SemigroupHom φ := by sorry -- use φHom
   let torusDS := torusDynamicalSystem d
   let homTorusDS := homDynamicalSystem φ torusDS
   have homTorusDSisEqui := homSystemOfEquicontinuousSystemIsEquicontinuous φ (torusDSIsEquicontinuous d)
@@ -1251,8 +1215,8 @@ by
   let V := {z : X | z.1 ∈ U} --V is X ∩ U, interpreted as a subset of X
   have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
   let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
-  letI : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
-  letI : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
+  let : CompactSpace ↑(orbitClosure homTorusDS x) := by sorry
+  let : Nonempty ↑(orbitClosure homTorusDS x) := by sorry
   have xInX : x ∈ X := by sorry -- A UR point is in its orbit closure
   have hMin : isMinimalSystem dSystem := by sorry -- orbit closure of UR point is minimal
   have hEqui : isEquicontinuousSystem dSystem := by sorry --
@@ -1285,7 +1249,7 @@ isBohrZero A := by
   let i : S → CXXEnd := fun (s : S) ↦ ⟨dSystem.map s, dSystem.mapCont s⟩
   have iHom : ∀ (s t : S), i (s * t) = (i s) * (i t) := by
     intro s t
-    refine ContinuousMap.End.End.ext ?_
+    refine ContinuousMap.End.ext ?_
     intro x
     rw [ContinuousMap.End.mul_apply (i s) (i t) x]
     unfold i
@@ -1431,7 +1395,7 @@ by sorry
   -- change A ∈ {A | Aᶜ ∉ (bohrZeroFamily S).sets} ↔ A ∈ (setOfBohrRecurrenceFamily S).sets
   -- unfold bohrZeroFamily
   -- unfold setOfBohrRecurrenceFamily
-  -- simp only [Set.mem_setOf_eq]
+  -- simp only [Set.mem_ofPred_eq]
   -- exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
 /- In a commutative semigroup, the family of Bohr_0 sets is a filter -/

@@ -1,5 +1,7 @@
 import NSFLEAPS._07_RP.RP_Defs
 
+/-! This is a module docstring -/
+
 /-- When `X` is both a minimal S and T system and actions commute, `RP_S = RP_T` -/
 theorem forTwoMinCommActionsRPsAreSame
 {S} [CommSemigroup S] [Nonempty S]
@@ -192,10 +194,10 @@ theorem natExtSetIsNonempty
 Set.Nonempty (natExtSet dSystem) :=
 by sorry
 
-instance natExtSetIsNonemptyInstance
+theorem natExtSetIsNonemptyInstance
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{dSystem : DynamicalSystem S X} {hSurject : isSurjectiveSystem dSystem} :
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
 Nonempty ↑(natExtSet dSystem) := by sorry
 
 def natExtGroSystem

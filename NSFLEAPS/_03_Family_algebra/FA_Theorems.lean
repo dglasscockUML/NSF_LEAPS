@@ -1,5 +1,7 @@
 import NSFLEAPS._03_Family_algebra.FA_Defs
 
+/-! This is a module docstring -/
+
 theorem famDualAlt {α} (F : Family α) :
 F* = {A : Set α | Aᶜ ∉ F} :=
   by
@@ -12,7 +14,7 @@ F* = {A : Set α | Aᶜ ∉ F} :=
     by_contra h
     have AcinF : Aᶜ ∈ F.sets := by
       change ¬ (Aᶜ ∉ F.sets) at h
-      push_neg at h
+      push Not at h
       exact h
     have AnAc := AinDual Aᶜ AcinF
     rcases AnAc with ⟨x, xinA, xinAc⟩
@@ -26,7 +28,7 @@ F* = {A : Set α | Aᶜ ∉ F} :=
       by_contra xninAc
       have xinA : x ∈ A := by
         rw [Set.mem_compl_iff] at xninAc
-        push_neg at xninAc
+        push Not at xninAc
         exact xninAc
       have : x ∈ A ∩ B := ⟨xinA, xinB⟩
       have : (A ∩ B).Nonempty := ⟨x, this⟩
@@ -59,7 +61,7 @@ theorem thm_dual_is_involution (F : Family α) : F** = F := by
   rw [mem_dual_alt]      -- 'A ∈ F**'
   rw [mem_dual_alt]      -- 'Aᶜ ∈ F*' inside the negation
   rw [compl_compl]
-  push_neg
+  push Not
   rfl
 
 --maybe funky
@@ -81,7 +83,7 @@ theorem thm_dual_is_antitone (F G : Family α) : F ⊆ G → G* ⊆ F* :=
   intro h A hAinF
   rw [famDualAlt] at hAinF
   rw [famDualAlt]
-  simp only [Set.mem_setOf_eq] at hAinF ⊢
+  simp only [Set.mem_ofPred_eq] at hAinF ⊢
   intro hAcinG
   apply hAinF
   exact h hAcinG

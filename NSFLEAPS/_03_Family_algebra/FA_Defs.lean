@@ -1,4 +1,7 @@
 import NSFLEAPS._00_Imports.IM_Base
+
+/-! This is a module docstring-/
+
 /- These imports have been moved to _00_Imports.IM_Base
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Lattice
@@ -39,7 +42,7 @@ structure Family (α : Type*) where
 --   ⟨Family.sets⟩
 instance {α} : SetLike (Family α) (Set α) where
   coe := Family.sets
-  coe_injective' := by
+  coe_injective := by
     intro F G h
     cases F; cases G
     congr

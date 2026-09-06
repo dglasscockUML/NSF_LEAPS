@@ -1,5 +1,7 @@
 import NSFLEAPS._04_Dynamical_systems.DS_Defs
 
+/-! This is a module docstring -/
+
 section Right_topological_semigroups
 
 -- For def. of RightTopological, cf. Hindman-Strauss Def. 2.1
@@ -21,197 +23,197 @@ that is, sets of the form `Ss`, are closed -/
 theorem principalLeftIdealClosed
 (s : S) :
 IsClosed ((· * s) '' Set.univ) := by
-have hCompact : IsCompact ((· * s) '' Set.univ) := by
-  apply IsCompact.image
-  · exact isCompact_univ
-  · apply hRT.rightCont
-apply IsCompact.isClosed
-exact hCompact
+  have hCompact : IsCompact ((· * s) '' Set.univ) := by
+    apply IsCompact.image
+    · exact isCompact_univ
+    · apply hRT.rightCont
+  apply IsCompact.isClosed
+  exact hCompact
 
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every left ideal
 contains a closed left ideal -/
 theorem leftIdealContainsClosedLeftIdeal
 (L : Set S) {hL : isLeftIdeal L} :
 ∃ (M : Set S), isLeftIdeal M ∧ IsClosed M ∧ M ⊆ L := by
-rcases hL with ⟨hL1, hL2⟩
-rcases hL1 with ⟨s, hs⟩
-let M := (· * s) '' Set.univ
-use M
-constructor
-· unfold isLeftIdeal
+  rcases hL with ⟨hL1, hL2⟩
+  rcases hL1 with ⟨s, hs⟩
+  let M := (· * s) '' Set.univ
+  use M
   constructor
-  · have hMNonempty : s * s ∈ M := by
+  · unfold isLeftIdeal
+    constructor
+    · have hMNonempty : s * s ∈ M := by
+        simp [M]
+      exact ⟨s * s, hMNonempty⟩
+    · intro r t ht
+      simp only [Set.mem_image] at ht
+      rcases ht with ⟨m, hm1, hm2⟩
+      rw [<- hm2]
+      rcases hm1 with ⟨n, hn1, hn2⟩
+      simp only at hn2
+      rw [<- hn2]
+      have hEq : (r * n) * s = r * (n * s):= by
+        apply Semigroup.mul_assoc
+      rw [<- hEq]
       simp [M]
-    exact ⟨s * s, hMNonempty⟩
-  · intro r t ht
-    simp only [Set.mem_image] at ht
-    rcases ht with ⟨m, hm1, hm2⟩
-    rw [<- hm2]
-    rcases hm1 with ⟨n, hn1, hn2⟩
-    simp only at hn2
-    rw [<- hn2]
-    have hEq : (r * n) * s = r * (n * s):= by
-      apply Semigroup.mul_assoc
-    rw [<- hEq]
-    simp [M]
-constructor
-· apply principalLeftIdealClosed
-· intro x hx
-  simp only [Set.image_univ, Set.mem_range, M] at hx
-  rcases hx with ⟨y, hy⟩
-  rw [<- hy]
-  specialize hL2 y
-  apply hL2
-  simp only [Set.mem_image]
-  use s
+  constructor
+  · apply principalLeftIdealClosed
+  · intro x hx
+    simp only [Set.image_univ, Set.mem_range, M] at hx
+    rcases hx with ⟨y, hy⟩
+    rw [<- hy]
+    specialize hL2 y
+    apply hL2
+    simp only [Set.mem_image]
+    use s
 
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every minimal left
 ideal is compact -/
 theorem minimalLeftIdealCompact
 {L : Set S} (hL : isMinLeftIdeal L) :
 IsCompact L := by
-rcases hL with ⟨hL1, hL2⟩
-have hM : ∃ (M : Set S), isLeftIdeal M ∧ IsClosed M ∧ M ⊆ L := by
-  apply leftIdealContainsClosedLeftIdeal
-  exact hL1
-rcases hM with ⟨M, hM1, hM2, hM3⟩
-specialize hL2 M hM1 hM3
-have hLClosed : IsClosed L := by
-  rw [<- hL2]
-  exact hM2
-apply IsClosed.isCompact
-exact hLClosed
+  rcases hL with ⟨hL1, hL2⟩
+  have hM : ∃ (M : Set S), isLeftIdeal M ∧ IsClosed M ∧ M ⊆ L := by
+    apply leftIdealContainsClosedLeftIdeal
+    exact hL1
+  rcases hM with ⟨M, hM1, hM2, hM3⟩
+  specialize hL2 M hM1 hM3
+  have hLClosed : IsClosed L := by
+    rw [<- hL2]
+    exact hM2
+  apply IsClosed.isCompact
+  exact hLClosed
 
 /-- In a compact, Hausdorff, right-topological semigroup `S`, every left ideal
 contains a minimal left ideal -/
 theorem leftIdealContainsMinLeftIdeal
 (L : Set S) {hL : isLeftIdeal L} :
 ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L := by
-have LContain : ∃ LC : Set S, isLeftIdeal LC ∧ IsClosed LC ∧ LC ⊆ L := by
-  apply leftIdealContainsClosedLeftIdeal
-  exact hL
-rcases LContain with ⟨LC, hLC1, hLC2, hLC3⟩
-let C := {I : Set S | IsClosed I ∧ isLeftIdeal I ∧ I ⊆ LC}
-have hChain : ∀ c ⊆ C, IsChain (· ⊆ ·) c → c.Nonempty → ∃ lb ∈ C, ∀ t ∈ c, lb ⊆ t := by
-  intro c hc1 hc2 hc3
-  let lb := c.sInter
-  use lb
-  constructor
-  · simp only [Set.mem_setOf_eq, C]
+  have LContain : ∃ LC : Set S, isLeftIdeal LC ∧ IsClosed LC ∧ LC ⊆ L := by
+    apply leftIdealContainsClosedLeftIdeal
+    exact hL
+  rcases LContain with ⟨LC, hLC1, hLC2, hLC3⟩
+  let C := {I : Set S | IsClosed I ∧ isLeftIdeal I ∧ I ⊆ LC}
+  have hChain : ∀ c ⊆ C, IsChain (· ⊆ ·) c → c.Nonempty → ∃ lb ∈ C, ∀ t ∈ c, lb ⊆ t := by
+    intro c hc1 hc2 hc3
+    let lb := c.sInter
+    use lb
     constructor
-    · apply isClosed_sInter
-      intro t ht
-      have htInC : t ∈ C := by
-        apply hc1 ht
-      simp only [Set.mem_setOf_eq, C] at htInC
-      rcases htInC with ⟨ht1, ht2, ht3⟩
-      exact ht1
-    constructor
-    · apply nonemptyInterOfLeftIdealsIsLeftIdeal
-      · intro t ht
+    · simp only [Set.mem_ofPred_eq, C]
+      constructor
+      · apply isClosed_sInter
+        intro t ht
         have htInC : t ∈ C := by
           apply hc1 ht
-        simp only [Set.mem_setOf_eq, C] at htInC
-        rcases htInC with ⟨ht1, ht2, ht3⟩
-        exact ht2
-      have hcNonempty : Nonempty c := by
-        simpa
-      apply IsCompact.nonempty_sInter_of_directed_nonempty_isCompact_isClosed
-      · simp only [DirectedOn]
-        intro x hx y hy
-        simp only [IsChain] at hc2
-        specialize hc2 hx hy
-        by_cases hxEqy : x = y
-        · use x
-          constructor
-          · exact hx
-          constructor
-          · simp
-          · rw [hxEqy]
-        · specialize hc2 hxEqy
-          rcases hc2 with hP | hQ
-          · use x
-          · use y
-      · intro t ht
-        have htInC : t ∈ C := by
-          apply hc1 ht
-        simp only [Set.mem_setOf_eq, C] at htInC
-        rcases htInC with ⟨ht1, ht2, ht3⟩
-        rcases ht2 with ⟨ht2a, ht2b⟩
-        exact ht2a
-      · intro t ht
-        have htInC : t ∈ C := by
-          apply hc1 ht
-        simp only [Set.mem_setOf_eq, C] at htInC
-        rcases htInC with ⟨ht1, ht2, ht3⟩
-        apply IsClosed.isCompact ht1
-      · intro t ht
-        have htInC : t ∈ C := by
-          apply hc1 ht
-        simp only [Set.mem_setOf_eq, C] at htInC
+        simp only [Set.mem_ofPred_eq, C] at htInC
         rcases htInC with ⟨ht1, ht2, ht3⟩
         exact ht1
-    simp only [lb]
-    rcases hc3 with ⟨t, ht⟩
-    have htInC : t ∈ C := by
-      apply hc1 ht
-    simp only [Set.mem_setOf_eq, C] at htInC
-    rcases htInC with ⟨ht1, ht2, ht3⟩
-    have htInt : c.sInter ⊆ t := by
+      constructor
+      · apply nonemptyInterOfLeftIdealsIsLeftIdeal
+        · intro t ht
+          have htInC : t ∈ C := by
+            apply hc1 ht
+          simp only [Set.mem_ofPred_eq, C] at htInC
+          rcases htInC with ⟨ht1, ht2, ht3⟩
+          exact ht2
+        have hcNonempty : Nonempty c := by
+          simpa
+        apply IsCompact.nonempty_sInter_of_directed_nonempty_isCompact_isClosed
+        · simp only [DirectedOn]
+          intro x hx y hy
+          simp only [IsChain] at hc2
+          specialize hc2 hx hy
+          by_cases hxEqy : x = y
+          · use x
+            constructor
+            · exact hx
+            constructor
+            · simp
+            · rw [hxEqy]
+          · specialize hc2 hxEqy
+            rcases hc2 with hP | hQ
+            · use x
+            · use y
+        · intro t ht
+          have htInC : t ∈ C := by
+            apply hc1 ht
+          simp only [Set.mem_ofPred_eq, C] at htInC
+          rcases htInC with ⟨ht1, ht2, ht3⟩
+          rcases ht2 with ⟨ht2a, ht2b⟩
+          exact ht2a
+        · intro t ht
+          have htInC : t ∈ C := by
+            apply hc1 ht
+          simp only [Set.mem_ofPred_eq, C] at htInC
+          rcases htInC with ⟨ht1, ht2, ht3⟩
+          apply IsClosed.isCompact ht1
+        · intro t ht
+          have htInC : t ∈ C := by
+            apply hc1 ht
+          simp only [Set.mem_ofPred_eq, C] at htInC
+          rcases htInC with ⟨ht1, ht2, ht3⟩
+          exact ht1
+      simp only [lb]
+      rcases hc3 with ⟨t, ht⟩
+      have htInC : t ∈ C := by
+        apply hc1 ht
+      simp only [Set.mem_ofPred_eq, C] at htInC
+      rcases htInC with ⟨ht1, ht2, ht3⟩
+      have htInt : c.sInter ⊆ t := by
+        apply Set.sInter_subset_of_mem ht
+      exact htInt.trans ht3
+    · intro t ht
+      simp only [lb]
       apply Set.sInter_subset_of_mem ht
-    exact htInt.trans ht3
-  · intro t ht
-    simp only [lb]
-    apply Set.sInter_subset_of_mem ht
-have hLCinC : LC ∈ C := by
-  simp only [Set.mem_setOf_eq, subset_refl, and_true, C]
+  have hLCinC : LC ∈ C := by
+    simp only [Set.mem_ofPred_eq, subset_refl, and_true, C]
+    constructor
+    · exact hLC2
+    · exact hLC1
+  have hExistMin : ∃ M, M ⊆ LC ∧ Minimal (· ∈ C) M := by
+    apply zorn_superset_nonempty
+    · exact hChain
+    · exact hLCinC
+  rcases hExistMin with ⟨M, hM1, hM2⟩
+  use M
+  unfold Minimal at hM2
+  rcases hM2 with ⟨hM2a, hM2b⟩
   constructor
-  · exact hLC2
-  · exact hLC1
-have hExistMin : ∃ M, M ⊆ LC ∧ Minimal (· ∈ C) M := by
-  apply zorn_superset_nonempty
-  · exact hChain
-  · exact hLCinC
-rcases hExistMin with ⟨M, hM1, hM2⟩
-use M
-unfold Minimal at hM2
-rcases hM2 with ⟨hM2a, hM2b⟩
-constructor
-· constructor
-  · simp only [Set.mem_setOf_eq, C] at hM2a
-    rcases hM2a with ⟨hMClosed, hMLeftIdeal, hMjunk⟩
-    exact hMLeftIdeal
-  · intro I hI1 hI2
-    have hIContain : ∃ J : Set S, isLeftIdeal J ∧ IsClosed J ∧ J ⊆ I := by
-      apply leftIdealContainsClosedLeftIdeal
-      exact hI1
-    rcases hIContain with ⟨J, hJ1, hJ2, hJ3⟩
-    have hJinC : J ∈ C := by
-      simp only [Set.mem_setOf_eq, C]
-      constructor
-      · exact hJ2
-      constructor
-      · exact hJ1
-      · exact (hJ3.trans hI2).trans hM1
-    specialize hM2b hJinC (hJ3.trans hI2)
-    have hMinI : M ⊆ I := by
-      exact hM2b.trans hJ3
-    apply subset_antisymm hI2 hMinI
-· exact hM1.trans hLC3
+  · constructor
+    · simp only [Set.mem_ofPred_eq, C] at hM2a
+      rcases hM2a with ⟨hMClosed, hMLeftIdeal, hMjunk⟩
+      exact hMLeftIdeal
+    · intro I hI1 hI2
+      have hIContain : ∃ J : Set S, isLeftIdeal J ∧ IsClosed J ∧ J ⊆ I := by
+        apply leftIdealContainsClosedLeftIdeal
+        exact hI1
+      rcases hIContain with ⟨J, hJ1, hJ2, hJ3⟩
+      have hJinC : J ∈ C := by
+        simp only [Set.mem_ofPred_eq, C]
+        constructor
+        · exact hJ2
+        constructor
+        · exact hJ1
+        · exact (hJ3.trans hI2).trans hM1
+      specialize hM2b hJinC (hJ3.trans hI2)
+      have hMinI : M ⊆ I := by
+        exact hM2b.trans hJ3
+      apply subset_antisymm hI2 hMinI
+  · exact hM1.trans hLC3
 
 /-- Compact, right-topological semigroups contain minimal left ideals -/
 theorem rightTopSemigroupContainsMinLeftIdeal [Nonempty S] :
 ∃ (L : Set S), isMinLeftIdeal L := by
-have hSleftIdeal : isLeftIdeal (Set.univ : Set S) := by
-  unfold isLeftIdeal
-  constructor
-  · simp
-  · simp
-have hExistLeftIdeal : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ Set.univ := by
-  apply leftIdealContainsMinLeftIdeal
-  exact hSleftIdeal
-rcases hExistLeftIdeal with ⟨L, hL1, hL2⟩
-use L
+  have hSleftIdeal : isLeftIdeal (Set.univ : Set S) := by
+    unfold isLeftIdeal
+    constructor
+    · simp
+    · simp
+  have hExistLeftIdeal : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ Set.univ := by
+    apply leftIdealContainsMinLeftIdeal
+    exact hSleftIdeal
+  rcases hExistLeftIdeal with ⟨L, hL1, hL2⟩
+  use L
 
 omit [CompactSpace S] in
 /-- In a compact, Hausdorff, right-topological semigroup `S`, a compact
@@ -227,35 +229,35 @@ an idempotent element -/
 theorem leftIdealContainsIdempotent
 (L : Set S) {hL : isLeftIdeal L} :
 ∃ s ∈ L, s * s = s := by
-have hContain : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L := by
-  apply leftIdealContainsMinLeftIdeal
-  exact hL
-rcases hContain with ⟨M, hM1, hM2⟩
-have hMsemi : isSubsemigroup M := by
-  unfold isSubsemigroup
-  intro s hs t ht
+  have hContain : ∃ (M : Set S), isMinLeftIdeal M ∧ M ⊆ L := by
+    apply leftIdealContainsMinLeftIdeal
+    exact hL
+  rcases hContain with ⟨M, hM1, hM2⟩
+  have hMsemi : isSubsemigroup M := by
+    unfold isSubsemigroup
+    intro s hs t ht
+    rcases hM1 with ⟨hM1a, hM1b⟩
+    rcases hM1a with ⟨hM1a1, hM1a2⟩
+    specialize hM1a2 s
+    apply hM1a2
+    simp only [Set.mem_image]
+    use t
+  have hMcompact : IsCompact M := by
+    apply minimalLeftIdealCompact
+    exact hM1
   rcases hM1 with ⟨hM1a, hM1b⟩
   rcases hM1a with ⟨hM1a1, hM1a2⟩
-  specialize hM1a2 s
-  apply hM1a2
-  simp only [Set.mem_image]
-  use t
-have hMcompact : IsCompact M := by
-  apply minimalLeftIdealCompact
-  exact hM1
-rcases hM1 with ⟨hM1a, hM1b⟩
-rcases hM1a with ⟨hM1a1, hM1a2⟩
-have hMcontainIdem : ∃ s ∈ M, s * s = s := by
-  apply compactSubsemigroupContainsIdempotent
-  · exact hMsemi
-  · exact hMcompact
-  · exact hM1a1
-rcases hMcontainIdem with ⟨s, hs1, hs2⟩
-use s
-constructor
-· apply hM2
-  exact hs1
-· exact hs2
+  have hMcontainIdem : ∃ s ∈ M, s * s = s := by
+    apply compactSubsemigroupContainsIdempotent
+    · exact hMsemi
+    · exact hMcompact
+    · exact hM1a1
+  rcases hMcontainIdem with ⟨s, hs1, hs2⟩
+  use s
+  constructor
+  · apply hM2
+    exact hs1
+  · exact hs2
 
 end Right_topological_semigroups
 
@@ -392,84 +394,84 @@ theorem membershipInLeftMultByPrincipal
 {S : Type*} [Semigroup S]
 (s : S) (B : Set S) (p : Ultrafilter S) :
 B ∈ leftMultUltra (pure s) p ↔ (leftMult s) ⁻¹' B ∈ p := by
-constructor
-· intro hB
-  have h1 : leftMultUltra (pure s) p = (pure s) * p := by
-    rfl
-  rw [h1] at hB
-  simp only [ultraProductDescription, Ultrafilter.mem_pure, Set.mem_setOf_eq] at hB
-  have h2 : {t | s * t ∈ B} = leftMult s ⁻¹' B := by
-    rfl
-  rw [<- h2]
-  exact hB
-· intro hB
-  simp only [leftMultUltra]
-  simp only [ultraProductDescription, Ultrafilter.mem_pure, Set.mem_setOf_eq]
-  have h2 : {t | s * t ∈ B} = leftMult s ⁻¹' B := by
-    rfl
-  rw [h2]
-  exact hB
+  constructor
+  · intro hB
+    have h1 : leftMultUltra (pure s) p = (pure s) * p := by
+      rfl
+    rw [h1] at hB
+    simp only [ultraProductDescription, Ultrafilter.mem_pure, Set.mem_ofPred_eq] at hB
+    have h2 : {t | s * t ∈ B} = leftMult s ⁻¹' B := by
+      rfl
+    rw [<- h2]
+    exact hB
+  · intro hB
+    simp only [leftMultUltra]
+    simp only [ultraProductDescription, Ultrafilter.mem_pure, Set.mem_ofPred_eq]
+    have h2 : {t | s * t ∈ B} = leftMult s ⁻¹' B := by
+      rfl
+    rw [h2]
+    exact hB
 
 /-- If ultrafilter p ∈ closure of B, then B ∈ p -/
 lemma memClosurePureIff
 {S : Type*} [Semigroup S]
 (B : Set S) (p : Ultrafilter S) :
 p ∈ closure (pure '' B) ↔ B ∈ p := by
-constructor
-· intro hp
-  by_contra hBNotInp
-  have hBCom : Bᶜ ∈ p := by
-    apply Ultrafilter.compl_mem_iff_notMem.mpr hBNotInp
-  let U := {u : Ultrafilter S | Bᶜ ∈ u}
-  have hpInU : p ∈ U := by
-    simp only [Set.mem_setOf_eq, U]
-    exact hBCom
-  have hUOpen : IsOpen U := by
-    apply ultrafilter_isOpen_basic
-  have hpBInter : (U ∩ pure '' B).Nonempty := by
-    apply mem_closure_iff.mp hp
-    · exact hUOpen
-    · exact hpInU
-  rcases hpBInter with ⟨q, hq1, hq2⟩
-  simp only [Set.mem_setOf_eq, U] at hq1
-  simp only [Set.mem_image] at hq2
-  rcases hq2 with ⟨b, hb1, hb2⟩
-  rw [<- hb2] at hq1
-  simp only [Ultrafilter.mem_pure, Set.mem_compl_iff] at hq1
-  exact hq1 hb1
-· intro hBinp
-  apply mem_closure_iff.mpr
-  intro U hU hpinU
-  have hUNeigh : U ∈ nhds p := by
-    apply mem_nhds_iff.mpr
-    use U
-  have hUCon : ∃ t ∈ ultrafilterBasis S, p ∈ t ∧ t ⊆ U := by
-    apply (TopologicalSpace.IsTopologicalBasis.mem_nhds_iff ultrafilterBasis_is_basis).mp
-    exact hUNeigh
-  rcases hUCon with ⟨t, ht1, ht2, ht3⟩
-  simp only [ultrafilterBasis, Set.mem_range] at ht1
-  rcases ht1 with ⟨A, hA⟩
-  have htIntB : (t ∩ pure '' B).Nonempty := by
-    rw [<- hA] at ht2
-    simp only [Set.mem_setOf_eq] at ht2
-    have hABinp : A ∩ B ∈ p := by
-      apply Filter.inter_mem ht2 hBinp
-    have hABNonempty : (A ∩ B).Nonempty := by
-      apply Ultrafilter.nonempty_of_mem hABinp
-    rcases hABNonempty with ⟨x, hx1, hx2⟩
-    have hxB : (pure x : Ultrafilter S) ∈ (pure '' B : Set (Ultrafilter S) ):= by
-      apply (Set.mem_image pure B (pure x)).mpr
-      use x
-    have hxt : pure x ∈ t := by
-      rw [<- hA]
-      simp only [Set.mem_setOf_eq, Ultrafilter.mem_pure]
-      exact hx1
-    exact ⟨pure x, hxt, hxB⟩
-  have hSubSet : t ∩ pure '' B ⊆ U ∩ pure '' B := by
-    apply Set.inter_subset_inter
-    · exact ht3
-    · rfl
-  apply Set.Nonempty.mono hSubSet htIntB
+  constructor
+  · intro hp
+    by_contra hBNotInp
+    have hBCom : Bᶜ ∈ p := by
+      apply Ultrafilter.compl_mem_iff_notMem.mpr hBNotInp
+    let U := {u : Ultrafilter S | Bᶜ ∈ u}
+    have hpInU : p ∈ U := by
+      simp only [Set.mem_ofPred_eq, U]
+      exact hBCom
+    have hUOpen : IsOpen U := by
+      apply ultrafilter_isOpen_basic
+    have hpBInter : (U ∩ pure '' B).Nonempty := by
+      apply mem_closure_iff.mp hp
+      · exact hUOpen
+      · exact hpInU
+    rcases hpBInter with ⟨q, hq1, hq2⟩
+    simp only [Set.mem_ofPred_eq, U] at hq1
+    simp only [Set.mem_image] at hq2
+    rcases hq2 with ⟨b, hb1, hb2⟩
+    rw [<- hb2] at hq1
+    simp only [Ultrafilter.mem_pure, Set.mem_compl_iff] at hq1
+    exact hq1 hb1
+  · intro hBinp
+    apply mem_closure_iff.mpr
+    intro U hU hpinU
+    have hUNeigh : U ∈ nhds p := by
+      apply mem_nhds_iff.mpr
+      use U
+    have hUCon : ∃ t ∈ ultrafilterBasis S, p ∈ t ∧ t ⊆ U := by
+      apply (TopologicalSpace.IsTopologicalBasis.mem_nhds_iff ultrafilterBasis_is_basis).mp
+      exact hUNeigh
+    rcases hUCon with ⟨t, ht1, ht2, ht3⟩
+    simp only [ultrafilterBasis, Set.mem_range] at ht1
+    rcases ht1 with ⟨A, hA⟩
+    have htIntB : (t ∩ pure '' B).Nonempty := by
+      rw [<- hA] at ht2
+      simp only [Set.mem_ofPred_eq] at ht2
+      have hABinp : A ∩ B ∈ p := by
+        apply Filter.inter_mem ht2 hBinp
+      have hABNonempty : (A ∩ B).Nonempty := by
+        apply Ultrafilter.nonempty_of_mem hABinp
+      rcases hABNonempty with ⟨x, hx1, hx2⟩
+      have hxB : (pure x : Ultrafilter S) ∈ (pure '' B : Set (Ultrafilter S) ):= by
+        apply (Set.mem_image pure B (pure x)).mpr
+        use x
+      have hxt : pure x ∈ t := by
+        rw [<- hA]
+        simp only [Set.mem_ofPred_eq, Ultrafilter.mem_pure]
+        exact hx1
+      exact ⟨pure x, hxt, hxB⟩
+    have hSubSet : t ∩ pure '' B ⊆ U ∩ pure '' B := by
+      apply Set.inter_subset_inter
+      · exact ht3
+      · rfl
+    apply Set.Nonempty.mono hSubSet htIntB
 
 /-- Given `s ∈ S` and `B ⊆ S`, `closure(s⁻¹B) = s⁻¹closure(B)` -/
 theorem preimageClosureDescription
@@ -477,20 +479,20 @@ theorem preimageClosureDescription
 (s : S) (B : Set S) :
 closure ((pure : S → Ultrafilter S) '' ((leftMult s) ⁻¹' B)) =
 (leftMultUltra (pure s)) ⁻¹' (closure ((pure : S → Ultrafilter S) '' B)) := by
-ext p
-constructor
-· intro hp
-  simp only [memClosurePureIff] at hp
-  simp only [← membershipInLeftMultByPrincipal] at hp
-  simp only [← memClosurePureIff] at hp
-  simp only [Set.mem_preimage]
-  exact hp
-· intro hp
-  simp only [Set.mem_preimage] at hp
-  simp only [memClosurePureIff] at hp
-  simp only [membershipInLeftMultByPrincipal] at hp
-  simp only [← memClosurePureIff] at hp
-  exact hp
+  ext p
+  constructor
+  · intro hp
+    simp only [memClosurePureIff] at hp
+    simp only [← membershipInLeftMultByPrincipal] at hp
+    simp only [← memClosurePureIff] at hp
+    simp only [Set.mem_preimage]
+    exact hp
+  · intro hp
+    simp only [Set.mem_preimage] at hp
+    simp only [memClosurePureIff] at hp
+    simp only [membershipInLeftMultByPrincipal] at hp
+    simp only [← memClosurePureIff] at hp
+    exact hp
 
 /-- Given a minimal left ideal `L ⊆ βS` and an idempotent `u ∈ L`,
 for all `p ∈ L`, `pu = p` -/
@@ -500,57 +502,57 @@ theorem minimalIdempotentsAreLeftIdentites
 (u : Ultrafilter S) {huL : u ∈ L} {huIdempotent : u * u = u}
 (p : Ultrafilter S) :
 p ∈ L → p * u = p := by
-intro hpL
-let Lu := (· * u) '' L
-rcases hL with ⟨hL1, hL2⟩
-unfold isLeftIdeal at hL1
-rcases hL1 with ⟨hL1a, hL1b⟩
-have hLuInL : Lu ⊆ L := by
-  intro a ha
-  simp only [Set.mem_image, Lu] at ha
-  rcases ha with ⟨x, hx1, hx2⟩
-  rw [<- hx2]
-  specialize hL1b x
-  apply hL1b
-  simp only [Set.mem_image]
-  use u
-have hLuLeftI : isLeftIdeal Lu := by
-  constructor
-  · rcases hL1a with ⟨l, hl⟩
-    have hlIn : l * u ∈ Lu := by
-      simp only [Set.mem_image, Lu]
-      use l
-    exact ⟨l * u, hlIn⟩
-  · intro s a ha
-    simp only [Set.mem_image] at ha
+  intro hpL
+  let Lu := (· * u) '' L
+  rcases hL with ⟨hL1, hL2⟩
+  unfold isLeftIdeal at hL1
+  rcases hL1 with ⟨hL1a, hL1b⟩
+  have hLuInL : Lu ⊆ L := by
+    intro a ha
+    simp only [Set.mem_image, Lu] at ha
     rcases ha with ⟨x, hx1, hx2⟩
-    simp only [Set.mem_image, Lu] at hx1
-    rcases hx1 with ⟨y, hy1, hy2⟩
-    rw [<- hy2] at hx2
     rw [<- hx2]
-    have hsyu : (s * y) * u = s * (y * u):= by
-      apply Semigroup.mul_assoc
-    rw [<- hsyu]
-    simp only [Set.mem_image, Lu]
-    use s * y
+    specialize hL1b x
+    apply hL1b
+    simp only [Set.mem_image]
+    use u
+  have hLuLeftI : isLeftIdeal Lu := by
     constructor
-    · specialize hL1b s
-      apply hL1b
-      simp only [Set.mem_image]
-      use y
-    · rfl
-have hLuEqL : Lu = L := by
-  exact hL2 Lu hLuLeftI hLuInL
-have hpLu : p ∈ Lu := by
-  rw [hLuEqL]
-  exact hpL
-simp only [Set.mem_image, Lu] at hpLu
-rcases hpLu with ⟨q, hq1, hq2⟩
-rw [<- hq2]
-have hquu : (q * u) * u = q * (u * u) := by
-  apply Semigroup.mul_assoc
-rw [hquu]
-rw [huIdempotent]
+    · rcases hL1a with ⟨l, hl⟩
+      have hlIn : l * u ∈ Lu := by
+        simp only [Set.mem_image, Lu]
+        use l
+      exact ⟨l * u, hlIn⟩
+    · intro s a ha
+      simp only [Set.mem_image] at ha
+      rcases ha with ⟨x, hx1, hx2⟩
+      simp only [Set.mem_image, Lu] at hx1
+      rcases hx1 with ⟨y, hy1, hy2⟩
+      rw [<- hy2] at hx2
+      rw [<- hx2]
+      have hsyu : (s * y) * u = s * (y * u):= by
+        apply Semigroup.mul_assoc
+      rw [<- hsyu]
+      simp only [Set.mem_image, Lu]
+      use s * y
+      constructor
+      · specialize hL1b s
+        apply hL1b
+        simp only [Set.mem_image]
+        use y
+      · rfl
+  have hLuEqL : Lu = L := by
+    exact hL2 Lu hLuLeftI hLuInL
+  have hpLu : p ∈ Lu := by
+    rw [hLuEqL]
+    exact hpL
+  simp only [Set.mem_image, Lu] at hpLu
+  rcases hpLu with ⟨q, hq1, hq2⟩
+  rw [<- hq2]
+  have hquu : (q * u) * u = q * (u * u) := by
+    apply Semigroup.mul_assoc
+  rw [hquu]
+  rw [huIdempotent]
 
 /-- The predicate that the ultrafilter p on S is minimal, that is, belongs to
 some minimal left ideal -/
@@ -728,7 +730,7 @@ isMinimalSubset (ultrafilterSystem S) Z ↔ isMinLeftIdeal Z :=
       · intro M hM1 hM2
         obtain ⟨K,hK1,hK2,hK3⟩ := leftIdealContainsClosedLeftIdeal M (hL := hM1)
         obtain ⟨KNon,KComp,KT2,KInv⟩ := (ultraSubsystemIffClosedLeftIdeal K).mpr ⟨hK2,hK1⟩
-        have KinZ : K ⊆ Z := by exact LE.le.subset fun ⦃a⦄ a_1 ↦ hM2 (hK3 a_1)
+        have KinZ : K ⊆ Z := by exact fun ⦃a⦄ a_1 ↦ hM2 (hK3 a_1)
         specialize ZMin K KinZ ⟨KNon,KComp,KT2,KInv⟩
         ext x
         constructor
@@ -763,8 +765,8 @@ isMinimalUltrafilter p ↔ isUniformlyRecurrent (ultrafilterSystem S) p :=
       have LCompact := minimalLeftIdealCompact hL
       have LMinSystem :=
         (minimalSubsetIffMinimalSubsystem (ultrafilterSystem S) Lpresubsys).mp ⟨Lpresubsys,Lmin⟩
-      letI : CompactSpace L := isCompact_iff_compactSpace.mp (Lpresubsys.2.1)
-      letI : Nonempty L := by
+      let : CompactSpace L := isCompact_iff_compactSpace.mp (Lpresubsys.2.1)
+      let : Nonempty L := by
         rcases Lpresubsys.1 with ⟨y, hy⟩
         exact ⟨⟨y, hy⟩⟩
       let newsys := fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) Lpresubsys
@@ -795,40 +797,40 @@ X :=
 /-- Given an ultrafilter `p` on a set `S` and a map `f : S → X` into a topological
 space `X`, `ultraLim p f`, also written `lim_{s → p} f(s)` or `p-lim_s f(s)`, is the ultrafilter
 limit of `f` along `p` -/
-noncomputable
-def ultraLimContinuousComp
+theorem ultraLimContinuousComp
 {S : Type*}
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
 (p : Ultrafilter S) {g : X → Y} (hgCont : Continuous g) (f : S → X) :
 ultraLim p (g ∘ f) = g (ultraLim p f) := by
-unfold ultraLim
-have h1 : ∀ s : S, Ultrafilter.extend (g ∘ f) (pure s) = (g ∘ (Ultrafilter.extend f)) (pure s) := by
-  intro s
-  simp
-have hGoal : Ultrafilter.extend (g ∘ f) = g ∘ (Ultrafilter.extend f) := by
-  have h1Cont : Continuous (Ultrafilter.extend (g ∘ f)) := by
-    apply continuous_ultrafilter_extend
-  have h2Cont : Continuous (g ∘ (Ultrafilter.extend f)) := by
-    apply Continuous.comp
-    · exact hgCont
-    · apply continuous_ultrafilter_extend
-  have h30 : DenseRange (pure : S → Ultrafilter S) := by
-    apply denseRange_pure
-  let R : Set (Ultrafilter S) := Set.range pure
-  have hDenseR : Dense R := by
-    unfold DenseRange at h30
-    simp only [R]
-    exact h30
-  apply Continuous.ext_on hDenseR h1Cont h2Cont
-  unfold Set.EqOn
-  intro p hpInR
-  simp only [Set.mem_range, R] at hpInR
-  rcases hpInR with ⟨s, hs⟩
-  rw [<- hs]
-  specialize h1 s
-  exact h1
-simp [hGoal]
+  unfold ultraLim
+  have h1 : ∀ s : S, Ultrafilter.extend (g ∘ f) (pure s) = (g ∘ (Ultrafilter.extend f)) (pure s) :=
+    by
+      intro s
+      simp only [ultrafilter_extend_pure, Function.comp_apply]
+  have hGoal : Ultrafilter.extend (g ∘ f) = g ∘ (Ultrafilter.extend f) := by
+    have h1Cont : Continuous (Ultrafilter.extend (g ∘ f)) := by
+      apply continuous_ultrafilter_extend
+    have h2Cont : Continuous (g ∘ (Ultrafilter.extend f)) := by
+      apply Continuous.comp
+      · exact hgCont
+      · apply continuous_ultrafilter_extend
+    have h30 : DenseRange (pure : S → Ultrafilter S) := by
+      apply denseRange_pure
+    let R : Set (Ultrafilter S) := Set.range pure
+    have hDenseR : Dense R := by
+      unfold DenseRange at h30
+      simp only [R]
+      exact h30
+    apply Continuous.ext_on hDenseR h1Cont h2Cont
+    unfold Set.EqOn
+    intro p hpInR
+    simp only [Set.mem_range, R] at hpInR
+    rcases hpInR with ⟨s, hs⟩
+    rw [<- hs]
+    specialize h1 s
+    exact h1
+  simp [hGoal]
 
 -- This is a lemma needed in the proof of iteratedUltraLims
 lemma ultraSLeftExtension
@@ -1035,21 +1037,21 @@ theorem ultraActionIntertwinesWithFactor
 {π : X → Y} (hπ : isFactorMap dSystem dSystemY π)
 (p : Ultrafilter S) :
 ((ultraAction dSystemY).map p) ∘ π = π ∘ (ultraAction dSystem).map p := by
-ext x
-simp only [Function.comp_apply]
-simp only [ultraAction]
-unfold isFactorMap at hπ
-rcases hπ with ⟨hπ1, hπ2, hπ3⟩
-have h1 : (fun s ↦ dSystemY.map s (π x)) = fun s ↦ π (dSystem.map s x) := by
-  ext s
-  unfold isEquivariant at hπ3
-  specialize hπ3 s
-  have hπ3New : (dSystemY.map s ∘ π) x = (π ∘ dSystem.map s) x := by
-    apply congrFun hπ3
-  exact hπ3New
-rw [h1]
-apply ultraLimContinuousComp
-· exact hπ1
+  ext x
+  simp only [Function.comp_apply]
+  simp only [ultraAction]
+  unfold isFactorMap at hπ
+  rcases hπ with ⟨hπ1, hπ2, hπ3⟩
+  have h1 : (fun s ↦ dSystemY.map s (π x)) = fun s ↦ π (dSystem.map s x) := by
+    ext s
+    unfold isEquivariant at hπ3
+    specialize hπ3 s
+    have hπ3New : (dSystemY.map s ∘ π) x = (π ∘ dSystem.map s) x := by
+      apply congrFun hπ3
+    exact hπ3New
+  rw [h1]
+  apply ultraLimContinuousComp
+  · exact hπ1
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, a point
 `x : X`, an open set `U ⊆ X`, and `p : βS`, if `px ∈ U`, then `R(x,U) ∈ p` -/
@@ -1174,7 +1176,7 @@ by
     intro p hp q hq
     constructor
     · unfold A
-      simp only [Set.mem_setOf_eq]
+      simp only [Set.mem_ofPred_eq]
       rw [(ultraAction dSystem).mapMult]
       rw [hq.1]
       exact hp.1
@@ -1254,7 +1256,7 @@ by
     visitTimeSet (ultrafilterSystem S) p barRxV ⊆ visitTimeSet dSystem px U := by
       intro s hs
       unfold visitTimeSet ultrafilterSystem leftMultUltra barRxV at hs
-      simp only [Set.preimage_setOf_eq, Set.mem_setOf_eq] at hs
+      simp only [Set.preimage_ofPred_eq, Set.mem_ofPred_eq] at hs
       have := visitTimeSetInUltraImpliesUltraActInClosure dSystem x V (pure s * p) hs
       rw [(ultraAction dSystem).mapMult] at this
       change (ultraAction dSystem).map (pure s) px ∈ closure V at this
@@ -1277,8 +1279,8 @@ by
   have LisMinimalSubset := (ultraMinSubsystemIffMinLeftIdeal L).mpr hLMin
   let Lsystem :=
     fromNonemptyCompactT2InvariantSubsetToSystem (ultrafilterSystem S) LisMinimalSubset.1
-  letI : CompactSpace ↑L := isCompact_iff_compactSpace.mp (LisMinimalSubset.1.2.1)
-  letI : Nonempty ↑L := (fun ⟨y, hy⟩ ↦ ⟨⟨y, hy⟩⟩) LisMinimalSubset.1.1
+  let : CompactSpace ↑L := isCompact_iff_compactSpace.mp (LisMinimalSubset.1.2.1)
+  let : Nonempty ↑L := (fun ⟨y, hy⟩ ↦ ⟨⟨y, hy⟩⟩) LisMinimalSubset.1.1
   have LsystemMin : isMinimalSystem Lsystem :=
     (minimalSubsetIffMinimalSubsystem (ultrafilterSystem S) LisMinimalSubset.1).mp LisMinimalSubset
   obtain ⟨u,hu1,hu2,hu3⟩ :=

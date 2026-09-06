@@ -9,7 +9,11 @@ import Init.PropLemmas
 
 import Mathlib.Data.Set.Defs
 import Mathlib.Data.Set.Basic
-import Mathlib.Data.Set.Lattice
+import Mathlib.Data.Set.Lattice.Bounded
+import Mathlib.Data.Set.Lattice.Disjoint
+import Mathlib.Data.Set.Lattice.Image
+import Mathlib.Data.Set.Lattice.Indexed
+import Mathlib.Data.Set.Lattice.Order
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Set.Operations
@@ -22,6 +26,7 @@ import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Topology.UniformSpace.Defs
 import Mathlib.Topology.UniformSpace.Separation
 import Mathlib.Topology.Maps.Proper.Basic
+import Mathlib.Topology.Maps.Basic
 import Mathlib.Topology.Constructions.SumProd
 import Mathlib.Topology.UniformSpace.Separation
 import Mathlib.Topology.UniformSpace.HeineCantor
@@ -38,6 +43,7 @@ import Mathlib.Topology.Algebra.PontryaginDual
 import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.AddCircle.Real
+
 
 import Mathlib.Analysis.Complex.Circle
 
