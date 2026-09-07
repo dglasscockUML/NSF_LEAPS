@@ -471,9 +471,7 @@ visitTimeSet dSystem x U ⊆ A := by
     exact hU2
   use V
   use by exact hU2
-  have Vopen : IsOpen V := by
-    sorry
-    --simpa [V] using hU1.preimage continuous_subtype_val
+  have Vopen : IsOpen V := hU1.preimage continuous_subtype_val
   use Vopen
   have visitInVisit : visitTimeSet dSystem ⟨p, pinX⟩ V ⊆
     visitTimeSet (ultrafilterSystem S) p U := by
@@ -502,9 +500,7 @@ visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
   have Vnonempty : V.Nonempty := by
     use ⟨x, xInZ⟩
     exact xInU
-  have Vopen : IsOpen V := by
-    sorry
-    --simpa [V] using Uopen.preimage continuous_subtype_val
+  have Vopen : IsOpen V := Uopen.preimage continuous_subtype_val
   have Zpresystem : isNonemptyCompactT2InvariantSubset dSystem Z :=
     orbitClosureIsNonemptyCompactT2InvariantSubset dSystem x
   let dSystemZ := fromNonemptyCompactT2InvariantSubsetToSystem dSystem Zpresystem
@@ -880,12 +876,125 @@ section Bohr_prelims
 
 /- ChatGPT helped me write the following -/
 
+/-- In a compact submonoid of a topological monoid
+with the property that "idempotent implies unit", every
+element has a two-sided inverse -/
 theorem existsTwoSidedInvInCompactSubmonoid
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
-∀ (x : S), ∃ (y : S), (x * y = 1) ∧ (y * x = 1) := by sorry
+∀ (x : S), ∃ (y : S), (x * y = 1) ∧ (y * x = 1) := by
+  intro x
+  let P : Subsemigroup T :=
+    { carrier := {y | ∃ n : ℕ, 2 ≤ n ∧ y = (x : T) ^ n}
+      mul_mem' := by
+        intro a b ha hb
+        rcases ha with ⟨m, hm, rfl⟩
+        rcases hb with ⟨n, hn, rfl⟩
+        refine ⟨m + n, ?_, ?_⟩
+        · omega
+        · rw [pow_add] }
+  have hPsubS : (P : Set T) ⊆ S := by
+    intro y hy
+    rcases hy with ⟨n, hn, rfl⟩
+    exact S.pow_mem x.property n
+  have hPnonempty : (P : Set T).Nonempty := by
+    refine ⟨(x : T) ^ 2, ?_⟩
+    exact ⟨2, le_rfl, rfl⟩
+  let A := P.topologicalClosure
+  have hAcompact : IsCompact (A : Set T) := by
+    rw [Subsemigroup.coe_topologicalClosure]
+    exact hSComp.closure_of_subset hPsubS
+  have hAnonempty : (A : Set T).Nonempty := by
+    rcases hPnonempty with ⟨a, ha⟩
+    exact ⟨a, subset_closure ha⟩
+  have hAmul :
+      ∀ a ∈ (A : Set T), ∀ b ∈ (A : Set T), a * b ∈ (A : Set T) := by
+    intro a ha b hb
+    exact A.mul_mem ha hb
+  obtain ⟨e, heA, heidem⟩ :=
+    exists_idempotent_in_compact_subsemigroup
+      (fun r : T => continuous_id.mul continuous_const)
+      (A : Set T)
+      hAnonempty
+      hAcompact
+      hAmul
+  have heS : e ∈ S := by
+    have hAS : (A : Set T) ⊆ S := by
+      rw [Subsemigroup.coe_topologicalClosure]
+      exact closure_minimal hPsubS hSComp.isClosed
+    exact hAS heA
+  have eheSisIdemp : (⟨e, heS⟩ : S) * (⟨e, heS⟩ : S) = (⟨e, heS⟩ : S) := by
+    apply Subtype.ext
+    change e * e = e
+    exact heidem
+  have heone : e = 1 := by
+    have h : (⟨e, heS⟩ : S) = 1 := hSIdemp ⟨e, heS⟩ eheSisIdemp
+    exact congrArg (fun z : S => (z : T)) h
+  let L : Set T :=
+    (fun y : T => (x : T) * y) '' (S : Set T)
+  have hLcompact : IsCompact L := by
+    exact hSComp.image (continuous_const.mul continuous_id)
+  have hLclosed : IsClosed L :=
+    hLcompact.isClosed
+  have hPL : (P : Set T) ⊆ L := by
+    intro y hy
+    rcases hy with ⟨n, hn, rfl⟩
+    have hn1 : 1 ≤ n := by omega
+    refine ⟨(x : T) ^ (n - 1), S.pow_mem x.property (n - 1), ?_⟩
+    rw [show n = (n - 1) + 1 by omega]
+    rw [pow_succ']
+    simp only [add_tsub_cancel_right]
+  have hAL : (A : Set T) ⊆ L := by
+    rw [Subsemigroup.coe_topologicalClosure]
+    exact closure_minimal hPL hLclosed
+  have heL : e ∈ L := by
+    exact hAL (by simpa [heone] using heA)
+  obtain ⟨s₁, hs₁S, hs₁⟩ := heL
+  have hs₁eq : (x : T) * s₁ = 1 := by
+    rw [heone] at hs₁
+    exact hs₁
+  let R : Set T :=
+    (fun y : T => y * (x : T)) '' (S : Set T)
+  have hRcompact : IsCompact R := by
+    exact hSComp.image (continuous_id.mul continuous_const)
+  have hRclosed : IsClosed R :=
+    hRcompact.isClosed
+  have hPR : (P : Set T) ⊆ R := by
+    intro y hy
+    rcases hy with ⟨n, hn, rfl⟩
+    have hn1 : 1 ≤ n := by omega
+    refine ⟨(x : T) ^ (n - 1), S.pow_mem x.property (n - 1), ?_⟩
+    rw [show n = (n - 1) + 1 by omega]
+    rw [pow_succ]
+    simp only [add_tsub_cancel_right]
+  have hAR : (A : Set T) ⊆ R := by
+    rw [Subsemigroup.coe_topologicalClosure]
+    exact closure_minimal hPR hRclosed
+  have heR : e ∈ R := by
+    exact hAR (by simpa [heone] using heA)
+  obtain ⟨s₂, hs₂S, hs₂⟩ := heR
+  have hs₂eq : s₂ * (x : T) = 1 := by
+    rw [heone] at hs₂
+    exact hs₂
+  have hs₁s₂ : s₁ = s₂ := by
+    calc
+      s₁ = 1 * s₁ := by rw [one_mul]
+      _ = (s₂ * (x : T)) * s₁ := by rw [hs₂eq]
+      _ = s₂ * ((x : T) * s₁) := by rw [mul_assoc]
+      _ = s₂ * 1 := by rw [hs₁eq]
+      _ = s₂ := by rw [mul_one]
+  refine ⟨⟨s₁, hs₁S⟩, ?_, ?_⟩
+  · apply Subtype.ext
+    exact hs₁eq
+  · apply Subtype.ext
+    change s₁ * (x : T) = 1
+    rw [hs₁s₂]
+    exact hs₂eq
 
+/-- An inverse for compact submonoid of a topological monoid
+with the property that "idempotent implies unit" -/
+@[instance_reducible]
 noncomputable
 def invFromCompactSubmonoid
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
@@ -898,6 +1007,9 @@ Inv S :=
     (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)
 }
 
+/-- A group structure for compact submonoid of a topological monoid
+with the property that "idempotent implies unit" -/
+@[instance_reducible]
 noncomputable
 def groupFromCompactSubmonoid
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
@@ -914,6 +1026,52 @@ Group S := by
         (Classical.choose_spec
           (existsTwoSidedInvInCompactSubmonoid S hSComp hSIdemp x)).2)
 
+
+/-- Closed graph implies continuous function -/
+lemma continuous_of_isClosed_graph_of_compact
+{X Y : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+[TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
+(f : X → Y) (hgraph : IsClosed {p : X × Y | p.2 = f p.1}) :
+Continuous f := by
+  rw [continuous_iff_isClosed]
+  intro C hC
+  let K : Set (X × Y) := {p | p.2 = f p.1 ∧ p.2 ∈ C}
+  have hKclosed : IsClosed K := by
+    change IsClosed ({p : X × Y | p.2 = f p.1} ∩ Prod.snd ⁻¹' C)
+    exact hgraph.inter (hC.preimage continuous_snd)
+  have hKcompact : IsCompact K := hKclosed.isCompact
+  have hprojclosed : IsClosed (Prod.fst '' K) :=
+    (hKcompact.image continuous_fst).isClosed
+  have hpre : f ⁻¹' C = Prod.fst '' K := by
+    ext x
+    constructor
+    · intro hx
+      refine ⟨(x, f x), ?_, rfl⟩
+      change f x = f x ∧ f x ∈ C
+      exact ⟨rfl, hx⟩
+    · rintro ⟨p, hp, rfl⟩
+      change (p.2 = f p.1 ∧ p.2 ∈ C) at hp
+      change f p.1 ∈ C
+      rw [← hp.1]
+      exact hp.2
+  rw [hpre]
+  exact hprojclosed
+
+
+/-- A compact Hausdorff group with a continuous multiplication has
+a continuous inverse -/
+theorem continuousInv_of_compactSpace
+{G : Type*} [Group G] [TopologicalSpace G] [CompactSpace G] [T2Space G]
+[ContinuousMul G] :
+ContinuousInv G := by
+  refine ⟨?_⟩
+  apply continuous_of_isClosed_graph_of_compact (f := fun x : G => x⁻¹)
+  have hmul : Continuous (fun p : G × G => p.1 * p.2) :=
+    continuous_fst.mul continuous_snd
+  have h : IsClosed {p : G × G | p.1 * p.2 = 1} :=
+    isClosed_eq hmul continuous_const
+  simpa only [mul_eq_one_iff_eq_inv'] using h
+
 /- The group above has a continuous inverse.  This is a standard fact: any
 compact Hausdorff group with a continuous multiplication has a continuous
 inverse. -/
@@ -922,16 +1080,41 @@ theorem groupFromCompactSubmonoidHasContinuousInv
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
 letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
-ContinuousInv S := by sorry
+ContinuousInv S := by
+  let : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
+  let hComp : CompactSpace S := isCompact_iff_compactSpace.mp hSComp
+  let hMul : ContinuousMul S := Submonoid.continuousMul S
+  exact
+    @continuousInv_of_compactSpace
+      S
+      (groupFromCompactSubmonoid S hSComp hSIdemp)
+      inferInstance
+      hComp
+      inferInstance
+      hMul
 
-/- Put the pieces above together. -/
+/- A compact submonoid of a topological monoid with the property
+that "idempotent implies unit" is a compact Hausdorff group. -/
 theorem groupFromCompactSubmonoidIsTopologicalGroup
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
 letI : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
-IsTopologicalGroup S := by sorry
-
+IsTopologicalGroup S := by
+  let : Group S := groupFromCompactSubmonoid S hSComp hSIdemp
+  let hComp : CompactSpace S := isCompact_iff_compactSpace.mp hSComp
+  let hMul : ContinuousMul S := Submonoid.continuousMul S
+  let hInv : ContinuousInv S :=
+    @continuousInv_of_compactSpace
+      S
+      (groupFromCompactSubmonoid S hSComp hSIdemp)
+      inferInstance
+      hComp
+      inferInstance
+      hMul
+  exact
+    { continuous_mul := hMul.continuous_mul
+      continuous_inv := hInv.continuous_inv }
 
 -- theorem: if A ⊆ C(X,X) consists of surjections, then so does its closure
 
