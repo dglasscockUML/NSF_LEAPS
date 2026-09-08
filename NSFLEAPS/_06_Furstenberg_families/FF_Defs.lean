@@ -1016,7 +1016,7 @@ def groupFromCompactSubmonoid
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
 (hSIdemp : ∀ (x : S), x * x = x → x = 1) :
 Group S := by
-  let : Inv S := invFromCompactSubmonoid S hSComp hSIdemp
+  letI : Inv S := invFromCompactSubmonoid S hSComp hSIdemp
   exact Group.ofLeftAxioms
     mul_assoc
     one_mul
@@ -1117,45 +1117,271 @@ IsTopologicalGroup S := by
       continuous_inv := hInv.continuous_inv }
 
 -- theorem: if A ⊆ C(X,X) consists of surjections, then so does its closure
+theorem surjectiveSetImpliesSurjectiveClosure
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Set (ContinuousMap.End X)}
+(hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ) :
+∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ closure S → Function.Surjective ϕ := by
+  let Z := TopologicalSpace.NonemptyCompacts X
+  let XZelt : Z := {
+    carrier := Set.univ (α := X)
+    isCompact' := isCompact_univ
+    nonempty' := Set.univ_nonempty
+  }
+  let ψ : (ContinuousMap.End X) → Z :=
+    fun (f : ContinuousMap.End X) ↦ TopologicalSpace.NonemptyCompacts.map
+      f.toContinuousMap f.toContinuousMap.continuous XZelt
+  -- {
+  --   carrier := f.toContinuousMap '' (Set.univ (α := X))
+  --   isCompact' := IsCompact.image (isCompact_univ) f.toContinuousMap.continuous
+  --   nonempty' := Set.image_nonempty.mpr (Set.univ_nonempty)
+  -- }
+  have ψCont : Continuous ψ := by
+    apply Continuous.nonemptyCompacts_map'
+    · exact continuous_const
+    · change Continuous (fun p : (ContinuousMap.End X) × X => p.1.toContinuousMap p.2)
+      fun_prop
+  let constX : (ContinuousMap.End X) → Z := fun (f : ContinuousMap.End X) ↦ XZelt
+  have constXCont : Continuous constX := by
+    exact continuous_const
+  have eqonS : Set.EqOn ψ constX S := by
+    intro x hx
+    have := hSsurject x hx
+    refine TopologicalSpace.NonemptyCompacts.ext_iff.mpr ?_
+    unfold constX XZelt ψ
+    simp only [TopologicalSpace.NonemptyCompacts.coe_mk, TopologicalSpace.Compacts.coe_mk]
+    exact Set.image_univ_of_surjective (hSsurject x hx)
+  have eqonclosS : Set.EqOn ψ constX (closure S) := by
+    exact Set.EqOn.closure eqonS ψCont constXCont
+  intro x hx
+  apply Set.range_eq_univ.mp
+  have := congrArg (fun z => z.1.1) (eqonclosS hx)
+  unfold ψ constX XZelt at this
+  simp only [TopologicalSpace.NonemptyCompacts.toCompacts_map,
+    TopologicalSpace.Compacts.carrier_eq_coe, TopologicalSpace.Compacts.coe_map,
+    TopologicalSpace.Compacts.coe_mk, Set.image_univ] at this
+  exact this
 
 -- theorem: if S ⊆ C(X,X) is a subsemigroup, then so is its closure
+theorem closureOfSubsemiIsSubsemi
+{T : Type*} [semi : Semigroup T] [TopologicalSpace T] [T2Space T] [CM : ContinuousMul T]
+{S : Set T} (hSsubsemi : ∀ (ϕ ψ : T), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S) :
+∀ (ϕ ψ : T), ϕ ∈ closure S → ψ ∈ closure S → ϕ * ψ ∈ closure S := by
+  let M : T × T → T := fun p => semi.mul p.1 p.2
+  have hMcont : Continuous M := by
+    exact CM.continuous_mul
+  have imgMinS : M '' (Set.prod S S) ⊆ S := by
+    intro x hx
+    obtain ⟨y,hy1,hy2⟩ := hx
+    rw [←hy2]
+    unfold M
+    exact hSsubsemi y.1 y.2 hy1.1 hy1.2
+  have cprod : Set.prod (closure S) (closure S) = closure (Set.prod S S) := closure_prod_eq.symm
+  have closInv : M '' (Set.prod (closure S) (closure S)) ⊆ closure S :=
+    calc
+      M '' (Set.prod (closure S) (closure S)) ⊆ M '' (closure (Set.prod S S)) := by rw [cprod]
+      _ ⊆ closure (M '' Set.prod S S) := image_closure_subset_closure_image hMcont
+      _ ⊆ closure S := closure_mono imgMinS
+  intro x y hx hy
+  have prodInImg : x * y ∈ M '' (Set.prod (closure S) (closure S)) := by
+    unfold M
+    simp only [Set.mem_image, Prod.exists]
+    use x
+    use y
+    exact ⟨⟨hx,hy⟩,rfl⟩
+  exact closInv prodInImg
+
+-- theorem: if the maps in A ⊆ C(X,X) commute, then the maps in its closure commute
+theorem closureOfCommSetIsCommSet
+{T : Type*} [semi : Semigroup T] [TopologicalSpace T] [T2Space T] [CM : ContinuousMul T]
+{S : Set T} (hScomm : ∀ (ϕ ψ : T), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ) :
+∀ (ϕ ψ : T), ϕ ∈ closure S → ψ ∈ closure S → ϕ * ψ = ψ * ϕ := by
+  let M : T × T → T := fun p => semi.mul p.1 p.2
+  have hMcont : Continuous M := by
+    exact CM.continuous_mul
+  let swap : T × T → T × T := fun ⟨x,y⟩ ↦ ⟨y,x⟩
+  have hswapcont : Continuous swap := by
+    refine continuous_prodMk.mpr ?_
+    exact ⟨continuous_snd,continuous_fst⟩
+  let N : T × T → T := M.comp swap
+  have Ncont : Continuous N := by
+    exact Continuous.comp hMcont hswapcont
+  have eqonS : Set.EqOn M N (Set.prod S S) := by
+    intro x hx
+    exact hScomm x.1 x.2 hx.1 hx.2
+  have eqonSclos : Set.EqOn M N (Set.prod (closure S) (closure S)) := by
+    have cprod : Set.prod (closure S) (closure S) = closure (Set.prod S S) := closure_prod_eq.symm
+    rw [cprod]
+    exact Set.EqOn.closure eqonS hMcont Ncont
+  intro x y hx hy
+  unfold Set.EqOn at eqonSclos
+  exact eqonSclos (x := ⟨x,y⟩) ⟨hx, hy⟩
 
 -- theorem: if S ⊆ C(X,X) is a subsemigroup and consists of surjections,
 -- then any idempotent it contains is equal to Id_X
+theorem surjectiveSubsemiUniqueIdempotent
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Set (ContinuousMap.End X)}
+(hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ) :
+∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → ϕ * ϕ = ϕ → ϕ = 1 := by
+  intro φ hφ φIdemp
+  apply ContinuousMap.End.ext
+  intro x
+  obtain ⟨y,hy⟩ := hSsurject φ hφ x
+  simp only [ContinuousMap.End.one_apply]
+  calc
+    φ.toContinuousMap x = φ.toContinuousMap (φ.toContinuousMap y) := by rw [hy.symm]
+    _ = (φ * φ).toContinuousMap y := by
+      simp only [ContinuousMap.End.mul_apply]
+    _ = φ.toContinuousMap y := by
+      rw [φIdemp]
+    _ = x := hy
+
+-- theorem: if S ⊆ C(X,X) is a subsemigroup and consists of surjections,
+-- then it contains Id_X
+theorem surjectiveSubsemiContainsId
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Set (ContinuousMap.End X)}
+(nonemptyS : S.Nonempty)
+(hSsubsemi : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S)
+(hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
+(hScompactclos : IsCompact (closure S)) :
+(1 : ContinuousMap.End X) ∈ closure S := by
+  let cm : ContinuousMul (ContinuousMap.End X) := inferInstance
+  have contmul := cm.continuous_mul
+  have contleftmul :
+    ∀ (r : ContinuousMap.End X), Continuous fun (x : ContinuousMap.End X) => x * r := by
+      exact fun r ↦ Continuous.uncurry_right r contmul
+  have csNon : (closure S).Nonempty := closure_nonempty_iff.mpr nonemptyS
+  have csub : ∀ x ∈ (closure S), ∀ y ∈ (closure S), x * y ∈ (closure S) := by
+    intro x hx y hy
+    exact closureOfSubsemiIsSubsemi hSsubsemi x y hx hy
+  have idempsource := exists_idempotent_in_compact_subsemigroup
+    contleftmul
+    (closure S)
+    csNon
+    hScompactclos
+    csub
+  obtain ⟨i, hi, iIdemp⟩ := idempsource
+  have := surjectiveSubsemiUniqueIdempotent
+    (surjectiveSetImpliesSurjectiveClosure hSsurject) i hi iIdemp
+  rw [←this]
+  exact hi
 
 -- def: given S ⊆ C(X,X) is a subsemigroup consists of surjections with,
 -- overline S compact, get group (overline S) with 1 = id_X
-
--- theorem: if the maps in A ⊆ C(X,X) commute, then the maps in its closure commute
-
 -- def: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
 -- overline S compact, get commgroup (overline S)
-
--- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
--- overline S compact, get ContinuousInv (overline S)
-
--- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
--- overline S compact, get IsTopologicalGroup (overline S)
-
+@[instance_reducible]
 noncomputable
 def commGroupFromSurjectiveSubsemiOfCXX
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
+(nonemptyS : S.Nonempty)
 (hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
 (hSsubsemi : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S)
 (hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
 (hScompactclos : IsCompact (closure S)) :
-CommGroup (closure S) := by sorry
+CommGroup (closure S) := by
+  let cSSubMonoid : Submonoid (ContinuousMap.End X) :=
+  {
+    carrier := closure S
+    mul_mem' {x y} := closureOfSubsemiIsSubsemi hSsubsemi x y
+    one_mem' := surjectiveSubsemiContainsId nonemptyS hSsubsemi hSsurject hScompactclos
+  }
+  have hSIdemp : ∀ (x : cSSubMonoid), x * x = x → x = 1 := by
+    intro x xIdemp
+    have x1Idemp : x.1 * x.1 = x.1 := by
+      rw [←Submonoid.coe_mul cSSubMonoid x x]
+      exact congrArg (fun z => z.1) xIdemp
+    have cSisSubsemi := closureOfSubsemiIsSubsemi hSsubsemi
+    have cSisSurjective := surjectiveSetImpliesSurjectiveClosure hSsurject
+    apply Subtype.ext
+    exact surjectiveSubsemiUniqueIdempotent (S := closure S) cSisSurjective x x.2 x1Idemp
+  have cSSubMonoidCmpt : IsCompact cSSubMonoid.carrier := hScompactclos
+  letI : IsMulCommutative cSSubMonoid :=
+    ⟨by
+      exact
+        {
+          comm := by
+            intro φ ψ
+            apply Subtype.ext
+            exact (closureOfCommSetIsCommSet hScomm) φ.1 ψ.1 φ.2 ψ.2
+        }
+    ⟩
+  letI : Group cSSubMonoid := groupFromCompactSubmonoid cSSubMonoid cSSubMonoidCmpt hSIdemp
+  letI : CommGroup cSSubMonoid := IsMulCommutative.instCommGroup
+  simpa [cSSubMonoid] using
+    (inferInstance : CommGroup cSSubMonoid)
 
+
+-- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
+-- overline S compact, get ContinuousInv (overline S)
+theorem groupFromPrecompactSubsemiHasContinuousInv
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Set (ContinuousMap.End X)}
+(nonemptyS : S.Nonempty)
+(hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
+(hSsubsemi : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S)
+(hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
+(hScompactclos : IsCompact (closure S)) :
+letI : CommGroup (closure S) :=
+  commGroupFromSurjectiveSubsemiOfCXX nonemptyS hSsurject hSsubsemi hScomm hScompactclos
+ContinuousInv (closure S) := by
+  let : CommGroup (closure S) :=
+    commGroupFromSurjectiveSubsemiOfCXX nonemptyS hSsurject hSsubsemi hScomm hScompactclos
+  let hComp : CompactSpace (closure S) := isCompact_iff_compactSpace.mp hScompactclos
+  let cSSubMonoid : Submonoid (ContinuousMap.End X) :=
+  {
+    carrier := closure S
+    mul_mem' {x y} := closureOfSubsemiIsSubsemi hSsubsemi x y
+    one_mem' := surjectiveSubsemiContainsId nonemptyS hSsubsemi hSsurject hScompactclos
+  }
+  have continuousMulForSubMonoid := Submonoid.continuousMul cSSubMonoid
+  let hMul : ContinuousMul (closure S) := by
+    change ContinuousMul cSSubMonoid
+    exact continuousMulForSubMonoid
+  exact
+    @continuousInv_of_compactSpace
+      (closure S)
+      (commGroupFromSurjectiveSubsemiOfCXX
+        nonemptyS hSsurject hSsubsemi hScomm hScompactclos).toGroup
+      inferInstance
+      hComp
+      inferInstance
+      hMul
+
+-- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
+-- overline S compact, get IsTopologicalGroup (overline S)
 theorem isTopologicalGroupFromSurjectiveSubsemiOfCXX
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
+(nonemptyS : S.Nonempty)
 (hSsurject : ∀ (ϕ : (ContinuousMap.End X)), ϕ ∈ S → Function.Surjective ϕ)
 (hSsubsemi : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S)
 (hScomm : ∀ (ϕ ψ : (ContinuousMap.End X)), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ)
 (hScompactclos : IsCompact (closure S)) :
-letI : CommGroup (closure S) := commGroupFromSurjectiveSubsemiOfCXX hSsurject hSsubsemi hScomm hScompactclos
-IsTopologicalGroup (closure S) := by sorry
+letI : CommGroup (closure S) :=
+  commGroupFromSurjectiveSubsemiOfCXX nonemptyS hSsurject hSsubsemi hScomm hScompactclos
+IsTopologicalGroup (closure S) := by
+  let commGroupcS : CommGroup (closure S) :=
+    commGroupFromSurjectiveSubsemiOfCXX nonemptyS hSsurject hSsubsemi hScomm hScompactclos
+  let cSSubMonoid : Submonoid (ContinuousMap.End X) :=
+  {
+    carrier := closure S
+    mul_mem' {x y} := closureOfSubsemiIsSubsemi hSsubsemi x y
+    one_mem' := surjectiveSubsemiContainsId nonemptyS hSsubsemi hSsurject hScompactclos
+  }
+  have continuousMulForSubMonoid := Submonoid.continuousMul cSSubMonoid
+  let hMul : ContinuousMul (closure S) := by
+    change ContinuousMul cSSubMonoid
+    exact continuousMulForSubMonoid
+  let hComp : CompactSpace (closure S) := isCompact_iff_compactSpace.mp hScompactclos
+  let hInv : ContinuousInv (closure S) :=
+    groupFromPrecompactSubsemiHasContinuousInv nonemptyS hSsurject hSsubsemi hScomm hScompactclos
+  exact
+    { continuous_mul := hMul.continuous_mul
+      continuous_inv := hInv.continuous_inv }
 
 -- I have my doubts that the following is available in Mathlib.  That may be a problem for us.
 theorem PontryaginDual.exists_apply_ne_one
@@ -1170,34 +1396,105 @@ theorem PontryaginDual.exists_apply_ne_one
     ∃ χ : PontryaginDual X, χ x ≠ 1 := by
   sorry
 
-/- The following theorem says that the open neighborhoods of 1 in a compact Hausdorff group
+/-- The open neighborhoods of 1 in a compact Hausdorff group
   are generated by finite intersections of neighborhoods of 1 by characters.
-  The argument is not complicated given PontryaginDual.exists_apply_ne_one: consider X \ W.
-  It is compact.  For each point, by PontryaginDual.exists_apply_ne_one,
-  there is a character that is non-unit at it.  By continuity, there is a neighborhood
-  around each of these points on which those characters eval to non-unit. By compactness,
-  there are finitely many such.  Note that those finitely many characters all evaluate
-  to unit at unit.  Therefore, the preimage of unit under these characters contains unit
-  and is contained in W.  Choose a small neighborhood U of unit whose preimage
-  is contained in W.
 -/
 theorem openPreimageInOpenSubsetTopCommGroup
-    {X : Type*}
-    [TopologicalSpace X]
-    [CompactSpace X]
-    [T2Space X]
-    [CommGroup X]
-    [IsTopologicalGroup X]
-    {W : Set X}
-    (hW : IsOpen W)
-    (hWone : (1 : X) ∈ W) :
-    ∃ (d : ℕ)
-    (φ : X → (Fin d → Circle))
-    (φHom : ∀ (x y : X), φ (x * y) = (φ x) * (φ y))
-    (U : Set (Fin d → Circle))
-    (_ : IsOpen U)
-    (_ : (1 : Fin d → Circle) ∈ U),
-    φ ⁻¹' U ⊆ W := by sorry
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [CommGroup X]
+[IsTopologicalGroup X] {W : Set X} (hW : IsOpen W) (hWone : (1 : X) ∈ W) :
+∃ (d : ℕ) (φ : X → (Fin d → Circle)) (_ : ∀ (x y : X), φ (x * y) = (φ x) * (φ y))
+(U : Set (Fin d → Circle)) (_ : IsOpen U) (_ : (1 : Fin d → Circle) ∈ U),
+φ ⁻¹' U ⊆ W := by
+  classical
+  have hWcComp : IsCompact Wᶜ :=
+    hW.isClosed_compl.isCompact
+  have hchar :
+      ∀ x : (Wᶜ : Set X),
+        ∃ χ : PontryaginDual X, χ x.1 ≠ 1 := by
+    intro x
+    apply PontryaginDual.exists_apply_ne_one
+    intro hx
+    apply x.2
+    simpa [hx] using hWone
+  choose χ hχ using hchar
+  have hnbr :
+      ∀ x : (Wᶜ : Set X),
+        ∃ V C : Set Circle,
+          IsOpen V ∧
+          (1 : Circle) ∈ V ∧
+          V ⊆ C ∧
+          IsClosed C ∧
+          x.1 ∉ χ x ⁻¹' C := by
+    intro x
+    have h1 :
+        (1 : Circle) ∈ ({χ x x.1}ᶜ : Set Circle) := by
+      simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
+      exact Ne.intro fun a ↦ hχ x (id (Eq.symm a))
+    have hnhd :
+        ({χ x x.1}ᶜ : Set Circle) ∈ nhds (1 : Circle) :=
+      IsOpen.mem_nhds isOpen_compl_singleton h1
+    obtain ⟨C, hCnhd, hCclosed, hCsubset⟩ :=
+      exists_mem_nhds_isClosed_subset hnhd
+    obtain ⟨V, hVC, hVopen, hVone⟩ :=
+      mem_nhds_iff.mp hCnhd
+    refine ⟨V, C, hVopen, hVone, hVC, hCclosed, ?_⟩
+    intro hx
+    have h' := hCsubset hx
+    simp only [Set.mem_compl_iff, Set.mem_singleton_iff, not_true_eq_false] at h'
+  choose V C hVopen hVone hVC hCclosed hCmiss using hnbr
+  let O : (Wᶜ : Set X) → Set X :=
+    fun x => (χ x ⁻¹' C x)ᶜ
+  have hOopen : ∀ x : (Wᶜ : Set X), IsOpen (O x) := by
+    intro x
+    dsimp [O]
+    exact (hCclosed x).preimage (χ x).continuous |>.isOpen_compl
+  have hOcover : Wᶜ ⊆ ⋃ x : (Wᶜ : Set X), O x := by
+    intro x hx
+    apply Set.mem_iUnion.mpr
+    exact ⟨⟨x, hx⟩, by
+      dsimp [O]
+      exact hCmiss ⟨x, hx⟩⟩
+  obtain ⟨F, hF⟩ :=
+    hWcComp.elim_finite_subcover O hOopen hOcover
+  let d : ℕ := F.card
+  let e : F ≃ Fin d := F.equivFin
+  let zsel : Fin d → (Wᶜ : Set X) :=
+    fun j => (e.symm j).1
+  let φ : X → (Fin d → Circle) :=
+    fun x j => χ (zsel j) x
+  have φHom :
+      ∀ x y : X, φ (x * y) = (φ x) * (φ y) := by
+    intro x y
+    funext j
+    exact map_mul (χ (zsel j)) x y
+  let U : Set (Fin d → Circle) :=
+    ⋂ j : Fin d, (Function.eval j) ⁻¹' V (zsel j)
+  have hUopen : IsOpen U := by
+    dsimp [U]
+    exact isOpen_iInter_of_finite fun j =>
+      (hVopen (zsel j)).preimage (continuous_apply j)
+  have hUone : (1 : Fin d → Circle) ∈ U := by
+    simp only [U, Set.mem_iInter, Set.mem_preimage]
+    intro j
+    exact hVone (zsel j)
+  refine ⟨d, φ, φHom, U, hUopen, hUone, ?_⟩
+  intro y hy
+  by_contra hyW
+  have hyWc : y ∈ Wᶜ := hyW
+  have hycover := hF hyWc
+  rcases Set.mem_iUnion.mp hycover with ⟨z, hycover⟩
+  rcases Set.mem_iUnion.mp hycover with ⟨hzF, hyzO⟩
+  let j : Fin d := e ⟨z, hzF⟩
+  have hyV : χ z y ∈ V z := by
+    have h := Set.mem_iInter.mp hy j
+    simpa [φ, zsel, j] using h
+  have hyC : χ z y ∈ C z :=
+    hVC z hyV
+  have hyPre : y ∈ χ z ⁻¹' C z := by
+    exact hyC
+  have hyzO' : y ∉ χ z ⁻¹' C z := by
+    simpa [O] using hyzO
+  exact hyzO' hyPre
 
 /- This is the application of ArzelaAscoli that we need.  ArzelaAscoli is stated in
 general terms in Mathlib. -/
@@ -1401,7 +1698,7 @@ theorem bohrZeroSetsContainEquiReturns
 isBohrZero A → ∃ (X : Type) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (xInU : x ∈ U) (_ : IsOpen U),
+(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_xInU : x ∈ U) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A :=
 by
   intro hBZA
@@ -1418,7 +1715,7 @@ by
     homSystemOfDistalSystemIsDistal φ (torusDSIsDistal d)
   let x : Fin d → Circle := 1
   let X := orbitClosure homTorusDS x
-  let V := {z : X | z.1 ∈ U} --V is X ∩ U, interpreted as a subset of X
+  let V := {z : X | z.1 ∈ U}
   have VisOpen : IsOpen V := UisOpen.preimage continuous_subtype_val
   have orbClosPresystem := orbitClosureIsNonemptyCompactT2InvariantSubset homTorusDS x
   let dSystem := fromNonemptyCompactT2InvariantSubsetToSystem homTorusDS orbClosPresystem
@@ -1439,7 +1736,8 @@ by
   have hMin : isMinimalSystem dSystem :=
     (minimalSubsetIffMinimalSubsystem homTorusDS orbClosPresystem).mp
       (orbitClosureOfURPointIsMinimalSubset homTorusDS xUR)
-  have hEqui : isEquicontinuousSystem dSystem := subsystemOfEquicontinuousIsEquicontinuousv2 homTorusDSisEqui orbClosPresystem
+  have hEqui : isEquicontinuousSystem dSystem :=
+    subsystemOfEquicontinuousIsEquicontinuousv2 homTorusDSisEqui orbClosPresystem
   have xInV : ⟨x,xInX⟩ ∈ V := by
     unfold V
     simp only [Set.mem_ofPred_eq]
@@ -1526,10 +1824,11 @@ isBohrZero A := by
   --Arzela-Ascoli
   have iSClosCompact : IsCompact iSClos := compactClosureOfUniformEquicontinuous i iSEqui
   let : CompactSpace iSClos := isCompact_iff_compactSpace.mp iSClosCompact
+  have nonemptyS : iS.Nonempty := by sorry
   let iSClosGroup :=
-    commGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
+    commGroupFromSurjectiveSubsemiOfCXX nonemptyS iSSurjective iSSemi iSComm iSClosCompact
   have iSClosGroupIsTopGroup :=
-    isTopologicalGroupFromSurjectiveSubsemiOfCXX iSSurjective iSSemi iSComm iSClosCompact
+    isTopologicalGroupFromSurjectiveSubsemiOfCXX nonemptyS iSSurjective iSSemi iSComm iSClosCompact
   have oneIniS : (1 : CXXEnd) ∈ iSClos := by sorry
   have oneIsone : ⟨(1 : CXXEnd), oneIniS⟩ = (1 : iSClos) := by sorry
     -- these must come from our proof that iSClos is a topological group with identity id_X
