@@ -791,27 +791,34 @@ isICER dSystem (⋂₀ c) := by
   unfold isEquivalenceRelation
   apply (equivalenceRelationSetForm (⋂₀ c)).mpr
   refine ⟨?_,?_,?_⟩
-  · sorry -- reflexive
-  · sorry -- symmetric
-  · sorry -- transitive
-  /- constructor
-  · intro x I hI
-    specialize hc3 I hI
-    rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
-    specialize hc3a x
-    exact hc3a
-  constructor
-  · intro x y hxy I hI
-    specialize hc3 I hI
-    rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
-    specialize hxy I hI
-    apply hc3b hxy
-  intro x y z hxy hyz I hI
-  specialize hxy I hI
-  specialize hyz I hI
-  specialize hc3 I hI
-  rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
-  apply hc3c hxy hyz -/
+  · exact
+      {
+        refl := by
+          intro x I hI
+          specialize hc3 I hI
+          rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
+          specialize hc3a x
+          exact hc3a
+      }
+  · exact
+    {
+      symm := by
+        intro x y hxy I hI
+        specialize hc3 I hI
+        rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
+        specialize hxy I hI
+        apply hc3b hxy
+    }
+  · exact
+    {
+      trans := by
+        intro x y z hxy hyz I hI
+        specialize hxy I hI
+        specialize hyz I hI
+        specialize hc3 I hI
+        rcases hc3 with ⟨hc3a, hc3b, hc3c⟩
+        apply hc3c hxy hyz
+    }
 
 /-- If `X` is a compact Hausdorff topological space and `I` is a closed
 equivalence relation on `X^2`, then `X/I` is a Hausdorff topological space -/
@@ -5617,7 +5624,8 @@ RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) := by
             have hfIn :  f ∈ ⋂ α ∈ nhdsSet (Set.diagonal X),
               setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) α := by
               apply Set.mem_sInter.mpr
-              simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Set.mem_iInter]
+              simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff,
+                Set.mem_iInter]
               intro a ha
               specialize hContra a ha
               exact hContra
@@ -5629,7 +5637,8 @@ RP dSystemY ⊆ (Prod.map π π) '' (RP dSystemX) := by
           by_contra hContra
           simp only [Mathlib.Tactic.Push.not_exists] at hContra
           simp only [Set.disjoint_iUnion_right, not_and, not_forall] at hContra
-          have hfInOrbitClosure : f ∈ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf := by
+          have hfInOrbitClosure : f ∈ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) αf :=
+            by
             unfold setOrbitClosure
             simp only [mem_closure_iff]
             intro Vf hVf1 hVf2
@@ -6338,8 +6347,8 @@ RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
             rw [Set.inter_comm]
             exact hG
           exact hGNew2
-        simp only [Set.coe_ofPred, Set.mem_ofPred_eq, Set.disjoint_left, Set.mem_iInter, Subtype.forall,
-          Set.mem_compl_iff, not_not, Prod.forall] at hGnew
+        simp only [Set.coe_ofPred, Set.mem_ofPred_eq, Set.disjoint_left, Set.mem_iInter,
+          Subtype.forall, Set.mem_compl_iff, not_not, Prod.forall] at hGnew
         specialize hGnew a b
         apply hGnew
         intro a1 ha1 ha2
