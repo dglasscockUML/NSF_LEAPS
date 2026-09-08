@@ -6273,7 +6273,7 @@ isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
 def isEquicontinuousICER
-(dSystem : DynamicalSystem S X) [UniformSpace X]
+(dSystem : DynamicalSystem S X)
 {I : Set (X × X)} (hI : isICER dSystem I) :
 Prop :=
 by
