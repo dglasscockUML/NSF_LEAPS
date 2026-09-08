@@ -723,8 +723,7 @@ isFactorMap (fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
       rfl
     rw [h2, <- hz1]
     unfold imageDynamicalSystem
-    simp only
-    sorry -- DGG: This broke with the update.
+    rfl
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, an ICER
 (for dSystem) is an invariant (under the diagonal action of `S`),
