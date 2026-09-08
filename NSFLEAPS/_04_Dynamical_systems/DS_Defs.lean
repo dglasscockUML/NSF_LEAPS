@@ -6300,10 +6300,9 @@ RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
     have hGoalPrep0 : ∃ F : Finset (Set (X × X)), (∀ β ∈ F, β ∈ uniformity X) ∧
       Disjoint (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) α0ᶜ := by
       unfold RPM at hRPα0
-      have h1 : ∃ F : Finset {β : Set (X × X) | β ∈ nhdsSet (Set.diagonal X)},
-        α0ᶜ ∩ (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) = ∅ := by
-        sorry --DGG: This broke with the update.  Can we fix it?
-        /-apply IsCompact.elim_finite_subfamily_closed
+      have h0 : ∃ F : Finset {β : Set (X × X) | β ∈ nhdsSet (Set.diagonal X)},
+        Disjoint α0ᶜ (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) := by
+        apply IsCompact.elim_finite_subfamily_closed
         · apply IsClosed.isCompact
           apply IsOpen.isClosed_compl
           exact hα02
@@ -6315,16 +6314,21 @@ RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
             apply Set.subset_compl_iff_disjoint_left.mp
             simp only [compl_compl]
             exact hRPα0
-          apply Disjoint.inter_eq
           intro x hx1 hx2
           specialize hDisjoint hx1
           have hxthis: x ≤ ⋂ β ∈ nhdsSet (Set.diagonal X), setOrbitClosure
             (diagDynamicalSystem dSystem dSystem) β := by
-            simp only [Set.le_eq_subset, Set.subset_iInter_iff]
-            simp only [Set.coe_ofPred, Set.mem_ofPred_eq, Set.le_eq_subset, Set.subset_iInter_iff,
+            simp only [Set.subset_iInter_iff]
+            simp only [Set.coe_ofPred, Set.mem_ofPred_eq, Set.subset_iInter_iff,
               Subtype.forall] at hx2
             exact hx2
-          apply hDisjoint hxthis-/
+          apply hDisjoint hxthis
+      have h1 : ∃ F : Finset {β : Set (X × X) | β ∈ nhdsSet (Set.diagonal X)},
+        α0ᶜ ∩ (⋂ β ∈ F, setOrbitClosure (diagDynamicalSystem dSystem dSystem) β) = ∅ := by
+        rcases h0 with ⟨G, hG⟩
+        use G
+        apply Disjoint.inter_eq
+        exact hG
       rcases h1 with ⟨G, hG⟩
       let F : Finset (Set (X × X)) := G.map ⟨Subtype.val, Subtype.val_injective⟩
       use F
@@ -6332,8 +6336,8 @@ RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
       · intro β hβ
         have hβN : β ∈ nhdsSet (Set.diagonal X) := by
           rw [Finset.mem_map] at hβ
-          simp only [Set.mem_ofPred_eq, Function.Embedding.coeFn_mk, Subtype.exists, exists_and_right,
-            exists_eq_right] at hβ
+          simp only [Set.mem_ofPred_eq, Function.Embedding.coeFn_mk, Subtype.exists,
+            exists_and_right, exists_eq_right] at hβ
           rcases hβ with ⟨hx1, hx2⟩
           exact hx1
         simp only [nhdsSet_diagonal_eq_uniformity] at hβN
