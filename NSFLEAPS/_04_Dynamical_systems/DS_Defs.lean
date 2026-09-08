@@ -6224,12 +6224,15 @@ by
 /-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
 nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
 dynamical system. (DGG: v2 is the form I need it in later.) -/
+-- Anh : I unfold the goal isEquicontinuousSystem and prove it directly
+-- the reason is the definition of isEquicontinuousSystem, the uniform topology
+-- was hardcoded as NSFLEAF_something_something which we don't really want
 theorem subsystemOfEquicontinuousIsEquicontinuousv2
 {dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
 {Z : Set X} [CompactSpace Z] [Nonempty Z]
 (hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := sorry
-
+UniformEquicontinuous (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ).map := by
+  exact subsystemOfEquicontinuousIsEquicontinuous hXEqui hZ
 
 /- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
 -- This seems unnecessary.  Typeclass is finding it properly.
@@ -6243,8 +6246,8 @@ theorem homSystemOfEquicontinuousSystemIsEquicontinuous
 {T} [Semigroup T] [Nonempty T]
 (φ : T → S) [hSemiHom : SemigroupHom φ]
 {dSystem : DynamicalSystem S X} (_ : isEquicontinuousSystem dSystem) :
-isEquicontinuousSystem (homDynamicalSystem φ dSystem) :=
-by sorry
+isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
+  sorry
 
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
