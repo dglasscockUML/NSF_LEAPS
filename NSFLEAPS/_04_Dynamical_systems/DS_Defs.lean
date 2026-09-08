@@ -1805,10 +1805,12 @@ isMinimalSubset dSystemY (π '' Z):= by
       simpa
     constructor
     · unfold Function.Surjective
-      simp [π']
-      simp only [hWDef]
-      simp only [Set.mem_image, forall_exists_index, forall_and_index]
-      sorry  -- DGG: This broke with the update.
+      simp only [Subtype.exists, Subtype.forall, π']
+      simp only [hWDef, Set.mem_image, forall_exists_index, forall_and_index]
+      intro a b hb hab
+      use b
+      use hb
+      simp only [hab]
     unfold isEquivariant
     intro s
     specialize hEquivariant s
