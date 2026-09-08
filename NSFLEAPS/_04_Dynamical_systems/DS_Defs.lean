@@ -6245,9 +6245,30 @@ by sorry -/
 theorem homSystemOfEquicontinuousSystemIsEquicontinuous
 {T} [Semigroup T] [Nonempty T]
 (φ : T → S) [hSemiHom : SemigroupHom φ]
-{dSystem : DynamicalSystem S X} (_ : isEquicontinuousSystem dSystem) :
+{dSystem : DynamicalSystem S X} (hXEqu : isEquicontinuousSystem dSystem) :
 isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
-  sorry
+  let hYSys := homDynamicalSystem φ dSystem
+  have hYDef : hYSys = homDynamicalSystem φ dSystem := by
+    rfl
+  rw [<- hYDef]
+  unfold isEquicontinuousSystem
+  simp only [homDynamicalSystem, hYSys]
+  simp only [isEquicontinuousSystem] at hXEqu
+  simp only [UniformEquicontinuous]
+  intro α hα β hβ
+  simp only [Set.mem_ofPred_eq]
+  unfold UniformEquicontinuous at hXEqu
+  specialize hXEqu α hα hβ
+  simp only [Set.mem_ofPred_eq] at hXEqu
+  have hSub : {x : X × X | ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
+    ⊆ {x : X × X | ∀ (i : T), (dSystem.map (φ i) x.1, dSystem.map (φ i) x.2) ∈ α} := by
+    intro x hx
+    simp only [Set.mem_ofPred_eq] at hx
+    simp only [Set.mem_ofPred_eq]
+    intro t
+    specialize hx (φ t)
+    exact hx
+  exact Filter.mem_of_superset hXEqu hSub
 
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
