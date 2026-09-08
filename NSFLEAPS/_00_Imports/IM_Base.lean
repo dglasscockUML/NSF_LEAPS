@@ -43,6 +43,7 @@ import Mathlib.Topology.Algebra.PontryaginDual
 import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.AddCircle.Real
+import Mathlib.Topology.Sets.VietorisTopology
 
 
 import Mathlib.Analysis.Complex.Circle
