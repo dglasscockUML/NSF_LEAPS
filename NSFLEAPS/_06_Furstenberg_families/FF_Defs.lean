@@ -1780,7 +1780,7 @@ theorem equiReturnsAreBohrZero
 (∃ (X : Type*) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X)
 (_ : Nonempty X) (dSystem : DynamicalSystem S X)
 (_ : isEquicontinuousSystem dSystem) (_ : isMinimalSystem dSystem) (x : X)
-(U : Set X) (xInU : x ∈ U) (_ : IsOpen U), visitTimeSet dSystem x U ⊆ A) →
+(U : Set X) (_ : x ∈ U) (_ : IsOpen U), visitTimeSet dSystem x U ⊆ A) →
 isBohrZero A := by
   intro h
   obtain ⟨X,_,_,_,_,dSystem,hEqui,hMin,x,U,xInU,UOpen,visitsxUinA⟩ := h
@@ -1821,18 +1821,18 @@ isBohrZero A := by
     simp only [ContinuousMap.coe_mk]
     exact hEqui
   let iSClos := closure iS
-  --Arzela-Ascoli
   have iSClosCompact : IsCompact iSClos := compactClosureOfUniformEquicontinuous i iSEqui
   let : CompactSpace iSClos := isCompact_iff_compactSpace.mp iSClosCompact
-  have nonemptyS : iS.Nonempty := by sorry
+  have nonemptyS : iS.Nonempty := Set.range_nonempty i
   let iSClosGroup :=
     commGroupFromSurjectiveSubsemiOfCXX nonemptyS iSSurjective iSSemi iSComm iSClosCompact
   have iSClosGroupIsTopGroup :=
     isTopologicalGroupFromSurjectiveSubsemiOfCXX nonemptyS iSSurjective iSSemi iSComm iSClosCompact
-  have oneIniS : (1 : CXXEnd) ∈ iSClos := by sorry
-  have oneIsone : ⟨(1 : CXXEnd), oneIniS⟩ = (1 : iSClos) := by sorry
-    -- these must come from our proof that iSClos is a topological group with identity id_X
-    -- we either have that already from the above, or need to include it in the statement
+  have oneisonepre : iSClosGroup.one = (1 : CXXEnd) := by rfl
+  have oneIniS : (1 : CXXEnd) ∈ iSClos := by
+    rw [←oneisonepre]
+    exact iSClosGroup.one.2
+  have oneIsone : ⟨(1 : CXXEnd), oneIniS⟩ = (1 : iSClos) := by rfl
   let ξ : iSClos → X := fun (f : iSClos) ↦ f.1 x
   have ξCont : Continuous ξ := by
     let eval := fun (f : C(X,X)) ↦ f x
@@ -1866,15 +1866,11 @@ isBohrZero A := by
   let j : S → iSClos :=
     fun (s : S) ↦ ⟨i s, subset_closure (Set.mem_range_self s)⟩
   have jHom : ∀ (s t : S), j (s * t) = (j s) * (j t) := by
-    -- need a coe_mul (coercion splits over product) for iSClos
-    -- this may resolve based on our lemmas for iSClos (it is a subsemigroup of CXXEnd)
     intro s t
-    unfold j
-    refine SetCoe.ext ?_
-    simp only
-    -- rw [iHom s t]
-    -- apply?
-    sorry
+    have : (j (s * t) : iSClos) = (j s : iSClos) * (j t : iSClos) := by
+      unfold j
+      exact SetCoe.ext (iHom s t)
+    rw [this]
   let φ := ψ ∘ j
   have φHom : ∀ (s t : S), φ (s * t) = (φ s) * (φ t) := by
     unfold φ
