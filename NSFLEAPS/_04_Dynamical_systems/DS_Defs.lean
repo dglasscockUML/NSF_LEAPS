@@ -6541,7 +6541,47 @@ theorem equicontinuousMinCommSystemsAreDistal
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
-isEquicontinuousSystem dSystem → isDistalSystem dSystem := by sorry
+isEquicontinuousSystem dSystem → isDistalSystem dSystem := by
+  intro hXEqu
+  unfold isDistalSystem
+  intro x y hxyProx
+  by_contra hContra
+  have hExistα : ∃ α ∈ nhdsSet (Set.diagonal X), (x, y) ∉ closure α := by
+    sorry
+  rcases hExistα with ⟨α, hα1, hα2⟩
+  unfold isEquicontinuousSystem at hXEqu
+  unfold UniformEquicontinuous at hXEqu
+  specialize hXEqu α hα1
+  simp only [Filter.Eventually] at hXEqu
+  let β0 := {x : X × X| ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
+  have hβ0Def : β0 = {x : X × X| ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α} := by
+    rfl
+  rw [<- hβ0Def] at hXEqu
+  simp only [← nhdsSet_diagonal_eq_uniformity] at hXEqu
+  simp only [mem_nhdsSet] at hXEqu
+  rcases hXEqu with ⟨β, hβ1, hβ2, hβ3⟩
+  have hβ4 : β ∈ nhdsSet (Set.diagonal X) := by
+    simp only [mem_nhdsSet]
+    use β
+  unfold proximal at hxyProx
+  specialize hxyProx β hβ4
+  rcases hxyProx with ⟨s, hs⟩
+  let V := (diagDynamicalSystem dSystem dSystem).map s ⁻¹' β ∩ (closure α)ᶜ
+  have hxyIn : (x, y) ∈ V := by
+    simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V]
+    constructor
+    · simp only [diagDynamicalSystem, Prod.map_apply]
+      exact hs
+    · exact hα2
+  have hInterOpen : IsOpen V := by
+    apply IsOpen.inter
+    · apply IsOpen.preimage
+      · exact (diagDynamicalSystem dSystem dSystem).mapCont s
+      · exact hβ2
+    · simp
+  have hExistx1y1 : ∃ z ∈ V, isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) z := by
+    sorry
+  sorry
 
 /-- In a minimal, distal system with a commutative acting semigroup,
 the semigroup acts by homeomorphisms -/
