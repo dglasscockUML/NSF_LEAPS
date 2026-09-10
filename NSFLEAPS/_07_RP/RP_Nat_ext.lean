@@ -124,19 +124,6 @@ by
     _ = dSystem.map t x := by rw [hy]
 
 
-/- Example use of calc
-  have qxx : qx = x :=
-    calc
-      qx = q_px := by unfold q_px ; rw [hpFix]
-      _ = qp_x := by unfold q_px ; rw [←(ultraAction dSystem).mapMult]
-      _ = ux := by unfold qp_x ; rw [qpu]
-      _ = u_px := by unfold ux ; unfold u_px ; rw [hpFix]
-      _ = up_x := by unfold u_px ; rw [←(ultraAction dSystem).mapMult]
-      _ = px := by unfold up_x ; rw [upp]
-      _ = x := by unfold px ; rw [hpFix]
-
--/
-
 /-- If `S` acts by homeomorphisms, `groGroupDynamicalSystem` is the
 dynamical system gotten by defining the action of `groGroup S`
 on `X` in the natural way, possible by `surjectiveActionsFactorThroughGroGroupHom` -/
