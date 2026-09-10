@@ -6227,6 +6227,10 @@ dynamical system. (DGG: v2 is the form I need it in later.) -/
 -- Anh : I unfold the goal isEquicontinuousSystem and prove it directly
 -- the reason is the definition of isEquicontinuousSystem, the uniform topology
 -- was hardcoded as NSFLEAF_something_something which we don't really want
+-- Dan: This change killed bohrZeroSetsContainEquiReturns in FF_Defs
+-- There is now confusion in that theorem about what the uniform structure is
+-- This reminds me of the problem we had earlier (and solved with
+-- new definitions.  We should talk about this at a meeting.)
 theorem subsystemOfEquicontinuousIsEquicontinuousv2
 {dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
 {Z : Set X} [CompactSpace Z] [Nonempty Z]
