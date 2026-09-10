@@ -44,6 +44,7 @@ import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.AddCircle.Real
 import Mathlib.Topology.Sets.VietorisTopology
+import Mathlib.Topology.Separation.Regular
 
 
 import Mathlib.Analysis.Complex.Circle
