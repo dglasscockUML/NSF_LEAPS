@@ -6552,7 +6552,29 @@ isEquicontinuousSystem dSystem → isDistalSystem dSystem := by
   intro x y hxyProx
   by_contra hContra
   have hExistα : ∃ α ∈ nhdsSet (Set.diagonal X), (x, y) ∉ closure α := by
-    sorry
+    have hDisjNhds : Disjoint (nhdsSet (Set.diagonal X)) (nhds (x, y)) := by
+      apply (regularSpace_iff (X × X)).mp
+      · infer_instance
+      · apply isClosed_diagonal
+      · simp only [Set.mem_diagonal_iff]
+        exact hContra
+    have hDis2 : ∃ U V : Set (X × X), IsOpen U ∧ Set.diagonal X ⊆ U ∧ IsOpen V
+      ∧ (x, y) ∈ V ∧ Disjoint U V := by
+      obtain ⟨U, ⟨hU, hWU⟩, V, ⟨hxV, hV⟩, hUV⟩ := ((hasBasis_nhdsSet (Set.diagonal X)).disjoint_iff
+        (nhds_basis_opens (x, y))).mp hDisjNhds
+      use U
+      use V
+    rcases hDis2 with ⟨U, V, hU1, hU2, hV1, hV2, hUV⟩
+    use U
+    constructor
+    · apply mem_nhdsSet.mpr
+      use U
+    · by_contra hContraInClosure
+      apply mem_closure_iff.mp at hContraInClosure
+      specialize hContraInClosure V hV1 hV2
+      apply Set.Nonempty.not_disjoint at hContraInClosure
+      apply Disjoint.symm at hUV
+      exact hContraInClosure hUV
   rcases hExistα with ⟨α, hα1, hα2⟩
   unfold isEquicontinuousSystem at hXEqu
   unfold UniformEquicontinuous at hXEqu
@@ -6584,9 +6606,59 @@ isEquicontinuousSystem dSystem → isDistalSystem dSystem := by
       · exact (diagDynamicalSystem dSystem dSystem).mapCont s
       · exact hβ2
     · simp
+  have hVInterUnif : (V ∩ {z : X × X | isUniformlyRecurrent
+    (diagDynamicalSystem dSystem dSystem) z}).Nonempty := by
+    apply dense_iff_inter_open.mp
+    · apply inMinCommSystemURPairsDense hMin
+    · exact hInterOpen
+    · exact ⟨(x, y), hxyIn⟩
   have hExistx1y1 : ∃ z ∈ V, isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) z := by
-    sorry
-  sorry
+    apply Set.inter_nonempty.mp hVInterUnif
+  rcases hExistx1y1 with ⟨z, hz1, hz2⟩
+  have hVNeigh : V ∈ nhds z := by
+    apply mem_nhds_iff.mpr
+    use V
+  unfold isUniformlyRecurrent at hz2
+  specialize hz2 V hVNeigh
+  have hSs : {r * s | r ∈ (Set.univ : Set S)} ⊆
+    visitTimeSet (diagDynamicalSystem dSystem dSystem) z α := by
+    intro k hk
+    simp only [Set.mem_univ, true_and, Set.mem_ofPred_eq] at hk
+    rcases hk with ⟨r, hr⟩
+    simp only [visitTimeSet, Set.mem_preimage]
+    rw [<- hr]
+    rw [(diagDynamicalSystem dSystem dSystem).mapMult]
+    simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V] at hz1
+    rcases hz1 with ⟨hz1a, hz1b⟩
+    have hz1c := Set.mem_of_subset_of_mem hβ1 hz1a
+    simp only [Set.mem_ofPred_eq, β0] at hz1c
+    specialize hz1c r
+    exact hz1c
+  have hReturnαThick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) z α) := by
+    have hSsThick : isThick {r * s | r ∈ (Set.univ : Set S)} := by
+      apply rightTransOfThickIsThick
+      unfold isThick
+      intro F hF
+      have hSNonempty : Nonempty S := by
+        infer_instance
+      use Nonempty.some hSNonempty
+      simp
+    apply thickIsMonotone hSsThick hSs
+  have hNonemptyInter : ((visitTimeSet (diagDynamicalSystem dSystem dSystem) z V) ∩
+    (visitTimeSet (diagDynamicalSystem dSystem dSystem) z α)).Nonempty := by
+    apply syndeticThickIntersect
+    · exact hz2
+    · exact hReturnαThick
+  simp only [Set.inter_nonempty] at hNonemptyInter
+  rcases hNonemptyInter with ⟨t, ht1, ht2⟩
+  simp only [visitTimeSet, Set.mem_preimage] at ht1
+  simp only [visitTimeSet, Set.mem_preimage] at ht2
+  simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V] at ht1
+  rcases ht1 with ⟨ht1a, ht1b⟩
+  have ht1c : (diagDynamicalSystem dSystem dSystem).map t z ∉ α := by
+    apply Set.notMem_subset (subset_closure)
+    exact ht1b
+  exact ht1c ht2
 
 --DEPRACATED in favor of a future result
 /-- In a minimal, distal system with a commutative acting semigroup,
