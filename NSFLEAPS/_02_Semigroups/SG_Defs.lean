@@ -223,3 +223,27 @@ lemma syndeticThickIntersect
       simp only [Set.mem_image]
       use f
     apply hs hIn
+
+/-- If H is thick, then Ht is thick for all t ∈ S -/
+theorem rightTransOfThickIsThick
+{S : Type*} [Semigroup S] [Nonempty S]
+{H : Set S} (hHThick : isThick H) (t : S) :
+isThick {h * t | h ∈ H} := by
+  unfold isThick
+  unfold isThick at hHThick
+  intro F hF
+  specialize hHThick F hF
+  rcases hHThick with ⟨s, hs⟩
+  use s * t
+  intro a ha
+  simp only [Set.mem_image] at ha
+  rcases ha with ⟨f, hf1, hf2⟩
+  simp only [Set.mem_ofPred_eq]
+  simp only [Set.image_subset_iff] at hs
+  have h1 := Set.mem_of_subset_of_mem hs hf1
+  simp only [Set.mem_preimage] at h1
+  use f * s
+  constructor
+  · exact h1
+  · rw [<- hf2]
+    exact Semigroup.mul_assoc f s t
