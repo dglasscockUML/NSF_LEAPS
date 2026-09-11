@@ -1,6 +1,81 @@
 import NSFLEAPS._07_RP.RP_Defs
+import Mathlib.Algebra.Group.WithOne.Basic
+import Mathlib.GroupTheory.Subgroup.Centralizer
 
 /-! This is a module docstring -/
+
+/-- One inclusion of `forTwoMinCommActionsRPsAreSame`, for the backward regionally proximal
+relation.  This is stated separately only so that it can be applied twice, once with the
+roles of `S` and `T` exchanged; `S` and `T` live in different universes, so the symmetry
+step cannot be carried out inside a single proof. -/
+theorem RPMSubsetOfRPMForTwoMinCommActions
+{S} [CommSemigroup S] [Nonempty S]
+{T} [CommSemigroup T] [Nonempty T]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystemS : DynamicalSystem S X} (hMinS : isMinimalSystem dSystemS)
+{dSystemT : DynamicalSystem T X} (hMinT : isMinimalSystem dSystemT)
+(hCommActions : ∀ (s : S) (t : T),
+  (dSystemS.map s) ∘ (dSystemT.map t) = (dSystemT.map t) ∘ (dSystemS.map s)) :
+RPM dSystemS ⊆ RPM dSystemT := by
+  -- The actions of `S` and of `T` commute pointwise.
+  have hcomm : ∀ (σ : S) (τ : T) (w : X),
+      dSystemS.map σ (dSystemT.map τ w) = dSystemT.map τ (dSystemS.map σ w) := by
+    intro σ τ w
+    simpa using congrFun (hCommActions σ τ) w
+  intro z hz
+  apply (inRPMiffBackwardUOrbitClosInterNeighDiag dSystemT z).mpr
+  -- Let `α` be a neighborhood of the diagonal and `W` an open neighborhood of `z`.
+  intro W α hWOpen hWz hαOpen hαDiag
+  -- Since `z ∈ RPM dSystemS`, some `s ∈ S` satisfies `s⁻¹ W ∩ α ≠ ∅`.
+  obtain ⟨⟨x₀, y₀⟩, hp₀α, hp₀orb⟩ :=
+    (inRPMiffBackwardUOrbitClosInterNeighDiag dSystemS z).mp hz W α hWOpen hWz hαOpen hαDiag
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hp₀orb
+  obtain ⟨s, hs⟩ := hp₀orb
+  -- `G = α ∩ s⁻¹ W` is open and contains `(x₀, y₀)`.
+  have hGOpen : IsOpen (α ∩ ((diagDynamicalSystem dSystemS dSystemS).map s) ⁻¹' W) :=
+    hαOpen.inter (hWOpen.preimage ((diagDynamicalSystem dSystemS dSystemS).mapCont s))
+  have hp₀G : (x₀, y₀) ∈ α ∩ ((diagDynamicalSystem dSystemS dSystemS).map s) ⁻¹' W :=
+    ⟨hp₀α, hs⟩
+  -- Choose non-empty open `U`, `V` with `U × V ⊆ s⁻¹ W ∩ α`.
+  obtain ⟨U, V, hUOpen, hVOpen, hx₀U, hy₀V, hUV⟩ := isOpen_prod_iff.mp hGOpen x₀ y₀ hp₀G
+  -- Since `S` acts minimally, some `l ∈ S` gives `Y = U ∩ l⁻¹ V ≠ ∅`.
+  obtain ⟨l, hl⟩ := minimalImpliesNonemptySetVisits hMinS x₀ hVOpen ⟨y₀, hy₀V⟩
+  simp only [visitTimeSet, Set.mem_preimage] at hl
+  have hYOpen : IsOpen (U ∩ (dSystemS.map l) ⁻¹' V) :=
+    hUOpen.inter (hVOpen.preimage (dSystemS.mapCont l))
+  have hYNonempty : (U ∩ (dSystemS.map l) ⁻¹' V).Nonempty := ⟨x₀, hx₀U, hl⟩
+  -- The action of `s` is surjective, so `s⁻¹ Y ≠ ∅`.
+  obtain ⟨y₁, hy₁⟩ := hYNonempty
+  obtain ⟨a₀, ha₀⟩ := minimalCommActionIsSurjective hMinS s y₁
+  have hsa₀ : dSystemS.map s a₀ ∈ U ∩ (dSystemS.map l) ⁻¹' V := by rw [ha₀]; exact hy₁
+  -- Since `T` acts minimally, some `t ∈ T` gives `s⁻¹ Y ∩ t⁻¹ Y ≠ ∅`, witnessed by `a₀`.
+  obtain ⟨t, ht⟩ := minimalImpliesNonemptySetVisits hMinT a₀ hYOpen ⟨y₁, hy₁⟩
+  simp only [visitTimeSet, Set.mem_preimage] at ht
+  -- The point `(s a₀, l s a₀)` lies in `α` and is carried into `W` by `t`.
+  refine ⟨(dSystemS.map s a₀, dSystemS.map l (dSystemS.map s a₀)), ?_, ?_⟩
+  · exact (hUV (Set.mk_mem_prod hsa₀.1 hsa₀.2)).1
+  · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+    refine ⟨t, ?_⟩
+    -- `t` moves the point onto the `s`-image of `(t a₀, l t a₀) ∈ U × V`.
+    have hbW := (hUV (Set.mk_mem_prod ht.1 ht.2)).2
+    have h1 : dSystemT.map t (dSystemS.map s a₀) = dSystemS.map s (dSystemT.map t a₀) :=
+      (hcomm s t a₀).symm
+    have h2 : dSystemT.map t (dSystemS.map l (dSystemS.map s a₀))
+        = dSystemS.map s (dSystemS.map l (dSystemT.map t a₀)) := by
+      calc dSystemT.map t (dSystemS.map l (dSystemS.map s a₀))
+          = dSystemS.map l (dSystemT.map t (dSystemS.map s a₀)) := (hcomm l t _).symm
+        _ = dSystemS.map l (dSystemS.map s (dSystemT.map t a₀)) := by rw [h1]
+        _ = dSystemS.map (l * s) (dSystemT.map t a₀) := (dSystemS.mapMult l s _).symm
+        _ = dSystemS.map (s * l) (dSystemT.map t a₀) := by rw [mul_comm]
+        _ = dSystemS.map s (dSystemS.map l (dSystemT.map t a₀)) := dSystemS.mapMult s l _
+    have hgoal : (diagDynamicalSystem dSystemT dSystemT).map t
+        (dSystemS.map s a₀, dSystemS.map l (dSystemS.map s a₀))
+        = (diagDynamicalSystem dSystemS dSystemS).map s
+        (dSystemT.map t a₀, dSystemS.map l (dSystemT.map t a₀)) := by
+      simp only [diagDynamicalSystem, Prod.map_apply, Prod.mk.injEq]
+      exact ⟨h1, h2⟩
+    rw [hgoal]
+    exact hbW
 
 /-- When `X` is both a minimal S and T system and actions commute, `RP_S = RP_T` -/
 theorem forTwoMinCommActionsRPsAreSame
@@ -11,13 +86,25 @@ theorem forTwoMinCommActionsRPsAreSame
 {dSystemT : DynamicalSystem T X} (hMinT : isMinimalSystem dSystemT)
 (hCommActions : ∀ (s : S) (t : T),
   (dSystemS.map s) ∘ (dSystemT.map t) = (dSystemT.map t) ∘ (dSystemS.map s)) :
-RP dSystemS = RP dSystemT := by sorry
+RP dSystemS = RP dSystemT := by
+  -- Both systems are minimal with a commutative acting semigroup, so `RP = RPM` for each.
+  rw [forwardEqualsBackwardRPInMinCommSystem dSystemS (hMin := hMin),
+    forwardEqualsBackwardRPInMinCommSystem dSystemT (hMin := hMinT)]
+  -- By the symmetry of `S` and `T` it suffices to prove one inclusion.
+  apply Set.Subset.antisymm
+  · exact RPMSubsetOfRPMForTwoMinCommActions hMin hMinT hCommActions
+  · exact RPMSubsetOfRPMForTwoMinCommActions hMinT hMin fun t s => (hCommActions s t).symm
 
 /-- The Grothendieck group of a non-empty, commutative semigroup `S` is
 the Grothendieck group of the Monoid extension of `S` -/
 def groGroup
 (S : Type*) [CommSemigroup S] [Nonempty S] :=
   Algebra.GrothendieckGroup (WithOne S)
+
+/- `groGroup` is made reducible so that `groGroup S` and `Algebra.GrothendieckGroup (WithOne S)`
+are interchangeable during type class synthesis.  This only adds an attribute; the definition
+above is unchanged. -/
+attribute [reducible] groGroup
 
 /- WithOne S is a CommMonoid (Lean already knows this) -/
 -- instance
@@ -47,11 +134,41 @@ def imageOfSemiInGG
 Set (groGroup S) :=
 groGroupHom '' Set.univ
 
+/-- `Algebra.GrothendieckGroup.of`, viewed as a map from `WithOne S` into `groGroup S` -/
+def groGroupOf
+{S : Type*} [CommSemigroup S] [Nonempty S] :
+WithOne S → groGroup S :=
+Algebra.GrothendieckGroup.of
+
+/-- `groGroupOf` is a monoid homomorphism -/
+lemma groGroupOfMul
+{S : Type*} [CommSemigroup S] [Nonempty S] (a b : WithOne S) :
+groGroupOf (a * b) = (groGroupOf a) * (groGroupOf b) :=
+map_mul Algebra.GrothendieckGroup.of a b
+
+/-- `groGroupHom` is the restriction of `groGroupOf` to `S` -/
+lemma groGroupHomEqOf
+{S : Type*} [CommSemigroup S] [Nonempty S] (s : S) :
+groGroupHom s = groGroupOf (s : WithOne S) := rfl
+
+/-- `groGroupOf` written using `Localization.mk` -/
+lemma groGroupOfEqMk
+{S : Type*} [CommSemigroup S] [Nonempty S] (a : WithOne S) :
+groGroupOf a = Localization.mk a 1 :=
+(Localization.mk_one_eq_monoidOf_mk a).symm
+
+/-- Case analysis on `WithOne S` -/
+lemma withOneCases
+{α : Type*} (u : WithOne α) :
+u = 1 ∨ ∃ a : α, u = (a : WithOne α) :=
+WithOne.cases_on u (Or.inl rfl) (fun a => Or.inr ⟨a, rfl⟩)
+
 /-- The map `groGroupHom` is a semigroup homomorphism -/
 theorem groGroupHomIsSemigroupHom
 (S : Type*) [CommSemigroup S] [Nonempty S] :
-∀ (s t : S), groGroupHom (s * t) = (groGroupHom s) * (groGroupHom t) :=
-  by sorry
+∀ (s t : S), groGroupHom (s * t) = (groGroupHom s) * (groGroupHom t) := by
+  intro s t
+  rw [groGroupHomEqOf, groGroupHomEqOf, groGroupHomEqOf, WithOne.coe_mul, groGroupOfMul]
 
 /-- Instance for `groGroupHom` being a semigroup homomorphism -/
 instance
@@ -67,41 +184,102 @@ def rightSetShift
 Set S :=
 (fun (t : S) ↦ t * s) '' F
 
-/-- The image of `S` under `groGroupHom` generates `groGroup S` -/
-theorem imageOfSIsThickInGroGroup
-(S : Type*) [CommSemigroup S] [Nonempty S] :
-∀ (F : Set (groGroup S)), F.Finite →
-  ∃ (s : S), rightSetShift F (groGroupHom s) ⊆ imageOfSemiInGG :=
-  by sorry
-
 /-- Necessary condition for image of two elements of `S`
 to be equal under `groGroupHom` -/
 theorem groGroupHomIncidenceCondition
 {S : Type*} [CommSemigroup S] [Nonempty S] {s t : S} :
-groGroupHom s = groGroupHom t ↔ ∃ (r : S), s * r = t * r :=
-by sorry
+groGroupHom s = groGroupHom t ↔ ∃ (r : S), s * r = t * r := by
+  have hkey : groGroupHom s = groGroupHom t ↔
+      ∃ c : (⊤ : Submonoid (WithOne S)),
+        (c : WithOne S) * (s : WithOne S) = (c : WithOne S) * (t : WithOne S) :=
+    Submonoid.LocalizationMap.eq_iff_exists
+      (Localization.monoidOf (⊤ : Submonoid (WithOne S)))
+  rw [hkey]
+  constructor
+  · rintro ⟨c, hc⟩
+    obtain ⟨r₀⟩ := ‹Nonempty S›
+    obtain ⟨cv, hcv⟩ := c
+    have hc' : cv * (s : WithOne S) = cv * (t : WithOne S) := hc
+    rcases withOneCases cv with rfl | ⟨a, rfl⟩
+    · rw [one_mul, one_mul, WithOne.coe_inj] at hc'
+      exact ⟨r₀, by rw [hc']⟩
+    · rw [← WithOne.coe_mul, ← WithOne.coe_mul, WithOne.coe_inj] at hc'
+      exact ⟨a, by rw [mul_comm s a, mul_comm t a]; exact hc'⟩
+  · rintro ⟨r, hr⟩
+    refine ⟨⟨(r : WithOne S), Submonoid.mem_top _⟩, ?_⟩
+    change (r : WithOne S) * (s : WithOne S) = (r : WithOne S) * (t : WithOne S)
+    rw [← WithOne.coe_mul, ← WithOne.coe_mul, WithOne.coe_inj, mul_comm r s, mul_comm r t]
+    exact hr
 
-/- The only reason to state the following theorem is to have it match
-how we've written it in the paper.  But curiously, I cannot
-prove theGrothendieckGroupExists as it is stated now, because note
-that the theorem is a function of a universe level metavariable for G.
-Of course, I want to use G := groGroup S, but in the case that u_2,
-the universe level metavariable for G, is smaller than that of u_1,
-the metavariable for S, I cannot use groGroup S.  And, in fact, there
-likely is not a ``smaller complexity'' such group...!  So, as stated
-I don't believe that Lean will allow us to verify theGrothendieckGroupExists.
--/
-/-- The Grothendieck group of a semigroup and its basic properties -/
-theorem theGrothendieckGroupExists
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-∃ (G : Type*) (_ : CommGroup G), ∃ (i : S → G),
-(∀ (s t : S), i (s * t) = (i s) * (i t))
-∧
-(∀ (F : Set G), F.Finite → ∃ (s : S), rightSetShift F (i s) ⊆ i '' Set.univ)
-∧
-(∀ (s t : S), i s = i t ↔ ∃ (r : S), r * s = r * t) :=
-by sorry
+/-- Every element of `groGroup S` is a quotient of two elements of `WithOne S` -/
+lemma groGroupIsQuotient
+{S : Type*} [CommSemigroup S] [Nonempty S] (g : groGroup S) :
+∃ a c : WithOne S, g = groGroupOf a * (groGroupOf c)⁻¹ := by
+  have key : ∀ x : Algebra.GrothendieckGroup (WithOne S),
+      ∃ a c : WithOne S, x = Localization.mk a 1 * (Localization.mk c 1)⁻¹ := by
+    intro x
+    induction x using Localization.ind with
+    | _ y =>
+      obtain ⟨a, c⟩ := y
+      refine ⟨a, (c : WithOne S), ?_⟩
+      rw [Algebra.GrothendieckGroup.inv_mk, Localization.mk_mul]
+      simp
+  obtain ⟨a, c, hac⟩ := key g
+  refine ⟨a, c, ?_⟩
+  rw [groGroupOfEqMk, groGroupOfEqMk]
+  exact hac
 
+/-- Multiplying an element of `WithOne S` by an element of `S` lands in the image of `S` -/
+lemma withOneMulCoe
+{S : Type*} [CommSemigroup S] (u : WithOne S) (r : S) :
+∃ b : S, (b : WithOne S) = u * (r : WithOne S) := by
+  rcases withOneCases u with rfl | ⟨a, rfl⟩
+  · exact ⟨r, by rw [one_mul]⟩
+  · exact ⟨a * r, by rw [WithOne.coe_mul]⟩
+
+/-- The image of `S` in `groGroup S` is closed under right multiplication by `groGroupHom` -/
+lemma imageOfSemiInGGMulSelf
+{S : Type*} [CommSemigroup S] [Nonempty S] {g : groGroup S}
+(hg : g ∈ imageOfSemiInGG) (b : S) :
+g * groGroupHom b ∈ imageOfSemiInGG := by
+  obtain ⟨a, -, rfl⟩ := hg
+  exact ⟨a * b, Set.mem_univ _, groGroupHomIsSemigroupHom S a b⟩
+
+/-- Every single element of `groGroup S` can be shifted into the image of `S`.
+This is the one-element case of `imageOfSIsThickInGroGroup`. -/
+lemma existsShiftIntoImageOfSemiInGG
+{S : Type*} [CommSemigroup S] [Nonempty S] (g : groGroup S) :
+∃ b : S, g * groGroupHom b ∈ imageOfSemiInGG := by
+  obtain ⟨r₀⟩ := ‹Nonempty S›
+  obtain ⟨a, c, rfl⟩ := groGroupIsQuotient g
+  obtain ⟨b, hb⟩ := withOneMulCoe c r₀
+  obtain ⟨u, hu⟩ := withOneMulCoe a r₀
+  refine ⟨b, u, Set.mem_univ _, ?_⟩
+  rw [groGroupHomEqOf, groGroupHomEqOf, hb, hu, groGroupOfMul, groGroupOfMul,
+    mul_assoc, ← mul_assoc (groGroupOf c)⁻¹, inv_mul_cancel, one_mul]
+
+/-- The image of `S` under `groGroupHom` generates `groGroup S` -/
+theorem imageOfSIsThickInGroGroup
+(S : Type*) [CommSemigroup S] [Nonempty S] :
+∀ (F : Set (groGroup S)), F.Finite →
+  ∃ (s : S), rightSetShift F (groGroupHom s) ⊆ imageOfSemiInGG := by
+  intro F hF
+  induction F, hF using Set.Finite.induction_on with
+  | empty =>
+    obtain ⟨r₀⟩ := ‹Nonempty S›
+    exact ⟨r₀, by simp [rightSetShift]⟩
+  | @insert g F' hgF hF' ih =>
+    obtain ⟨s', hs'⟩ := ih
+    obtain ⟨b, hb⟩ := existsShiftIntoImageOfSemiInGG (g * groGroupHom s')
+    refine ⟨s' * b, ?_⟩
+    rintro x ⟨f, hf, rfl⟩
+    change f * groGroupHom (s' * b) ∈ imageOfSemiInGG
+    have hrw : f * groGroupHom (s' * b) = (f * groGroupHom s') * groGroupHom b := by
+      rw [groGroupHomIsSemigroupHom, mul_assoc]
+    rw [hrw]
+    rcases hf with hf | hf
+    · rw [hf]; exact hb
+    · exact imageOfSemiInGGMulSelf (hs' ⟨f, hf, rfl⟩) b
 
 /-- If `S` acts surjectively on `X` and `groGroupHom s = groGroupHom t`, then
 `s` and `t` act in the same way on `X` -/
@@ -124,16 +302,121 @@ by
     _ = dSystem.map t x := by rw [hy]
 
 
+/-! ### Theorem 6.3: the action of the Grothendieck group
+
+When `S` acts by homeomorphisms, the maps `f_s` all commute, so the subgroup of `X ≃ₜ X` that
+they generate is commutative.  The universal property of the Grothendieck group then extends
+the action of `S` to an action of `groGroup S`, which is what the paper constructs by hand.
+-/
+
+/-- When `S` acts by homeomorphisms, the homeomorphism of `X` given by `s` -/
+noncomputable def actionHomeo
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (s : S) :
+X ≃ₜ X :=
+IsHomeomorph.homeomorph (dSystem.map s) (hHomeo s)
+
+@[simp] lemma actionHomeoApply
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (s : S) (x : X) :
+actionHomeo hHomeo s x = dSystem.map s x := rfl
+
+/-- `actionHomeo` turns multiplication in `S` into composition of homeomorphisms -/
+lemma actionHomeoMul
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (s t : S) :
+actionHomeo hHomeo (s * t) = actionHomeo hHomeo s * actionHomeo hHomeo t :=
+Homeomorph.ext (fun x ↦ dSystem.mapMult s t x)
+
+/-- The subgroup of `X ≃ₜ X` generated by the action of `S` -/
+noncomputable def actionSubgroup
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+Subgroup (X ≃ₜ X) :=
+Subgroup.closure (Set.range (actionHomeo hHomeo))
+
+/-- The generators of `actionSubgroup` commute, because `S` is commutative -/
+lemma actionSubgroupGensComm
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+∀ f ∈ Set.range (actionHomeo hHomeo), ∀ g ∈ Set.range (actionHomeo hHomeo), f * g = g * f := by
+  rintro _ ⟨s, rfl⟩ _ ⟨t, rfl⟩
+  rw [← actionHomeoMul, ← actionHomeoMul, mul_comm]
+
+open scoped IsMulCommutative in
+/-- Hence `actionSubgroup` is a commutative group -/
+noncomputable instance actionSubgroupCommGroup
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+CommGroup ↥(actionSubgroup hHomeo) :=
+  have : IsMulCommutative ↥(actionSubgroup hHomeo) :=
+    Subgroup.isMulCommutative_closure (actionSubgroupGensComm hHomeo)
+  inferInstance
+
+/-- `actionHomeo`, viewed as a semigroup homomorphism into `actionSubgroup` -/
+noncomputable def actionMulHom
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+S →ₙ* ↥(actionSubgroup hHomeo) :=
+{
+  toFun := fun s ↦ ⟨actionHomeo hHomeo s, Subgroup.subset_closure ⟨s, rfl⟩⟩
+  map_mul' := fun s t ↦ Subtype.ext (actionHomeoMul hHomeo s t)
+}
+
+/-- The extension of the action of `S` to `groGroup S`, via the universal property
+of the Grothendieck group -/
+noncomputable def groGroupHomeoHom
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+groGroup S →* ↥(actionSubgroup hHomeo) :=
+Algebra.GrothendieckGroup.lift (WithOne.lift (actionMulHom hHomeo))
+
+/-- The extended action restricts to the original action along `groGroupHom` -/
+lemma groGroupHomeoHomApplyHom
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (s : S) :
+groGroupHomeoHom hHomeo (groGroupHom s) = actionMulHom hHomeo s := by
+  have h : (Algebra.GrothendieckGroup.lift (WithOne.lift (actionMulHom hHomeo))).comp
+      Algebra.GrothendieckGroup.of = WithOne.lift (actionMulHom hHomeo) :=
+    Equiv.symm_apply_apply Algebra.GrothendieckGroup.lift (WithOne.lift (actionMulHom hHomeo))
+  have h2 := DFunLike.congr_fun h ((s : WithOne S))
+  exact h2.trans (WithOne.lift_coe (actionMulHom hHomeo) s)
+
 /-- If `S` acts by homeomorphisms, `groGroupDynamicalSystem` is the
 dynamical system gotten by defining the action of `groGroup S`
 on `X` in the natural way, possible by `surjectiveActionsFactorThroughGroGroupHom` -/
-def groGroupDynamicalSystem
+noncomputable def groGroupDynamicalSystem
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
 DynamicalSystem (groGroup S) X :=
-by sorry
+{
+  map := fun g x ↦ ((groGroupHomeoHom hHomeo g : X ≃ₜ X)) x
+  mapMult := by
+    intro g₁ g₂ x
+    simp only [map_mul, Subgroup.coe_mul, Homeomorph.mul_apply]
+  mapCont := fun g ↦ (groGroupHomeoHom hHomeo g : X ≃ₜ X).continuous
+}
 
+/-- Two dynamical systems with the same action map are equal -/
+lemma dynamicalSystemEq
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{d₁ d₂ : DynamicalSystem S X} (h : d₁.map = d₂.map) :
+d₁ = d₂ := by
+  obtain ⟨m₁, hm₁, hc₁⟩ := d₁
+  obtain ⟨m₂, hm₂, hc₂⟩ := d₂
+  subst h
+  rfl
 
 /-- If `S` acts by homeomorphisms, `DynamicalSystem S X` is the same as
 the `homDynamicalSystem` of `groGroupDynamicalSystem` via `groGroupHom` -/
@@ -141,17 +424,105 @@ theorem homDSofGroGroupDSIsOriginalSystem
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
-dSystem = homDynamicalSystem (groGroupHom) (groGroupDynamicalSystem hHomeo) :=
-by sorry
+dSystem = homDynamicalSystem (groGroupHom) (groGroupDynamicalSystem hHomeo) := by
+  refine dynamicalSystemEq ?_
+  funext s x
+  change dSystem.map s x = ((groGroupHomeoHom hHomeo (groGroupHom s) : X ≃ₜ X)) x
+  rw [groGroupHomeoHomApplyHom]
+  rfl
 
-/-- If `S` acts by homeomorphisms, then `RP` for the original action is the
-same as `RP` for the extended action, `groGroupDynamicalSystem` -/
-theorem extendedActionRPisActionRP
+/-- The extended action restricted along `groGroupHom` is the original action -/
+lemma groGroupDynamicalSystemApplyHom
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (s : S) (x : X) :
+(groGroupDynamicalSystem hHomeo).map (groGroupHom s) x = dSystem.map s x := by
+  change ((groGroupHomeoHom hHomeo (groGroupHom s) : X ≃ₜ X)) x = dSystem.map s x
+  rw [groGroupHomeoHomApplyHom]
+  rfl
+
+/-- The `S`-orbit of a point is contained in its `groGroup S`-orbit -/
+lemma orbitSubsetGroGroupOrbit
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (x : X) :
+orbit dSystem x ⊆ orbit (groGroupDynamicalSystem hHomeo) x := by
+  rintro z ⟨s, rfl⟩
+  exact ⟨groGroupHom s, groGroupDynamicalSystemApplyHom hHomeo s x⟩
+
+/-- If the `S`-action is minimal then so is the extended `groGroup S`-action -/
+lemma groGroupSystemMinimalOfMinimal
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem)
+(hMin : isMinimalSystem dSystem) :
+isMinimalSystem (groGroupDynamicalSystem hHomeo) := by
+  rw [minimalIffDenseOrbits]
+  intro x
+  exact Dense.mono (orbitSubsetGroGroupOrbit hHomeo x)
+    ((minimalIffDenseOrbits dSystem).mp hMin x)
+
+/-- The actions of `S` and of `groGroup S` on `X` commute -/
+lemma groGroupActionCommutes
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+∀ (s : S) (g : groGroup S),
+  (dSystem.map s) ∘ ((groGroupDynamicalSystem hHomeo).map g)
+    = ((groGroupDynamicalSystem hHomeo).map g) ∘ (dSystem.map s) := by
+  intro s g
+  funext x
+  change dSystem.map s ((groGroupDynamicalSystem hHomeo).map g x)
+      = (groGroupDynamicalSystem hHomeo).map g (dSystem.map s x)
+  rw [← groGroupDynamicalSystemApplyHom hHomeo s ((groGroupDynamicalSystem hHomeo).map g x),
+    ← groGroupDynamicalSystemApplyHom hHomeo s x,
+    ← (groGroupDynamicalSystem hHomeo).mapMult,
+    ← (groGroupDynamicalSystem hHomeo).mapMult, mul_comm]
+
+/-- Unconditionally, `RP` for the original action is contained in `RP` for the extended
+action: the `groGroup S`-orbit of a set contains its `S`-orbit. -/
+theorem RPSubsetExtendedActionRP
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+RP dSystem ⊆ RP (groGroupDynamicalSystem hHomeo) := by
+  intro z hz
+  simp only [RP, Set.mem_iInter] at hz ⊢
+  intro α hα
+  refine closure_mono ?_ (hz α hα)
+  intro w hw
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hw ⊢
+  obtain ⟨s, hs⟩ := hw
+  refine ⟨groGroupHom s, ?_⟩
+  have h1 : (diagDynamicalSystem (groGroupDynamicalSystem hHomeo)
+      (groGroupDynamicalSystem hHomeo)).map (groGroupHom s) w
+      = (diagDynamicalSystem dSystem dSystem).map s w := by
+    change ((groGroupDynamicalSystem hHomeo).map (groGroupHom s) w.1,
+        (groGroupDynamicalSystem hHomeo).map (groGroupHom s) w.2)
+      = (dSystem.map s w.1, dSystem.map s w.2)
+    rw [groGroupDynamicalSystemApplyHom, groGroupDynamicalSystemApplyHom]
+  rw [h1]
+  exact hs
+
+/-- If `S` acts by homeomorphisms, then `RP` for the original action is the
+same as `RP` for the extended action, `groGroupDynamicalSystem`.
+
+DGG/CLAUDE: **the hypothesis `hMin` was added.**  This statement is Corollary 6.4 of the
+paper, whose proof reads "Apply Theorem D, noting that `S` and `Gr(S)` are commutative
+semigroups whose actions commute and are minimal".  Theorem D is
+`forTwoMinCommActionsRPsAreSame`, which requires *both* actions to be minimal, so minimality
+of the `S`-system is genuinely needed and is indeed assumed in Corollary 6.4.  Without it only
+the inclusion `RPSubsetExtendedActionRP` above is available: the reverse inclusion would
+require replacing an arbitrary `g = i(t)i(s)⁻¹ ∈ Gr(S)` by an element of `S`, which is exactly
+what minimality buys via Theorem D. -/
+theorem extendedActionRPisActionRP
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem)
+(hMin : isMinimalSystem dSystem) :
 RP dSystem = RP (groGroupDynamicalSystem hHomeo) :=
-by sorry
+forTwoMinCommActionsRPsAreSame hMin (groGroupSystemMinimalOfMinimal hHomeo hMin)
+  (groGroupActionCommutes hHomeo)
 
 
 def natExtSet
@@ -161,12 +532,26 @@ def natExtSet
 Set ((groGroup S) → X) :=
 { φ : (groGroup S) → X | ∀ (g : groGroup S) (s : S), φ ((groGroupHom s) * g) = dSystem.map s (φ g)}
 
+/-- `natExtSet` is closed: it is cut out by continuous equations -/
+theorem natExtSetIsClosed
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+IsClosed (natExtSet dSystem) := by
+  have heq : natExtSet dSystem = ⋂ (g : groGroup S), ⋂ (s : S),
+      {φ : groGroup S → X | φ ((groGroupHom s) * g) = dSystem.map s (φ g)} := by
+    ext φ
+    simp only [natExtSet, Set.mem_ofPred_eq, Set.mem_iInter]
+  rw [heq]
+  refine isClosed_iInter fun g ↦ isClosed_iInter fun s ↦ ?_
+  exact isClosed_eq (continuous_apply _) ((dSystem.mapCont s).comp (continuous_apply g))
+
 theorem natExtSetIsCompact
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
 IsCompact (natExtSet dSystem) :=
-by sorry
+(natExtSetIsClosed dSystem).isCompact
 
 instance
 {S} [CommSemigroup S] [Nonempty S]
@@ -174,18 +559,113 @@ instance
 {dSystem : DynamicalSystem S X} :
 CompactSpace ↑(natExtSet dSystem) := isCompact_iff_compactSpace.mp (natExtSetIsCompact dSystem)
 
+/-! ### Theorem 6.5: the natural extension is non-empty and `natExtFactorMap` is onto -/
+
+/-- The explicit construction in the proof of Theorem 6.5: for a *finite* set `F` of
+constraints there is a function satisfying them whose value at the identity is any
+prescribed `x`.
+
+Write `h = i(s₀)⁻¹`, where `s₀` is supplied by `imageOfSIsThickInGroGroup`, so that every
+`g ∈ F` is of the form `i(r)h`, and pick `y` with `s₀ y = x`.  The function is
+`φ(g) = r y` if `g = i(r)h`, and `y` otherwise.  Note that `g = i(r)h` is the same as
+`g * i(s₀) = i(r)`, which is how the condition is phrased below; stating it this way avoids
+the case analysis of the paper for `φ(h) = y`, which is never actually needed. -/
+theorem natExtSetFiniteApprox
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem)
+(x : X) (F : Set (groGroup S)) (hF : F.Finite) :
+∃ φ : groGroup S → X,
+  (∀ g ∈ F, ∀ s : S, φ (groGroupHom s * g) = dSystem.map s (φ g)) ∧ φ 1 = x := by
+  classical
+  obtain ⟨s₀, hs₀⟩ := imageOfSIsThickInGroGroup S F hF
+  obtain ⟨y, hy⟩ := hSurject s₀ x
+  set φ : groGroup S → X := fun g ↦
+    if hg : ∃ t : S, g * groGroupHom s₀ = groGroupHom t then dSystem.map hg.choose y else y
+    with hφ
+  have key : ∀ (g : groGroup S) (t : S), g * groGroupHom s₀ = groGroupHom t →
+      φ g = dSystem.map t y := by
+    intro g t hgt
+    have hex : ∃ t : S, g * groGroupHom s₀ = groGroupHom t := ⟨t, hgt⟩
+    have h1 : groGroupHom hex.choose = groGroupHom t := by
+      rw [← hex.choose_spec, hgt]
+    simp only [hφ, hex, ↓reduceDIte]
+    rw [surjectiveActionsFactorThroughGroGroupHom hSurject h1]
+  refine ⟨φ, ?_, ?_⟩
+  · intro g hg u
+    obtain ⟨r, -, hr⟩ := hs₀ ⟨g, hg, rfl⟩
+    have hr' : groGroupHom r = g * groGroupHom s₀ := hr
+    have h2 : (groGroupHom u * g) * groGroupHom s₀ = groGroupHom (u * r) := by
+      rw [mul_assoc, ← hr', groGroupHomIsSemigroupHom]
+    rw [key _ _ h2, key g r hr'.symm, dSystem.mapMult]
+  · rw [key 1 s₀ (one_mul _), hy]
+
+/-- Theorem 6.5: every point of `X` is the value at the identity of some element of
+`natExtSet`.  The finitely many constraints of `natExtSetFiniteApprox` cut out closed
+subsets of the compact space `groGroup S → X` with the finite intersection property. -/
+theorem natExtSetExistsWithValue
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) (x : X) :
+∃ φ ∈ natExtSet dSystem, φ 1 = x := by
+  classical
+  set Z : groGroup S → Set (groGroup S → X) := fun g ↦
+    {φ | (∀ s : S, φ (groGroupHom s * g) = dSystem.map s (φ g)) ∧ φ 1 = x} with hZ
+  have hZclosed : ∀ g, IsClosed (Z g) := by
+    intro g
+    have h1 : Z g =
+        (⋂ s : S, {φ : groGroup S → X | φ (groGroupHom s * g) = dSystem.map s (φ g)})
+          ∩ {φ : groGroup S → X | φ 1 = x} := by
+      ext φ
+      simp only [hZ, Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter]
+    rw [h1]
+    refine IsClosed.inter (isClosed_iInter fun s ↦ ?_)
+      (isClosed_eq (continuous_apply 1) continuous_const)
+    exact isClosed_eq (continuous_apply _) ((dSystem.mapCont s).comp (continuous_apply g))
+  have hZne : ∀ u : Finset (groGroup S), (⋂ g ∈ u, Z g).Nonempty := by
+    intro u
+    obtain ⟨φ, hφ1, hφ2⟩ := natExtSetFiniteApprox hSurject x (↑u) u.finite_toSet
+    refine ⟨φ, ?_⟩
+    simp only [Set.mem_iInter]
+    intro g hg
+    exact ⟨fun s ↦ hφ1 g hg s, hφ2⟩
+  have hall : (⋂ g, Z g).Nonempty := by
+    by_contra hcon
+    rw [Set.not_nonempty_iff_eq_empty] at hcon
+    obtain ⟨u, hu⟩ := isCompact_univ.elim_finite_subfamily_closed Z hZclosed
+      (by simp [hcon])
+    obtain ⟨φ, hφ⟩ := hZne u
+    exact (Set.disjoint_left.mp hu (Set.mem_univ φ)) hφ
+  obtain ⟨φ, hφ⟩ := hall
+  simp only [Set.mem_iInter] at hφ
+  exact ⟨φ, fun g s ↦ (hφ g).1 s, (hφ 1).2⟩
+
 theorem natExtSetIsNonempty
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) {hSurject : isSurjectiveSystem dSystem} :
-Set.Nonempty (natExtSet dSystem) :=
-by sorry
+Set.Nonempty (natExtSet dSystem) := by
+  obtain ⟨x⟩ := ‹Nonempty X›
+  obtain ⟨φ, hφ, -⟩ := natExtSetExistsWithValue hSurject x
+  exact ⟨φ, hφ⟩
 
 theorem natExtSetIsNonemptyInstance
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
-Nonempty ↑(natExtSet dSystem) := by sorry
+Nonempty ↑(natExtSet dSystem) :=
+Set.Nonempty.to_subtype (natExtSetIsNonempty dSystem (hSurject := hSurject))
+
+/-- Right translation by `g` preserves `natExtSet` -/
+lemma natExtSetTranslateMem
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (g : groGroup S) (φ : natExtSet dSystem) :
+(fun h ↦ φ.1 (h * g)) ∈ natExtSet dSystem := by
+  intro g' s
+  change φ.1 ((groGroupHom s * g') * g) = dSystem.map s (φ.1 (g' * g))
+  rw [mul_assoc]
+  exact φ.2 (g' * g) s
 
 def natExtGroSystem
 {S} [CommSemigroup S] [Nonempty S]
@@ -193,7 +673,19 @@ def natExtGroSystem
 {dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
 letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
 DynamicalSystem (groGroup S) (natExtSet dSystem) :=
-by sorry
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+{
+  map := fun g φ ↦ ⟨fun h ↦ φ.1 (h * g), natExtSetTranslateMem g φ⟩
+  mapMult := by
+    intro g₁ g₂ φ
+    apply Subtype.ext
+    funext h
+    exact congrArg φ.1 (by rw [mul_assoc])
+  mapCont := by
+    intro g
+    apply Continuous.subtype_mk
+    exact continuous_pi fun h ↦ (continuous_apply (h * g)).comp continuous_subtype_val
+}
 
 def natExtSystem
 {S} [CommSemigroup S] [Nonempty S]
@@ -201,7 +693,8 @@ def natExtSystem
 {dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
 letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
 DynamicalSystem S (natExtSet dSystem) :=
-by sorry
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+homDynamicalSystem (groGroupHom) (natExtGroSystem hSurject)
 
 def natExtFactorMap
 {S} [CommSemigroup S] [Nonempty S]
@@ -214,10 +707,41 @@ theorem natExtFactorMapIsFactorMap
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
 letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
-isFactorMap (natExtSystem hSurject) dSystem (natExtFactorMap dSystem) :=
-by sorry
+isFactorMap (natExtSystem hSurject) dSystem (natExtFactorMap dSystem) := by
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  refine ⟨(continuous_apply 1).comp continuous_subtype_val, ?_, ?_⟩
+  · intro x
+    obtain ⟨φ, hφ, hφ1⟩ := natExtSetExistsWithValue hSurject x
+    exact ⟨⟨φ, hφ⟩, hφ1⟩
+  · intro s
+    funext φ
+    change dSystem.map s (φ.1 1) = φ.1 (1 * groGroupHom s)
+    have h := φ.2 1 s
+    rw [mul_one] at h
+    rw [one_mul, ← h]
 
 
+/-- The extended `groGroup S`-action is again by homeomorphisms -/
+lemma groGroupDynamicalSystemIsHomeo
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
+isHomeoSystem (groGroupDynamicalSystem hHomeo) :=
+fun g ↦ (groGroupHomeoHom hHomeo g : X ≃ₜ X).isHomeomorph
+
+/-- The identity of `groGroup S` acts trivially -/
+lemma groGroupDynamicalSystemOne
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) (x : X) :
+(groGroupDynamicalSystem hHomeo).map 1 x = x := by
+  change ((groGroupHomeoHom hHomeo 1 : X ≃ₜ X)) x = x
+  rw [map_one]
+  rfl
+
+/-- Theorem 6.6: the natural extension is the smallest extension on which `S` acts by
+homeomorphisms.  Given `ρ : V → X` with `S` acting on `V` by homeomorphisms, extend the
+action of `S` on `V` to `groGroup S` and put `ξ v = fun g ↦ ρ (g v)`. -/
 theorem natExtUniversalProperty
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -225,36 +749,272 @@ theorem natExtUniversalProperty
 letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
 ∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
 ∀ (dSystemV : DynamicalSystem S V),
-∀ (ρ : V → X) (ρIsFactor : isFactorMap dSystemV dSystem ρ) (hHomeoV : isHomeoSystem dSystemV),
-∃ (ξ : V → natExtSet dSystem) (ξIsFactor : isFactorMap dSystemV (natExtSystem hSurject) ξ),
-ρ = (natExtFactorMap dSystem) ∘ ξ := by sorry
+∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystem ρ) (_ : isHomeoSystem dSystemV),
+∃ (ξ : V → natExtSet dSystem) (_ : isFactorMap dSystemV (natExtSystem hSurject) ξ),
+ρ = (natExtFactorMap dSystem) ∘ ξ := by
+  classical
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  intro V _ _ _ _ dSystemV ρ ρIsFactor hHomeoV
+  obtain ⟨hρcont, hρsurj, hρequiv⟩ := ρIsFactor
+  have hρS : ∀ (s : S) (v : V), ρ (dSystemV.map s v) = dSystem.map s (ρ v) :=
+    fun s v ↦ (congrFun (hρequiv s) v).symm
+  set GV := groGroupDynamicalSystem hHomeoV with hGV
+  -- `ξ v` lands in `natExtSet`
+  have hξmem : ∀ v : V, (fun g ↦ ρ (GV.map g v)) ∈ natExtSet dSystem := by
+    intro v g s
+    change ρ (GV.map (groGroupHom s * g) v) = dSystem.map s (ρ (GV.map g v))
+    rw [GV.mapMult, groGroupDynamicalSystemApplyHom, hρS]
+  set ξ : V → natExtSet dSystem := fun v ↦ ⟨fun g ↦ ρ (GV.map g v), hξmem v⟩ with hξ
+  have hξcont : Continuous ξ :=
+    Continuous.subtype_mk (continuous_pi fun g ↦ hρcont.comp (GV.mapCont g)) _
+  -- `ξ` has dense range, and its range is closed, so it is onto
+  have hdense : Dense (Set.range ξ) := by
+    rw [dense_iff_inter_open]
+    rintro U hUopen ⟨φ, hφU⟩
+    obtain ⟨U', hU'open, hU'eq⟩ := isOpen_induced_iff.mp hUopen
+    subst hU'eq
+    have hU'nhds : U' ∈ nhds (φ.1) := hU'open.mem_nhds hφU
+    rw [nhds_pi, Filter.mem_pi] at hU'nhds
+    obtain ⟨I, hIfin, Wf, hWf, hWfU⟩ := hU'nhds
+    obtain ⟨s₀, hs₀⟩ := imageOfSIsThickInGroGroup S I hIfin
+    have hchoice : ∀ f : groGroup S, ∃ r : S,
+        f ∈ I → groGroupHom r = f * groGroupHom s₀ := by
+      intro f
+      by_cases hf : f ∈ I
+      · obtain ⟨r, -, hr⟩ := hs₀ ⟨f, hf, rfl⟩
+        exact ⟨r, fun _ ↦ hr⟩
+      · obtain ⟨r₀⟩ := ‹Nonempty S›
+        exact ⟨r₀, fun h ↦ absurd h hf⟩
+    choose sf hsf using hchoice
+    set h₀ : groGroup S := (groGroupHom s₀)⁻¹ with hh₀
+    have hfEq : ∀ f ∈ I, groGroupHom (sf f) * h₀ = f := by
+      intro f hf
+      rw [hsf f hf, hh₀, mul_assoc, mul_inv_cancel, mul_one]
+    obtain ⟨w, hw⟩ := hρsurj (φ.1 h₀)
+    obtain ⟨v, hv⟩ := (groGroupDynamicalSystemIsHomeo hHomeoV h₀).surjective w
+    refine ⟨ξ v, ?_, ⟨v, rfl⟩⟩
+    apply hWfU
+    intro f hf
+    have hfv : GV.map f v = dSystemV.map (sf f) (GV.map h₀ v) := by
+      conv_lhs => rw [← hfEq f hf]
+      rw [GV.mapMult, groGroupDynamicalSystemApplyHom]
+    have hkey : (ξ v).1 f = φ.1 f := by
+      change ρ (GV.map f v) = φ.1 f
+      rw [hfv, hρS, hv, hw, ← φ.2 h₀ (sf f), hfEq f hf]
+    rw [hkey]
+    exact mem_of_mem_nhds (hWf f)
+  have hξsurj : Function.Surjective ξ := by
+    have hclosed : IsClosed (Set.range ξ) := (isCompact_range hξcont).isClosed
+    have : Set.range ξ = Set.univ := by
+      rw [← hclosed.closure_eq, hdense.closure_eq]
+    exact Set.range_eq_univ.mp this
+  refine ⟨ξ, ⟨hξcont, hξsurj, ?_⟩, ?_⟩
+  · intro s
+    funext v
+    apply Subtype.ext
+    funext g
+    change ρ (GV.map (g * groGroupHom s) v) = ρ (GV.map g (dSystemV.map s v))
+    rw [GV.mapMult, groGroupDynamicalSystemApplyHom]
+  · funext v
+    change ρ v = ρ (GV.map 1 v)
+    rw [groGroupDynamicalSystemOne]
 
 
+/-- Every value of an element of `natExtSet` is determined, up to the action of a single
+element of `S`, by its value at the identity -/
+lemma natExtSetValueDetermined
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (g : groGroup S) :
+∃ (b r : S), ∀ χ : natExtSet dSystem,
+  dSystem.map b (χ.1 g) = dSystem.map r (χ.1 1) := by
+  obtain ⟨b, hb⟩ := existsShiftIntoImageOfSemiInGG g
+  obtain ⟨r, -, hr⟩ := hb
+  refine ⟨b, r, fun χ ↦ ?_⟩
+  have h1 : χ.1 (groGroupHom b * g) = dSystem.map b (χ.1 g) := χ.2 g b
+  have h2 : χ.1 (groGroupHom r * 1) = dSystem.map r (χ.1 1) := χ.2 1 r
+  rw [mul_one] at h2
+  rw [← h1, ← h2, mul_comm, ← hr]
+
+/-- Theorem 6.6 (last part): if `S` acts by homeomorphisms then the natural extension is
+already isomorphic to `X`.  Rather than going through the universal property, note directly
+that `s₀ (φ g) = r (φ 1)` pins down `φ g` because `s₀` acts injectively. -/
 theorem natExtFactorMapIsIsomIfHomeoAction
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hHomeo : isHomeoSystem dSystem) :
 letI : Nonempty ↑(natExtSet dSystem) :=
   natExtSetIsNonemptyInstance (hSurject := homeoSystemIsSurjectiveSystem hHomeo)
-isIsomorphism (natExtSystem (homeoSystemIsSurjectiveSystem hHomeo)) dSystem (natExtFactorMap dSystem) :=
-by sorry
+isIsomorphism (natExtSystem (homeoSystemIsSurjectiveSystem hHomeo))
+  dSystem (natExtFactorMap dSystem) := by
+    have hSurject := homeoSystemIsSurjectiveSystem hHomeo
+    have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+    obtain ⟨hcont, hsurj, hequiv⟩ := natExtFactorMapIsFactorMap hSurject
+    refine ⟨?_, hequiv⟩
+    rw [isHomeomorph_iff_continuous_isClosedMap_bijective]
+    refine ⟨hcont, hcont.isClosedMap, ⟨?_, hsurj⟩⟩
+    intro φ ψ hφψ
+    apply Subtype.ext
+    funext g
+    obtain ⟨b, r, hbr⟩ := natExtSetValueDetermined (dSystem := dSystem) g
+    have h3 : φ.1 1 = ψ.1 1 := hφψ
+    have h4 : dSystem.map b (φ.1 g) = dSystem.map b (ψ.1 g) := by
+      rw [hbr φ, hbr ψ, h3]
+    exact (hHomeo b).injective h4
 
 
+/-- Theorem 6.7: the natural extension is minimal exactly when the system is -/
 theorem natExtMinimalIffSystemIsMinimal
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
 letI : Nonempty ↑(natExtSet dSystem) :=   natExtSetIsNonemptyInstance (hSurject := hSurject)
-isMinimalSystem dSystem ↔ isMinimalSystem (natExtSystem hSurject) :=
-by sorry
+isMinimalSystem dSystem ↔ isMinimalSystem (natExtSystem hSurject) := by
+  classical
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  constructor
+  · -- `X` minimal implies the natural extension is minimal
+    intro hMin
+    rw [minimalIffDenseOrbits]
+    intro φ
+    rw [dense_iff_inter_open]
+    rintro U hUopen ⟨ψ, hψU⟩
+    obtain ⟨U', hU'open, hU'eq⟩ := isOpen_induced_iff.mp hUopen
+    subst hU'eq
+    have hU'nhds : U' ∈ nhds (ψ.1) := hU'open.mem_nhds hψU
+    rw [nhds_pi, Filter.mem_pi] at hU'nhds
+    obtain ⟨I, hIfin, V, hV, hVU⟩ := hU'nhds
+    -- shift the finitely many relevant coordinates into the image of `S`
+    obtain ⟨s₀, hs₀⟩ := imageOfSIsThickInGroGroup S I hIfin
+    have hchoice : ∀ f : groGroup S, ∃ r : S,
+        f ∈ I → groGroupHom r = f * groGroupHom s₀ := by
+      intro f
+      by_cases hf : f ∈ I
+      · obtain ⟨r, -, hr⟩ := hs₀ ⟨f, hf, rfl⟩
+        exact ⟨r, fun _ ↦ hr⟩
+      · obtain ⟨r₀⟩ := ‹Nonempty S›
+        exact ⟨r₀, fun h ↦ absurd h hf⟩
+    choose sf hsf using hchoice
+    set h₀ : groGroup S := (groGroupHom s₀)⁻¹ with hh₀
+    have hfEq : ∀ f ∈ I, groGroupHom (sf f) * h₀ = f := by
+      intro f hf
+      rw [hsf f hf, hh₀, mul_assoc, mul_inv_cancel, mul_one]
+    -- the finitely many constraints define a non-empty open subset of `X`
+    set Y : Set X := ⋂ f ∈ I, (dSystem.map (sf f)) ⁻¹' (interior (V f)) with hY
+    have hYopen : IsOpen Y := by
+      refine hIfin.isOpen_biInter fun f _ ↦ ?_
+      exact isOpen_interior.preimage (dSystem.mapCont (sf f))
+    have hYne : (ψ.1 h₀) ∈ Y := by
+      simp only [hY, Set.mem_iInter, Set.mem_preimage]
+      intro f hf
+      have hkey : ψ.1 (groGroupHom (sf f) * h₀) = dSystem.map (sf f) (ψ.1 h₀) := ψ.2 h₀ (sf f)
+      rw [hfEq f hf] at hkey
+      rw [← hkey]
+      exact mem_interior_iff_mem_nhds.mpr (hV f)
+    -- minimality of `X` moves `φ h₀` into `Y`
+    obtain ⟨t, ht⟩ := minimalImpliesNonemptySetVisits hMin (φ.1 h₀) hYopen ⟨_, hYne⟩
+    simp only [visitTimeSet, Set.mem_preimage] at ht
+    refine ⟨(natExtSystem hSurject).map t φ, ?_, ⟨t, rfl⟩⟩
+    apply hVU
+    intro f hf
+    have hshift : f * groGroupHom t = groGroupHom (sf f * t) * h₀ := by
+      rw [groGroupHomIsSemigroupHom, mul_assoc, mul_comm (groGroupHom t) h₀,
+        ← mul_assoc, hfEq f hf]
+    have hval : ((natExtSystem hSurject).map t φ).1 f = φ.1 (f * groGroupHom t) := rfl
+    rw [hval, hshift, φ.2 h₀ (sf f * t), dSystem.mapMult]
+    simp only [hY, Set.mem_iInter, Set.mem_preimage] at ht
+    exact interior_subset (ht f hf)
+  · -- the natural extension is a factor of which `X` is a factor
+    intro hWMin
+    exact factorOfMinimalIsMinimal hWMin
+      ⟨natExtFactorMap dSystem, natExtFactorMapIsFactorMap hSurject⟩
 
--- DGG: This is supposed to be Corollary 6.8.
--- DGG: Not sure how to formulate this in Lean.  Probably not important.
--- theorem natExtForMinCommutativeActions
--- {S} [CommSemigroup S] [Nonempty S]
--- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+/-! ### Towards Theorem 6.9 -/
 
+/-- Regional proximality is carried forward by a factor map.  This is the analogue of
+Lemma 3.6 of the paper, and it gives the easy inclusion of Theorem 6.9. -/
+theorem RPSubsetPreimageRPOfFactorMap
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemX : DynamicalSystem S X} {dSystemY : DynamicalSystem S Y} {π : X → Y}
+(hπ : isFactorMap dSystemX dSystemY π) :
+RP dSystemX ⊆ (Prod.map π π) ⁻¹' (RP dSystemY) := by
+  obtain ⟨hcont, -, hequiv⟩ := hπ
+  have hcont2 : Continuous (Prod.map π π) := hcont.prodMap hcont
+  intro z hz
+  simp only [RP, Set.mem_iInter] at hz
+  simp only [Set.mem_preimage, RP, Set.mem_iInter]
+  intro β hβ
+  -- pull `β` back to a neighbourhood of the diagonal of `X`
+  obtain ⟨β₀, hβ₀sub, hβ₀open, hβ₀diag⟩ := mem_nhdsSet.mp hβ
+  have hα : (Prod.map π π) ⁻¹' β ∈ nhdsSet (Set.diagonal X) := by
+    refine mem_nhdsSet.mpr ⟨(Prod.map π π) ⁻¹' β₀, Set.preimage_mono hβ₀sub,
+      hβ₀open.preimage hcont2, ?_⟩
+    rintro ⟨a, b⟩ hab
+    have : a = b := hab
+    subst this
+    exact hβ₀diag (rfl : π a = π a)
+  rw [mem_closure_iff]
+  intro W hWopen hzW
+  have hz' := hz _ hα
+  rw [mem_closure_iff] at hz'
+  obtain ⟨w, hwW, hwOrb⟩ :=
+    hz' ((Prod.map π π) ⁻¹' W) (hWopen.preimage hcont2) hzW
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hwOrb
+  obtain ⟨s, hs⟩ := hwOrb
+  refine ⟨Prod.map π π w, hwW, ?_⟩
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+  refine ⟨s, ?_⟩
+  have hswap : (diagDynamicalSystem dSystemY dSystemY).map s (Prod.map π π w)
+      = Prod.map π π ((diagDynamicalSystem dSystemX dSystemX).map s w) := by
+    change (dSystemY.map s (π w.1), dSystemY.map s (π w.2))
+      = (π (dSystemX.map s w.1), π (dSystemX.map s w.2))
+    have e1 := congrFun (hequiv s) w.1
+    have e2 := congrFun (hequiv s) w.2
+    simp only [Function.comp_apply] at e1 e2
+    rw [e1, e2]
+  rw [hswap]
+  exact hs
+
+/-- Claim 1 in the proof of Theorem 6.9: two elements of the natural extension that are
+regionally proximal at the identity are regionally proximal at every coordinate.
+
+The point is that `b (φ g) = r (φ 1)` for a single pair `b, r ∈ S` independent of `φ`
+(`natExtSetValueDetermined`), so `b (φ g, ψ g) = r (φ 1, ψ 1) ∈ RP` by invariance of `RP`,
+and then Theorem 5.7 (`RPIsStrongSInvariant`) removes the `b`. -/
+theorem natExtRPAtAllCoordinates
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
+(φ ψ : natExtSet dSystem) (h : (φ.1 1, ψ.1 1) ∈ RP dSystem) (g : groGroup S) :
+(φ.1 g, ψ.1 g) ∈ RP dSystem := by
+  obtain ⟨b, r, hbr⟩ := natExtSetValueDetermined (dSystem := dSystem) g
+  have hinv : (diagDynamicalSystem dSystem dSystem).map r (φ.1 1, ψ.1 1) ∈ RP dSystem :=
+    RPInCommSemiIsInvariant dSystem r h
+  have heq : (diagDynamicalSystem dSystem dSystem).map b (φ.1 g, ψ.1 g)
+      = (diagDynamicalSystem dSystem dSystem).map r (φ.1 1, ψ.1 1) := by
+    change (dSystem.map b (φ.1 g), dSystem.map b (ψ.1 g))
+      = (dSystem.map r (φ.1 1), dSystem.map r (ψ.1 1))
+    rw [hbr φ, hbr ψ]
+  rw [(RPIsStrongSInvariant hMin).1]
+  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+  exact ⟨b, heq ▸ hinv⟩
+
+/-- Theorem 6.9.
+
+DGG/CLAUDE: **only the inclusion `RP_W ⊆ (π × π)⁻¹ RP_X` is proved here**; the reverse
+inclusion is still `sorry`.  What is missing is the "cylinder set" step of the paper's proof:
+given an open neighbourhood `α` of the diagonal of `W`, one needs a finite `F ⊆ groGroup S`
+and a neighbourhood `α₀` of the diagonal of `X` with
+`{(χ₁, χ₂) | ∀ f ∈ F, (χ₁ f, χ₂ f) ∈ α₀} ⊆ α`.
+That is the statement that neighbourhoods of the diagonal of a compact Hausdorff subspace of
+a product `X ^ Γ` contain basic entourages of the product uniformity; it is true (the sets
+`{(χ₁,χ₂) | ∀ f ∈ F, (χ₁ f, χ₂ f) ∈ α₀}` are closed, directed downwards, and meet in the
+diagonal, so compactness gives one inside `α`), but neither it nor the uniform space
+structure it refers to is currently available in this development.  Granting it, the rest of
+the paper's argument runs on `natExtRPAtAllCoordinates` together with surjectivity of
+`χ ↦ χ h`, which follows from `natExtFactorMapIsFactorMap` and `groGroupDynamicalSystemIsHomeo`. -/
 theorem pullBackOfRPThruNatExtFactorIsRP
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -262,5 +1022,9 @@ theorem pullBackOfRPThruNatExtFactorIsRP
 letI : Nonempty ↑(natExtSet dSystem) :=
   natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
 Set.preimage (Prod.map (natExtFactorMap dSystem) (natExtFactorMap dSystem)) (RP dSystem) =
-  RP (natExtSystem (minimalCommActionIsSurjective hMin)) :=
-by sorry
+  RP (natExtSystem (minimalCommActionIsSurjective hMin)) := by
+  have hSurject := minimalCommActionIsSurjective hMin
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  refine Set.Subset.antisymm ?_
+    (RPSubsetPreimageRPOfFactorMap (natExtFactorMapIsFactorMap hSurject))
+  sorry
