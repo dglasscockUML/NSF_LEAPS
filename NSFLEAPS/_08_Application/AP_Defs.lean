@@ -85,9 +85,9 @@ A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
 theorem syndSetIsUROnThickSet
 {S : Type*} [Semigroup S] [Nonempty S]
-(A : Set S) {hA : isSyndetic A}
+(A : Set S) {_ : isSyndetic A}
 (H : Set S) {hH : isThick H} :
-∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+∃ (B : Set S) (_ : isURSet B) (H' : Set S) (_ : isThick H') (_ : H' ⊆ H),
 A ∩ H' = B ∩ H' := by
   have hExistp := minIdempotentWitnessesShiftIntersectionLargeness H hH
   rcases hExistp with ⟨p, hp1, hp2, hp3, hp4⟩
@@ -110,7 +110,114 @@ A ∩ H' = B ∩ H' := by
       intro f hf
       rw [ht]
     have hUOpen : IsOpen U := by
-      sorry
+      let V : S → Set ((S → Bool) × (S → Bool)) :=
+        fun f ↦ {x : (S → Bool) × (S → Bool) | x.1 f = x.2 f}
+      have hEachf : ∀ f : S, IsOpen (V f) := by
+        intro f
+        let V1a := {x : (S → Bool) × (S → Bool) | x.1 f = true}
+        let V1b := {x : (S → Bool) × (S → Bool) | x.2 f = true}
+        let V2a := {x : (S → Bool) × (S → Bool) | x.1 f = false}
+        let V2b := {x : (S → Bool) × (S → Bool) | x.2 f = false}
+        have hVf : V f = V1a ∩ V1b ∪ V2a ∩ V2b := by
+          simp only [V, V1a, V1b, V2a, V2b]
+          apply Set.Subset.antisymm_iff.mpr
+          constructor
+          · intro x hx
+            simp only [Set.mem_ofPred_eq] at hx
+            simp
+            by_cases hTrue : (x.1 f) = true
+            · rw [hTrue] at hx
+              simp [hTrue, hx]
+            · simp only [Bool.not_eq_true] at hTrue
+              rw [hTrue] at hx
+              simp [hTrue, hx]
+          · intro x hx
+            simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_ofPred_eq] at hx
+            simp only [Set.mem_ofPred_eq]
+            rcases hx with ⟨hx1a, hx1b⟩ | ⟨hx2a, hx2b⟩
+            · rw [hx1a, hx1b]
+            · rw [hx2a, hx2b]
+        have hV1aOpen : IsOpen V1a := by
+          have hV1aRedef : V1a = Prod.fst ⁻¹' {t : (S → Bool) | t f = true} := by
+            simp
+            rfl
+          rw [hV1aRedef]
+          apply IsOpen.preimage
+          · continuity
+          · let ψ : (S → Bool) → Bool := fun t ↦ t f
+            have hEq : {t : (S → Bool) | t f = true} = ψ ⁻¹' {true} := by
+              rfl
+            rw [hEq]
+            apply IsOpen.preimage
+            · continuity
+            · simp
+        have hV1bOpen : IsOpen V1b := by
+          have hV1bRedef : V1b = Prod.snd ⁻¹' {t : (S → Bool) | t f = true} := by
+            simp
+            rfl
+          rw [hV1bRedef]
+          apply IsOpen.preimage
+          · apply continuous_snd
+          · let ψ : (S → Bool) → Bool := fun t ↦ t f
+            have hEq : {t : (S → Bool) | t f = true} = ψ ⁻¹' {true} := by
+              rfl
+            rw [hEq]
+            apply IsOpen.preimage
+            · continuity
+            · simp
+        have hV2aOpen : IsOpen V2a := by
+          have hV2aRedef : V2a = Prod.fst ⁻¹' {t : (S → Bool) | t f = false} := by
+            simp
+            rfl
+          rw [hV2aRedef]
+          apply IsOpen.preimage
+          · apply continuous_fst
+          · let ψ : (S → Bool) → Bool := fun t ↦ t f
+            have hEq : {t : (S → Bool) | t f = false} = ψ ⁻¹' {false} := by
+              rfl
+            rw [hEq]
+            apply IsOpen.preimage
+            · continuity
+            · simp
+        have hV2bOpen : IsOpen V2b := by
+          have hV2aRedef : V2b = Prod.snd ⁻¹' {t : (S → Bool) | t f = false} := by
+            simp
+            rfl
+          rw [hV2aRedef]
+          apply IsOpen.preimage
+          · apply continuous_snd
+          · let ψ : (S → Bool) → Bool := fun t ↦ t f
+            have hEq : {t : (S → Bool) | t f = false} = ψ ⁻¹' {false} := by
+              rfl
+            rw [hEq]
+            apply IsOpen.preimage
+            · continuity
+            · simp
+        rw [hVf]
+        apply IsOpen.union
+        · apply IsOpen.inter
+          · exact hV1aOpen
+          · exact hV1bOpen
+        · apply IsOpen.inter
+          · exact hV2aOpen
+          · exact hV2bOpen
+      have hURedef : U = ⋂ f ∈ F, V f := by
+        simp only [U, V]
+        apply Set.Subset.antisymm_iff.mpr
+        constructor
+        · intro t ht
+          simp only [Set.mem_ofPred_eq] at ht
+          simp only [Set.mem_iInter, Set.mem_ofPred_eq]
+          exact ht
+        · intro t ht
+          simp only [Set.mem_iInter, Set.mem_ofPred_eq] at ht
+          simp only [Set.mem_ofPred_eq]
+          exact ht
+      rw [hURedef]
+      apply Set.Finite.isOpen_biInter hF
+      intro f hf
+      specialize hEachf f
+      exact hEachf
     let dDiag := diagDynamicalSystem (selfSymbolicSystem S) (selfSymbolicSystem S)
     have hVisit : visitTimeSet dDiag (b, a) U ∈ p := by
       apply visitTimeSetBelongsToUltrafilter
@@ -119,10 +226,24 @@ A ∩ H' = B ∩ H' := by
         intro f hf
         have hEq1 : ((ultraAction dDiag).map p (b, a)).1 f
           = (ultraAction (selfSymbolicSystem S)).map p b f := by
-          sorry
+          simp only [ultraAction, ultraLim, diagDynamicalSystem, Prod.map_apply, dDiag]
+          let φ := fun s ↦ ((selfSymbolicSystem S).map s b, (selfSymbolicSystem S).map s a)
+          have hφ : Filter.Tendsto φ (p : Filter _) (nhds (Ultrafilter.extend φ p)) := by
+            exact ultrafilter_extend_eq_iff.mp rfl
+          have hφ1 : Ultrafilter.extend (fun s ↦ (selfSymbolicSystem S).map s b) p
+            = (Ultrafilter.extend φ p).1 := by
+            exact ultrafilter_extend_eq_iff.mpr hφ.fst_nhds
+          exact congrArg (fun x ↦ x f) hφ1.symm
         have hEq2 : ((ultraAction dDiag).map p (b, a)).2 f
           = (ultraAction (selfSymbolicSystem S)).map p a f := by
-          sorry
+          simp only [ultraAction, ultraLim, diagDynamicalSystem, Prod.map_apply, dDiag]
+          let φ := fun s ↦ ((selfSymbolicSystem S).map s b, (selfSymbolicSystem S).map s a)
+          have hφ : Filter.Tendsto φ (p : Filter _) (nhds (Ultrafilter.extend φ p)) := by
+            exact ultrafilter_extend_eq_iff.mp rfl
+          have hφ1 : Ultrafilter.extend (fun s ↦ (selfSymbolicSystem S).map s a) p
+            = (Ultrafilter.extend φ p).2 := by
+            exact ultrafilter_extend_eq_iff.mpr hφ.snd_nhds
+          exact congrArg (fun x ↦ x f) hφ1.symm
         rw [hEq1, hEq2]
         simp only [b]
         rw [<- (ultraAction (selfSymbolicSystem S)).mapMult p p a]
@@ -144,8 +265,12 @@ A ∩ H' = B ∩ H' := by
     · simp only [Set.mem_iInter, Set.mem_preimage] at hg1
       specialize hg1 f hf1
       exact hg1
-    · simp [T]
-      sorry
+    · simp only [Set.mem_ofPred_eq, T]
+      simp only [visitTimeSet, Set.preimage_ofPred_eq, Set.mem_ofPred_eq, U] at hg2
+      specialize hg2 f hf1
+      simp only [diagDynamicalSystem, selfSymbolicSystem, basicRightAction,
+        Prod.map_apply, dDiag] at hg2
+      exact hg2
   let B := {s : S | b s = true}
   have hBUR : isURSet B := by
     unfold isURSet
