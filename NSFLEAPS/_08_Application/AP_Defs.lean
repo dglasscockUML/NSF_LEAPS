@@ -54,7 +54,7 @@ theorem urSetIsRxU
 ∃ (U : Set (WithOne S → Bool)) (UClopen : IsClopen U) (UNonempty : U.Nonempty),
 ∃ (x : WithOne S → Bool) (xMin : isUniformlyRecurrent (monoidExtSymbolicSystem S) x),
 A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
-  simp
+  simp only [exists_prop]
   let U := {x : WithOne S → Bool | x none = true}
   use U
   constructor
@@ -66,18 +66,19 @@ A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
   classical
   let x0 := fun (s : WithOne S) ↦ if s ∈ A_wOne then true else false
   let x1 := fun (s : WithOne S) ↦ if s ∈ A_wOne ∪ {none} then true else false
-  have h1 : isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 ∨ isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 := by
+  have h1 : isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 ∨ isUniformlyRecurrent
+    (monoidExtSymbolicSystem S) x0 := by
     sorry
   rcases h1 with hx0 | hx1
-  use x0
-  use hx0
-  ext s
-  constructor
-  intro hs
-  unfold visitTimeSet
-  simp
-  sorry
-  sorry
+  · use x0
+    use hx0
+    ext s
+    constructor
+    · intro hs
+      unfold visitTimeSet
+      simp
+      sorry
+    sorry
   sorry
 
 /-- Given a syndetic set `A` and a thick set `H`, there exists a
@@ -87,8 +88,113 @@ theorem syndSetIsUROnThickSet
 (A : Set S) {hA : isSyndetic A}
 (H : Set S) {hH : isThick H} :
 ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
-A ∩ H' = B ∩ H' :=
-by sorry
+A ∩ H' = B ∩ H' := by
+  have hExistp := minIdempotentWitnessesShiftIntersectionLargeness H hH
+  rcases hExistp with ⟨p, hp1, hp2, hp3, hp4⟩
+  let a := indicator (A ∩ H)
+  let b := (ultraAction (selfSymbolicSystem S)).map p a
+  have hUnifb : isUniformlyRecurrent (selfSymbolicSystem S) b := by
+    simp only [b]
+    apply minUltraImageIsUniformlyRecurrent
+    exact hp2
+  let T := {g : S | b g = a g}
+  let H' := H ∩ T
+  have hH'thick : isThick H' := by
+    unfold isThick
+    intro F hF
+    let U := {(α, β) : (S → Bool) × (S → Bool) | ∀ f ∈ F, α f = β f}
+    have hUContDiag : Set.diagonal (S → Bool) ⊆ U := by
+      intro t ht
+      simp only [Set.mem_diagonal_iff] at ht
+      simp only [Set.mem_ofPred_eq, U]
+      intro f hf
+      rw [ht]
+    have hUOpen : IsOpen U := by
+      sorry
+    let dDiag := diagDynamicalSystem (selfSymbolicSystem S) (selfSymbolicSystem S)
+    have hVisit : visitTimeSet dDiag (b, a) U ∈ p := by
+      apply visitTimeSetBelongsToUltrafilter
+      · exact hUOpen
+      · simp only [Set.mem_ofPred_eq, U]
+        intro f hf
+        have hEq1 : ((ultraAction dDiag).map p (b, a)).1 f
+          = (ultraAction (selfSymbolicSystem S)).map p b f := by
+          sorry
+        have hEq2 : ((ultraAction dDiag).map p (b, a)).2 f
+          = (ultraAction (selfSymbolicSystem S)).map p a f := by
+          sorry
+        rw [hEq1, hEq2]
+        simp only [b]
+        rw [<- (ultraAction (selfSymbolicSystem S)).mapMult p p a]
+        rw [hp3]
+    specialize hp4 F hF
+    have hJoin : (⋂ f ∈ F, leftMult f ⁻¹' H) ∩ (visitTimeSet dDiag (b, a) U) ∈ p := by
+      apply Filter.inter_mem hp4 hVisit
+    have hNonempty : ((⋂ f ∈ F, leftMult f ⁻¹' H) ∩ (visitTimeSet dDiag (b, a) U)).Nonempty := by
+      apply Ultrafilter.nonempty_of_mem hJoin
+    apply Set.nonempty_def.mp at hNonempty
+    rcases hNonempty with ⟨g, hg1, hg2⟩
+    use g
+    intro t ht
+    simp only [Set.mem_image] at ht
+    rcases ht with ⟨f, hf1, hf2⟩
+    rw [<- hf2]
+    simp only [Set.mem_inter_iff, H']
+    constructor
+    · simp only [Set.mem_iInter, Set.mem_preimage] at hg1
+      specialize hg1 f hf1
+      exact hg1
+    · simp [T]
+      sorry
+  let B := {s : S | b s = true}
+  have hBUR : isURSet B := by
+    unfold isURSet
+    have hEq : indicator B = b := by
+      simp only [B]
+      unfold indicator
+      simp
+    rw [hEq]
+    exact hUnifb
+  have hH'H : H' ⊆ H := by
+    simp [H']
+  use B
+  use hBUR
+  use H'
+  use hH'thick
+  use hH'H
+  apply Set.Subset.antisymm_iff.mpr
+  constructor
+  · intro s hs
+    simp only [Set.mem_inter_iff, H'] at hs
+    rcases hs with ⟨hs1, hs2, hs3⟩
+    simp only [Set.mem_inter_iff, H']
+    constructor
+    · simp only [Set.mem_ofPred_eq, T] at hs3
+      simp only [Set.mem_ofPred_eq, B]
+      rw [hs3]
+      simp only [a]
+      simp only [indicator, Set.mem_inter_iff, decide_eq_true_eq]
+      constructor
+      · exact hs1
+      · exact hs2
+    constructor
+    · exact hs2
+    · exact hs3
+  · intro s hs
+    simp only [Set.mem_inter_iff, H'] at hs
+    rcases hs with ⟨hs1, hs2, hs3⟩
+    simp only [Set.mem_inter_iff, H']
+    constructor
+    · simp only [Set.mem_ofPred_eq, T] at hs3
+      simp only [Set.mem_ofPred_eq, B] at hs1
+      rw [hs3] at hs1
+      simp only [a] at hs1
+      simp only [indicator, Set.mem_inter_iff, decide_eq_true_eq] at hs1
+      rcases hs1 with ⟨hs1a, hs1b⟩
+      exact hs1a
+    constructor
+    · exact hs2
+    · exact hs3
 
 /-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
 for all sets. -/
@@ -150,42 +256,43 @@ theorem urContainmentSufficesForFamilyContainment
     specialize h1 H hH2
     exact h1
 
-  end Reduction_to_UR_sets
+end Reduction_to_UR_sets
 
-  section Delta_builder
+section Delta_builder
 
-  /-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
-  then for all thick set H, R(x, V) ∩ H is a Delta set -/
-  theorem commVisitTimeSetForRPPairIsDelta
-  {S : Type*} [CommSemigroup S] [Nonempty S]
-  {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-  {dSystem : DynamicalSystem S X} {hMin : isMinimalSystem dSystem}
-  (x : X) {y : X}
-  (V : Set X) {hV : V ∈ nhds y} :
-  ∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) :=
+/-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
+then for all thick set H, R(x, V) ∩ H is a Delta set -/
+theorem commVisitTimeSetForRPPairIsDelta
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {hMin : isMinimalSystem dSystem}
+(x : X) {y : X}
+(V : Set X) {hV : V ∈ nhds y} :
+∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) :=
   by sorry
 
-  end Delta_builder
+end Delta_builder
 
-  section Dynamical_sets_of_bohr_recurrence
+section Dynamical_sets_of_bohr_recurrence
 
-  /-- If B is a set of Bohr recurrence and a uniformly recurrent set,
-  then for all thick set H, B ∩ H is a Δ set -/
-  theorem commURSetsOfBohrRecurrenceAreDelta
-  {S : Type*} [CommSemigroup S] [Nonempty S]
-  (B : Set S) {hBur : isURSet B} {hBrec : isSetOfBohrRecurrence B} :
-  ∀ (H : Set S), isThick H → isDelta (B ∩ H) :=
+/-- If B is a set of Bohr recurrence and a uniformly recurrent set,
+then for all thick set H, B ∩ H is a Δ set -/
+theorem commURSetsOfBohrRecurrenceAreDelta
+{S : Type*} [CommSemigroup S] [Nonempty S]
+(B : Set S) {hBur : isURSet B} {hBrec : isSetOfBohrRecurrence B} :
+∀ (H : Set S), isThick H → isDelta (B ∩ H) :=
   by sorry
 
-  end Dynamical_sets_of_bohr_recurrence
+end Dynamical_sets_of_bohr_recurrence
 
-  section Application
+section Application
 
-  /-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
-  theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
-  {S : Type*} [CommSemigroup S] [Nonempty S] :
-  syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:= by
-    have h1 : syndeticFamily S ⋏ deltaFamily S ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
+/-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
+theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
+{S : Type*} [CommSemigroup S] [Nonempty S] :
+syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:= by
+    have h1 : syndeticFamily S ⋏ deltaFamily S
+      ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
       apply familyMeetIsMonotonic
       have h11 : deltaFamily S ⊆ deltaZeroFamily S := by
         exact deltaFamilyContainedInDeltaZeroFamily
@@ -204,7 +311,8 @@ theorem urContainmentSufficesForFamilyContainment
       · exact hB
       · exact h32
       exact hH
-    have h2 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S ⊆ syndeticFamily S ⋏ deltaFamily S := by
+    have h2 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S
+      ⊆ syndeticFamily S ⋏ deltaFamily S := by
       apply urContainmentSufficesForFamilyContainment
       exact h3
     simpa using Set.Subset.antisymm h1 h2
