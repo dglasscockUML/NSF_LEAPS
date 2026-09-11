@@ -6539,6 +6539,7 @@ end Equicontinuity_and_regional_proximality
 
 section Equicontinuity_and_regional_proximality_with_S_commutative
 
+--DEPRACATED in favor of a future result
 /-- Minimal, equicontinuous systems with a commutative acting semigroup
 are distal -/
 theorem equicontinuousMinCommSystemsAreDistal
@@ -6659,6 +6660,7 @@ isEquicontinuousSystem dSystem → isDistalSystem dSystem := by
     exact ht1b
   exact ht1c ht2
 
+--DEPRACATED in favor of a future result
 /-- In a minimal, distal system with a commutative acting semigroup,
 the semigroup acts by homeomorphisms -/
 theorem semigroupActsByHomeosOnMinCommDistalSystems
