@@ -1,4 +1,5 @@
 import NSFLEAPS._07_RP.RP_Defs
+import NSFLEAPS._01_Topology.TP_Cylinders
 import Mathlib.Algebra.Group.WithOne.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
 
@@ -929,53 +930,13 @@ isMinimalSystem dSystem ↔ isMinimalSystem (natExtSystem hSurject) := by
     exact factorOfMinimalIsMinimal hWMin
       ⟨natExtFactorMap dSystem, natExtFactorMapIsFactorMap hSurject⟩
 
-/-! ### Towards Theorem 6.9 -/
+/-! ### Theorem 6.9
 
-/-- Regional proximality is carried forward by a factor map.  This is the analogue of
-Lemma 3.6 of the paper, and it gives the easy inclusion of Theorem 6.9. -/
-theorem RPSubsetPreimageRPOfFactorMap
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-{dSystemX : DynamicalSystem S X} {dSystemY : DynamicalSystem S Y} {π : X → Y}
-(hπ : isFactorMap dSystemX dSystemY π) :
-RP dSystemX ⊆ (Prod.map π π) ⁻¹' (RP dSystemY) := by
-  obtain ⟨hcont, -, hequiv⟩ := hπ
-  have hcont2 : Continuous (Prod.map π π) := hcont.prodMap hcont
-  intro z hz
-  simp only [RP, Set.mem_iInter] at hz
-  simp only [Set.mem_preimage, RP, Set.mem_iInter]
-  intro β hβ
-  -- pull `β` back to a neighbourhood of the diagonal of `X`
-  obtain ⟨β₀, hβ₀sub, hβ₀open, hβ₀diag⟩ := mem_nhdsSet.mp hβ
-  have hα : (Prod.map π π) ⁻¹' β ∈ nhdsSet (Set.diagonal X) := by
-    refine mem_nhdsSet.mpr ⟨(Prod.map π π) ⁻¹' β₀, Set.preimage_mono hβ₀sub,
-      hβ₀open.preimage hcont2, ?_⟩
-    rintro ⟨a, b⟩ hab
-    have : a = b := hab
-    subst this
-    exact hβ₀diag (rfl : π a = π a)
-  rw [mem_closure_iff]
-  intro W hWopen hzW
-  have hz' := hz _ hα
-  rw [mem_closure_iff] at hz'
-  obtain ⟨w, hwW, hwOrb⟩ :=
-    hz' ((Prod.map π π) ⁻¹' W) (hWopen.preimage hcont2) hzW
-  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hwOrb
-  obtain ⟨s, hs⟩ := hwOrb
-  refine ⟨Prod.map π π w, hwW, ?_⟩
-  simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
-  refine ⟨s, ?_⟩
-  have hswap : (diagDynamicalSystem dSystemY dSystemY).map s (Prod.map π π w)
-      = Prod.map π π ((diagDynamicalSystem dSystemX dSystemX).map s w) := by
-    change (dSystemY.map s (π w.1), dSystemY.map s (π w.2))
-      = (π (dSystemX.map s w.1), π (dSystemX.map s w.2))
-    have e1 := congrFun (hequiv s) w.1
-    have e2 := congrFun (hequiv s) w.2
-    simp only [Function.comp_apply] at e1 e2
-    rw [e1, e2]
-  rw [hswap]
-  exact hs
+Theorem 6.9 has two halves: the equality `(π × π)⁻¹ RP_X = RP_W`
+(`pullBackOfRPThruNatExtFactorIsRP`), and the resulting isomorphism `W / RP_W ≅ X / RP_X`
+(`maxEquiFactorOfNatExtIsoMaxEquiFactor`).  For the second we first package "the quotient by
+`RP`", that is, the largest equicontinuous factor of a minimal system.
+-/
 
 /-- Claim 1 in the proof of Theorem 6.9: two elements of the natural extension that are
 regionally proximal at the identity are regionally proximal at every coordinate.
@@ -1001,20 +962,51 @@ theorem natExtRPAtAllCoordinates
   simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
   exact ⟨b, heq ▸ hinv⟩
 
-/-- Theorem 6.9.
+/-- The `groGroup S`-action on the natural extension is by surjections -/
+lemma natExtGroSystemMapSurjective
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+∀ g : groGroup S, Function.Surjective ((natExtGroSystem hSurject).map g) := by
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  intro g ψ
+  refine ⟨(natExtGroSystem hSurject).map g⁻¹ ψ, ?_⟩
+  rw [← (natExtGroSystem hSurject).mapMult, mul_inv_cancel]
+  exact Subtype.ext (funext fun k ↦ congrArg ψ.1 (mul_one k))
 
-DGG/CLAUDE: **only the inclusion `RP_W ⊆ (π × π)⁻¹ RP_X` is proved here**; the reverse
-inclusion is still `sorry`.  What is missing is the "cylinder set" step of the paper's proof:
-given an open neighbourhood `α` of the diagonal of `W`, one needs a finite `F ⊆ groGroup S`
-and a neighbourhood `α₀` of the diagonal of `X` with
-`{(χ₁, χ₂) | ∀ f ∈ F, (χ₁ f, χ₂ f) ∈ α₀} ⊆ α`.
-That is the statement that neighbourhoods of the diagonal of a compact Hausdorff subspace of
-a product `X ^ Γ` contain basic entourages of the product uniformity; it is true (the sets
-`{(χ₁,χ₂) | ∀ f ∈ F, (χ₁ f, χ₂ f) ∈ α₀}` are closed, directed downwards, and meet in the
-diagonal, so compactness gives one inside `α`), but neither it nor the uniform space
-structure it refers to is currently available in this development.  Granting it, the rest of
-the paper's argument runs on `natExtRPAtAllCoordinates` together with surjectivity of
-`χ ↦ χ h`, which follows from `natExtFactorMapIsFactorMap` and `groGroupDynamicalSystemIsHomeo`. -/
+/-- Evaluation at any `h ∈ groGroup S` maps the natural extension onto `X`.  This is the
+paper's observation that `π ∘ h` is surjective. -/
+lemma natExtEvalSurjective
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) (h : groGroup S) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+Function.Surjective (fun χ : ↑(natExtSet dSystem) ↦ χ.1 h) := by
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  intro x
+  obtain ⟨χ, hχ⟩ := (natExtFactorMapIsFactorMap hSurject).2.1 x
+  obtain ⟨η, hη⟩ := natExtGroSystemMapSurjective hSurject h χ
+  refine ⟨η, ?_⟩
+  have h1 : χ.1 1 = η.1 h := by
+    rw [← hη]
+    exact congrArg η.1 (one_mul h)
+  change η.1 h = x
+  rw [← h1]
+  exact hχ
+
+/-- **Theorem 6.9**, first half: the regionally proximal relation of the natural extension is
+the pullback along `π × π` of the regionally proximal relation of `X`.
+
+The inclusion `RP_W ⊆ (π × π)⁻¹ RP_X` is the general fact `imageOfRPIsInRP` about factor maps.
+The reverse inclusion is the substantial one and follows the paper.  Given a neighbourhood `α`
+of the diagonal of `W` and an open `𝒰 ∋ (φ, ψ)`, both are first replaced by *cylinder*
+neighbourhoods (`existsCylinderSubsetNhdsSetDiagonal` and `existsProdCylinderSubsetNhds`),
+which constrain only finitely many coordinates `F ⊆ groGroup S`.  Theorem 6.1 supplies `s₀`
+with `F · i(s₀) ⊆ i(S)`; writing `h₀ = i(s₀)⁻¹` and `f = i(s_f) h₀`, every coordinate `χ(f)`
+equals `s_f (χ(h₀))`.  Regional proximality of `(φ(h₀), ψ(h₀))`, which is
+`natExtRPAtAllCoordinates`, then produces the required pair, lifted back to `W` by
+`natExtEvalSurjective`. -/
 theorem pullBackOfRPThruNatExtFactorIsRP
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -1025,6 +1017,371 @@ Set.preimage (Prod.map (natExtFactorMap dSystem) (natExtFactorMap dSystem)) (RP 
   RP (natExtSystem (minimalCommActionIsSurjective hMin)) := by
   have hSurject := minimalCommActionIsSurjective hMin
   have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
-  refine Set.Subset.antisymm ?_
-    (RPSubsetPreimageRPOfFactorMap (natExtFactorMapIsFactorMap hSurject))
-  sorry
+  refine Set.Subset.antisymm ?_ ?_
+  · -- `(π × π)⁻¹ RP_X ⊆ RP_W`, the substantial inclusion
+    classical
+    intro z hz
+    have hzRP : (z.1.1 1, z.2.1 1) ∈ RP dSystem := hz
+    simp only [RP, Set.mem_iInter]
+    intro α hα
+    rw [mem_closure_iff]
+    intro 𝒰 h𝒰open h𝒰z
+    -- replace `α` and `𝒰` by cylinder neighbourhoods, constraining finitely many coordinates
+    obtain ⟨F₁, α₀, hα₀open, hα₀diag, hcyl⟩ :=
+      existsCylinderSubsetNhdsSetDiagonal (natExtSetIsClosed dSystem) hα
+    obtain ⟨F₂, A, B, hF₂fin, hA, hB, hprod⟩ :=
+      existsProdCylinderSubsetNhds (h𝒰open.mem_nhds h𝒰z)
+    -- shift the finitely many relevant coordinates into the image of `S`
+    have hFfin : ((↑F₁ : Set (groGroup S)) ∪ F₂).Finite := F₁.finite_toSet.union hF₂fin
+    obtain ⟨s₀, hs₀⟩ := imageOfSIsThickInGroGroup S _ hFfin
+    have hchoice : ∀ f : groGroup S, ∃ r : S,
+        f ∈ (↑F₁ : Set (groGroup S)) ∪ F₂ → groGroupHom r = f * groGroupHom s₀ := by
+      intro f
+      by_cases hf : f ∈ (↑F₁ : Set (groGroup S)) ∪ F₂
+      · obtain ⟨r, -, hr⟩ := hs₀ ⟨f, hf, rfl⟩
+        have hr' : groGroupHom r = f * groGroupHom s₀ := hr
+        exact ⟨r, fun _ ↦ hr'⟩
+      · obtain ⟨r₀⟩ := ‹Nonempty S›
+        exact ⟨r₀, fun h ↦ absurd h hf⟩
+    choose sf hsf using hchoice
+    set h₀ : groGroup S := (groGroupHom s₀)⁻¹ with hh₀
+    have hfEq : ∀ f ∈ (↑F₁ : Set (groGroup S)) ∪ F₂, groGroupHom (sf f) * h₀ = f := by
+      intro f hf
+      rw [hsf f hf, hh₀, mul_assoc, mul_inv_cancel, mul_one]
+    have hEval : ∀ (χ : ↑(natExtSet dSystem)) (f : groGroup S),
+        f ∈ (↑F₁ : Set (groGroup S)) ∪ F₂ → χ.1 f = dSystem.map (sf f) (χ.1 h₀) := by
+      intro χ f hf
+      have hx := χ.2 h₀ (sf f)
+      rw [hfEq f hf] at hx
+      exact hx
+    -- the corresponding open sets downstairs in `X`
+    have h𝒫open : IsOpen (⋂ f ∈ F₂, (dSystem.map (sf f)) ⁻¹' (interior (A f))) :=
+      hF₂fin.isOpen_biInter fun f _ ↦ isOpen_interior.preimage (dSystem.mapCont (sf f))
+    have h𝒬open : IsOpen (⋂ f ∈ F₂, (dSystem.map (sf f)) ⁻¹' (interior (B f))) :=
+      hF₂fin.isOpen_biInter fun f _ ↦ isOpen_interior.preimage (dSystem.mapCont (sf f))
+    have h𝒜open : IsOpen (⋂ f ∈ (↑F₁ : Set (groGroup S)),
+        ((diagDynamicalSystem dSystem dSystem).map (sf f)) ⁻¹' α₀) :=
+      F₁.finite_toSet.isOpen_biInter fun f _ ↦
+        hα₀open.preimage ((diagDynamicalSystem dSystem dSystem).mapCont (sf f))
+    have h𝒜diag : Set.diagonal X ⊆ ⋂ f ∈ (↑F₁ : Set (groGroup S)),
+        ((diagDynamicalSystem dSystem dSystem).map (sf f)) ⁻¹' α₀ := by
+      rintro ⟨x, y⟩ hxy
+      have hxy' : x = y := hxy
+      subst hxy'
+      simp only [Set.mem_iInter, Set.mem_preimage]
+      intro f _
+      exact hα₀diag (rfl : dSystem.map (sf f) x = dSystem.map (sf f) x)
+    have h𝒫mem : z.1.1 h₀ ∈ ⋂ f ∈ F₂, (dSystem.map (sf f)) ⁻¹' (interior (A f)) := by
+      simp only [Set.mem_iInter, Set.mem_preimage]
+      intro f hf
+      rw [← hEval z.1 f (Set.mem_union_right _ hf)]
+      exact mem_interior_iff_mem_nhds.mpr (hA f)
+    have h𝒬mem : z.2.1 h₀ ∈ ⋂ f ∈ F₂, (dSystem.map (sf f)) ⁻¹' (interior (B f)) := by
+      simp only [Set.mem_iInter, Set.mem_preimage]
+      intro f hf
+      rw [← hEval z.2 f (Set.mem_union_right _ hf)]
+      exact mem_interior_iff_mem_nhds.mpr (hB f)
+    -- regional proximality of `z` at the coordinate `h₀` (Claim 1)
+    have hRPh₀ := natExtRPAtAllCoordinates hMin z.1 z.2 hzRP h₀
+    simp only [RP, Set.mem_iInter] at hRPh₀
+    have hRP' := hRPh₀ _ (mem_nhdsSet.mpr ⟨_, subset_rfl, h𝒜open, h𝒜diag⟩)
+    rw [mem_closure_iff] at hRP'
+    obtain ⟨w, hw, hworb⟩ := hRP' _ (h𝒫open.prod h𝒬open) (Set.mk_mem_prod h𝒫mem h𝒬mem)
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hworb
+    obtain ⟨s, hs⟩ := hworb
+    -- lift `w` back to the natural extension along evaluation at `h₀`
+    obtain ⟨η, hη⟩ := natExtEvalSurjective hSurject h₀ w.1
+    obtain ⟨ρ, hρ⟩ := natExtEvalSurjective hSurject h₀ w.2
+    have hη' : η.1 h₀ = w.1 := hη
+    have hρ' : ρ.1 h₀ = w.2 := hρ
+    refine ⟨(η, ρ), ?_, ?_⟩
+    · refine hprod (η, ρ) ?_ ?_
+      · intro f hf
+        rw [hEval η f (Set.mem_union_right _ hf), hη']
+        have h1 := hw.1
+        simp only [Set.mem_iInter, Set.mem_preimage] at h1
+        exact interior_subset (h1 f hf)
+      · intro f hf
+        rw [hEval ρ f (Set.mem_union_right _ hf), hρ']
+        have h2 := hw.2
+        simp only [Set.mem_iInter, Set.mem_preimage] at h2
+        exact interior_subset (h2 f hf)
+    · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+      refine ⟨s, hcyl ?_⟩
+      intro f hf
+      have hfF : f ∈ (↑F₁ : Set (groGroup S)) ∪ F₂ :=
+        Set.mem_union_left _ (Finset.mem_coe.mpr hf)
+      have hshift : f * groGroupHom s = groGroupHom (sf f * s) * h₀ := by
+        rw [groGroupHomIsSemigroupHom, mul_assoc, mul_comm (groGroupHom s) h₀, ← mul_assoc,
+          hfEq f hfF]
+      have hco : ∀ (χ : ↑(natExtSet dSystem)) (c : X), χ.1 h₀ = c →
+          ((natExtSystem hSurject).map s χ).1 f = dSystem.map (sf f) (dSystem.map s c) := by
+        intro χ c hc
+        change χ.1 (f * groGroupHom s) = _
+        rw [hshift, χ.2 h₀ (sf f * s), dSystem.mapMult, hc]
+      simp only [Set.mem_iInter, Set.mem_preimage] at hs
+      change (((natExtSystem hSurject).map s η).1 f,
+        ((natExtSystem hSurject).map s ρ).1 f) ∈ α₀
+      rw [hco η w.1 hη', hco ρ w.2 hρ']
+      exact hs f (Finset.mem_coe.mpr hf)
+  · -- `RP_W ⊆ (π × π)⁻¹ RP_X`: `imageOfRPIsInRP` carries `RP` forward along the factor map
+    intro z hz
+    exact imageOfRPIsInRP (natExtSystem hSurject) dSystem (natExtFactorMap dSystem)
+      (hπ := natExtFactorMapIsFactorMap hSurject) ⟨z, hz, rfl⟩
+
+
+/-- The setoid on `X` given by the regionally proximal relation of a minimal system -/
+abbrev RPSetoid
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+Setoid X :=
+⟨setToRelation (RP dSystem), (RPisICER hMin).2.2⟩
+
+instance RPQuotientNonempty
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+Nonempty (Quotient (RPSetoid hMin)) :=
+nonemptyQuotient X (RPisICER hMin).2.2
+
+instance RPQuotientT2
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+T2Space (Quotient (RPSetoid hMin)) :=
+quotientOfCompactT2ByClosedIsT2 (RPisICER hMin).2.1 (RPisICER hMin).2.2
+
+/-- The largest equicontinuous factor `X / RP_X` of a minimal system `X` -/
+noncomputable def maxEquiFactor
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+DynamicalSystem S (Quotient (RPSetoid hMin)) :=
+quotientDynamicalSystem dSystem (RPisICER hMin)
+
+/-- The quotient map `X → X / RP_X` is a factor map onto the largest equicontinuous factor -/
+lemma maxEquiFactorQuotientIsFactorMap
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+isFactorMap dSystem (maxEquiFactor hMin) (Quotient.mk (RPSetoid hMin)) :=
+quotientMapIsFactorMap dSystem (RPisICER hMin)
+
+@[simp] lemma maxEquiFactorMap
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) (s : S) (x : X) :
+(maxEquiFactor hMin).map s (Quotient.mk (RPSetoid hMin) x)
+  = Quotient.mk (RPSetoid hMin) (dSystem.map s x) :=
+congrFun ((maxEquiFactorQuotientIsFactorMap hMin).2.2 s) x
+
+/-- Shorthand for the forward direction of `natExtMinimalIffSystemIsMinimal` (Theorem 6.7):
+the natural extension of a minimal system is a minimal `S`-system.
+
+This carries no content of its own; it exists only because
+`(natExtMinimalIffSystemIsMinimal (minimalCommActionIsSurjective hMin)).mp hMin` appears
+inside the *statements* below, where spelling it out in full is unreadable.  Contrast
+`natExtGroSystemIsMinimal`, which is a genuinely different fact: it concerns the
+`groGroup S`-system `natExtGroSystem`, not the `S`-system `natExtSystem`, so it is not an
+instance of Theorem 6.7. -/
+abbrev natExtSystemIsMinimal
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+isMinimalSystem (natExtSystem (minimalCommActionIsSurjective hMin)) :=
+(natExtMinimalIffSystemIsMinimal (minimalCommActionIsSurjective hMin)).mp hMin
+
+/-- **Theorem 6.9**, second half: `W / RP_W` is isomorphic to `X / RP_X`, via `[w] ↦ [π w]`.
+
+Well-definedness of the map is the inclusion `RP_W ⊆ (π × π)⁻¹ RP_X` and its injectivity is
+the reverse inclusion, so both halves of `pullBackOfRPThruNatExtFactorIsRP` are used. -/
+theorem maxEquiFactorOfNatExtIsoMaxEquiFactor
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+∃ ξ : Quotient (RPSetoid (natExtSystemIsMinimal hMin)) → Quotient (RPSetoid hMin),
+  isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin)) (maxEquiFactor hMin) ξ := by
+  have hSurject := minimalCommActionIsSurjective hMin
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  have hWMin := natExtSystemIsMinimal hMin
+  obtain ⟨hπcont, hπsurj, hπequiv⟩ := natExtFactorMapIsFactorMap hSurject
+  have hTh69 := pullBackOfRPThruNatExtFactorIsRP hMin
+  -- well-definedness is the inclusion `RP_W ⊆ (π × π)⁻¹ RP_X` of Theorem 6.9
+  have hwell : ∀ a b : ↥(natExtSet dSystem), (a, b) ∈ RP (natExtSystem hSurject) →
+      Quotient.mk (RPSetoid hMin) (natExtFactorMap dSystem a)
+        = Quotient.mk (RPSetoid hMin) (natExtFactorMap dSystem b) := by
+    intro a b hab
+    apply Quotient.sound
+    rw [← hTh69] at hab
+    exact hab
+  refine ⟨Quotient.lift
+    (fun w ↦ Quotient.mk (RPSetoid hMin) (natExtFactorMap dSystem w)) hwell, ?_, ?_⟩
+  · -- a continuous bijection from a compact space to a Hausdorff space
+    rw [isHomeomorph_iff_continuous_isClosedMap_bijective]
+    have hcont : Continuous (Quotient.lift (s := RPSetoid hWMin)
+        (fun w ↦ Quotient.mk (RPSetoid hMin) (natExtFactorMap dSystem w)) hwell) :=
+      continuous_quot_lift hwell (continuous_quot_mk.comp hπcont)
+    refine ⟨hcont, hcont.isClosedMap, ?_, ?_⟩
+    · -- injectivity is the reverse inclusion of Theorem 6.9
+      intro q₁ q₂ h
+      induction q₁ using Quotient.inductionOn with | _ a =>
+      induction q₂ using Quotient.inductionOn with | _ b =>
+      apply Quotient.sound
+      have h1 : (natExtFactorMap dSystem a, natExtFactorMap dSystem b) ∈ RP dSystem :=
+        Quotient.exact h
+      change (a, b) ∈ RP (natExtSystem hSurject)
+      rw [← hTh69]
+      exact h1
+    · intro q
+      induction q using Quotient.inductionOn with | _ x =>
+      obtain ⟨w, hw⟩ := hπsurj x
+      subst hw
+      exact ⟨Quotient.mk _ w, rfl⟩
+  · intro s
+    funext q
+    induction q using Quotient.inductionOn with | _ w =>
+    change (maxEquiFactor hMin).map s (Quotient.mk (RPSetoid hMin) (natExtFactorMap dSystem w))
+      = Quotient.lift _ hwell ((maxEquiFactor hWMin).map s (Quotient.mk (RPSetoid hWMin) w))
+    rw [maxEquiFactorMap, maxEquiFactorMap]
+    have he := congrFun (hπequiv s) w
+    simp only [Function.comp_apply] at he
+    rw [he]
+    rfl
+
+/-! ### Theorem E
+
+Theorem E identifies three `S`-systems: `X / RP_X`, `W / RP_{W,S}` and `W / RP_{W,Gr(S)}`.
+The first two are identified by Theorem 6.9 above, so what remains is to identify
+`W / RP_{W,S}` with `W / RP_{W,Gr(S)}`; this rests on Theorem D applied to the two commuting
+actions on `W`.
+-/
+
+/-- The natural extension of a minimal system is a minimal `groGroup S`-system -/
+lemma natExtGroSystemIsMinimal
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+isMinimalSystem (natExtGroSystem (minimalCommActionIsSurjective hMin)) := by
+  have hSurject := minimalCommActionIsSurjective hMin
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  have hWMin : isMinimalSystem (natExtSystem hSurject) :=
+    (natExtMinimalIffSystemIsMinimal hSurject).mp hMin
+  rw [minimalIffDenseOrbits]
+  intro φ
+  refine Dense.mono ?_ ((minimalIffDenseOrbits (natExtSystem hSurject)).mp hWMin φ)
+  rintro z ⟨s, rfl⟩
+  exact ⟨groGroupHom s, rfl⟩
+
+/-- The `S`-action and the `groGroup S`-action on the natural extension commute -/
+lemma natExtActionsCommute
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hSurject : isSurjectiveSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+∀ (s : S) (g : groGroup S),
+  ((natExtSystem hSurject).map s) ∘ ((natExtGroSystem hSurject).map g)
+    = ((natExtGroSystem hSurject).map g) ∘ ((natExtSystem hSurject).map s) := by
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  intro s g
+  funext φ
+  change (natExtGroSystem hSurject).map (groGroupHom s) ((natExtGroSystem hSurject).map g φ)
+    = (natExtGroSystem hSurject).map g ((natExtGroSystem hSurject).map (groGroupHom s) φ)
+  rw [← (natExtGroSystem hSurject).mapMult, ← (natExtGroSystem hSurject).mapMult, mul_comm]
+
+/-- Theorem D applied to the natural extension: its regionally proximal relation as an
+`S`-system and as a `groGroup S`-system agree -/
+lemma natExtRPEqGroRP
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+RP (natExtSystem (minimalCommActionIsSurjective hMin))
+  = RP (natExtGroSystem (minimalCommActionIsSurjective hMin)) := by
+  have hSurject := minimalCommActionIsSurjective hMin
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  exact forTwoMinCommActionsRPsAreSame
+    ((natExtMinimalIffSystemIsMinimal hSurject).mp hMin)
+    (natExtGroSystemIsMinimal hMin)
+    (natExtActionsCommute hSurject)
+
+/-- Theorem E, (2) is isomorphic to (3): the largest equicontinuous factor of `W` as an
+`S`-system is the largest equicontinuous factor of `W` as a `groGroup S`-system, viewed as
+an `S`-system via `groGroupHom`.  The two relations are equal by Theorem D, so the identity
+descends to the isomorphism. -/
+theorem maxEquiFactorOfNatExtIsoGroMaxEquiFactor
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+∃ ζ : Quotient (RPSetoid (natExtSystemIsMinimal hMin))
+    → Quotient (RPSetoid (natExtGroSystemIsMinimal hMin)),
+  isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin))
+    (homDynamicalSystem groGroupHom (maxEquiFactor (natExtGroSystemIsMinimal hMin))) ζ := by
+  have hSurject := minimalCommActionIsSurjective hMin
+  have : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  have hWMin := natExtSystemIsMinimal hMin
+  have hWGrMin := natExtGroSystemIsMinimal hMin
+  have hRPeq := natExtRPEqGroRP hMin
+  have hwell : ∀ a b : ↥(natExtSet dSystem), (a, b) ∈ RP (natExtSystem hSurject) →
+      Quotient.mk (RPSetoid hWGrMin) a = Quotient.mk (RPSetoid hWGrMin) b := by
+    intro a b hab
+    apply Quotient.sound
+    rw [hRPeq] at hab
+    exact hab
+  refine ⟨Quotient.lift (fun w ↦ Quotient.mk (RPSetoid hWGrMin) w) hwell, ?_, ?_⟩
+  · rw [isHomeomorph_iff_continuous_isClosedMap_bijective]
+    have hcont : Continuous (Quotient.lift (s := RPSetoid hWMin)
+        (fun w ↦ Quotient.mk (RPSetoid hWGrMin) w) hwell) :=
+      continuous_quot_lift hwell continuous_quot_mk
+    refine ⟨hcont, hcont.isClosedMap, ?_, ?_⟩
+    · intro q₁ q₂ h
+      induction q₁ using Quotient.inductionOn with | _ a =>
+      induction q₂ using Quotient.inductionOn with | _ b =>
+      apply Quotient.sound
+      have h1 : (a, b) ∈ RP (natExtGroSystem hSurject) := Quotient.exact h
+      change (a, b) ∈ RP (natExtSystem hSurject)
+      rw [hRPeq]
+      exact h1
+    · intro q
+      induction q using Quotient.inductionOn with | _ w =>
+      exact ⟨Quotient.mk _ w, rfl⟩
+  · intro s
+    funext q
+    induction q using Quotient.inductionOn with | _ w =>
+    change (maxEquiFactor hWGrMin).map (groGroupHom s) (Quotient.mk (RPSetoid hWGrMin) w)
+      = Quotient.lift _ hwell ((maxEquiFactor hWMin).map s (Quotient.mk (RPSetoid hWMin) w))
+    rw [maxEquiFactorMap, maxEquiFactorMap]
+    rfl
+
+/-- **Theorem E.**  For a minimal system `X` with natural extension `π : W → X`, the three
+`S`-systems
+
+1. `X / RP_X`, the largest equicontinuous factor of `X`;
+2. `W / RP_{W,S}`, the largest equicontinuous factor of `W` as an `S`-system;
+3. `W / RP_{W,Gr(S)}`, the largest equicontinuous factor of `W` as a `Gr(S)`-system, made
+   into an `S`-system via `groGroupHom`,
+
+are the same up to isomorphism.  Both isomorphisms are stated with (2) as the source. -/
+theorem theoremE
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+letI : Nonempty ↑(natExtSet dSystem) :=
+  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
+(∃ ξ : Quotient (RPSetoid (natExtSystemIsMinimal hMin)) → Quotient (RPSetoid hMin),
+    isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin)) (maxEquiFactor hMin) ξ)
+∧
+(∃ ζ : Quotient (RPSetoid (natExtSystemIsMinimal hMin))
+     → Quotient (RPSetoid (natExtGroSystemIsMinimal hMin)),
+    isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin))
+      (homDynamicalSystem groGroupHom (maxEquiFactor (natExtGroSystemIsMinimal hMin))) ζ) :=
+⟨maxEquiFactorOfNatExtIsoMaxEquiFactor hMin, maxEquiFactorOfNatExtIsoGroMaxEquiFactor hMin⟩
