@@ -297,11 +297,10 @@ isLeftIdeal L → (L ∩ closure ((pure : S → Ultrafilter S) '' A)).Nonempty :
 for all finite `F ⊆ S`, `∩ f ∈ F, f⁻¹H ∈ p` -/
 theorem minIdempotentWitnessesShiftIntersectionLargeness
 {S : Type*} [Semigroup S] [Nonempty S]
-(H : Set S) {hH : isThick H} :
-∃ (p : Ultrafilter S), isMinimalUltrafilter p ∧ p * p = p ∧
-∀ (F : Set S), F.Finite → (⋂ f ∈ F, (leftMult f) ⁻¹' H) ∈ p :=
+(H : Set S) (hH : isThick H) :
+∃ (p : Ultrafilter S), p ∈ closure ((pure : S → Ultrafilter S) '' H) ∧
+isMinimalUltrafilter p ∧ p * p = p ∧ ∀ (F : Set S), F.Finite → (⋂ f ∈ F, (leftMult f) ⁻¹' H) ∈ p :=
   by sorry
-
 
 end Syndetic_and_thick_sets
 
