@@ -63,6 +63,19 @@ DynamicalSystem S (X × Y) :=
     exact Continuous.prodMap (dSystemX.mapCont s) (dSystemY.mapCont s)
 }
 
+/-- Given dynamical systems of `S` on `X` and `Y`, the diagonal system
+of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
+def multiProdDynamicalSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (d : ℕ) :
+DynamicalSystem S (Fin d → X) :=
+{
+  map := fun s ↦ (Pi.map (fun _ : Fin d => dSystem.map s))
+  mapMult := by sorry
+  mapCont := by sorry -- use Continuous.piMap
+}
+
 /- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
 we get an action of `T` on `X` by setting `tx = (φ t)x` -/
 def homDynamicalSystem
@@ -3605,6 +3618,39 @@ by
   use φ t
   exact ht
 
+
+/-- A system is semisimple if all points are uniformly recurrent -/
+def isSemisimpleSystem
+(dSystem : DynamicalSystem S X) :
+Prop :=
+∀ (x : X), isUniformlyRecurrent dSystem x
+
+/-- If a system X^d is semisimple for some d >= 2, then it is distal for some d >= 1.
+Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
+theorem semisimpleImpliesDistal
+(dSystem : DynamicalSystem S X) :
+∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
+  ∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) :=
+   by sorry
+
+/-- If a system is distal for some d >= 1, then it is distal and semisimple for all d.
+Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
+theorem distalImpliesDistalAndSemisimple
+(dSystem : DynamicalSystem S X) :
+∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) →
+  ∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
+    (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
+      by sorry
+
+/-- If a system is distal and semisimple for all d, then it is semisimple for some d >= 2.
+Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
+theorem distalAndSemisimpleImpliesSemisimple
+(dSystem : DynamicalSystem S X) :
+∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
+    (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
+      ∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
+        by sorry
+
 end Proximality_and_distality
 
 section Regional_proximality_basics
@@ -6074,12 +6120,70 @@ variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
 instance : UniformSpace X := uniformSpaceOfCompactR1
 
+-- We might consider defining Equicontinuous system ``by hand'' using
+-- open sets containing the diagonal.  This will allow us to avoid talking
+-- about the uniform structure on X at all.
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
 def isEquicontinuousSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 UniformEquicontinuous dSystem.map
+
+-- Here is a ``by hand'' attempt at equicontinuity
+def isEquicontinuousSystemv2
+(dSystem : DynamicalSystem S X) :
+Prop :=
+∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
+  ∃ (β : Set (X × X)) (_ : IsOpen β) (_ : Set.diagonal X ⊆ β),
+    ∀ (s : S), ((diagDynamicalSystem dSystem dSystem).map s) '' β ⊆ α
+
+/-- A system is equicontinuous iff RPM is contained in the diagonal -/
+theorem equiSystemIffRPMInDiag
+(dSystem : DynamicalSystem S X) :
+isEquicontinuousSystemv2 dSystem ↔ RPM dSystem ⊆ Set.diagonal X := by sorry
+
+/-- If S acts on an S-system surjectively and that system is equicontinuous,
+then it is semisimple -/
+theorem equiSurjectiveSystemsAreSemisimple
+(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
+isEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by sorry
+
+-- Here is a ``by hand'' attempt at backward equicontinuity
+def isBackwardEquicontinuousSystemv2
+(dSystem : DynamicalSystem S X) :
+Prop :=
+∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
+  ∃ (β : Set (X × X)) (_ : IsOpen β) (_ : Set.diagonal X ⊆ β),
+    ∀ (s : S), ((diagDynamicalSystem dSystem dSystem).map s) ⁻¹' β ⊆ α
+
+/-- A system is backward equicontinuous iff RP is contained in the diagonal -/
+theorem backEquiSystemIffRPInDiag
+(dSystem : DynamicalSystem S X) :
+isBackwardEquicontinuousSystemv2 dSystem ↔ RP dSystem ⊆ Set.diagonal X := by sorry
+
+/-- If a system is backward equicontinuous, then it is semisimple -/
+theorem backEquiSystemsAreSemisimple
+(dSystem : DynamicalSystem S X) :
+isBackwardEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by sorry
+
+/-- If S acts on an S-system surjectively, then the system is equicontinuous iff
+it is backward equicontinuous -/
+theorem inSurjectiveSystemsEquiIffBackEqui
+(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
+isEquicontinuousSystemv2 dSystem ↔ isBackwardEquicontinuousSystemv2 dSystem := by sorry
+
+/-- If S acts on an S-system surjectively and the system is equicontinuous,
+any product system is equicontinuous, backward equicontinuous, distal, semisimple, and
+S acts on them by homeomorphisms -/
+theorem surjEquiImpliesProdIsEquiDistalSemisimpleHomeo
+(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
+isEquicontinuousSystemv2 dSystem → ∀ (d : ℕ),
+  isEquicontinuousSystemv2 (multiProdDynamicalSystem dSystem d) ∧
+  isBackwardEquicontinuousSystemv2 (multiProdDynamicalSystem dSystem d) ∧
+  isSemisimpleSystem (multiProdDynamicalSystem dSystem d) ∧
+  isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
+  isHomeoSystem (multiProdDynamicalSystem dSystem d) := by sorry
 
 -- We create the next definitions because Lean has trouble understanding
 -- that the uniformity structure
