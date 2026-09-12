@@ -335,11 +335,29 @@ theorem existOpenNeighborhoodPreImageContainedIn
     exact h1
   use U
 
-/-- If `y ∈ U ⊆ X`, there is `V ⊆ U` and `α ⊆ X^2` containing the diagonal
-such that if `(x,z) ∈ α` and `z ∈ V`, then `x ∈ U` -/
+/-- If `U ⊆ X` is open and `y ∈ U`, there is an open `V ∋ y` and an open `α ⊆ X^2` containing
+the diagonal such that if `(x,z) ∈ α` and `z ∈ V`, then `x ∈ U`. -/
 theorem nbhdOfDiagForcesOtherSetContainment
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
-{y : X} {U : Set X} (hyU : y ∈ U) :
+{y : X} {U : Set X} (hUOpen : IsOpen U) (hyU : y ∈ U) :
 ∃ (V : Set X) (_ : IsOpen V) (_ : y ∈ V),
 ∃ (α : Set (X × X)) (_ : IsOpen α) (_ : Set.diagonal X ⊆ α),
-∀ (x z : X), ⟨x,z⟩ ∈ α → z ∈ V → x ∈ U := by sorry
+∀ (x z : X), ⟨x,z⟩ ∈ α → z ∈ V → x ∈ U := by
+  -- by regularity, an open `V ∋ y` whose closure is inside `U`
+  obtain ⟨T, hTnhds, hTclosed, hTU⟩ := exists_mem_nhds_isClosed_subset (hUOpen.mem_nhds hyU)
+  have hclosureV : closure (interior T) ⊆ U :=
+    (closure_mono interior_subset).trans (hTclosed.closure_subset.trans hTU)
+  refine ⟨interior T, isOpen_interior, mem_interior_iff_mem_nhds.mpr hTnhds,
+    (Uᶜ ×ˢ closure (interior T))ᶜ,
+    (hUOpen.isClosed_compl.prod isClosed_closure).isOpen_compl, ?_, ?_⟩
+  · -- the diagonal misses `K ×ˢ closure V`, since `closure V ⊆ U`
+    rintro ⟨x, z⟩ hxz
+    have hxz' : x = z := hxz
+    subst hxz'
+    simp only [Set.mem_compl_iff, Set.mem_prod, not_and]
+    exact fun hxK hxV ↦ hxK (hclosureV hxV)
+  · -- if `(x,z) ∉ K ×ˢ closure V` and `z ∈ V ⊆ closure V`, then `x ∉ K`, that is, `x ∈ U`
+    intro x z hxz hzV
+    simp only [Set.mem_compl_iff, Set.mem_prod, not_and] at hxz
+    by_contra hxU
+    exact hxz hxU (subset_closure hzV)

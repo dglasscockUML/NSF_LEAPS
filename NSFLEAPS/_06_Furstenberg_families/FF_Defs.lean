@@ -634,7 +634,7 @@ visitTimeSet dSystem x U = A) → (∃ (B : Set S) (_ : isdcSSet B),
 ∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) := by
   intro hA
   obtain ⟨X,Xts,Xcs,Xt2,Xnon,dSystem,x,y,yIsUR,xyProx,U,yInU,UIsOpen,visitTimesIsA⟩ := hA
-  obtain ⟨V,VIsOpen,yInV,α,αIsOpen,αContainsDiag,VαProp⟩ := nbhdOfDiagForcesOtherSetContainment yInU
+  obtain ⟨V,VIsOpen,yInV,α,αIsOpen,αContainsDiag,VαProp⟩ := nbhdOfDiagForcesOtherSetContainment UIsOpen yInU
   let yToV := visitTimeSet dSystem y V
   use yToV
   have yToVisdcS : isdcSSet yToV := by
