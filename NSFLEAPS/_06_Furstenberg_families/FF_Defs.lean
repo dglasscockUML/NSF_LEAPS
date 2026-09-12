@@ -13,8 +13,8 @@ theorem visitTimeConcentrationForPRFamily
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
-(x : X) (U : Set X) {hU : IsClosed U}
-(F : Family S) {hF : isPRFamily F} :
+(x : X) (U : Set X) (hU : IsClosed U)
+(F : Family S) (hF : isPRFamily F) :
 visitTimeSet dSystem x U ∈ F →
 ∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
   contrapose
