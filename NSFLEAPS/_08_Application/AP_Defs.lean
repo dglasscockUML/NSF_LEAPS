@@ -447,15 +447,19 @@ theorem commURSetsOfBohrRecurrenceAreDelta
         exact hIicer3
       let K := Quotient ⟨setToRelation I, hIEquiRel⟩
       let dSystemK := quotientDynamicalSystem dSystemX hIicer
-      let π := (Quotient.mk ⟨setToRelation I, hIEquiRel⟩)
+      let π : X → K := (Quotient.mk ⟨setToRelation I, hIEquiRel⟩)
       have hKT2 : T2Space K := by
         apply quotientOfCompactT2ByClosedIsT2
         · unfold isICER at hIicer
           rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
           exact hIicer2
       apply (Equivalence.quot_mk_eq_iff hIEquiRel x y).mp
-      by_contra hContra
-      sorry
+      have hπxy : π x = π y := by
+        by_contra hContra
+        let hSep := t2_separation hContra
+        rcases hSep with ⟨V, W, hV1, hW1, hV2, hW2, hVW⟩
+        sorry
+      exact hπxy
     unfold setToRelation at hGoal
     exact hGoal
   have hxyRP : (x, y) ∈ RP dSystemX := by
