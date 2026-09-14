@@ -20,6 +20,14 @@ where
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
   mapCont : ∀ s, Continuous (map s)
 
+/- DGG: SEVERAL OF THE FOLLOWING CAN BE UNIFIED AS FOLLOWS
+Arbitrary products of dynamical systems as a dynamical system (eg: for an index set I,
+I → S_i Dynamical system yields a prod S_i dynamical system)
+Specialize to all S_i the same
+Then specialize that to get diagonal version
+Probably still want special cases for the two-system products since those are used most frequently
+-/
+
 /-- Given dynamical systems of `S` on `X` and `T` on `Y`, the product system
 of `S × T` on `X × Y` is given by `(s,t) (x,y) = (sx,ty)` -/
 def prodDynamicalSystem
@@ -63,18 +71,54 @@ DynamicalSystem S (X × Y) :=
     exact Continuous.prodMap (dSystemX.mapCont s) (dSystemY.mapCont s)
 }
 
-/-- Given dynamical systems of `S` on `X` and `Y`, the diagonal system
+-- DGG: May not need this
+/- Given dynamical systems of `S` on `X` and `Y`, the diagonal system
 of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
-def multiProdDynamicalSystem
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (d : ℕ) :
-DynamicalSystem S (Fin d → X) :=
+-- def multiProdDynamicalSystem
+-- {S} [Semigroup S] [Nonempty S]
+-- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) (d : ℕ) :
+-- DynamicalSystem S (Fin d → X) :=
+-- {
+--   map := fun s ↦ (Pi.map (fun _ : Fin d => dSystem.map s))
+--   mapMult := by sorry
+--   mapCont := by sorry -- use Continuous.piMap
+-- }
+
+-- DGG: We do need support for arbitrary products of systems so that we can show that
+-- arbitrary products of distal / equicontinuous / backward equicontinuous systems are such
+
+/-- Given an index type `I` and, for each `i : I`, an `S`-system on `X i`, the arbitrary
+product system of `S` on `∀ i, X i` is given by the diagonal action `s φ = fun i ↦ s (φ i)`.
+
+The phase space carries the product topology; it is compact by Tychonoff, and Hausdorff and
+non-empty because each factor is, so Lean finds those instances on its own. -/
+def arbProdDynamicalSystem
+{S : Type*} [Semigroup S] [Nonempty S]
+{I : Type*}
+{X : I → Type*} [∀ i, TopologicalSpace (X i)] [∀ i, CompactSpace (X i)]
+[∀ i, T2Space (X i)] [∀ i, Nonempty (X i)]
+(dSystems : ∀ i, DynamicalSystem S (X i)) :
+DynamicalSystem S (∀ i, X i) :=
 {
-  map := fun s ↦ (Pi.map (fun _ : Fin d => dSystem.map s))
-  mapMult := by sorry
-  mapCont := by sorry -- use Continuous.piMap
+  map := fun s φ i ↦ (dSystems i).map s (φ i)
+  mapMult := by
+    intro s t φ
+    funext i
+    exact (dSystems i).mapMult s t (φ i)
+  mapCont := by
+    intro s
+    exact continuous_pi fun i ↦ ((dSystems i).mapCont s).comp (continuous_apply i)
 }
+
+/-- The action of `arbProdDynamicalSystem` is coordinatewise -/
+@[simp] lemma arbProdDynamicalSystemMap
+{S : Type*} [Semigroup S] [Nonempty S]
+{I : Type*}
+{X : I → Type*} [∀ i, TopologicalSpace (X i)] [∀ i, CompactSpace (X i)]
+[∀ i, T2Space (X i)] [∀ i, Nonempty (X i)]
+(dSystems : ∀ i, DynamicalSystem S (X i)) (s : S) (φ : ∀ i, X i) (i : I) :
+(arbProdDynamicalSystem dSystems).map s φ i = (dSystems i).map s (φ i) := rfl
 
 /- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
 we get an action of `T` on `X` by setting `tx = (φ t)x` -/
@@ -103,6 +147,17 @@ def isSurjectiveSystem
 (dSystem : DynamicalSystem S X) :=
 ∀ s : S, Function.Surjective (dSystem.map s)
 
+/-- The square of a surjective system is surjective -/
+lemma diagOfSurjectiveIsSurjective
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hsurj : isSurjectiveSystem dSystem) :
+isSurjectiveSystem (diagDynamicalSystem dSystem dSystem) := by
+  rintro s ⟨z₁, z₂⟩
+  obtain ⟨a, ha⟩ := hsurj s z₁
+  obtain ⟨b, hb⟩ := hsurj s z₂
+  exact ⟨(a, b), by simp only [diagDynamicalSystem, Prod.map_apply, ha, hb]⟩
+
 /-- A dynamical system satisfies `homeoSystem` if all
 elements of the acting semigroup act by homeomorphisms -/
 def isHomeoSystem
@@ -119,6 +174,53 @@ theorem homeoSystemIsSurjectiveSystem
 isSurjectiveSystem dSystem := by
   intro s
   exact IsHomeomorph.surjective (hHomeo s)
+
+
+/-- A pair viewed as a `Bool`-indexed family.  This identifies the square `X × X` of a system
+with the `Bool`-indexed product of two copies of it, so that the results on arbitrary products
+of systems apply to squares. -/
+private def pairToBoolFamily {W : Type*} (p : W × W) : Bool → W :=
+  fun b ↦ bif b then p.1 else p.2
+
+/-- The inverse of `pairToBoolFamily` -/
+private def boolFamilyToPair {W : Type*} (φ : Bool → W) : W × W := (φ true, φ false)
+
+private lemma pairToBoolFamilyContinuous {W : Type*} [TopologicalSpace W] :
+Continuous (pairToBoolFamily : W × W → Bool → W) :=
+  continuous_pi fun b ↦ by cases b; exacts [continuous_snd, continuous_fst]
+
+private lemma boolFamilyToPairContinuous {W : Type*} [TopologicalSpace W] :
+Continuous (boolFamilyToPair : (Bool → W) → W × W) :=
+  (continuous_apply true).prodMk (continuous_apply false)
+
+private lemma pairToBoolFamilyRightInverse {W : Type*} (φ : Bool → W) :
+pairToBoolFamily (boolFamilyToPair φ) = φ :=
+  funext fun b ↦ by cases b <;> rfl
+
+private lemma diagonalSubsetPreimageBoolFamilyToPair {W : Type*}
+{α : Set ((W × W) × (W × W))} (hα : Set.diagonal (W × W) ⊆ α) :
+Set.diagonal (Bool → W) ⊆ (Prod.map boolFamilyToPair boolFamilyToPair) ⁻¹' α := by
+  rintro ⟨φ, ψ⟩ hφψ
+  have h : φ = ψ := hφψ
+  subst h
+  exact hα rfl
+
+private lemma diagonalSubsetPreimagePairToBoolFamily {W : Type*}
+{β : Set ((Bool → W) × (Bool → W))} (hβ : Set.diagonal (Bool → W) ⊆ β) :
+Set.diagonal (W × W) ⊆ (Prod.map pairToBoolFamily pairToBoolFamily) ⁻¹' β := by
+  rintro ⟨x, y⟩ hxy
+  have h : x = y := hxy
+  subst h
+  exact hβ rfl
+
+private lemma pairToBoolFamilyEquivariant
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSys : DynamicalSystem S X) (s : S) (q : X × X) :
+(arbProdDynamicalSystem (fun _ : Bool ↦ dSys)).map s (pairToBoolFamily q)
+  = pairToBoolFamily ((diagDynamicalSystem dSys dSys).map s q) :=
+  funext fun b ↦ by cases b <;> rfl
+
 
 end Structures
 
@@ -194,6 +296,16 @@ section Orbits
 
 variable {S : Type*} [Semigroup S] [Nonempty S]
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+
+lemma mapSemigroupIteratePow
+(dSystem : DynamicalSystem S X) (s : S) (n : ℕ) (x : X) :
+dSystem.map (semigroupIteratePow s n) x = (dSystem.map s)^[n + 1] x := by
+  induction n generalizing x with
+  | zero => simp [semigroupIteratePow]
+  | succ n ih =>
+    change dSystem.map (s * semigroupIteratePow s n) x = _
+    rw [dSystem.mapMult, ih]
+    exact (Function.iterate_succ_apply' (dSystem.map s) (n + 1) x).symm
 
 /-- The orbit of a point `x` under the action of a semigroup `S` is the
 image of `S` under the map `s ↦ sx` -/
@@ -603,6 +715,17 @@ def isFactorMap
 (π : X → Y) :
 Prop :=
 Continuous π ∧ Function.Surjective π ∧ isEquivariant dSystemX.map dSystemY.map π
+
+/-- The square of a system is the `Bool`-indexed product of two copies of it -/
+private lemma pairToBoolFamilyIsFactorMap
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSys : DynamicalSystem S X) :
+isFactorMap (diagDynamicalSystem dSys dSys)
+  (arbProdDynamicalSystem (fun _ : Bool ↦ dSys)) pairToBoolFamily :=
+  ⟨pairToBoolFamilyContinuous,
+    fun φ ↦ ⟨boolFamilyToPair φ, pairToBoolFamilyRightInverse φ⟩,
+    fun _ ↦ funext fun _ ↦ funext fun b ↦ by cases b <;> rfl⟩
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
 if it is a equivariant homeomorphism -/
@@ -3409,6 +3532,23 @@ def proximal
 Prop :=
 ∀ α ∈ nhdsSet (Set.diagonal X), ∃ (s : S), (dSystem.map s x, dSystem.map s y) ∈ α
 
+/-- If `x` and `y` are proximal, then the orbit closure of `(x,y)` meets the diagonal.
+Otherwise the complement of that orbit closure would be a neighbourhood of the diagonal
+containing no point of the orbit. -/
+lemma proximalOrbitClosureMeetsDiagonal
+{dSys : DynamicalSystem S X} {x y : X} (hprox : proximal dSys x y) :
+(Set.diagonal X ∩ orbitClosure (diagDynamicalSystem dSys dSys) (x, y)).Nonempty := by
+  by_contra hcon
+  rw [Set.not_nonempty_iff_eq_empty, ← Set.disjoint_iff_inter_eq_empty] at hcon
+  have hnhds : (orbitClosure (diagDynamicalSystem dSys dSys) (x, y))ᶜ
+      ∈ nhdsSet (Set.diagonal X) :=
+    mem_nhdsSet.mpr ⟨_, subset_rfl, isClosed_closure.isOpen_compl,
+      fun z hz ↦ Set.disjoint_left.mp hcon hz⟩
+  obtain ⟨s, hs⟩ := hprox _ hnhds
+  exact hs (subset_closure ⟨s, rfl⟩)
+
+-- Simplification of minSystemOrbitClosProxPairContainsDiag
+-- possible by appealing to proximalOrbitClosureMeetsDiagonal
 /-- In a minimal action of `S` on `X`, if `x` and `y` are proximal, then
 the `S`-orbit closure (under the diagonal action) of `(x,y)` contains the diagonal of `X` -/
 theorem minSystemOrbitClosProxPairContainsDiag
@@ -3604,6 +3744,33 @@ def isDistalSystem
 (dSystem : DynamicalSystem S X) : Prop :=
 ∀ (x y : X), proximal dSystem x y → x = y
 
+/-- An arbitrary product of distal systems is distal -/
+theorem arbProdOfDistalIsDistal
+{I : Type*} {Z : I → Type*}
+[∀ i, TopologicalSpace (Z i)] [∀ i, CompactSpace (Z i)] [∀ i, T2Space (Z i)] [∀ i, Nonempty (Z i)]
+{dSystems : ∀ i, DynamicalSystem S (Z i)} (hEquis : ∀ i, isDistalSystem (dSystems i)) :
+isDistalSystem (arbProdDynamicalSystem dSystems) := by
+  classical
+  -- each coordinate projection is a factor map, so a proximal pair is proximal coordinatewise
+  intro x y hProx
+  funext i
+  refine hEquis i (x i) (y i) ?_
+  have hFactor : isFactorMap (arbProdDynamicalSystem dSystems) (dSystems i) (fun φ ↦ φ i) :=
+    ⟨continuous_apply i,
+      fun z ↦ ⟨Function.update (fun j ↦ Classical.arbitrary (Z j)) i z,
+        Function.update_self i z _⟩,
+      fun _ ↦ rfl⟩
+  exact imageOfProxByFactorIsProx hFactor hProx
+
+/-- The square of a distal system is distal -/
+lemma diagOfDistalIsDistal
+{dSys : DynamicalSystem S X} (hdistal : isDistalSystem dSys) :
+isDistalSystem (diagDynamicalSystem dSys dSys) := by
+  intro p q hprox
+  exact congrArg boolFamilyToPair
+    (arbProdOfDistalIsDistal (dSystems := fun _ : Bool ↦ dSys) (fun _ ↦ hdistal) _ _
+      (imageOfProxByFactorIsProx (pairToBoolFamilyIsFactorMap dSys) hprox))
+
 /-- A hom system from a distal system is distal -/
 theorem homSystemOfDistalSystemIsDistal
 {T} [Semigroup T] [Nonempty T]
@@ -3618,38 +3785,26 @@ by
   use φ t
   exact ht
 
+/- If a system is distal for some d >= 1, then it is distal and semisimple for all d.
+Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem
+This is shown in distalImpliesDistalAndSemisimple in the UF_Defs file. -/
 
-/-- A system is semisimple if all points are uniformly recurrent -/
-def isSemisimpleSystem
-(dSystem : DynamicalSystem S X) :
-Prop :=
-∀ (x : X), isUniformlyRecurrent dSystem x
-
-/-- If a system X^d is semisimple for some d >= 2, then it is distal for some d >= 1.
+/- If a system X^d is semisimple for some d >= 2, then it is distal for some d >= 1.
 Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
-theorem semisimpleImpliesDistal
-(dSystem : DynamicalSystem S X) :
-∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
-  ∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) :=
-   by sorry
+-- theorem semisimpleImpliesDistal
+-- (dSystem : DynamicalSystem S X) :
+-- ∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
+--   ∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) :=
+--    by sorry
 
-/-- If a system is distal for some d >= 1, then it is distal and semisimple for all d.
+/- If a system is distal and semisimple for all d, then it is semisimple for some d >= 2.
 Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
-theorem distalImpliesDistalAndSemisimple
-(dSystem : DynamicalSystem S X) :
-∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) →
-  ∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
-    (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
-      by sorry
-
-/-- If a system is distal and semisimple for all d, then it is semisimple for some d >= 2.
-Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
-theorem distalAndSemisimpleImpliesSemisimple
-(dSystem : DynamicalSystem S X) :
-∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
-    (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
-      ∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
-        by sorry
+-- theorem distalAndSemisimpleImpliesSemisimple
+-- (dSystem : DynamicalSystem S X) :
+-- ∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
+--     (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
+--       ∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
+--         by sorry
 
 end Proximality_and_distality
 
@@ -6138,52 +6293,37 @@ Prop :=
   ∃ (β : Set (X × X)) (_ : IsOpen β) (_ : Set.diagonal X ⊆ β),
     ∀ (s : S), ((diagDynamicalSystem dSystem dSystem).map s) '' β ⊆ α
 
-/-- A system is equicontinuous iff RPM is contained in the diagonal -/
-theorem equiSystemIffRPMInDiag
-(dSystem : DynamicalSystem S X) :
-isEquicontinuousSystemv2 dSystem ↔ RPM dSystem ⊆ Set.diagonal X := by sorry
+/-- An arbitrary product of equicontinuous systems is equicontinuous -/
+theorem arbProdOfEquiIsEqui
+{I : Type*} {Z : I → Type*}
+[∀ i, TopologicalSpace (Z i)] [∀ i, CompactSpace (Z i)] [∀ i, T2Space (Z i)] [∀ i, Nonempty (Z i)]
+{dSystems : ∀ i, DynamicalSystem S (Z i)} (hEquis : ∀ i, isEquicontinuousSystemv2 (dSystems i)) :
+isEquicontinuousSystemv2 (arbProdDynamicalSystem dSystems) := by
+  -- shrink `α` to a box determined by finitely many coordinates, and apply equicontinuity
+  -- of each of those finitely many factors
+  intro α hαopen hαdiag
+  obtain ⟨F, hFfin, γ, hγopen, hγdiag, hγbox⟩ := existsFiniteBoxInDiagonalNbhdOfPi hαopen hαdiag
+  choose δ hδopen hδdiag hδprop using fun i ↦ hEquis i (γ i) (hγopen i) (hγdiag i)
+  refine ⟨{p : (∀ i, Z i) × (∀ i, Z i) | ∀ i ∈ F, (p.1 i, p.2 i) ∈ δ i},
+    isOpenDiagonalBoxOfPi hFfin hδopen, diagonalSubsetDiagonalBoxOfPi hδdiag, ?_⟩
+  rintro s w ⟨p, hp, rfl⟩
+  exact hγbox fun i hi ↦ hδprop i s ⟨(p.1 i, p.2 i), hp i hi, rfl⟩
 
-/-- If S acts on an S-system surjectively and that system is equicontinuous,
-then it is semisimple -/
-theorem equiSurjectiveSystemsAreSemisimple
-(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
-isEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by sorry
-
--- Here is a ``by hand'' attempt at backward equicontinuity
-def isBackwardEquicontinuousSystemv2
-(dSystem : DynamicalSystem S X) :
-Prop :=
-∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
-  ∃ (β : Set (X × X)) (_ : IsOpen β) (_ : Set.diagonal X ⊆ β),
-    ∀ (s : S), ((diagDynamicalSystem dSystem dSystem).map s) ⁻¹' β ⊆ α
-
-/-- A system is backward equicontinuous iff RP is contained in the diagonal -/
-theorem backEquiSystemIffRPInDiag
-(dSystem : DynamicalSystem S X) :
-isBackwardEquicontinuousSystemv2 dSystem ↔ RP dSystem ⊆ Set.diagonal X := by sorry
-
-/-- If a system is backward equicontinuous, then it is semisimple -/
-theorem backEquiSystemsAreSemisimple
-(dSystem : DynamicalSystem S X) :
-isBackwardEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by sorry
-
-/-- If S acts on an S-system surjectively, then the system is equicontinuous iff
-it is backward equicontinuous -/
-theorem inSurjectiveSystemsEquiIffBackEqui
-(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
-isEquicontinuousSystemv2 dSystem ↔ isBackwardEquicontinuousSystemv2 dSystem := by sorry
-
-/-- If S acts on an S-system surjectively and the system is equicontinuous,
-any product system is equicontinuous, backward equicontinuous, distal, semisimple, and
-S acts on them by homeomorphisms -/
-theorem surjEquiImpliesProdIsEquiDistalSemisimpleHomeo
-(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
-isEquicontinuousSystemv2 dSystem → ∀ (d : ℕ),
-  isEquicontinuousSystemv2 (multiProdDynamicalSystem dSystem d) ∧
-  isBackwardEquicontinuousSystemv2 (multiProdDynamicalSystem dSystem d) ∧
-  isSemisimpleSystem (multiProdDynamicalSystem dSystem d) ∧
-  isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
-  isHomeoSystem (multiProdDynamicalSystem dSystem d) := by sorry
+/-- The square of an equicontinuous system is equicontinuous -/
+lemma diagOfEquiIsEqui
+{dSys : DynamicalSystem S X} (hequi : isEquicontinuousSystemv2 dSys) :
+isEquicontinuousSystemv2 (diagDynamicalSystem dSys dSys) := by
+  intro α hαopen hαdiag
+  obtain ⟨β, hβopen, hβdiag, hβprop⟩ :=
+    arbProdOfEquiIsEqui (dSystems := fun _ : Bool ↦ dSys) (fun _ ↦ hequi)
+      ((Prod.map boolFamilyToPair boolFamilyToPair) ⁻¹' α)
+      (hαopen.preimage (boolFamilyToPairContinuous.prodMap boolFamilyToPairContinuous))
+      (diagonalSubsetPreimageBoolFamilyToPair hαdiag)
+  refine ⟨(Prod.map pairToBoolFamily pairToBoolFamily) ⁻¹' β,
+    hβopen.preimage (pairToBoolFamilyContinuous.prodMap pairToBoolFamilyContinuous),
+    diagonalSubsetPreimagePairToBoolFamily hβdiag, ?_⟩
+  rintro s w ⟨p, hp, rfl⟩
+  exact hβprop s ⟨(pairToBoolFamily p.1, pairToBoolFamily p.2), hp, rfl⟩
 
 -- We create the next definitions because Lean has trouble understanding
 -- that the uniformity structure
@@ -6196,13 +6336,7 @@ def isEquicontinuousProductSystem
 Prop :=
 UniformEquicontinuous (diagDynamicalSystem dSystemX dSystemY).map
 
-def isEquicontinuousSubSystem
-(dSystem : DynamicalSystem S X)
-{Z : Set X} [CompactSpace Z] [Nonempty Z]
-(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-Prop :=
-UniformEquicontinuous (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ).map
-
+-- DGG: Plan to upgrade in favor of stronger arbProdOfEquiIsEqui above
 /-- If `dSystem` and `dSystemY` are equicontinuous dynamical systems, then the
 diagonal action of `S` on `X × Y` is an equicontinuous dynamical system -/
 theorem diagSystemOfEquiSystemsIsEquiSystem
@@ -6263,146 +6397,59 @@ isEquicontinuousProductSystem dSystemX dSystemY := by
     exact hαY
   exact Filter.mem_of_superset hαXY2 hαXY
 
-/-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
-nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
-dynamical system -/
-theorem subsystemOfEquicontinuousIsEquicontinuous
-{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
-{Z : Set X} [CompactSpace Z] [Nonempty Z]
-(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-isEquicontinuousSubSystem dSystem hZ :=
-letI : UniformSpace X := uniformSpaceOfCompactR1
-by
-  unfold isEquicontinuousSystem at hXEqui
-  have h1 : UniformEquicontinuousOn dSystem.map Z := by
-    apply UniformEquicontinuous.uniformEquicontinuousOn
-    exact hXEqui
-  intro α hα
-  unfold UniformEquicontinuous at hXEqui
-  unfold UniformEquicontinuousOn at h1
-  have h2init : uniformity (Z) = Filter.comap (fun (q : Subtype Z × Subtype Z)
-    => (Subtype.val q.1, Subtype.val q.2)) (uniformity X) := by
-    exact uniformity_subtype
-  have h2 : ∃ β ∈ uniformity X, (Prod.map Subtype.val Subtype.val) ⁻¹' β ⊆ α:= by
-    simp only [h2init, Filter.mem_comap] at hα
-    rcases hα with ⟨γ, hγ1, hγ2⟩
-    use γ
-    constructor
-    · exact hγ1
-    exact hγ2
-  rcases h2 with ⟨β, hβ1, hβ2⟩
-  specialize hXEqui β hβ1
-  let γ := {z : X × X | ∀ s : S, (dSystem.map s z.1, dSystem.map s z.2) ∈ β}
-  have h3 : γ ∈ uniformity X := by
-    simp only [γ]
-    exact hXEqui
-  let ZdSys := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ
-  let δ := {z : (Z × Z) | ∀ s : S, (ZdSys.map s z.1, ZdSys.map s z.2) ∈ α}
-  have h4 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ  ∈ uniformity Z := by
-    simp only [uniformity_subtype]
-    use γ
-    constructor
-    · exact h3
-    rfl
-  have h5 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ ⊆ δ:= by
-    simp only [δ]
-    simp only [γ]
-    intro z hz
-    simp only [Set.mem_ofPred_eq]
-    simp only [Set.preimage_ofPred_eq, Prod.map_fst, Prod.map_snd, Set.mem_ofPred_eq] at hz
-    intro s
-    specialize hz s
-    let θ : Set (↑Z × ↑Z) := (Prod.map Subtype.val Subtype.val) ⁻¹' β
-    have h51 : (ZdSys.map s z.1, ZdSys.map s z.2) ∈ θ := by
-      simpa
-    have h52 : θ ⊆ α := by
-      simpa
-    apply h52
-    exact h51
-  have h6 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ ∈ uniformity Z := by
-    exact h4
-  have hGoal : δ ∈ uniformity Z := by
-    exact Filter.mem_of_superset h6 h5
-  exact hGoal
+/-- A system is equicontinuous iff RPM is contained in the diagonal -/
+theorem equiSystemIffRPMInDiag
+(dSystem : DynamicalSystem S X) :
+isEquicontinuousSystemv2 dSystem ↔ RPM dSystem ⊆ Set.diagonal X := by
+  constructor
+  · -- if `z ∉ Δ`, pick `γ` with `z ∉ closure γ`; equicontinuity puts `Sβ ⊆ γ` for some `β`,
+    -- and `RPM ⊆ closure (Sβ) ⊆ closure γ`
+    intro hequi z hz
+    by_contra hzd
+    obtain ⟨γ, hγopen, hγdiag, hzγ⟩ := existsOpenNbhdDiagonalNotMemClosure hzd
+    obtain ⟨β, hβopen, hβdiag, hβprop⟩ := hequi γ hγopen hγdiag
+    have hβnhds : β ∈ nhdsSet (Set.diagonal X) := mem_nhdsSet.mpr ⟨β, subset_rfl, hβopen, hβdiag⟩
+    have hzclos : z ∈ setOrbitClosure (diagDynamicalSystem dSystem dSystem) β := by
+      simp only [RPM, Set.mem_iInter] at hz
+      exact hz β hβnhds
+    have hsub : setOrbit (diagDynamicalSystem dSystem dSystem) β ⊆ γ := by
+      rintro w hw
+      simp only [setOrbit, Set.mem_range] at hw
+      obtain ⟨⟨t, b⟩, hb⟩ := hw
+      exact hβprop t ⟨(b : X × X), b.2, hb⟩
+    exact hzγ (closure_mono hsub hzclos)
+  · -- compactness: finitely many of the closed sets `closure (Sγ)` already sit inside `α`
+    intro hRPM α hαopen hαdiag
+    set Zf : {γ : Set (X × X) // γ ∈ nhdsSet (Set.diagonal X)} → Set (X × X) :=
+      fun γ ↦ setOrbitClosure (diagDynamicalSystem dSystem dSystem) (γ : Set (X × X)) with hZf
+    have hZclosed : ∀ γ, IsClosed (Zf γ) := fun _ ↦ isClosed_closure
+    have hinter : (⋂ γ, Zf γ) ⊆ α := by
+      have hEq : (⋂ γ, Zf γ) = RPM dSystem := by
+        ext w
+        simp only [hZf, RPM, Set.mem_iInter, Subtype.forall]
+      rw [hEq]
+      exact hRPM.trans hαdiag
+    have hdisj : Disjoint (αᶜ : Set (X × X)) (⋂ γ, Zf γ) :=
+      Set.disjoint_compl_left_iff_subset.mpr hinter
+    obtain ⟨u, hu⟩ := (isClosed_compl_iff.mpr hαopen).isCompact.elim_finite_subfamily_closed
+      Zf hZclosed hdisj
+    have husub : (⋂ γ ∈ u, Zf γ) ⊆ α := Set.disjoint_compl_left_iff_subset.mp hu
+    refine ⟨⋂ γ ∈ u, interior (γ : Set (X × X)), ?_, ?_, ?_⟩
+    · exact u.finite_toSet.isOpen_biInter fun γ _ ↦ isOpen_interior
+    · refine Set.subset_iInter fun γ ↦ Set.subset_iInter fun _ ↦ ?_
+      obtain ⟨V, hVsub, hVopen, hVdiag⟩ := mem_nhdsSet.mp γ.2
+      exact hVdiag.trans (interior_maximal hVsub hVopen)
+    · intro t
+      rintro w ⟨p, hp, rfl⟩
+      refine husub ?_
+      simp only [Set.mem_iInter]
+      intro γ hγ
+      refine subset_closure ?_
+      simp only [Set.mem_iInter] at hp
+      exact ⟨(t, ⟨p, interior_subset (hp γ hγ)⟩), rfl⟩
 
-/-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
-nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
-dynamical system. (DGG: v2 is the form I need it in later.) -/
--- Anh : I unfold the goal isEquicontinuousSystem and prove it directly
--- the reason is the definition of isEquicontinuousSystem, the uniform topology
--- was hardcoded as NSFLEAF_something_something which we don't really want
--- Dan: This change killed bohrZeroSetsContainEquiReturns in FF_Defs
--- There is now confusion in that theorem about what the uniform structure is
--- This reminds me of the problem we had earlier (and solved with
--- new definitions.  We should talk about this at a meeting.)
-theorem subsystemOfEquicontinuousIsEquicontinuousv2
-{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
-{Z : Set X} [CompactSpace Z] [Nonempty Z]
-(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-UniformEquicontinuous (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ).map := by
-  exact subsystemOfEquicontinuousIsEquicontinuous hXEqui hZ
 
-/- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
--- This seems unnecessary.  Typeclass is finding it properly.
-/- def quotientIsUniformSpace
-(dSystem : DynamicalSystem S X)
-{I : Set (X × X)} (hI : isICER dSystem I) :
-UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
-by sorry -/
-
-theorem homSystemOfEquicontinuousSystemIsEquicontinuous
-{T} [Semigroup T] [Nonempty T]
-(φ : T → S) [hSemiHom : SemigroupHom φ]
-{dSystem : DynamicalSystem S X} (hXEqu : isEquicontinuousSystem dSystem) :
-isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
-  let hYSys := homDynamicalSystem φ dSystem
-  have hYDef : hYSys = homDynamicalSystem φ dSystem := by
-    rfl
-  rw [<- hYDef]
-  unfold isEquicontinuousSystem
-  simp only [homDynamicalSystem, hYSys]
-  simp only [isEquicontinuousSystem] at hXEqu
-  simp only [UniformEquicontinuous]
-  intro α hα β hβ
-  simp only [Set.mem_ofPred_eq]
-  unfold UniformEquicontinuous at hXEqu
-  specialize hXEqu α hα hβ
-  simp only [Set.mem_ofPred_eq] at hXEqu
-  have hSub : {x : X × X | ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
-    ⊆ {x : X × X | ∀ (i : T), (dSystem.map (φ i) x.1, dSystem.map (φ i) x.2) ∈ α} := by
-    intro x hx
-    simp only [Set.mem_ofPred_eq] at hx
-    simp only [Set.mem_ofPred_eq]
-    intro t
-    specialize hx (φ t)
-    exact hx
-  exact Filter.mem_of_superset hXEqu hSub
-
-/-- An ICER `I` on `X` is equicontinuous if
-the quotient system `X/I` is equicontinuous -/
-def isEquicontinuousICER
-(dSystem : DynamicalSystem S X)
-{I : Set (X × X)} (hI : isICER dSystem I) :
-Prop :=
-by
-  have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
-  nonemptyQuotient X hI.2.2
-  have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
-  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
-  exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
-
--- The proof of this theorem as shown in Auslander and Dai is quite involved. It needs
--- to use distalality and proximality
--- If we just need this theorem for commutative S and minimal X, then maybe we don't need
--- to formalize this general statement
-/-- A dynamical system on `X` which acts by surjections is equicontinuous if and only
-if the regionally proximal relation is contained in the diagonal of `X × X` -/
-theorem equicontinuousIffRPTrivialIfSurjective
-(dSystem : DynamicalSystem S X)
-(hSurject : isSurjectiveSystem dSystem) :
-RP dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
-  sorry
-
+-- DGG: Plan to depracate the following in favor of equiSystemIffRPMInDiag
 /-- A dynamical system on `X` is equicontinuous if and only if the
 backward regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPMTrivial
@@ -6639,139 +6686,447 @@ RPM dSystem ⊆ Set.diagonal X ↔ isEquicontinuousSystem dSystem := by
     specialize ht1 α hα2
     exact hα5 ht1
 
+-- Here is a ``by hand'' attempt at backward equicontinuity
+def isBackwardEquicontinuousSystemv2
+(dSystem : DynamicalSystem S X) :
+Prop :=
+∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
+  ∃ (β : Set (X × X)) (_ : IsOpen β) (_ : Set.diagonal X ⊆ β),
+    ∀ (s : S), ((diagDynamicalSystem dSystem dSystem).map s) ⁻¹' β ⊆ α
+
+/-- An arbitrary product of backward equicontinuous systems is backward equicontinuous -/
+theorem arbProdOfBackEquiIsBackEqui
+{I : Type*} {Z : I → Type*}
+[∀ i, TopologicalSpace (Z i)] [∀ i, CompactSpace (Z i)] [∀ i, T2Space (Z i)] [∀ i, Nonempty (Z i)]
+{dSystems : ∀ i, DynamicalSystem S (Z i)}
+(hEquis : ∀ i, isBackwardEquicontinuousSystemv2 (dSystems i)) :
+isBackwardEquicontinuousSystemv2 (arbProdDynamicalSystem dSystems) := by
+  -- shrink `α` to a box determined by finitely many coordinates, and apply backward
+  -- equicontinuity of each of those finitely many factors
+  intro α hαopen hαdiag
+  obtain ⟨F, hFfin, γ, hγopen, hγdiag, hγbox⟩ := existsFiniteBoxInDiagonalNbhdOfPi hαopen hαdiag
+  choose δ hδopen hδdiag hδprop using fun i ↦ hEquis i (γ i) (hγopen i) (hγdiag i)
+  refine ⟨{p : (∀ i, Z i) × (∀ i, Z i) | ∀ i ∈ F, (p.1 i, p.2 i) ∈ δ i},
+    isOpenDiagonalBoxOfPi hFfin hδopen, diagonalSubsetDiagonalBoxOfPi hδdiag, ?_⟩
+  intro s p hp
+  exact hγbox fun i hi ↦ hδprop i s (hp i hi)
+
+/-- The square of a backward equicontinuous system is backward equicontinuous -/
+lemma diagOfBackEquiIsBackEqui
+{dSys : DynamicalSystem S X} (hback : isBackwardEquicontinuousSystemv2 dSys) :
+isBackwardEquicontinuousSystemv2 (diagDynamicalSystem dSys dSys) := by
+  intro α hαopen hαdiag
+  obtain ⟨β, hβopen, hβdiag, hβprop⟩ :=
+    arbProdOfBackEquiIsBackEqui (dSystems := fun _ : Bool ↦ dSys) (fun _ ↦ hback)
+      ((Prod.map boolFamilyToPair boolFamilyToPair) ⁻¹' α)
+      (hαopen.preimage (boolFamilyToPairContinuous.prodMap boolFamilyToPairContinuous))
+      (diagonalSubsetPreimageBoolFamilyToPair hαdiag)
+  refine ⟨(Prod.map pairToBoolFamily pairToBoolFamily) ⁻¹' β,
+    hβopen.preimage (pairToBoolFamilyContinuous.prodMap pairToBoolFamilyContinuous),
+    diagonalSubsetPreimagePairToBoolFamily hβdiag, ?_⟩
+  intro s p hp
+  refine hβprop s (a := (pairToBoolFamily p.1, pairToBoolFamily p.2)) ?_
+  have h : ((arbProdDynamicalSystem (fun _ : Bool ↦ dSys)).map s (pairToBoolFamily p.1),
+      (arbProdDynamicalSystem (fun _ : Bool ↦ dSys)).map s (pairToBoolFamily p.2)) ∈ β := by
+    rw [pairToBoolFamilyEquivariant, pairToBoolFamilyEquivariant]
+    exact hp
+  exact h
+
+/-- A system is backward equicontinuous iff RP is contained in the diagonal -/
+theorem backEquiSystemIffRPInDiag
+(dSystem : DynamicalSystem S X) :
+isBackwardEquicontinuousSystemv2 dSystem ↔ RP dSystem ⊆ Set.diagonal X := by
+  constructor
+  · -- if `z ∉ Δ`, pick `γ` with `z ∉ closure γ`; backward equicontinuity puts `S⁻¹β ⊆ γ`
+    -- for some `β`, and `RP ⊆ closure (S⁻¹β) ⊆ closure γ`
+    intro hback z hz
+    by_contra hzd
+    obtain ⟨γ, hγopen, hγdiag, hzγ⟩ := existsOpenNbhdDiagonalNotMemClosure hzd
+    obtain ⟨β, hβopen, hβdiag, hβprop⟩ := hback γ hγopen hγdiag
+    have hβnhds : β ∈ nhdsSet (Set.diagonal X) := mem_nhdsSet.mpr ⟨β, subset_rfl, hβopen, hβdiag⟩
+    have hzclos : z ∈ closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) β) := by
+      simp only [RP, Set.mem_iInter] at hz
+      exact hz β hβnhds
+    refine hzγ (closure_mono ?_ hzclos)
+    rintro w hw
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hw
+    obtain ⟨t, ht⟩ := hw
+    exact hβprop t ht
+  · -- compactness: finitely many of the closed sets `closure (S⁻¹γ)` already sit inside `α`
+    intro hRP α hαopen hαdiag
+    set Zf : {γ : Set (X × X) // γ ∈ nhdsSet (Set.diagonal X)} → Set (X × X) :=
+      fun γ ↦ closure (inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (γ : Set (X × X)))
+      with hZf
+    have hZclosed : ∀ γ, IsClosed (Zf γ) := fun _ ↦ isClosed_closure
+    have hinter : (⋂ γ, Zf γ) ⊆ α := by
+      have hEq : (⋂ γ, Zf γ) = RP dSystem := by
+        ext w
+        simp only [hZf, RP, Set.mem_iInter, Subtype.forall]
+      rw [hEq]
+      exact hRP.trans hαdiag
+    have hdisj : Disjoint (αᶜ : Set (X × X)) (⋂ γ, Zf γ) :=
+      Set.disjoint_compl_left_iff_subset.mpr hinter
+    obtain ⟨u, hu⟩ := (isClosed_compl_iff.mpr hαopen).isCompact.elim_finite_subfamily_closed
+      Zf hZclosed hdisj
+    have husub : (⋂ γ ∈ u, Zf γ) ⊆ α := Set.disjoint_compl_left_iff_subset.mp hu
+    refine ⟨⋂ γ ∈ u, interior (γ : Set (X × X)), ?_, ?_, ?_⟩
+    · exact u.finite_toSet.isOpen_biInter fun γ _ ↦ isOpen_interior
+    · refine Set.subset_iInter fun γ ↦ Set.subset_iInter fun _ ↦ ?_
+      obtain ⟨V, hVsub, hVopen, hVdiag⟩ := mem_nhdsSet.mp γ.2
+      exact hVdiag.trans (interior_maximal hVsub hVopen)
+    · intro t p hp
+      simp only [Set.mem_preimage, Set.mem_iInter] at hp
+      refine husub ?_
+      simp only [Set.mem_iInter]
+      intro γ hγ
+      refine subset_closure ?_
+      simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+      exact ⟨t, interior_subset (hp γ hγ)⟩
+
+/-- If a system is backward equicontinuous, then S acts surjectively -/
+theorem backEqImpliesSurjective
+(dSystem : DynamicalSystem S X) :
+isBackwardEquicontinuousSystemv2 dSystem → isSurjectiveSystem dSystem := by
+  classical
+  intro hback s x
+  have hclosed : IsClosed (Set.range (dSystem.map s)) :=
+    (isCompact_range (dSystem.mapCont s)).isClosed
+  have hmem : x ∈ closure (Set.range (dSystem.map s)) := by
+    rw [mem_closure_iff]
+    intro U hUopen hxU
+    obtain ⟨α, hαopen, hαdiag, hαprop⟩ := existsDiagonalNbhdForcingMembership hUopen hxU
+    obtain ⟨β, hβopen, hβdiag, hβprop⟩ := hback α hαopen hαdiag
+    obtain ⟨F, V, hcover, hmemV, hVβ⟩ := existsFiniteCoverBySmallSets hβopen hβdiag
+    -- pigeonhole on the iterates `s^(i+1) x`
+    choose g hgF hgV using fun i : Fin (Fintype.card ↥F + 1) ↦
+      hcover ((dSystem.map s)^[(i : ℕ) + 1] x)
+    obtain ⟨i, j, hij, hgij⟩ :=
+      Fintype.exists_ne_map_eq_of_card_lt (fun i ↦ (⟨g i, hgF i⟩ : ↥F)) (by simp)
+    -- put the smaller index first
+    have key : ∀ m n : Fin (Fintype.card ↥F + 1), (m : ℕ) < (n : ℕ) → g m = g n →
+        (U ∩ Set.range (dSystem.map s)).Nonempty := by
+      intro m n hmn hg
+      obtain ⟨e, he⟩ : ∃ e, (n : ℕ) - (m : ℕ) = e + 1 := ⟨(n : ℕ) - (m : ℕ) - 1, by omega⟩
+      have hpair : ((dSystem.map s)^[(m : ℕ) + 1] x,
+          (dSystem.map s)^[(n : ℕ) + 1] x) ∈ β :=
+        hVβ (g m) ⟨hgV m, by rw [hg]; exact hgV n⟩
+      have hsplit : (dSystem.map s)^[(n : ℕ) + 1] x
+          = (dSystem.map s)^[(m : ℕ) + 1] ((dSystem.map s)^[e + 1] x) := by
+        rw [← Function.iterate_add_apply]
+        congr 1
+        omega
+      have hin : (x, (dSystem.map s)^[e + 1] x) ∈ α := by
+        refine hβprop (semigroupIteratePow s (m : ℕ)) ?_
+        change (dSystem.map (semigroupIteratePow s (m : ℕ)) x,
+          dSystem.map (semigroupIteratePow s (m : ℕ))
+            ((dSystem.map s)^[e + 1] x)) ∈ β
+        rw [mapSemigroupIteratePow, mapSemigroupIteratePow, ← hsplit]
+        exact hpair
+      exact ⟨(dSystem.map s)^[e + 1] x, hαprop _ hin,
+        ⟨(dSystem.map s)^[e] x, (Function.iterate_succ_apply' (dSystem.map s) e x).symm⟩⟩
+    rcases lt_or_gt_of_ne (fun h ↦ hij (Fin.ext h)) with hlt | hlt
+    · exact key i j hlt (by simpa using congrArg Subtype.val hgij)
+    · exact key j i hlt (by simpa using congrArg Subtype.val hgij.symm)
+  rwa [hclosed.closure_eq] at hmem
+
+-- We create the next definitions because Lean has trouble understanding
+-- that the uniformity structure
+-- from product space coming from uniformSpaceOfCompactR1 is the same
+-- as the one coming from instUniformSpaceProd
+
+def isEquicontinuousSubSystem
+(dSystem : DynamicalSystem S X)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+Prop :=
+UniformEquicontinuous (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ).map
+
+/-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
+nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
+dynamical system -/
+theorem subsystemOfEquicontinuousIsEquicontinuous
+{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+isEquicontinuousSubSystem dSystem hZ :=
+letI : UniformSpace X := uniformSpaceOfCompactR1
+by
+  unfold isEquicontinuousSystem at hXEqui
+  have h1 : UniformEquicontinuousOn dSystem.map Z := by
+    apply UniformEquicontinuous.uniformEquicontinuousOn
+    exact hXEqui
+  intro α hα
+  unfold UniformEquicontinuous at hXEqui
+  unfold UniformEquicontinuousOn at h1
+  have h2init : uniformity (Z) = Filter.comap (fun (q : Subtype Z × Subtype Z)
+    => (Subtype.val q.1, Subtype.val q.2)) (uniformity X) := by
+    exact uniformity_subtype
+  have h2 : ∃ β ∈ uniformity X, (Prod.map Subtype.val Subtype.val) ⁻¹' β ⊆ α:= by
+    simp only [h2init, Filter.mem_comap] at hα
+    rcases hα with ⟨γ, hγ1, hγ2⟩
+    use γ
+    constructor
+    · exact hγ1
+    exact hγ2
+  rcases h2 with ⟨β, hβ1, hβ2⟩
+  specialize hXEqui β hβ1
+  let γ := {z : X × X | ∀ s : S, (dSystem.map s z.1, dSystem.map s z.2) ∈ β}
+  have h3 : γ ∈ uniformity X := by
+    simp only [γ]
+    exact hXEqui
+  let ZdSys := fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ
+  let δ := {z : (Z × Z) | ∀ s : S, (ZdSys.map s z.1, ZdSys.map s z.2) ∈ α}
+  have h4 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ  ∈ uniformity Z := by
+    simp only [uniformity_subtype]
+    use γ
+    constructor
+    · exact h3
+    rfl
+  have h5 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ ⊆ δ:= by
+    simp only [δ]
+    simp only [γ]
+    intro z hz
+    simp only [Set.mem_ofPred_eq]
+    simp only [Set.preimage_ofPred_eq, Prod.map_fst, Prod.map_snd, Set.mem_ofPred_eq] at hz
+    intro s
+    specialize hz s
+    let θ : Set (↑Z × ↑Z) := (Prod.map Subtype.val Subtype.val) ⁻¹' β
+    have h51 : (ZdSys.map s z.1, ZdSys.map s z.2) ∈ θ := by
+      simpa
+    have h52 : θ ⊆ α := by
+      simpa
+    apply h52
+    exact h51
+  have h6 : (Prod.map Subtype.val Subtype.val) ⁻¹' γ ∈ uniformity Z := by
+    exact h4
+  have hGoal : δ ∈ uniformity Z := by
+    exact Filter.mem_of_superset h6 h5
+  exact hGoal
+
+/-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
+nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
+dynamical system. (DGG: v2 is the form I need it in later.) -/
+-- Anh : I unfold the goal isEquicontinuousSystem and prove it directly
+-- the reason is the definition of isEquicontinuousSystem, the uniform topology
+-- was hardcoded as NSFLEAF_something_something which we don't really want
+-- Dan: This change killed bohrZeroSetsContainEquiReturns in FF_Defs
+-- There is now confusion in that theorem about what the uniform structure is
+-- This reminds me of the problem we had earlier (and solved with
+-- new definitions.  We should talk about this at a meeting.)
+-- DGG: Now, with isEquicontinuousSystemv2, we should be able to state this directly:
+-- Prove: isEquicontinuousSystemv2 (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ)
+theorem subsystemOfEquicontinuousIsEquicontinuousv2
+{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+UniformEquicontinuous (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ).map := by
+  exact subsystemOfEquicontinuousIsEquicontinuous hXEqui hZ
+
+-- DGG: Can we prove this?  I think this would suffice for our purposes
+theorem subsysOfEquiIsEqui
+{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystemv2 dSystem)
+{Z : Set X} [CompactSpace Z] [Nonempty Z]
+(hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
+isEquicontinuousSystemv2 (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := by
+  intro α hαopen hαdiag
+  -- extend `α` to a neighbourhood `U` of the diagonal of `X`, apply equicontinuity on `X`,
+  -- and restrict the resulting `β` back to `Z`
+  obtain ⟨U, hUopen, hUdiag, hUα⟩ :=
+    existsDiagonalNbhdExtendingSubspaceDiagonalNbhd (hZ.2.1.isClosed) hαopen hαdiag
+  obtain ⟨β, hβopen, hβdiag, hβprop⟩ := hXEqui U hUopen hUdiag
+  refine ⟨(Prod.map Subtype.val Subtype.val) ⁻¹' β,
+    hβopen.preimage (continuous_subtype_val.prodMap continuous_subtype_val), ?_, ?_⟩
+  · rintro ⟨z, w⟩ hzw
+    have hzw' : z = w := hzw
+    subst hzw'
+    exact hβdiag rfl
+  · rintro s v ⟨p, hp, rfl⟩
+    exact hUα _ _ (hβprop s ⟨((p.1 : X), (p.2 : X)), hp, rfl⟩)
+
+/- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
+-- This seems unnecessary.  Typeclass is finding it properly.
+/- def quotientIsUniformSpace
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+by sorry -/
+
+theorem homSystemOfEquicontinuousSystemIsEquicontinuous
+{T} [Semigroup T] [Nonempty T]
+(φ : T → S) [hSemiHom : SemigroupHom φ]
+{dSystem : DynamicalSystem S X} (hXEqu : isEquicontinuousSystem dSystem) :
+isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
+  let hYSys := homDynamicalSystem φ dSystem
+  have hYDef : hYSys = homDynamicalSystem φ dSystem := by
+    rfl
+  rw [<- hYDef]
+  unfold isEquicontinuousSystem
+  simp only [homDynamicalSystem, hYSys]
+  simp only [isEquicontinuousSystem] at hXEqu
+  simp only [UniformEquicontinuous]
+  intro α hα β hβ
+  simp only [Set.mem_ofPred_eq]
+  unfold UniformEquicontinuous at hXEqu
+  specialize hXEqu α hα hβ
+  simp only [Set.mem_ofPred_eq] at hXEqu
+  have hSub : {x : X × X | ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
+    ⊆ {x : X × X | ∀ (i : T), (dSystem.map (φ i) x.1, dSystem.map (φ i) x.2) ∈ α} := by
+    intro x hx
+    simp only [Set.mem_ofPred_eq] at hx
+    simp only [Set.mem_ofPred_eq]
+    intro t
+    specialize hx (φ t)
+    exact hx
+  exact Filter.mem_of_superset hXEqu hSub
+
+/-- An ICER `I` on `X` is equicontinuous if
+the quotient system `X/I` is equicontinuous -/
+def isEquicontinuousICER
+(dSystem : DynamicalSystem S X)
+{I : Set (X × X)} (hI : isICER dSystem I) :
+Prop :=
+by
+  have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  nonemptyQuotient X hI.2.2
+  have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+  exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
+
 end Equicontinuity_and_regional_proximality
 
 section Equicontinuity_and_regional_proximality_with_S_commutative
 
---DEPRACATED in favor of a future result
-/-- Minimal, equicontinuous systems with a commutative acting semigroup
+--DEPRACATED in favor of the stronger surjEquiOrBackEquiImpliesEquiBackEquiDistalSemisimpleHomeo
+-- when combined with minimalCommActionIsSurjective (minimal, commsemi implies surjective)
+/- Minimal, equicontinuous systems with a commutative acting semigroup
 are distal -/
-theorem equicontinuousMinCommSystemsAreDistal
-{S} [CommSemigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
-isEquicontinuousSystem dSystem → isDistalSystem dSystem := by
-  intro hXEqu
-  unfold isDistalSystem
-  intro x y hxyProx
-  by_contra hContra
-  have hExistα : ∃ α ∈ nhdsSet (Set.diagonal X), (x, y) ∉ closure α := by
-    have hDisjNhds : Disjoint (nhdsSet (Set.diagonal X)) (nhds (x, y)) := by
-      apply (regularSpace_iff (X × X)).mp
-      · infer_instance
-      · apply isClosed_diagonal
-      · simp only [Set.mem_diagonal_iff]
-        exact hContra
-    have hDis2 : ∃ U V : Set (X × X), IsOpen U ∧ Set.diagonal X ⊆ U ∧ IsOpen V
-      ∧ (x, y) ∈ V ∧ Disjoint U V := by
-      obtain ⟨U, ⟨hU, hWU⟩, V, ⟨hxV, hV⟩, hUV⟩ := ((hasBasis_nhdsSet (Set.diagonal X)).disjoint_iff
-        (nhds_basis_opens (x, y))).mp hDisjNhds
-      use U
-      use V
-    rcases hDis2 with ⟨U, V, hU1, hU2, hV1, hV2, hUV⟩
-    use U
-    constructor
-    · apply mem_nhdsSet.mpr
-      use U
-    · by_contra hContraInClosure
-      apply mem_closure_iff.mp at hContraInClosure
-      specialize hContraInClosure V hV1 hV2
-      apply Set.Nonempty.not_disjoint at hContraInClosure
-      apply Disjoint.symm at hUV
-      exact hContraInClosure hUV
-  rcases hExistα with ⟨α, hα1, hα2⟩
-  unfold isEquicontinuousSystem at hXEqu
-  unfold UniformEquicontinuous at hXEqu
-  specialize hXEqu α hα1
-  simp only [Filter.Eventually] at hXEqu
-  let β0 := {x : X × X| ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
-  have hβ0Def : β0 = {x : X × X| ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α} := by
-    rfl
-  rw [<- hβ0Def] at hXEqu
-  simp only [← nhdsSet_diagonal_eq_uniformity] at hXEqu
-  simp only [mem_nhdsSet] at hXEqu
-  rcases hXEqu with ⟨β, hβ1, hβ2, hβ3⟩
-  have hβ4 : β ∈ nhdsSet (Set.diagonal X) := by
-    simp only [mem_nhdsSet]
-    use β
-  unfold proximal at hxyProx
-  specialize hxyProx β hβ4
-  rcases hxyProx with ⟨s, hs⟩
-  let V := (diagDynamicalSystem dSystem dSystem).map s ⁻¹' β ∩ (closure α)ᶜ
-  have hxyIn : (x, y) ∈ V := by
-    simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V]
-    constructor
-    · simp only [diagDynamicalSystem, Prod.map_apply]
-      exact hs
-    · exact hα2
-  have hInterOpen : IsOpen V := by
-    apply IsOpen.inter
-    · apply IsOpen.preimage
-      · exact (diagDynamicalSystem dSystem dSystem).mapCont s
-      · exact hβ2
-    · simp
-  have hVInterUnif : (V ∩ {z : X × X | isUniformlyRecurrent
-    (diagDynamicalSystem dSystem dSystem) z}).Nonempty := by
-    apply dense_iff_inter_open.mp
-    · apply inMinCommSystemURPairsDense hMin
-    · exact hInterOpen
-    · exact ⟨(x, y), hxyIn⟩
-  have hExistx1y1 : ∃ z ∈ V, isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) z := by
-    apply Set.inter_nonempty.mp hVInterUnif
-  rcases hExistx1y1 with ⟨z, hz1, hz2⟩
-  have hVNeigh : V ∈ nhds z := by
-    apply mem_nhds_iff.mpr
-    use V
-  unfold isUniformlyRecurrent at hz2
-  specialize hz2 V hVNeigh
-  have hSs : {r * s | r ∈ (Set.univ : Set S)} ⊆
-    visitTimeSet (diagDynamicalSystem dSystem dSystem) z α := by
-    intro k hk
-    simp only [Set.mem_univ, true_and, Set.mem_ofPred_eq] at hk
-    rcases hk with ⟨r, hr⟩
-    simp only [visitTimeSet, Set.mem_preimage]
-    rw [<- hr]
-    rw [(diagDynamicalSystem dSystem dSystem).mapMult]
-    simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V] at hz1
-    rcases hz1 with ⟨hz1a, hz1b⟩
-    have hz1c := Set.mem_of_subset_of_mem hβ1 hz1a
-    simp only [Set.mem_ofPred_eq, β0] at hz1c
-    specialize hz1c r
-    exact hz1c
-  have hReturnαThick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) z α) := by
-    have hSsThick : isThick {r * s | r ∈ (Set.univ : Set S)} := by
-      apply rightTransOfThickIsThick
-      unfold isThick
-      intro F hF
-      have hSNonempty : Nonempty S := by
-        infer_instance
-      use Nonempty.some hSNonempty
-      simp
-    apply thickIsMonotone hSsThick hSs
-  have hNonemptyInter : ((visitTimeSet (diagDynamicalSystem dSystem dSystem) z V) ∩
-    (visitTimeSet (diagDynamicalSystem dSystem dSystem) z α)).Nonempty := by
-    apply syndeticThickIntersect
-    · exact hz2
-    · exact hReturnαThick
-  simp only [Set.inter_nonempty] at hNonemptyInter
-  rcases hNonemptyInter with ⟨t, ht1, ht2⟩
-  simp only [visitTimeSet, Set.mem_preimage] at ht1
-  simp only [visitTimeSet, Set.mem_preimage] at ht2
-  simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V] at ht1
-  rcases ht1 with ⟨ht1a, ht1b⟩
-  have ht1c : (diagDynamicalSystem dSystem dSystem).map t z ∉ α := by
-    apply Set.notMem_subset (subset_closure)
-    exact ht1b
-  exact ht1c ht2
+-- theorem equicontinuousMinCommSystemsAreDistal
+-- {S} [CommSemigroup S] [Nonempty S]
+-- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+-- isEquicontinuousSystem dSystem → isDistalSystem dSystem := by
+--   intro hXEqu
+--   unfold isDistalSystem
+--   intro x y hxyProx
+--   by_contra hContra
+--   have hExistα : ∃ α ∈ nhdsSet (Set.diagonal X), (x, y) ∉ closure α := by
+--     have hDisjNhds : Disjoint (nhdsSet (Set.diagonal X)) (nhds (x, y)) := by
+--       apply (regularSpace_iff (X × X)).mp
+--       · infer_instance
+--       · apply isClosed_diagonal
+--       · simp only [Set.mem_diagonal_iff]
+--         exact hContra
+--     have hDis2 : ∃ U V : Set (X × X), IsOpen U ∧ Set.diagonal X ⊆ U ∧ IsOpen V
+--       ∧ (x, y) ∈ V ∧ Disjoint U V := by
+--       obtain ⟨U, ⟨hU, hWU⟩, V, ⟨hxV, hV⟩, hUV⟩ :=
+--          ((hasBasis_nhdsSet (Set.diagonal X)).disjoint_iff
+--         (nhds_basis_opens (x, y))).mp hDisjNhds
+--       use U
+--       use V
+--     rcases hDis2 with ⟨U, V, hU1, hU2, hV1, hV2, hUV⟩
+--     use U
+--     constructor
+--     · apply mem_nhdsSet.mpr
+--       use U
+--     · by_contra hContraInClosure
+--       apply mem_closure_iff.mp at hContraInClosure
+--       specialize hContraInClosure V hV1 hV2
+--       apply Set.Nonempty.not_disjoint at hContraInClosure
+--       apply Disjoint.symm at hUV
+--       exact hContraInClosure hUV
+--   rcases hExistα with ⟨α, hα1, hα2⟩
+--   unfold isEquicontinuousSystem at hXEqu
+--   unfold UniformEquicontinuous at hXEqu
+--   specialize hXEqu α hα1
+--   simp only [Filter.Eventually] at hXEqu
+--   let β0 := {x : X × X| ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
+--   have hβ0Def : β0 = {x : X × X| ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α} := by
+--     rfl
+--   rw [<- hβ0Def] at hXEqu
+--   simp only [← nhdsSet_diagonal_eq_uniformity] at hXEqu
+--   simp only [mem_nhdsSet] at hXEqu
+--   rcases hXEqu with ⟨β, hβ1, hβ2, hβ3⟩
+--   have hβ4 : β ∈ nhdsSet (Set.diagonal X) := by
+--     simp only [mem_nhdsSet]
+--     use β
+--   unfold proximal at hxyProx
+--   specialize hxyProx β hβ4
+--   rcases hxyProx with ⟨s, hs⟩
+--   let V := (diagDynamicalSystem dSystem dSystem).map s ⁻¹' β ∩ (closure α)ᶜ
+--   have hxyIn : (x, y) ∈ V := by
+--     simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V]
+--     constructor
+--     · simp only [diagDynamicalSystem, Prod.map_apply]
+--       exact hs
+--     · exact hα2
+--   have hInterOpen : IsOpen V := by
+--     apply IsOpen.inter
+--     · apply IsOpen.preimage
+--       · exact (diagDynamicalSystem dSystem dSystem).mapCont s
+--       · exact hβ2
+--     · simp
+--   have hVInterUnif : (V ∩ {z : X × X | isUniformlyRecurrent
+--     (diagDynamicalSystem dSystem dSystem) z}).Nonempty := by
+--     apply dense_iff_inter_open.mp
+--     · apply inMinCommSystemURPairsDense hMin
+--     · exact hInterOpen
+--     · exact ⟨(x, y), hxyIn⟩
+--   have hExistx1y1 : ∃ z ∈ V, isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) z := by
+--     apply Set.inter_nonempty.mp hVInterUnif
+--   rcases hExistx1y1 with ⟨z, hz1, hz2⟩
+--   have hVNeigh : V ∈ nhds z := by
+--     apply mem_nhds_iff.mpr
+--     use V
+--   unfold isUniformlyRecurrent at hz2
+--   specialize hz2 V hVNeigh
+--   have hSs : {r * s | r ∈ (Set.univ : Set S)} ⊆
+--     visitTimeSet (diagDynamicalSystem dSystem dSystem) z α := by
+--     intro k hk
+--     simp only [Set.mem_univ, true_and, Set.mem_ofPred_eq] at hk
+--     rcases hk with ⟨r, hr⟩
+--     simp only [visitTimeSet, Set.mem_preimage]
+--     rw [<- hr]
+--     rw [(diagDynamicalSystem dSystem dSystem).mapMult]
+--     simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V] at hz1
+--     rcases hz1 with ⟨hz1a, hz1b⟩
+--     have hz1c := Set.mem_of_subset_of_mem hβ1 hz1a
+--     simp only [Set.mem_ofPred_eq, β0] at hz1c
+--     specialize hz1c r
+--     exact hz1c
+--   have hReturnαThick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) z α) := by
+--     have hSsThick : isThick {r * s | r ∈ (Set.univ : Set S)} := by
+--       apply rightTransOfThickIsThick
+--       unfold isThick
+--       intro F hF
+--       have hSNonempty : Nonempty S := by
+--         infer_instance
+--       use Nonempty.some hSNonempty
+--       simp
+--     apply thickIsMonotone hSsThick hSs
+--   have hNonemptyInter : ((visitTimeSet (diagDynamicalSystem dSystem dSystem) z V) ∩
+--     (visitTimeSet (diagDynamicalSystem dSystem dSystem) z α)).Nonempty := by
+--     apply syndeticThickIntersect
+--     · exact hz2
+--     · exact hReturnαThick
+--   simp only [Set.inter_nonempty] at hNonemptyInter
+--   rcases hNonemptyInter with ⟨t, ht1, ht2⟩
+--   simp only [visitTimeSet, Set.mem_preimage] at ht1
+--   simp only [visitTimeSet, Set.mem_preimage] at ht2
+--   simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_compl_iff, V] at ht1
+--   rcases ht1 with ⟨ht1a, ht1b⟩
+--   have ht1c : (diagDynamicalSystem dSystem dSystem).map t z ∉ α := by
+--     apply Set.notMem_subset (subset_closure)
+--     exact ht1b
+--   exact ht1c ht2
 
 --DEPRACATED in favor of a future result
-/-- In a minimal, distal system with a commutative acting semigroup,
+/- In a minimal, distal system with a commutative acting semigroup,
 the semigroup acts by homeomorphisms -/
-theorem semigroupActsByHomeosOnMinCommDistalSystems
-{S} [CommSemigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
-isDistalSystem dSystem → isHomeoSystem dSystem := by sorry
+-- theorem semigroupActsByHomeosOnMinCommDistalSystems
+-- {S} [CommSemigroup S] [Nonempty S]
+-- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+-- isDistalSystem dSystem → isHomeoSystem dSystem := by sorry
 
 /- Note the following generalizes equicontinuousIffRPTrivial by
 applying the following to the identity map --/
@@ -6917,6 +7272,24 @@ isICER dSystem (equiStructureRelation dSystem) := by
   rcases hI with ⟨hI1, hI2⟩
   exact hI1
 
+theorem equiStructRelIsEquiICER
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) := by sorry
+
+-- Placeholder: want to say that X/S_eq is the largest equicontinuous factor of X
+--theorem equiStructRelYieldsLargestEquiFactor
+-- {S : Type*} [Semigroup S] [Nonempty S]
+-- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) :
+-- ∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
+-- ∀ (dSystemV : DynamicalSystem S V),
+-- ∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystem ρ) (_ : isHomeoSystem dSystemV),
+-- ∃ (ξ : V → natExtSet dSystem) (_ : isFactorMap dSystemV (natExtSystem hSurject) ξ),
+-- ρ = (natExtFactorMap dSystem) ∘ ξ := by sorry
+
+-- The following will be depracted for stronger equiStructRelIsEquiICER and equiStructRelIsLargestEquiICER
 /-- The equicontinuous structure relation of a dynamical system is an
 equicontinuous ICER -/
 theorem equiStructureRelationIsEquiICER

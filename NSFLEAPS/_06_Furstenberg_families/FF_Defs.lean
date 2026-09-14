@@ -1684,7 +1684,7 @@ theorem bohrZeroSetsContainEquiReturns
 {S : Type*} [CommSemigroup S] [SNonempty : Nonempty S] (A : Set S) :
 isBohrZero A → ∃ (X : Type) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystemv2 dSystem)
 (_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_xInU : x ∈ U) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A :=
 by
@@ -1723,11 +1723,11 @@ by
   have hMin : isMinimalSystem dSystem :=
     (minimalSubsetIffMinimalSubsystem homTorusDS orbClosPresystem).mp
       (orbitClosureOfURPointIsMinimalSubset homTorusDS xUR)
-  have hEqui : isEquicontinuousSystem dSystem := by
-    unfold dSystem
-    unfold isEquicontinuousSystem
-    sorry -- This was killed with an update to subsystemOfEquicontinuousIsEquicontinuousv2
-    --exact subsystemOfEquicontinuousIsEquicontinuousv2 homTorusDSisEqui orbClosPresystem
+  have hEqui : isEquicontinuousSystemv2 dSystem := by
+    -- unfold dSystem
+    -- unfold isEquicontinuousSystem
+     sorry -- We need to propogate the equiv2 everywhere.
+    -- exact subsysOfEquiIsEqui homTorusDSisEqui orbClosPresystem
   have xInV : ⟨x,xInX⟩ ∈ V := by
     unfold V
     simp only [Set.mem_ofPred_eq]

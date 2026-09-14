@@ -428,3 +428,35 @@ isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
     exact ⟨h, Set.mem_iUnion.mpr ⟨f m, s m, hf m, hh ▸ (hfmn ▸ hf n)⟩, hhH⟩
   · obtain ⟨h, hhH, hh⟩ := hs n m hlt
     exact ⟨h, Set.mem_iUnion.mpr ⟨f n, s n, hf n, hh ▸ (hfmn ▸ hf m)⟩, hhH⟩
+
+/-- `Fintype`-indexed version of `unionOfRightQuotientSetsIsSyndetic` -/
+lemma unionOfRightQuotientSetsIsSyndeticOfFintype
+{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Fintype ι] (C : ι → Set T)
+(hcover : ∀ t : T, ∃ i, t ∈ C i) :
+isSyndetic (⋃ i, rightQuotientSet (C i) (C i)) := by
+  classical
+  refine syndeticIsMonotone (unionOfRightQuotientSetsIsSyndetic
+    (fun j ↦ C ((Fintype.equivFin ι).symm j)) (fun t ↦ ?_)) ?_
+  · obtain ⟨i, hi⟩ := hcover t
+    exact ⟨Fintype.equivFin ι i, by simpa using hi⟩
+  · exact Set.iUnion_subset fun j ↦
+      Set.subset_iUnion (fun i ↦ rightQuotientSet (C i) (C i)) ((Fintype.equivFin ι).symm j)
+
+/-- `Fintype`-indexed version of `unionOfLeftQuotientSetsIsSyndetic` -/
+lemma unionOfLeftQuotientSetsIsSyndeticOfFintype
+{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Fintype ι] (C : ι → Set T)
+(hcover : ∀ t : T, ∃ i, t ∈ C i) :
+isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
+  classical
+  refine syndeticIsMonotone (unionOfLeftQuotientSetsIsSyndetic
+    (fun j ↦ C ((Fintype.equivFin ι).symm j)) (fun t ↦ ?_)) ?_
+  · obtain ⟨i, hi⟩ := hcover t
+    exact ⟨Fintype.equivFin ι i, by simpa using hi⟩
+  · exact Set.iUnion_subset fun j ↦
+      Set.subset_iUnion (fun i ↦ leftQuotientSet (C i) (C i)) ((Fintype.equivFin ι).symm j)
+
+/-- The `(n+1)`-fold product `s * s * ⋯ * s` in a semigroup -/
+def semigroupIteratePow
+{T : Type*} [Semigroup T] (s : T) : ℕ → T
+  | 0 => s
+  | (n + 1) => s * semigroupIteratePow s n

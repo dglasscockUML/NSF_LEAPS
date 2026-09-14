@@ -361,3 +361,290 @@ theorem nbhdOfDiagForcesOtherSetContainment
     simp only [Set.mem_compl_iff, Set.mem_prod, not_and] at hxz
     by_contra hxU
     exact hxz hxU (subset_closure hzV)
+
+-- DGG: this may be the same as nbhdOfDiagForcesOtherSetContainment
+/-- The open neighbourhood of the diagonal that detects membership in `W` from `x`:
+`α = (X × X) \ ({x} × Wᶜ)` -/
+lemma existsDiagonalNbhdForcingMembership
+{Z : Type*} [TopologicalSpace Z] [T1Space Z] {x : Z} {W : Set Z}
+(hWOpen : IsOpen W) (hxW : x ∈ W) :
+∃ α : Set (Z × Z), IsOpen α ∧ Set.diagonal Z ⊆ α ∧ ∀ w : Z, (x, w) ∈ α → w ∈ W := by
+  refine ⟨(({x} : Set Z) ×ˢ Wᶜ)ᶜ, (isClosed_singleton.prod hWOpen.isClosed_compl).isOpen_compl,
+    ?_, ?_⟩
+  · rintro ⟨a, b⟩ hab
+    have hab' : a = b := hab
+    subst hab'
+    intro hmem
+    exact hmem.2 (by rw [show a = x from hmem.1]; exact hxW)
+  · intro w hw
+    by_contra hwW
+    exact hw ⟨rfl, hwW⟩
+
+/-- A point of the diagonal has a square neighbourhood inside any neighbourhood of the
+diagonal -/
+lemma existsSquareNbhdInDiagonalNbhd
+{Z : Type*} [TopologicalSpace Z] {α : Set (Z × Z)} (hαOpen : IsOpen α)
+(hαDiag : Set.diagonal Z ⊆ α) (x : Z) :
+∃ V : Set Z, IsOpen V ∧ x ∈ V ∧ V ×ˢ V ⊆ α := by
+  obtain ⟨u, v, hu, hv, hxu, hxv, huv⟩ := isOpen_prod_iff.mp hαOpen x x (hαDiag rfl)
+  exact ⟨u ∩ v, hu.inter hv, ⟨hxu, hxv⟩, fun p hp ↦ huv ⟨hp.1.1, hp.2.2⟩⟩
+
+/-- A compact Hausdorff space is covered by finitely many sets that are "small" with respect
+to a given neighbourhood of the diagonal.  This is the "partition `X` into `∪ Uᵢ`" step of
+the proofs below. -/
+lemma existsFiniteCoverBySmallSets
+{Z : Type*} [TopologicalSpace Z] [CompactSpace Z] {β : Set (Z × Z)}
+(hβOpen : IsOpen β) (hβDiag : Set.diagonal Z ⊆ β) :
+∃ (F : Finset Z) (V : Z → Set Z), (∀ x : Z, ∃ y ∈ F, x ∈ V y) ∧
+  (∀ y : Z, y ∈ V y) ∧ (∀ y : Z, V y ×ˢ V y ⊆ β) := by
+  classical
+  choose V hVopen hxV hVβ using existsSquareNbhdInDiagonalNbhd hβOpen hβDiag
+  obtain ⟨F, hF⟩ := CompactSpace.elim_nhds_subcover V (fun x ↦ (hVopen x).mem_nhds (hxV x))
+  refine ⟨F, V, fun x ↦ ?_, hxV, hVβ⟩
+  have hx : x ∈ (⊤ : Set Z) := trivial
+  rw [← hF] at hx
+  simpa using hx
+
+/-- The "square root" of a neighbourhood of the diagonal, by hand: for every open
+neighbourhood `α` of the diagonal of a compact Hausdorff space there is an open symmetric
+neighbourhood `β` of the diagonal with `β ∘ β ⊆ α`.
+
+For each `x` pick open `V x ∋ x` with `V x ×ˢ V x ⊆ α` and open `W x ∋ x` with
+`closure (W x) ⊆ V x`, and take a finite subcover by the `W y`.  Then
+`β = ⋂ y, (V y ×ˢ V y) ∪ (closure (W y))ᶜ ×ˢ (closure (W y))ᶜ` works: given `(a,b), (b,c) ∈ β`,
+the middle point `b` lies in some `W y`, which rules out the second alternative at `y`, so
+`a, b, c ∈ V y`. -/
+lemma existsSymmetricSquareNbhdOfDiagonal
+{Z : Type*} [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] {α : Set (Z × Z)}
+(hαOpen : IsOpen α) (hαDiag : Set.diagonal Z ⊆ α) :
+∃ β : Set (Z × Z), IsOpen β ∧ Set.diagonal Z ⊆ β ∧
+  (∀ a b : Z, (a, b) ∈ β → (b, a) ∈ β) ∧
+  (∀ a b c : Z, (a, b) ∈ β → (b, c) ∈ β → (a, c) ∈ α) := by
+  classical
+  choose V hVopen hxV hVα using existsSquareNbhdInDiagonalNbhd hαOpen hαDiag
+  have hW : ∀ x : Z, ∃ W : Set Z, IsOpen W ∧ x ∈ W ∧ closure W ⊆ V x := by
+    intro x
+    obtain ⟨T, hTnhds, hTclosed, hTV⟩ :=
+      exists_mem_nhds_isClosed_subset ((hVopen x).mem_nhds (hxV x))
+    exact ⟨interior T, isOpen_interior, mem_interior_iff_mem_nhds.mpr hTnhds,
+      (closure_mono interior_subset).trans (hTclosed.closure_subset.trans hTV)⟩
+  choose W hWopen hxW hWV using hW
+  obtain ⟨F, hF⟩ := CompactSpace.elim_nhds_subcover W (fun x ↦ (hWopen x).mem_nhds (hxW x))
+  refine ⟨⋂ y ∈ F, ((V y ×ˢ V y) ∪ ((closure (W y))ᶜ ×ˢ (closure (W y))ᶜ)), ?_, ?_, ?_, ?_⟩
+  · exact F.finite_toSet.isOpen_biInter fun y _ ↦
+      ((hVopen y).prod (hVopen y)).union
+        (isClosed_closure.isOpen_compl.prod isClosed_closure.isOpen_compl)
+  · rintro ⟨a, b⟩ hab
+    have hab' : a = b := hab
+    subst hab'
+    simp only [Set.mem_iInter]
+    intro y _
+    by_cases hy : a ∈ V y
+    · exact Set.mem_union_left _ ⟨hy, hy⟩
+    · exact Set.mem_union_right _ ⟨fun h ↦ hy (hWV y h), fun h ↦ hy (hWV y h)⟩
+  · intro a b hab
+    simp only [Set.mem_iInter] at hab ⊢
+    intro y hy
+    rcases hab y hy with h | h
+    · exact Set.mem_union_left _ ⟨h.2, h.1⟩
+    · exact Set.mem_union_right _ ⟨h.2, h.1⟩
+  · intro a b c hab hbc
+    have hb : b ∈ (⊤ : Set Z) := trivial
+    rw [← hF] at hb
+    simp only [Set.mem_iUnion] at hb
+    obtain ⟨y, hyF, hbW⟩ := hb
+    simp only [Set.mem_iInter] at hab hbc
+    have hbcl : b ∈ closure (W y) := subset_closure hbW
+    have hab' : a ∈ V y ∧ b ∈ V y := by
+      rcases hab y hyF with h | h
+      · exact h
+      · exact absurd hbcl h.2
+    have hbc' : b ∈ V y ∧ c ∈ V y := by
+      rcases hbc y hyF with h | h
+      · exact h
+      · exact absurd hbcl h.1
+    exact hVα y ⟨hab'.1, hbc'.2⟩
+
+/-- Iterating `existsSymmetricSquareNbhdOfDiagonal` gives a "cube root": an open symmetric
+`β ∋ Δ` with `β ∘ β ∘ β ⊆ α`. -/
+lemma existsSymmetricCubeNbhdOfDiagonal
+{Z : Type*} [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] {α : Set (Z × Z)}
+(hαOpen : IsOpen α) (hαDiag : Set.diagonal Z ⊆ α) :
+∃ β : Set (Z × Z), IsOpen β ∧ Set.diagonal Z ⊆ β ∧
+  (∀ a b : Z, (a, b) ∈ β → (b, a) ∈ β) ∧
+  (∀ a b c d : Z, (a, b) ∈ β → (b, c) ∈ β → (c, d) ∈ β → (a, d) ∈ α) := by
+  obtain ⟨γ, hγopen, hγdiag, hγsymm, hγcomp⟩ :=
+    existsSymmetricSquareNbhdOfDiagonal hαOpen hαDiag
+  obtain ⟨β, hβopen, hβdiag, hβsymm, hβcomp⟩ :=
+    existsSymmetricSquareNbhdOfDiagonal hγopen hγdiag
+  refine ⟨β, hβopen, hβdiag, hβsymm, fun a b c d hab hbc hcd ↦ ?_⟩
+  exact hγcomp a c d (hβcomp a b c hab hbc) (hβcomp c d d hcd (hβdiag rfl))
+
+/-- In a compact Hausdorff space, a point off the diagonal is avoided by the closure of some
+open neighbourhood of the diagonal -/
+lemma existsOpenNbhdDiagonalNotMemClosure
+{Z : Type*} [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] {z : Z × Z}
+(hz : z ∉ Set.diagonal Z) :
+∃ γ : Set (Z × Z), IsOpen γ ∧ Set.diagonal Z ⊆ γ ∧ z ∉ closure γ := by
+  obtain ⟨G, H, hG, hH, hΔ, hzH, hGH⟩ :=
+    normal_separation isClosed_diagonal isClosed_singleton
+      (Set.disjoint_singleton_right.mpr hz)
+  refine ⟨G, hG, hΔ, fun hzG ↦ ?_⟩
+  have hGHc : closure G ⊆ Hᶜ :=
+    closure_minimal (Set.disjoint_left.mp hGH) hH.isClosed_compl
+  exact hGHc hzG (hzH rfl)
+
+/-- A neighbourhood `α` of the diagonal of `Z × Z` contains a "box" built from a single
+neighbourhood `γ` of the diagonal of `Z`: if the first coordinates of a pair are `γ`-close
+and its second coordinates are `γ`-close, then the pair lies in `α`.
+
+This is the step that makes squares of (backward) equicontinuous systems (backward)
+equicontinuous.  The swap `((a,b),(c,d)) ↦ ((a,c),(b,d))` carries the diagonal of `Z × Z`
+onto `Δ_Z ×ˢ Δ_Z`, and the generalized tube lemma then produces the box. -/
+lemma existsDiagonalBoxInDiagonalNbhd
+{Z : Type*} [TopologicalSpace Z] [CompactSpace Z] [T2Space Z]
+{α : Set ((Z × Z) × (Z × Z))} (hαOpen : IsOpen α) (hαDiag : Set.diagonal (Z × Z) ⊆ α) :
+∃ γ : Set (Z × Z), IsOpen γ ∧ Set.diagonal Z ⊆ γ ∧
+  ∀ p : (Z × Z) × (Z × Z), (p.1.1, p.2.1) ∈ γ → (p.1.2, p.2.2) ∈ γ → p ∈ α := by
+  have hσcont : Continuous
+      (fun p : (Z × Z) × (Z × Z) ↦ ((p.1.1, p.2.1), (p.1.2, p.2.2))) :=
+    ((continuous_fst.comp continuous_fst).prodMk
+      (continuous_fst.comp continuous_snd)).prodMk
+      ((continuous_snd.comp continuous_fst).prodMk (continuous_snd.comp continuous_snd))
+  have hpre : Set.diagonal Z ×ˢ Set.diagonal Z ⊆
+      (fun p : (Z × Z) × (Z × Z) ↦ ((p.1.1, p.2.1), (p.1.2, p.2.2))) ⁻¹' α := by
+    rintro ⟨⟨a, a'⟩, ⟨b, b'⟩⟩ ⟨ha, hb⟩
+    have ha' : a = a' := ha
+    have hb' : b = b' := hb
+    subst ha'
+    subst hb'
+    exact hαDiag (rfl : ((a, b) : Z × Z) = (a, b))
+  obtain ⟨u, v, hu, hv, hΔu, hΔv, huv⟩ :=
+    generalized_tube_lemma isClosed_diagonal.isCompact isClosed_diagonal.isCompact
+      (hαOpen.preimage hσcont) hpre
+  refine ⟨u ∩ v, hu.inter hv, fun z hz ↦ ⟨hΔu hz, hΔv hz⟩, ?_⟩
+  rintro ⟨⟨a, b⟩, ⟨c, d⟩⟩ h1 h2
+  exact huv (Set.mk_mem_prod h1.1 h2.2)
+
+/-- The "box" neighbourhood of the diagonal of a product `∀ i, Z i` determined by the finitely
+many coordinates in `F` and, in each of those coordinates, a neighbourhood `γ i` of the
+diagonal of `Z i`, is open -/
+lemma isOpenDiagonalBoxOfPi
+{I : Type*} {Z : I → Type*} [∀ i, TopologicalSpace (Z i)]
+{F : Set I} (hF : F.Finite) {γ : ∀ i, Set (Z i × Z i)} (hγ : ∀ i, IsOpen (γ i)) :
+IsOpen {p : (∀ i, Z i) × (∀ i, Z i) | ∀ i ∈ F, (p.1 i, p.2 i) ∈ γ i} := by
+  have hEq : {p : (∀ i, Z i) × (∀ i, Z i) | ∀ i ∈ F, (p.1 i, p.2 i) ∈ γ i}
+      = ⋂ i ∈ F, (fun p : (∀ i, Z i) × (∀ i, Z i) ↦ (p.1 i, p.2 i)) ⁻¹' γ i := by
+    ext p
+    simp only [Set.mem_iInter, Set.mem_preimage, Set.mem_ofPred_eq]
+  rw [hEq]
+  refine hF.isOpen_biInter fun i _ ↦ (hγ i).preimage ?_
+  exact ((continuous_apply i).comp continuous_fst).prodMk
+    ((continuous_apply i).comp continuous_snd)
+
+/-- A box built from neighbourhoods of the diagonals of the factors is a neighbourhood of the
+diagonal of the product -/
+lemma diagonalSubsetDiagonalBoxOfPi
+{I : Type*} {Z : I → Type*} [∀ i, TopologicalSpace (Z i)]
+{F : Set I} {γ : ∀ i, Set (Z i × Z i)} (hγ : ∀ i, Set.diagonal (Z i) ⊆ γ i) :
+Set.diagonal (∀ i, Z i) ⊆ {p : (∀ i, Z i) × (∀ i, Z i) | ∀ i ∈ F, (p.1 i, p.2 i) ∈ γ i} := by
+  rintro ⟨x, y⟩ hxy
+  have hxy' : x = y := hxy
+  subst hxy'
+  exact fun i _ ↦ hγ i rfl
+
+/-- In a product of compact Hausdorff spaces, the boxes of the previous two lemmas form a
+neighbourhood basis of the diagonal: every neighbourhood `α` of the diagonal of `∀ i, Z i`
+contains a box determined by finitely many coordinates.
+
+The proof covers the product by boxes `N z` with `N z × N z ⊆ α`, shrinks each of them
+coordinatewise to a box `M z` with `closure (M z)ᵢ ⊆ (N z)ᵢ`, and extracts a finite subcover
+`M z`, `z ∈ t`.  The `i`-th neighbourhood of the diagonal is then
+`γ i = ⋂ z ∈ t, {q | q.1 ∈ closure (M z)ᵢ → q.2 ∈ (N z)ᵢ}`: if `x` lies in `M z` and `(x, y)`
+is `γ`-close in every relevant coordinate, then both `x` and `y` lie in `N z`. -/
+lemma existsFiniteBoxInDiagonalNbhdOfPi
+{I : Type*} {Z : I → Type*} [∀ i, TopologicalSpace (Z i)] [∀ i, CompactSpace (Z i)]
+[∀ i, T2Space (Z i)] {α : Set ((∀ i, Z i) × (∀ i, Z i))} (hαOpen : IsOpen α)
+(hαDiag : Set.diagonal (∀ i, Z i) ⊆ α) :
+∃ F : Set I, F.Finite ∧ ∃ γ : ∀ i, Set (Z i × Z i),
+  (∀ i, IsOpen (γ i)) ∧ (∀ i, Set.diagonal (Z i) ⊆ γ i) ∧
+  {p : (∀ i, Z i) × (∀ i, Z i) | ∀ i ∈ F, (p.1 i, p.2 i) ∈ γ i} ⊆ α := by
+  classical
+  -- around each point `z`, a box `E.pi O` whose square sits in `α`, together with a shrinking
+  have key : ∀ z : (∀ i, Z i), ∃ (E : Set I) (O O' : ∀ i, Set (Z i)), E.Finite ∧
+      (∀ i, IsOpen (O i)) ∧ (∀ i, IsOpen (O' i)) ∧ (∀ i, z i ∈ O' i) ∧
+      (∀ i, closure (O' i) ⊆ O i) ∧ (E.pi O) ×ˢ (E.pi O) ⊆ α := by
+    intro z
+    have hmem : α ∈ nhds ((z, z) : (∀ i, Z i) × (∀ i, Z i)) := hαOpen.mem_nhds (hαDiag rfl)
+    rw [nhds_prod_eq, Filter.mem_prod_iff] at hmem
+    obtain ⟨U, hU, V, hV, hUV⟩ := hmem
+    have hW : U ∩ V ∈ nhds z := Filter.inter_mem hU hV
+    rw [nhds_pi, Filter.mem_pi] at hW
+    obtain ⟨E, hEfin, O₀, hO₀, hO₀sub⟩ := hW
+    have hshrink : ∀ i, ∃ O O' : Set (Z i), IsOpen O ∧ IsOpen O' ∧ z i ∈ O' ∧
+        closure O' ⊆ O ∧ O ⊆ O₀ i := by
+      intro i
+      obtain ⟨A, hAsub, hAopen, hzA⟩ := mem_nhds_iff.mp (hO₀ i)
+      obtain ⟨T, hTnhds, hTclosed, hTA⟩ := exists_mem_nhds_isClosed_subset (hAopen.mem_nhds hzA)
+      exact ⟨A, interior T, hAopen, isOpen_interior, mem_interior_iff_mem_nhds.mpr hTnhds,
+        (closure_mono interior_subset).trans (hTclosed.closure_subset.trans hTA), hAsub⟩
+    choose O O' hO hO' hzO' hclos hOO₀ using hshrink
+    refine ⟨E, O, O', hEfin, hO, hO', hzO', hclos, ?_⟩
+    rintro ⟨a, b⟩ ⟨ha, hb⟩
+    have hsub : E.pi O ⊆ U ∩ V := (Set.pi_mono fun i _ ↦ hOO₀ i).trans hO₀sub
+    exact hUV (Set.mk_mem_prod (hsub ha).1 (hsub hb).2)
+  choose E O O' hEfin hO hO' hzO' hclos hbox using key
+  -- the shrunken boxes cover the product
+  obtain ⟨t, ht⟩ := CompactSpace.elim_nhds_subcover (fun z ↦ (E z).pi (O' z))
+    (fun z ↦ (isOpen_set_pi (hEfin z) fun i _ ↦ hO' z i).mem_nhds fun i _ ↦ hzO' z i)
+  refine ⟨⋃ z ∈ t, E z, t.finite_toSet.biUnion fun z _ ↦ hEfin z,
+    fun i ↦ ⋂ z ∈ t, ((closure (O' z i))ᶜ ×ˢ (Set.univ : Set (Z i))
+      ∪ (Set.univ : Set (Z i)) ×ˢ O z i), fun i ↦ ?_, fun i ↦ ?_, ?_⟩
+  · exact t.finite_toSet.isOpen_biInter fun z _ ↦
+      (isClosed_closure.isOpen_compl.prod isOpen_univ).union (isOpen_univ.prod (hO z i))
+  · rintro ⟨u, v⟩ huv
+    have huv' : u = v := huv
+    subst huv'
+    simp only [Set.mem_iInter]
+    intro z _
+    by_cases hu : u ∈ closure (O' z i)
+    · exact Set.mem_union_right _ ⟨trivial, hclos z i hu⟩
+    · exact Set.mem_union_left _ ⟨hu, trivial⟩
+  · intro p hp
+    have hp1 : p.1 ∈ (⊤ : Set (∀ i, Z i)) := trivial
+    rw [← ht] at hp1
+    simp only [Set.mem_iUnion] at hp1
+    obtain ⟨z, hzt, hpz⟩ := hp1
+    refine hbox z ⟨fun i hi ↦ hclos z i (subset_closure (hpz i hi)), fun i hi ↦ ?_⟩
+    have hmem : (p.1 i, p.2 i) ∈ (⋂ z ∈ t, ((closure (O' z i))ᶜ ×ˢ (Set.univ : Set (Z i))
+        ∪ (Set.univ : Set (Z i)) ×ˢ O z i)) :=
+      hp i (Set.mem_biUnion hzt hi)
+    simp only [Set.mem_iInter] at hmem
+    rcases hmem z hzt with h | h
+    · exact absurd (subset_closure (hpz i hi)) h.1
+    · exact h.2
+
+/-- A neighbourhood of the diagonal of a closed subspace `Z ⊆ X` extends to a neighbourhood of
+the diagonal of `X`: the extension is `U ∪ (Z ×ˢ Z)ᶜ`, where `U` is any open subset of `X × X`
+cutting out `α` in `Z × Z`.  Pairs of points of `Z` lying in the extension lie in `α`. -/
+lemma existsDiagonalNbhdExtendingSubspaceDiagonalNbhd
+{X : Type*} [TopologicalSpace X] {Z : Set X} (hZClosed : IsClosed Z)
+{α : Set (↥Z × ↥Z)} (hαOpen : IsOpen α) (hαDiag : Set.diagonal ↥Z ⊆ α) :
+∃ U : Set (X × X), IsOpen U ∧ Set.diagonal X ⊆ U ∧
+  ∀ z w : ↥Z, ((z : X), (w : X)) ∈ U → (z, w) ∈ α := by
+  obtain ⟨V, hVopen, hVα⟩ :=
+    (Topology.IsInducing.subtypeVal.prodMap Topology.IsInducing.subtypeVal).isOpen_iff.mp hαOpen
+  refine ⟨V ∪ (Z ×ˢ Z)ᶜ, hVopen.union (hZClosed.prod hZClosed).isOpen_compl, ?_, ?_⟩
+  · rintro ⟨x, y⟩ hxy
+    have hxy' : x = y := hxy
+    subst hxy'
+    by_cases hx : x ∈ Z
+    · refine Set.mem_union_left _ ?_
+      have hmem : ((⟨x, hx⟩ : ↥Z), (⟨x, hx⟩ : ↥Z)) ∈ α := hαDiag rfl
+      rw [← hVα] at hmem
+      exact hmem
+    · exact Set.mem_union_right _ fun hmem ↦ hx hmem.1
+  · rintro z w (h | h)
+    · rw [← hVα]
+      exact h
+    · exact absurd (Set.mk_mem_prod z.2 w.2) h

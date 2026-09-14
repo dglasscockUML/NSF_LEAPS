@@ -1287,74 +1287,28 @@ by
     everyPointInMinFixedBySomeIdempotentUltrafilter Lsystem LsystemMin hLMin ⟨p,hpL⟩
   obtain ⟨q,hq1,hq2⟩ := minLeftIdealSurjectsOntoMinSystem Lsystem LsystemMin hLMin ⟨p,hpL⟩ ⟨u,hu1⟩
   obtain ⟨r,hr1,hr2⟩ := minLeftIdealSurjectsOntoMinSystem Lsystem LsystemMin hLMin ⟨q,hq1⟩ ⟨u,hu1⟩
-  -- "hprojp" shows the coersion from type L to type Ultrafilter S commutes with Ultrafilter.extend
-  -- The complicated 2nd coordinate is specific to this proof
-  have hprojp (ℓ : Ultrafilter S) : (fun x : L => (x : Ultrafilter S)) (Ultrafilter.extend
-      (fun s ↦ ⟨pure s * p, Subtype.map._proof_1 (fun x ↦ pure s * x)
-        (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
-          { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
-            mapCont := leftMultPrincipalUltraContinuous } LisMinimalSubset.left s) ⟨p, hpL⟩⟩) ℓ)
-              = Ultrafilter.extend (fun s ↦ pure s * p) ℓ := by
-                let f : S → L := fun s ↦ ⟨pure s * p, Subtype.map._proof_1 (fun x ↦ pure s * x)
-                  (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
-                    { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
-                      mapCont := leftMultPrincipalUltraContinuous }
-                        LisMinimalSubset.left s) ⟨p, hpL⟩⟩
-                let π : L → Ultrafilter S := fun x ↦ x.1
-                have h₁ : Continuous (π ∘ Ultrafilter.extend f) :=
-                  continuous_subtype_val.comp (continuous_ultrafilter_extend f)
-                have h₂ : Continuous (Ultrafilter.extend (π ∘ f)) :=
-                  continuous_ultrafilter_extend (π ∘ f)
-                have heq : π ∘ Ultrafilter.extend f = Ultrafilter.extend (π ∘ f) := by
-                  have continuous_π : Continuous π := continuous_subtype_val
-                  apply Continuous.ext_on
-                    denseRange_pure
-                    (continuous_π.comp (continuous_ultrafilter_extend f))
-                    (continuous_ultrafilter_extend (π ∘ f))
-                  intro s
-                  simp only [Function.comp_def]
-                  intro hs
-                  obtain ⟨x, hx⟩ := hs
-                  rw [←hx]
-                  rw [ultrafilter_extend_pure]
-                  simp only [ultrafilter_extend_pure]
-                exact
-                  Eq.symm
-                    ((fun {α} {f g} ↦ Ultrafilter.coe_inj.mp)
-                      (congrArg Ultrafilter.toFilter (congrFun (id (Eq.symm heq)) ℓ)))
-  --copy of same result with a q and hq1 instead of p and hpL
-  have hprojq (ℓ : Ultrafilter S) : (fun x : L => (x : Ultrafilter S)) (Ultrafilter.extend
-    (fun s ↦ ⟨pure s * q, Subtype.map._proof_1 (fun x ↦ pure s * x)
-      (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
-        { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
-          mapCont := leftMultPrincipalUltraContinuous } LisMinimalSubset.left s) ⟨q, hq1⟩⟩) ℓ)
-            = Ultrafilter.extend (fun s ↦ pure s * q) ℓ := by
-              let f : S → L := fun s ↦ ⟨pure s * q, Subtype.map._proof_1 (fun x ↦ pure s * x)
-                (fromNonemptyCompactT2InvariantSubsetToSystem._proof_4
-                  { map := fun s x ↦ pure s * x, mapMult := ultrafilterSystem._proof_1 S,
-                    mapCont := leftMultPrincipalUltraContinuous } LisMinimalSubset.left s) ⟨q, hq1⟩⟩
-              let π : L → Ultrafilter S := fun x ↦ x.1
-              have h₁ : Continuous (π ∘ Ultrafilter.extend f) :=
-                continuous_subtype_val.comp (continuous_ultrafilter_extend f)
-              have h₂ : Continuous (Ultrafilter.extend (π ∘ f)) :=
-                continuous_ultrafilter_extend (π ∘ f)
-              have heq : π ∘ Ultrafilter.extend f = Ultrafilter.extend (π ∘ f) := by
-                have continuous_π : Continuous π := continuous_subtype_val
-                apply Continuous.ext_on
-                  denseRange_pure
-                  (continuous_π.comp (continuous_ultrafilter_extend f))
-                  (continuous_ultrafilter_extend (π ∘ f))
-                intro s
-                simp only [Function.comp_def]
-                intro hs
-                obtain ⟨x, hx⟩ := hs
-                rw [←hx]
-                rw [ultrafilter_extend_pure]
-                simp only [ultrafilter_extend_pure]
-              exact
-                Eq.symm
-                  ((fun {α} {f g} ↦ Ultrafilter.coe_inj.mp)
-                    (congrArg Ultrafilter.toFilter (congrFun (id (Eq.symm heq)) ℓ)))
+  -- `L` is a left ideal, so it is closed under left multiplication by principal ultrafilters
+  have hmulL : ∀ (s : S) {y : Ultrafilter S}, y ∈ L → pure s * y ∈ L :=
+    fun s _ hy ↦ hLMin.1.2 (pure s) ⟨_, hy, rfl⟩
+  -- the coercion from type L to type Ultrafilter S is continuous, hence commutes with
+  -- Ultrafilter.extend; "hprojp" and "hprojq" are the two instances of this that we need
+  have hproj (f : S → ↥L) (ℓ : Ultrafilter S) :
+      ((Ultrafilter.extend f ℓ : ↥L) : Ultrafilter S)
+        = Ultrafilter.extend (fun s ↦ ((f s : ↥L) : Ultrafilter S)) ℓ := by
+    have heq : (fun y : ↥L ↦ (y : Ultrafilter S)) ∘ Ultrafilter.extend f
+        = Ultrafilter.extend ((fun y : ↥L ↦ (y : Ultrafilter S)) ∘ f) := by
+      refine Continuous.ext_on denseRange_pure
+        (continuous_subtype_val.comp (continuous_ultrafilter_extend f))
+        (continuous_ultrafilter_extend _) ?_
+      rintro z ⟨s, rfl⟩
+      simp only [Function.comp_def, ultrafilter_extend_pure]
+    exact congrFun heq ℓ
+  have hprojp (ℓ : Ultrafilter S) :
+      ((Ultrafilter.extend (fun s ↦ (⟨pure s * p, hmulL s hpL⟩ : ↥L)) ℓ : ↥L) : Ultrafilter S)
+        = Ultrafilter.extend (fun s ↦ pure s * p) ℓ := hproj _ ℓ
+  have hprojq (ℓ : Ultrafilter S) :
+      ((Ultrafilter.extend (fun s ↦ (⟨pure s * q, hmulL s hq1⟩ : ↥L)) ℓ : ↥L) : Ultrafilter S)
+        = Ultrafilter.extend (fun s ↦ pure s * q) ℓ := hproj _ ℓ
   -- this equality holds in subtype form in hu3. the following gets the projection
   have upp : u * p = p := by
     unfold ultraAction Lsystem ultraLim
@@ -1442,11 +1396,304 @@ by
   use q
   refine ⟨hq1, by rw [pqu] ; exact hu2, qxx⟩
 
-
-/-- In a distal system, every point is uniformly recurrent -/
-theorem distalImpliesSemisimple :
-isDistalSystem dSystem → ∀ (x : X), isUniformlyRecurrent dSystem x :=
-by sorry
-
-
 end Ultrafilter_action_theorems
+
+section Semisimplicity_and_equicontinuity
+
+variable {S : Type*} [Semigroup S] [Nonempty S]
+variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+variable (dSystem : DynamicalSystem S X)
+
+/-- A system is semisimple if all points are uniformly recurrent -/
+def isSemisimpleSystem
+(dSystem : DynamicalSystem S X) :
+Prop :=
+∀ (x : X), isUniformlyRecurrent dSystem x
+
+/-- A distal system is semisimple.
+Let `p` be any minimal idempotent ultrafilter on `S`.  The point `p x` is uniformly recurrent
+and proximal to `x`, so distality forces `p x = x` and `x` is uniformly recurrent. -/
+lemma distalImpliesSemisimple
+{dSys : DynamicalSystem S X} (hdistal : isDistalSystem dSys) :
+isSemisimpleSystem dSys := by
+  intro x
+  obtain ⟨p, hpmin, hpidem⟩ :=
+    leftIdealInBetaSContainsMinIdempotent (S := S) Set.univ
+      (hL := ⟨Set.univ_nonempty, fun _ ↦ Set.subset_univ _⟩)
+  have hprox := pointAndUltraImageAreProximal dSys x hpidem
+  have hur := minUltraImageIsUniformlyRecurrent dSys x hpmin
+  rwa [← hdistal x _ hprox] at hur
+
+/-- A system X is distal iff the system X^2 is semisimple -/
+theorem distalIffDiagSemisimple
+(dSystem : DynamicalSystem S X) :
+isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) ↔ isDistalSystem dSystem := by
+  constructor
+  · -- a proximal pair `(x,y)` is uniformly recurrent, so its orbit closure is minimal; it
+    -- meets the diagonal at some `w`, and then `(x,y)` lies in the orbit closure of `w ∈ Δ`
+    intro hss x y hprox
+    obtain ⟨w, hwdiag, hwK⟩ := proximalOrbitClosureMeetsDiagonal hprox
+    have hUR : isUniformlyRecurrent (diagDynamicalSystem dSystem dSystem) (x, y) := hss (x, y)
+    have hmin := orbitClosureOfURPointIsMinimalSubset (diagDynamicalSystem dSystem dSystem) hUR
+    have hwsub : orbitClosure (diagDynamicalSystem dSystem dSystem) w
+        ⊆ orbitClosure (diagDynamicalSystem dSystem dSystem) (x, y) := by
+      refine closure_minimal ?_ isClosed_closure
+      rintro v ⟨s, rfl⟩
+      exact hmin.1.2.2.2 s hwK
+    have hKeq := hmin.2 _ hwsub
+      (orbitClosureIsNonemptyCompactT2InvariantSubset (diagDynamicalSystem dSystem dSystem) w)
+    have hxyK := URPointBelongsToOrbitClosure (diagDynamicalSystem dSystem dSystem) hUR
+    rw [hKeq] at hxyK
+    have hdiagsub : orbitClosure (diagDynamicalSystem dSystem dSystem) w ⊆ Set.diagonal X := by
+      refine closure_minimal ?_ isClosed_diagonal
+      rintro v ⟨s, rfl⟩
+      have hw12 : w.1 = w.2 := hwdiag
+      change dSystem.map s w.1 = dSystem.map s w.2
+      rw [hw12]
+    exact hdiagsub hxyK
+  · intro hdistal
+    exact distalImpliesSemisimple (diagOfDistalIsDistal hdistal)
+
+/-- If S acts on an S-system surjectively and that system is equicontinuous,
+then it is semisimple -/
+theorem equiSurjectiveSystemsAreSemisimple
+(dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
+isEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by
+  classical
+  intro hequi x U hU
+  obtain ⟨W, hWU, hWopen, hxW⟩ := mem_nhds_iff.mp hU
+  refine syndeticIsMonotone (A := visitTimeSet dSystem x W) ?_ (fun t ht ↦ hWU ht)
+  obtain ⟨α, hαopen, hαdiag, hαprop⟩ := existsDiagonalNbhdForcingMembership hWopen hxW
+  obtain ⟨α₁, hα₁open, hα₁diag, hα₁symm, hα₁cube⟩ :=
+    existsSymmetricCubeNbhdOfDiagonal hαopen hαdiag
+  obtain ⟨γ₀, hγ₀open, hγ₀diag, hγ₀prop⟩ := hequi α₁ hα₁open hα₁diag
+  -- cover `X` by sets small with respect to `γ₀ ∩ α₁`
+  obtain ⟨F, V, hcover, hmemV, hVγ⟩ :=
+    existsFiniteCoverBySmallSets (hγ₀open.inter hα₁open) (fun p hp ↦ ⟨hγ₀diag hp, hα₁diag hp⟩)
+  -- `φ s y` names the piece of the cover that `s y` lands in
+  choose φ hφF hφV using fun (s : S) (y : ↥F) ↦ hcover (dSystem.map s (y : X))
+  set C : (↥F → ↥F) → Set S := fun v ↦ {s : S | ∀ y : ↥F, φ s y = (v y : X)} with hC
+  have hCcover : ∀ s : S, ∃ v, s ∈ C v :=
+    fun s ↦ ⟨fun y ↦ ⟨φ s y, hφF s y⟩, fun _ ↦ rfl⟩
+  refine syndeticIsMonotone (unionOfRightQuotientSetsIsSyndeticOfFintype C hCcover) ?_
+  rintro t ht
+  simp only [Set.mem_iUnion] at ht
+  obtain ⟨v, r, hrC, htrC⟩ := ht
+  -- write `x = r y₀` and find the piece `V y₁` containing `y₀`
+  obtain ⟨y₀, hy₀⟩ := hSurject r x
+  obtain ⟨y₁, hy₁F, hy₁⟩ := hcover y₀
+  have hpair : (y₀, (y₁ : X)) ∈ γ₀ := (hVγ y₁ ⟨hy₁, hmemV y₁⟩).1
+  -- three `α₁`-steps from `r y₀` to `(t r) y₀`
+  have hstep1 : (dSystem.map r y₀, dSystem.map r y₁) ∈ α₁ :=
+    hγ₀prop r ⟨(y₀, (y₁ : X)), hpair, rfl⟩
+  have hstep3 : (dSystem.map (t * r) y₀, dSystem.map (t * r) y₁) ∈ α₁ :=
+    hγ₀prop (t * r) ⟨(y₀, (y₁ : X)), hpair, rfl⟩
+  have hstep2 : (dSystem.map r y₁, dSystem.map (t * r) y₁) ∈ α₁ := by
+    refine (hVγ ((v ⟨y₁, hy₁F⟩ : ↥F) : X) ⟨?_, ?_⟩).2
+    · have h := hφV r ⟨y₁, hy₁F⟩
+      rwa [hrC ⟨y₁, hy₁F⟩] at h
+    · have h := hφV (t * r) ⟨y₁, hy₁F⟩
+      rwa [htrC ⟨y₁, hy₁F⟩] at h
+  have hcube := hα₁cube _ _ _ _ hstep1 hstep2
+    (hα₁symm _ _ hstep3)
+  rw [hy₀] at hcube
+  rw [dSystem.mapMult, hy₀] at hcube
+  exact hαprop _ hcube
+
+/-- If a system is backward equicontinuous, then it is semisimple -/
+theorem backEquiSystemsAreSemisimple
+(dSystem : DynamicalSystem S X) :
+isBackwardEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by
+  classical
+  intro hback x U hU
+  obtain ⟨W, hWU, hWopen, hxW⟩ := mem_nhds_iff.mp hU
+  refine syndeticIsMonotone (A := visitTimeSet dSystem x W) ?_ (fun t ht ↦ hWU ht)
+  obtain ⟨α, hαopen, hαdiag, hαprop⟩ := existsDiagonalNbhdForcingMembership hWopen hxW
+  obtain ⟨γ, hγopen, hγdiag, hγprop⟩ := hback α hαopen hαdiag
+  -- `β = (α ∩ γ) ∪ S⁻¹γ` contains the open set `α ∩ γ ⊇ Δ`, sits inside `α`,
+  -- and satisfies `S⁻¹β ⊆ β`
+  set β : Set (X × X) :=
+    (α ∩ γ) ∪ inverseSetOrbit (diagDynamicalSystem dSystem dSystem) γ with hβdef
+  have hβα : β ⊆ α := by
+    rintro p (hp | hp)
+    · exact hp.1
+    · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hp
+      obtain ⟨t, ht⟩ := hp
+      exact hγprop t ht
+  have hβinv : ∀ (t : S) (p : X × X),
+      (diagDynamicalSystem dSystem dSystem).map t p ∈ β → p ∈ β := by
+    intro t p hp
+    refine Set.mem_union_right _ ?_
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+    rcases hp with hp | hp
+    · exact ⟨t, hp.2⟩
+    · simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hp
+      obtain ⟨r, hr⟩ := hp
+      refine ⟨r * t, ?_⟩
+      rw [(diagDynamicalSystem dSystem dSystem).mapMult]
+      exact hr
+  -- cover `X` by sets small with respect to the open set `α ∩ γ`
+  obtain ⟨F, V, hcover, hmemV, hVβ⟩ :=
+    existsFiniteCoverBySmallSets (hαopen.inter hγopen) (fun p hp ↦ ⟨hαdiag hp, hγdiag hp⟩)
+  set C : ↥F → Set S := fun y ↦ {t : S | dSystem.map t x ∈ V (y : X)} with hC
+  have hCcover : ∀ t : S, ∃ y : ↥F, t ∈ C y := by
+    intro t
+    obtain ⟨y, hyF, hy⟩ := hcover (dSystem.map t x)
+    exact ⟨⟨y, hyF⟩, hy⟩
+  refine syndeticIsMonotone (unionOfLeftQuotientSetsIsSyndeticOfFintype C hCcover) ?_
+  rintro t ht
+  simp only [Set.mem_iUnion] at ht
+  obtain ⟨y, r, hrC, hrtC⟩ := ht
+  have hmem : ((diagDynamicalSystem dSystem dSystem).map r) (x, dSystem.map t x) ∈ β := by
+    refine Set.mem_union_left _ (hVβ (y : X) ⟨hrC, ?_⟩)
+    change dSystem.map r (dSystem.map t x) ∈ V (y : X)
+    rw [← dSystem.mapMult]
+    exact hrtC
+  exact hαprop _ (hβα (hβinv r _ hmem))
+
+
+
+/-- If the square of a system is semisimple, then the forward and backward regionally
+proximal relations coincide.  This is the case `A = B = S` of
+`forwardBackwardSetOrbClosCoincideInBronsSys`. -/
+lemma RPEqRPMOfDiagSemisimple
+{dSys : DynamicalSystem S X}
+(hss : isSemisimpleSystem (diagDynamicalSystem dSys dSys)) :
+RP dSys = RPM dSys := by
+  have hDense :
+      Dense {(x, y) : X × X | isUniformlyRecurrent (diagDynamicalSystem dSys dSys) (x, y)} := by
+    rintro ⟨x, y⟩
+    exact subset_closure (hss (x, y))
+  have hUnivThick : isThick (Set.univ : Set S) :=
+    fun _ _ ↦ ⟨Classical.arbitrary S, Set.subset_univ _⟩
+  -- along all of `S`, the orbit (resp. inverse orbit) of a set is the plain orbit
+  have hfwd : ∀ W : Set (X × X),
+      setOrbitAlongASet (diagDynamicalSystem dSys dSys) Set.univ W
+        = setOrbit (diagDynamicalSystem dSys dSys) W := by
+    intro W
+    apply Set.Subset.antisymm
+    · intro w hw
+      obtain ⟨s, hs⟩ := Set.mem_iUnion.mp hw
+      obtain ⟨z, hz, hzw⟩ := hs
+      exact ⟨((s : S), ⟨z, hz⟩), hzw⟩
+    · intro w hw
+      obtain ⟨⟨s, z⟩, hzw⟩ := hw
+      exact Set.mem_iUnion.mpr ⟨⟨s, Set.mem_univ s⟩, ⟨(z : X × X), z.2, hzw⟩⟩
+  have hbwd : ∀ W : Set (X × X),
+      inverseSetOrbitAlongASet (diagDynamicalSystem dSys dSys) Set.univ W
+        = inverseSetOrbit (diagDynamicalSystem dSys dSys) W := by
+    intro W
+    apply Set.Subset.antisymm
+    · intro w hw
+      obtain ⟨s, hs⟩ := Set.mem_iUnion.mp hw
+      exact Set.mem_iUnion.mpr ⟨(s : S), hs⟩
+    · intro w hw
+      obtain ⟨s, hs⟩ := Set.mem_iUnion.mp hw
+      exact Set.mem_iUnion.mpr ⟨⟨s, Set.mem_univ s⟩, hs⟩
+  have hkey : ∀ W : Set (X × X), IsOpen W →
+      setOrbitClosure (diagDynamicalSystem dSys dSys) W
+        = closure (inverseSetOrbit (diagDynamicalSystem dSys dSys) W) := by
+    intro W hW
+    have h := forwardBackwardSetOrbClosCoincideInBronsSys dSys hDense Set.univ Set.univ
+      hUnivThick hUnivThick W hW
+    rwa [hfwd W, hbwd W] at h
+  -- neighbourhoods of the diagonal may be shrunk to open ones
+  have hinterior : ∀ α ∈ nhdsSet (Set.diagonal X), interior α ∈ nhdsSet (Set.diagonal X) := by
+    intro α hα
+    obtain ⟨V, hVα, hVopen, hVdiag⟩ := mem_nhdsSet.mp hα
+    exact mem_nhdsSet.mpr ⟨interior α, subset_rfl, isOpen_interior,
+      hVdiag.trans (interior_maximal hVα hVopen)⟩
+  apply Set.Subset.antisymm
+  · intro z hz
+    simp only [RP, Set.mem_iInter] at hz
+    simp only [RPM, Set.mem_iInter]
+    intro α hα
+    have h1 := hz (interior α) (hinterior α hα)
+    rw [← hkey (interior α) isOpen_interior] at h1
+    exact monotoneSetOrbitClosure _ _ _ interior_subset h1
+  · intro z hz
+    simp only [RPM, Set.mem_iInter] at hz
+    simp only [RP, Set.mem_iInter]
+    intro α hα
+    have h1 := hz (interior α) (hinterior α hα)
+    rw [hkey (interior α) isOpen_interior] at h1
+    exact closure_mono (Set.iUnion_mono fun _ ↦ Set.preimage_mono interior_subset) h1
+
+/- A dynamical system on `X` which acts by surjections is equicontinuous if and only
+if the regionally proximal relation is contained in the diagonal of `X × X` -/
+theorem equiSurjectiveIffBackEqui
+(dSystem : DynamicalSystem S X) :
+(isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem) ↔
+  isBackwardEquicontinuousSystemv2 dSystem := by
+  constructor
+  · -- `X × X` is surjective and equicontinuous, hence semisimple, so `RP = RPM ⊆ Δ`
+    rintro ⟨hsurj, hequi⟩
+    have hss : isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) :=
+      equiSurjectiveSystemsAreSemisimple (diagDynamicalSystem dSystem dSystem)
+        (diagOfSurjectiveIsSurjective hsurj) (diagOfEquiIsEqui hequi)
+    rw [backEquiSystemIffRPInDiag, RPEqRPMOfDiagSemisimple hss]
+    exact (equiSystemIffRPMInDiag dSystem).mp hequi
+  · -- `X × X` is backward equicontinuous, hence semisimple, so `RPM = RP ⊆ Δ`
+    intro hback
+    refine ⟨backEqImpliesSurjective dSystem hback, ?_⟩
+    have hss : isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) :=
+      backEquiSystemsAreSemisimple (diagDynamicalSystem dSystem dSystem)
+        (diagOfBackEquiIsBackEqui hback)
+    rw [equiSystemIffRPMInDiag, ← RPEqRPMOfDiagSemisimple hss]
+    exact (backEquiSystemIffRPInDiag dSystem).mp hback
+
+/-- Summary theorem. If S acts on an S-system surjectively and the system is equicontinuous,
+or if the system is backward equi, then any product system is equicontinuous,
+backward equicontinuous, distal, semisimple, and S acts on them by homeomorphisms -/
+theorem surjEquiOrBackEquiImpliesEquiBackEquiDistalSemisimpleHomeo
+(dSystem : DynamicalSystem S X) :
+((isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem) ∨
+isBackwardEquicontinuousSystemv2 dSystem) →
+  isEquicontinuousSystemv2 dSystem ∧
+  isBackwardEquicontinuousSystemv2 dSystem ∧
+  isSemisimpleSystem dSystem ∧
+  isDistalSystem dSystem ∧
+  isHomeoSystem dSystem := by
+  intro hhyp
+  have hback : isBackwardEquicontinuousSystemv2 dSystem := by
+    rcases hhyp with h | h
+    · exact (equiSurjectiveIffBackEqui dSystem).mp h
+    · exact h
+  obtain ⟨hsurj, hequi⟩ := (equiSurjectiveIffBackEqui dSystem).mpr hback
+  have hss : isSemisimpleSystem dSystem :=
+    equiSurjectiveSystemsAreSemisimple dSystem hsurj hequi
+  have hssdiag : isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) :=
+    equiSurjectiveSystemsAreSemisimple (diagDynamicalSystem dSystem dSystem)
+      (diagOfSurjectiveIsSurjective hsurj) (diagOfEquiIsEqui hequi)
+  have hdistal : isDistalSystem dSystem := (distalIffDiagSemisimple dSystem).mp hssdiag
+  refine ⟨hequi, hback, hss, hdistal, fun s ↦ ?_⟩
+  -- distality gives injectivity: if `s x = s y` then `(x,y)` is a proximal pair
+  have hinj : Function.Injective (dSystem.map s) := by
+    intro a b hab
+    refine hdistal a b fun α hα ↦ ⟨s, ?_⟩
+    rw [hab]
+    exact subset_of_mem_nhdsSet hα rfl
+  exact isHomeomorph_iff_continuous_bijective.mpr ⟨dSystem.mapCont s, hinj, hsurj s⟩
+
+/-- A dynamical system on `X` which acts by surjections is equicontinuous if and only
+if the regionally proximal relation is contained in the diagonal of `X × X` -/
+theorem equicontinuousIffRPTrivialAndSurjective
+(dSystem : DynamicalSystem S X) :
+RP dSystem ⊆ Set.diagonal X ↔
+  (isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem) :=
+    calc
+      RP dSystem ⊆ Set.diagonal X ↔ isBackwardEquicontinuousSystemv2 dSystem :=
+        (backEquiSystemIffRPInDiag dSystem).symm
+      _ ↔ isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem :=
+        (equiSurjectiveIffBackEqui dSystem).symm
+
+/- If a system is distal for some d >= 1, then it is distal and semisimple for all d.
+Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
+-- theorem distalImpliesDistalAndSemisimple
+-- (dSystem : DynamicalSystem S X) :
+-- ∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) →
+--   ∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
+--     (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
+--       by sorry
+
+end Semisimplicity_and_equicontinuity
