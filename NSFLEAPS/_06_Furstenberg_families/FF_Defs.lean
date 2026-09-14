@@ -870,6 +870,22 @@ theorem dcSCapThickIsCentral
   use p, pMin, pIdemp
 
 
+/- central is dcs family join thick. -/
+-- theorem centralIsdcSCapThick
+-- {S : Type*} [Semigroup S] [Nonempty S] :
+-- centralFamily = dcSFamily ⋎ thickFamily := by sorry
+-- The proof is contained above.
+-- dcSCapThickIsCentral shows that dcSFamily ⋎ thickFamily ⊆ centralFamily
+-- centralSetsAreVisitsOfPtToProxURPoint shows central is visit times of pt to set
+-- Then visitsOfPtToProxURPointAredcSCapThick gives that visit times of pt to set is dcs cap thick
+
+/- dcS sets are central along every thick set -/
+-- theorem dcsIsSyndeticMeetCentral
+-- {S : Type*} [Semigroup S] [Nonempty S] :
+-- dcSFamily ⊆ syndeticFamily ⋏ centralFamily := by sorry
+-- Proof is to combine algebra lemma with centralIsdcSCapThick and simplify
+
+
 end central_sets
 
 section Bohr_prelims
