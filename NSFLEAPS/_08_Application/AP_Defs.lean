@@ -48,38 +48,49 @@ def isURSet
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
+-- the following statement needs to be modified. We cannot prove as written since X may not be
+-- of Type. In fact X : Set (S → Bool)
 /-- An UR set can be written as R(x, U) -/
 theorem urSetIsRxU
 {S : Type*} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
-∃ (U : Set (WithOne S → Bool)) (UClopen : IsClopen U) (UNonempty : U.Nonempty),
-∃ (x : WithOne S → Bool) (xMin : isUniformlyRecurrent (monoidExtSymbolicSystem S) x),
-A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
-  simp only [exists_prop]
-  let U := {x : WithOne S → Bool | x none = true}
-  use U
-  constructor
-  · sorry
-  constructor
-  · sorry
-  let liftSet : Set S → Set (WithOne S) := fun A : Set S ↦ {s : WithOne S | ∃ t ∈ A, some t = s}
-  let A_wOne := liftSet A
-  classical
-  let x0 := fun (s : WithOne S) ↦ if s ∈ A_wOne then true else false
-  let x1 := fun (s : WithOne S) ↦ if s ∈ A_wOne ∪ {none} then true else false
-  have h1 : isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 ∨ isUniformlyRecurrent
-    (monoidExtSymbolicSystem S) x0 := by
-    sorry
-  rcases h1 with hx0 | hx1
-  · use x0
-    use hx0
-    ext s
-    constructor
-    · intro hs
-      unfold visitTimeSet
-      simp
-      sorry
-    sorry
+∃ (X : Type) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
+∃ (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem),
+∃ x : X, ∃ U : Set X, x ∈ U ∧ IsClopen U ∧ A = visitTimeSet dSystem x U := by
   sorry
+
+-- next is the old version of urSetIsRxU
+-- /-- An UR set can be written as R(x, U) -/
+-- theorem urSetIsRxUv1
+-- {S : Type*} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
+-- ∃ (U : Set (WithOne S → Bool)) (UClopen : IsClopen U) (UNonempty : U.Nonempty),
+-- ∃ (x : WithOne S → Bool) (xMin : isUniformlyRecurrent (monoidExtSymbolicSystem S) x),
+-- A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
+--   simp only [exists_prop]
+--   let U := {x : WithOne S → Bool | x none = true}
+--   use U
+--   constructor
+--   · sorry
+--   constructor
+--   · sorry
+--   let liftSet : Set S → Set (WithOne S) := fun A : Set S ↦ {s : WithOne S | ∃ t ∈ A, some t = s}
+--   let A_wOne := liftSet A
+--   classical
+--   let x0 := fun (s : WithOne S) ↦ if s ∈ A_wOne then true else false
+--   let x1 := fun (s : WithOne S) ↦ if s ∈ A_wOne ∪ {none} then true else false
+--   have h1 : isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 ∨ isUniformlyRecurrent
+--     (monoidExtSymbolicSystem S) x0 := by
+--     sorry
+--   rcases h1 with hx0 | hx1
+--   · use x0
+--     use hx0
+--     ext s
+--     constructor
+--     · intro hs
+--       unfold visitTimeSet
+--       simp
+--       sorry
+--     sorry
+--   sorry
 
 /-- Given a syndetic set `A` and a thick set `H`, there exists a
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
@@ -390,9 +401,9 @@ then for all thick set H, R(x, V) ∩ H is a Delta set -/
 theorem commVisitTimeSetForRPPairIsDelta
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{dSystem : DynamicalSystem S X} {hMin : isMinimalSystem dSystem}
-(x : X) {y : X}
-(V : Set X) {hV : V ∈ nhds y} :
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem)
+(x y : X) (hxyRP : (x, y) ∈ RP dSystem)
+{V : Set X} (hV : V ∈ nhds y) :
 ∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) :=
   by sorry
 
@@ -405,8 +416,67 @@ then for all thick set H, B ∩ H is a Δ set -/
 theorem commURSetsOfBohrRecurrenceAreDelta
 {S : Type*} [CommSemigroup S] [Nonempty S]
 (B : Set S) {hBur : isURSet B} {hBrec : isSetOfBohrRecurrence B} :
-∀ (H : Set S), isThick H → isDelta (B ∩ H) :=
-  by sorry
+∀ (H : Set S), isThick H → isDelta (B ∩ H) := by
+  intro H hHThick
+  rcases (urSetIsRxU hBur) with
+    ⟨X, _, _, _, hXNonempty, dSystemX, hXMin, x, U, hxU, hUClopen, hBvis⟩
+  have hBinBohr : B ∈ setOfBohrRecurrenceFamily S := by
+    simp only [setOfBohrRecurrenceFamily]
+    exact hBrec
+  have hBohrPR : isPRFamily (setOfBohrRecurrenceFamily S) := by
+    exact commSetOfBohrRecurrenceFamilyIsPR
+  have hUClosed : IsClosed U := by
+    unfold IsClopen at hUClopen
+    exact hUClopen.1
+  have hNew := visitTimeConcentrationForPRFamily dSystemX x U hUClosed
+    (setOfBohrRecurrenceFamily S) hBohrPR
+  rw [<- hBvis] at hNew
+  specialize hNew hBinBohr
+  rcases hNew with ⟨y, hyU, hy1⟩
+  have hxyEQ : (x, y) ∈ equiStructureRelation dSystemX := by
+    simp only [equiStructureRelation, Set.mem_sInter]
+    intro I hI
+    unfold setOfEquicontinuousICERS at hI
+    rcases hI with ⟨hIicer, hIEq⟩
+    simp only [setOfICERS, Set.mem_ofPred_eq] at hIicer
+    have hGoal : (setToRelation I) x y := by
+      have hIEquiRel : Equivalence (setToRelation I) := by
+        unfold isICER at hIicer
+        rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
+        unfold isEquivalenceRelation at hIicer3
+        exact hIicer3
+      let K := Quotient ⟨setToRelation I, hIEquiRel⟩
+      let dSystemK := quotientDynamicalSystem dSystemX hIicer
+      let π : X → K := (Quotient.mk ⟨setToRelation I, hIEquiRel⟩)
+      have hKT2 : T2Space K := by
+        apply quotientOfCompactT2ByClosedIsT2
+        · unfold isICER at hIicer
+          rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
+          exact hIicer2
+      apply (Equivalence.quot_mk_eq_iff hIEquiRel x y).mp
+      have hπxy : π x = π y := by
+        by_contra hContra
+        let hSep := t2_separation hContra
+        rcases hSep with ⟨V, W, hV1, hW1, hV2, hW2, hVW⟩
+        sorry
+      exact hπxy
+    unfold setToRelation at hGoal
+    exact hGoal
+  have hxyRP : (x, y) ∈ RP dSystemX := by
+    rw [RPisEquiStructureRelation hXMin]
+    exact hxyEQ
+  have hUNeigh : U ∈ nhds y := by
+    apply mem_nhds_iff.mpr
+    use U
+    constructor
+    · simp
+    constructor
+    · exact hUClopen.2
+    · exact hyU
+  have hDelta := commVisitTimeSetForRPPairIsDelta dSystemX hXMin x y hxyRP hUNeigh
+  specialize hDelta H hHThick
+  rw [hBvis]
+  exact hDelta
 
 end Dynamical_sets_of_bohr_recurrence
 
