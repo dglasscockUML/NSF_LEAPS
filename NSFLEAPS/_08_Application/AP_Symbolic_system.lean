@@ -76,7 +76,7 @@ S → Bool := by
 /-- For a set `S`, a boolean value val, and `s ∈ S`, the cylinder set
 `[value]_s` is the set of functions `S → Bool` whose value at `s` is `val` -/
 def cylinderSet
-{S : Type*} (val : Bool) (s : S) :
+(S : Type*) (val : Bool) (s : S) :
 Set (S → Bool) :=
 {f : S → Bool | f s = val}
 

@@ -56,6 +56,35 @@ theorem urSetIsRxU.{u}
 ∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
 ∃ (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem),
 ∃ x : X, ∃ U : Set X, x ∈ U ∧ IsClopen U ∧ A = visitTimeSet dSystem x U := by
+  let π : (WithOne S → Bool) → (S → Bool) := fun w ↦ (fun s ↦ w s)
+  have hπFacMap : isFactorMap (monoidExtSymbolicSystem S) (selfSymbolicSystem S) π := by
+    sorry
+  unfold isURSet at hA
+  let hLiftUnif := liftUniformRecurrentPoint hπFacMap (indicator A) hA
+  rcases hLiftUnif with ⟨w, hw1, hw2⟩
+  let X := orbitClosure (monoidExtSymbolicSystem S) w
+  have hXDef : X = orbitClosure (monoidExtSymbolicSystem S) w := by
+    rfl
+  have hMinSubset := orbitClosureOfURPointIsMinimalSubset (monoidExtSymbolicSystem S) hw2
+  rw [<- hXDef] at hMinSubset
+  have hMinCopy := hMinSubset
+  rcases hMinCopy with ⟨h1, h2⟩
+  have hXInv := h1
+  rcases h1 with ⟨h1a, h1b, h1c, h1d⟩
+  use X, inferInstance, isCompact_iff_compactSpace.mp h1b, h1c, Set.Nonempty.to_subtype h1a
+  have hMinSubsystem :=
+    (minimalSubsetIffMinimalSubsystem (monoidExtSymbolicSystem S) hXInv).mp hMinSubset
+  let dSystemX := fromNonemptyCompactT2InvariantSubsetToSystem (monoidExtSymbolicSystem S) hXInv
+  have hdSystemXDef :
+    dSystemX = fromNonemptyCompactT2InvariantSubsetToSystem (monoidExtSymbolicSystem S) hXInv := by
+    rfl
+  rw [<- hdSystemXDef] at hMinSubsystem
+  have hwInX : w ∈ X := by
+    simp only [X]
+    apply URPointBelongsToOrbitClosure
+    exact hw2
+  let U := cylinderSet (WithOne S) true none
+  use dSystemX, hMinSubsystem, ⟨w, hwInX⟩, Subtype.val ⁻¹' U
   sorry
 
 -- next is the old version of urSetIsRxU
