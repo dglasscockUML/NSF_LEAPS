@@ -635,6 +635,54 @@ visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
   rw [preimageVisits]
   exact AhasVisits
 
+
+/-- A subset `A` of a semigroup `S` is a set of pointwise recurrence if it
+has non-empty intersection with every `dcS` subset of `S` -/
+def isdcTSet
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+A ∈ (dcSFamily S)*
+
+/-- The family of dcT subsets of a semigroup -/
+def dcTFamily
+(S : Type*) [Semigroup S] [Nonempty S] :
+Family S :=
+(dcSFamily S)*
+
+/-- If `A ⊆ S` is a set of pointwise recurrence and `A ⊆ B`, then `B`
+is a set of pointwise recurrence. -/
+theorem dcTIsMonotone
+(S : Type*) [Semigroup S] [Nonempty S]
+{A B : Set S} (hA : isdcTSet A) (hAB : A ⊆ B) :
+isdcTSet B :=
+(dcTFamily S).2 A B hA hAB
+
+
+theorem dcTIffTimeOfRecurrenceForMinSystems
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isdcTSet A ↔ ∀ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
+(x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U), ∃ (s : S) (_ : s ∈ A),
+dSystem.map s x ∈ U := by
+  constructor
+  · intro hA X Xtop Xcmpt XT2 XNon dSystem hMin x U xInU UOpen
+    have : ∀ (B : Set S), ((∃ (X : Type u_2) (_ : TopologicalSpace X)
+      (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+      (dSystem : DynamicalSystem S X) (x : X) (_ : isUniformlyRecurrent dSystem x)
+      (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+      visitTimeSet dSystem x U ⊆ B) → isdcSSet B) := returnTimesImpliesdcS
+    have : isdcSSet (visitTimeSet dSystem x U) := by
+      apply this (visitTimeSet dSystem x U)
+      have xUR : isUniformlyRecurrent dSystem x := by sorry
+        -- points in minimal systems are uniformly recurrent
+      use X, Xtop, Xcmpt, XT2, XNon, dSystem, x, xUR, U, xInU, UOpen
+    have : (A ∩ (visitTimeSet dSystem x U)).Nonempty := by sorry
+      --dcT sets are dual to dcS sets, so follows by def of dual
+    obtain ⟨s, hsA, hsV⟩ := this
+    use s, hsA, hsV
+  · sorry
+
 end dcS_sets
 
 section IP_sets
@@ -1022,23 +1070,45 @@ theorem dcSCapThickIsCentral
 /-- central is dcs family join thick. -/
 theorem centralIsdcSCapThick
 (S : Type*) [Semigroup S] [Nonempty S] :
-centralFamily S = (dcSFamily S) ⋎ (thickFamily S) := by sorry
--- The proof is contained above.
--- dcSCapThickIsCentral shows that dcSFamily ⋎ thickFamily ⊆ centralFamily
--- centralSetsAreVisitsOfPtToProxURPoint shows central is visit times of pt to set
--- Then visitsOfPtToProxURPointAredcSCapThick gives that visit times of pt to set is dcs cap thick
+centralFamily S = (dcSFamily S) ⋎ (thickFamily S) := by
+  ext A
+  constructor
+  · intro Acentral
+    have centralConsequence := centralSetsAreVisitsOfPtToProxURPoint A Acentral
+    have : (∃ (X : Type u_1) (_ : TopologicalSpace X) (_ : CompactSpace X)
+      (_ : T2Space X) (_ : Nonempty X) (dSystem : DynamicalSystem S X) (x y : X)
+        (_ : isUniformlyRecurrent dSystem y) (_ : proximal dSystem x y) (U : Set X)
+          (_ : y ∈ U) (_ : IsOpen U), visitTimeSet dSystem x U = A) →
+            (∃ (B : Set S) (_ : isdcSSet B), ∃ (H : Set S) (_ : isThick H), B ∩ H ⊆ A) :=
+              visitsOfPtToProxURPointAredcSCapThick A
+    obtain ⟨B, dcSB, H, thickH, intersectionContain⟩ := this centralConsequence
+    have BcapHinJoin : B ∩ H ∈ dcSFamily S ⋎ thickFamily S := by
+      use B, dcSB, H, thickH
+    exact (dcSFamily S ⋎ thickFamily S).2 (B ∩ H) A BcapHinJoin intersectionContain
+  · intro hA
+    obtain ⟨B, dcSB, H, thickH, intersectionEqual⟩ := hA
+    apply dcSCapThickIsCentral A
+    use B, dcSB, H, thickH
+    exact le_of_eq_of_le (id (Eq.symm intersectionEqual)) fun ⦃a⦄ a_1 ↦ a_1
 
 /-- dcS sets are central along every thick set -/
 theorem dcsIsSyndeticMeetCentral
 (S : Type*) [Semigroup S] [Nonempty S] :
-dcSFamily S ⊆ (syndeticFamily S) ⋏ (centralFamily S) := by sorry
+dcSFamily S ⊆ (syndeticFamily S) ⋏ (centralFamily S) :=
+  by sorry -- Wait for algebra.
 -- Proof is to combine algebra lemma with centralIsdcSCapThick and simplify
 
-/--  set `A ⊆ S` is Central* if and only if it is a set of recurrence
+/-- Central * is syndetic ⋏ dcSyndetic* -/
+theorem cStarIsSyndeticMeetdcThick
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+(centralFamily S)* = (syndeticFamily S) ⋏ (dcTFamily S) := by sorry
+-- follows from centralIsdcSCapThick and demorgan algebra
+
+/-- A set `A ⊆ S` is Central* if and only if it is a set of recurrence
 along all thick sets -/
 theorem cStarIffSetOfRecAlongAllThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ (dcSFamily S)* := by sorry
+A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ dcTFamily S := by sorry
 
 /-- A set `A ⊆ S` is Central* if and only if `R(x,U) ∩ A` is syndetic for all
 `x ∈ U` in any minimal system -/
@@ -1049,6 +1119,7 @@ A ∈ (centralFamily S)* ↔ (∀ (X : Type*) (_ : TopologicalSpace X)
 (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) (x : X)
 (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
 isSyndetic (A ∩ (visitTimeSet dSystem x U))) := by sorry
+-- should follow from dcS characterizations and abcde immediately
 
 
 theorem thickIndicatorLemmaInCountCommSemi
