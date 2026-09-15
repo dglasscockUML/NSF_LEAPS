@@ -1734,50 +1734,51 @@ by
       apply subset_closure
       use s
     exact ⟨homTorusDS.map s x, this⟩
-  have xUR := distalImpliesSemisimple homTorusDS homTorusDSisDistal x
-  have xInX : x ∈ X := URPointBelongsToOrbitClosure homTorusDS xUR
-  have hMin : isMinimalSystem dSystem :=
-    (minimalSubsetIffMinimalSubsystem homTorusDS orbClosPresystem).mp
-      (orbitClosureOfURPointIsMinimalSubset homTorusDS xUR)
-  have hEqui : isEquicontinuousSystemv2 dSystem := by
-    -- unfold dSystem
-    -- unfold isEquicontinuousSystem
-     sorry -- We need to propogate the equiv2 everywhere.
-    -- exact subsysOfEquiIsEqui homTorusDSisEqui orbClosPresystem
-  have xInV : ⟨x,xInX⟩ ∈ V := by
-    unfold V
-    simp only [Set.mem_ofPred_eq]
-    exact oneinU
-  have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A :=
-    calc
-      visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ visitTimeSet homTorusDS x U := by
-        intro s hs
-        unfold V visitTimeSet at hs
-        simp only [Set.mem_preimage] at hs
-        exact hs
-      _ ⊆ φ ⁻¹' U := by
-        intro t ht
-        unfold visitTimeSet at ht
-        simp only [Set.mem_preimage] at ht
-        unfold homTorusDS homDynamicalSystem at ht
-        simp only at ht
-        unfold torusDS at ht
-        unfold torusDynamicalSystem at ht
-        simp only at ht
-        unfold x at ht
-        simp only [mul_one] at ht
-        exact ht
-      _ ⊆ A := preimageUinA
-  use X
-  use by infer_instance
-  use by infer_instance
-  use by infer_instance
-  use by infer_instance
-  use dSystem
-  use hEqui
-  use hMin
-  use ⟨x,xInX⟩
-  use V
+  sorry
+  -- have xUR := distalImpliesSemisimple homTorusDS homTorusDSisDistal x
+  -- have xInX : x ∈ X := URPointBelongsToOrbitClosure homTorusDS xUR
+  -- have hMin : isMinimalSystem dSystem :=
+  --   (minimalSubsetIffMinimalSubsystem homTorusDS orbClosPresystem).mp
+  --     (orbitClosureOfURPointIsMinimalSubset homTorusDS xUR)
+  -- have hEqui : isEquicontinuousSystemv2 dSystem := by
+  --   -- unfold dSystem
+  --   -- unfold isEquicontinuousSystem
+  --    sorry -- We need to propogate the equiv2 everywhere.
+  --   -- exact subsysOfEquiIsEqui homTorusDSisEqui orbClosPresystem
+  -- have xInV : ⟨x,xInX⟩ ∈ V := by
+  --   unfold V
+  --   simp only [Set.mem_ofPred_eq]
+  --   exact oneinU
+  -- have visitTimesxToVinA : visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ A :=
+  --   calc
+  --     visitTimeSet dSystem ⟨x,xInX⟩ V ⊆ visitTimeSet homTorusDS x U := by
+  --       intro s hs
+  --       unfold V visitTimeSet at hs
+  --       simp only [Set.mem_preimage] at hs
+  --       exact hs
+  --     _ ⊆ φ ⁻¹' U := by
+  --       intro t ht
+  --       unfold visitTimeSet at ht
+  --       simp only [Set.mem_preimage] at ht
+  --       unfold homTorusDS homDynamicalSystem at ht
+  --       simp only at ht
+  --       unfold torusDS at ht
+  --       unfold torusDynamicalSystem at ht
+  --       simp only at ht
+  --       unfold x at ht
+  --       simp only [mul_one] at ht
+  --       exact ht
+  --     _ ⊆ A := preimageUinA
+  -- use X
+  -- use by infer_instance
+  -- use by infer_instance
+  -- use by infer_instance
+  -- use by infer_instance
+  -- use dSystem
+  -- use hEqui
+  -- use hMin
+  -- use ⟨x,xInX⟩
+  -- use V
 
 /-- If `A ⊆ S` is a set containing a set of returns of a point to a neighborhood
 in a minimal, equicontinuous system, then `A` is Bohr_0. -/

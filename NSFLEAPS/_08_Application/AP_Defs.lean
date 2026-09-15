@@ -453,12 +453,66 @@ theorem commURSetsOfBohrRecurrenceAreDelta
         · unfold isICER at hIicer
           rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
           exact hIicer2
+      have hKNonempty : Nonempty K := by
+        apply nonemptyQuotient X hIEquiRel
       apply (Equivalence.quot_mk_eq_iff hIEquiRel x y).mp
+      have hπFactorMap : isFactorMap dSystemX dSystemK π := by
+        apply quotientMapIsFactorMap
+      have hFactor : isFactor dSystemK dSystemX := by
+        unfold isFactor
+        use π
+      have hKMin : isMinimalSystem dSystemK := by
+        apply factorOfMinimalIsMinimal hXMin hFactor
+      have hKEquiC : isEquicontinuousSystem dSystemK := by
+        unfold isEquicontinuousICER at hIEq
+        exact hIEq
       have hπxy : π x = π y := by
         by_contra hContra
         let hSep := t2_separation hContra
         rcases hSep with ⟨V, W, hV1, hW1, hV2, hW2, hVW⟩
-        sorry
+        let C := visitTimeSet dSystemK (π x) V
+        have hCBohr : isBohrZero C := by
+          apply equiReturnsAreBohrZero
+          use K
+          sorry
+        have hWNeigh : π⁻¹' W ∈ nhds y := by
+          apply mem_nhds_iff.mpr
+          use π⁻¹' W
+          constructor
+          · simp
+          constructor
+          · apply IsOpen.preimage
+            · unfold isFactorMap at hπFactorMap
+              exact hπFactorMap.1
+            · exact hW1
+          · simp only [Set.mem_preimage]
+            exact hW2
+        specialize hy1 (π⁻¹' W) hWNeigh
+        simp only [← dualBohrZeroSetsOfBohrRecurrence] at hy1
+        have hNonemptyInter : (visitTimeSet dSystemX x (π ⁻¹' W) ∩
+          visitTimeSet dSystemK (π x) V).Nonempty := by
+          apply (mem_famDual (bohrZeroFamily S) (visitTimeSet dSystemX x (π ⁻¹' W))).mp
+          · exact hy1
+          · simp only [bohrZeroFamily, SetLike.mem_coe]
+            exact hCBohr
+        apply Set.inter_nonempty.mp at hNonemptyInter
+        rcases hNonemptyInter with ⟨s, hs1, hs2⟩
+        simp only [visitTimeSet, Set.mem_preimage] at hs1
+        simp only [visitTimeSet, Set.mem_preimage] at hs2
+        rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
+        simp only [isEquivariant] at hπ3
+        specialize hπ3 s
+        have hπ3x : (dSystemK.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+          apply congr_fun hπ3
+        have hπ3x1 : (dSystemK.map s ∘ π) x = dSystemK.map s (π x) := by
+          rfl
+        have hπ3x2 : (π ∘ dSystemX.map s) x = π (dSystemX.map s x) := by
+          rfl
+        rw [<- hπ3x2, <- hπ3x, hπ3x1] at hs1
+        have hVWNotDisjoint : ¬Disjoint V W := by
+          apply Set.not_disjoint_iff.mpr
+          use dSystemK.map s (π x)
+        exact hVWNotDisjoint hVW
       exact hπxy
     unfold setToRelation at hGoal
     exact hGoal
