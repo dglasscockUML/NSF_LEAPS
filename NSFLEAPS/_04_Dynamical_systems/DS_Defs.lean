@@ -6329,12 +6329,12 @@ isEquicontinuousSystem (diagDynamicalSystem dSystem dSystem) := by
 -- that the uniformity structure
 -- from product space coming from uniformSpaceOfCompactR1 is the same
 -- as the one coming from instUniformSpaceProd
-def isEquicontinuousProductSystem
-(dSystemX : DynamicalSystem S X)
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-(dSystemY : DynamicalSystem S Y) :
-Prop :=
-UniformEquicontinuous (diagDynamicalSystem dSystemX dSystemY).map
+-- def isEquicontinuousProductSystem
+-- (dSystemX : DynamicalSystem S X)
+-- {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+-- (dSystemY : DynamicalSystem S Y) :
+-- Prop :=
+-- UniformEquicontinuous (diagDynamicalSystem dSystemX dSystemY).map
 
 -- DEPRACATED: Plan to upgrade in favor of diagOfEquiIsEqui above
 /- If `dSystem` and `dSystemY` are equicontinuous dynamical systems, then the

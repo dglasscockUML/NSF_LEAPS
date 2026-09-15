@@ -473,7 +473,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
         let C := visitTimeSet dSystemK (π x) V
         have hCBohr : isBohrZero C := by
           apply equiReturnsAreBohrZero
-          use K
+          use K, inferInstance, inferInstance, inferInstance, inferInstance
           sorry
         have hWNeigh : π⁻¹' W ∈ nhds y := by
           apply mem_nhds_iff.mpr
