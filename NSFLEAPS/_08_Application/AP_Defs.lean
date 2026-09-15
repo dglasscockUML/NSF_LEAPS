@@ -465,7 +465,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
         apply factorOfMinimalIsMinimal hXMin hFactor
       have hKEquiC : isEquicontinuousSystem dSystemK := by
         unfold isEquicontinuousICER at hIEq
-        exact hIEq
+        sorry
       have hπxy : π x = π y := by
         by_contra hContra
         let hSep := t2_separation hContra
