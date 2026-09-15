@@ -1028,7 +1028,7 @@ by
   constructor
   · intro hx
     exact (minimalICEREquicontinuousIffRPInICER hMin (equiStructureRelationIsICER dSystem)).2.mp
-      (equiStructureRelationIsEquiICER dSystem hMin) hx
+      (equiStructureRelationIsEquiICER dSystem) hx
   · intro hx
     have RPisEquiICER : isEquicontinuousICER dSystem (RPisICER hMin) :=
       (minimalICEREquicontinuousIffRPInICER hMin (RPisICER hMin)).2.symm.mp subset_rfl

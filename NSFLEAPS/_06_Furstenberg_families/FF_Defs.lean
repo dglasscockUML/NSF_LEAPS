@@ -13,7 +13,7 @@ theorem visitTimeConcentrationForPRFamily
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
-(x : X) (U : Set X) (hU : IsClosed U)
+(x : X) (U : Set X) (hU : IsClosed U) (hU' : U.Nonempty)
 (F : Family S) (hF : isPRFamily F) :
 visitTimeSet dSystem x U ∈ F →
 ∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
@@ -77,8 +77,13 @@ visitTimeSet dSystem x U ∈ F →
     exact hf.2.2
   by_contra hContra
   have hGCard : G.card > 0 := by
-    simp
-    sorry
+    simp only [gt_iff_lt, Finset.card_pos]
+    -- a point of `U` lies in some `g y` with `y ∈ G`
+    obtain ⟨u, hu⟩ := hU'
+    have hmem := hG hu
+    simp only [Set.mem_iUnion, exists_prop] at hmem
+    obtain ⟨y, hyG, -⟩ := hmem
+    exact ⟨y, hyG⟩
   have hIn : ⋃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
     apply F.upward_closed (visitTimeSet dSystem x U) (⋃ y : G, visitTimeSet dSystem x (g y))
     · exact hContra
@@ -86,7 +91,18 @@ visitTimeSet dSystem x U ∈ F →
   have hExistOne : ∃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
     unfold isPRFamily at hF
     specialize hF (⋃ y : G, visitTimeSet dSystem x (g y)) hIn ⟨G.card, hGCard⟩
-    sorry
+    classical
+    have hGNonempty : Nonempty ↥G := ⟨G.equivFin.symm ⟨0, hGCard⟩⟩
+    -- colour `s` by the index of some `y ∈ G` with `s ∈ R(x, g y)`
+    choose! w hw using fun (s : S) (hs : s ∈ ⋃ y : G, visitTimeSet dSystem x (g y)) ↦
+      Set.mem_iUnion.mp hs
+    obtain ⟨i, hi⟩ := hF (fun s ↦ G.equivFin (w s))
+    -- the monochromatic piece of colour `i` sits inside `R(x, g (e.symm i))`
+    refine ⟨G.equivFin.symm i, F.upward_closed _ _ hi ?_⟩
+    rintro s ⟨hsUnion, hsColour⟩
+    have hws : w s = G.equivFin.symm i := (Equiv.eq_symm_apply _).mpr hsColour
+    rw [← hws]
+    exact hw s hsUnion
   rcases hExistOne with ⟨y, hy⟩
   specialize hNo y
   exact hNo hy
@@ -275,14 +291,80 @@ instance
 {S : Type*} [Semigroup S] : Semigroup (Ultrafilter S) :=
   Ultrafilter.semigroup
 
-/-- The closure in `βS` of a thick subset of a semigroup `S`
-contains a minimal left ideal -/
-theorem thickClosureContainsIdeal
+/-- For `A ⊆ S`, the set `closure A ⊆ βS` contains a minimal left ideal
+if and only if `A` is thick. -/
+theorem thickIffClosureContainsMinLeftIdeal
 {S : Type*} [Semigroup S] [Nonempty S]
-{H : Set S} (hH : isThick H) :
+{H : Set S} :
+isThick H ↔
 ∃ (L : Set (Ultrafilter S)),
 isMinLeftIdeal L ∧ L ⊆ closure ((pure : S → Ultrafilter S) '' H) :=
-  by sorry
+  by
+  classical
+  constructor
+  · intro hH
+    -- `L = closure H ∩ ⋂ s, closure (s⁻¹H)`; a point of `L` is an ultrafilter containing
+    -- `H` and every `s⁻¹H`
+    set L : Set (Ultrafilter S) :=
+      closure ((pure : S → Ultrafilter S) '' H) ∩
+        ⋂ s : S, closure ((pure : S → Ultrafilter S) '' ((leftMult s) ⁻¹' H)) with hLdef
+    have hmem : ∀ p : Ultrafilter S,
+        p ∈ L ↔ (H ∈ p ∧ ∀ s : S, (leftMult s) ⁻¹' H ∈ p) := by
+      intro p
+      simp only [hLdef, Set.mem_inter_iff, Set.mem_iInter, memClosurePureIff]
+    -- thickness gives the finite intersection property, so `L` is non-empty
+    have hLNonempty : L.Nonempty := by
+      refine isClosed_closure.isCompact.inter_iInter_nonempty _ (fun _ ↦ isClosed_closure) ?_
+      intro u
+      obtain ⟨a⟩ : Nonempty S := inferInstance
+      obtain ⟨r, hr⟩ := hH (insert a ((fun x : S ↦ x * a) '' (u : Set S)))
+        ((u.finite_toSet.image _).insert _)
+      -- `t = a * r` lies in `H`, and in `f⁻¹H` for every `f ∈ u`
+      refine ⟨pure (a * r), ?_, ?_⟩
+      · refine (memClosurePureIff H _).mpr ?_
+        simp only [Ultrafilter.mem_pure]
+        exact hr ⟨a, Set.mem_insert _ _, rfl⟩
+      · simp only [Set.mem_iInter]
+        intro f hf
+        refine (memClosurePureIff _ _).mpr ?_
+        simp only [Ultrafilter.mem_pure, Set.mem_preimage, leftMult]
+        rw [← mul_assoc]
+        exact hr ⟨f * a, Set.mem_insert_of_mem _ ⟨f, hf, rfl⟩, rfl⟩
+    -- `L` is a left ideal of `βS`
+    have hLIdeal : isLeftIdeal L := by
+      refine ⟨hLNonempty, ?_⟩
+      rintro q w ⟨p, hp, rfl⟩
+      obtain ⟨hpH, hpS⟩ := (hmem p).mp hp
+      refine (hmem (q * p)).mpr ⟨?_, fun s ↦ ?_⟩
+      · rw [ultraProductDescription]
+        exact Filter.univ_mem' fun u ↦ hpS u
+      · rw [ultraProductDescription]
+        refine Filter.univ_mem' fun u ↦ ?_
+        have hset : {t : S | u * t ∈ (leftMult s) ⁻¹' H} = (leftMult (s * u)) ⁻¹' H := by
+          ext t
+          simp only [Set.mem_ofPred_eq, Set.mem_preimage, leftMult, mul_assoc]
+        change {t : S | u * t ∈ (leftMult s) ⁻¹' H} ∈ p
+        rw [hset]
+        exact hpS (s * u)
+    -- every left ideal contains a minimal left ideal
+    obtain ⟨M, hMmin, hML⟩ := leftIdealContainsMinLeftIdeal (S := Ultrafilter S) L (hL := hLIdeal)
+    refine ⟨M, hMmin, hML.trans ?_⟩
+    rw [hLdef]
+    exact Set.inter_subset_left
+  · rintro ⟨L, hLmin, hLH⟩ F hF
+    obtain ⟨p, hp⟩ := hLmin.1.1
+    -- `L ⊆ f⁻¹L ⊆ f⁻¹(closure H)`, so every `f⁻¹H` belongs to `p`
+    have hfp : ∀ f : S, (leftMult f) ⁻¹' H ∈ p := by
+      intro f
+      have hfpL : (pure f : Ultrafilter S) * p ∈ L := hLmin.1.2 (pure f) ⟨p, hp, rfl⟩
+      exact (membershipInLeftMultByPrincipal f H p).mp ((memClosurePureIff H _).mp (hLH hfpL))
+    -- a finite intersection of members of the ultrafilter `p` is non-empty
+    obtain ⟨s, hs⟩ :=
+      Ultrafilter.nonempty_of_mem ((Filter.biInter_mem hF).mpr fun f _ ↦ hfp f)
+    refine ⟨s, ?_⟩
+    rintro w ⟨f, hf, rfl⟩
+    simp only [Set.mem_iInter] at hs
+    exact hs f hf
 
 /-- The closure in `βS` of a syndetic subset of a semigroup `S`
 has non-empty intersection with every left ideal -/
@@ -291,7 +373,25 @@ theorem syndeticClosureMeetsEveryIdeal
 {A : Set S} (hA : isSyndetic A) :
 ∀ (L : Set (Ultrafilter S)),
 isLeftIdeal L → (L ∩ closure ((pure : S → Ultrafilter S) '' A)).Nonempty :=
-  by sorry
+  by
+  intro L hL
+  -- `B = S \ A` is not thick, since a syndetic set meets every thick set
+  have hBNotThick : ¬ isThick (Aᶜ : Set S) := by
+    intro hB
+    obtain ⟨x, hxA, hxB⟩ := syndeticThickIntersect A Aᶜ hA hB
+    exact hxB hxA
+  -- so `closure B` contains no minimal left ideal, and hence no left ideal at all
+  have hLNotSub : ¬ (L ⊆ closure ((pure : S → Ultrafilter S) '' (Aᶜ : Set S))) := by
+    intro hsub
+    obtain ⟨M, hMmin, hML⟩ := leftIdealContainsMinLeftIdeal (S := Ultrafilter S) L (hL := hL)
+    exact hBNotThick (thickIffClosureContainsMinLeftIdeal.mpr ⟨M, hMmin, hML.trans hsub⟩)
+  -- a point of `L` outside `closure B` contains `A`, so it lies in `closure A`
+  rw [Set.not_subset] at hLNotSub
+  obtain ⟨p, hpL, hpB⟩ := hLNotSub
+  rw [memClosurePureIff] at hpB
+  refine ⟨p, hpL, (memClosurePureIff A p).mpr ?_⟩
+  by_contra hpA
+  exact hpB (Ultrafilter.compl_mem_iff_notMem.mpr hpA)
 
 /-- If `H ⊆ S` is thick, there exists a minimal idempotent `p ∈ βS` such that
 for all finite `F ⊆ S`, `∩ f ∈ F, f⁻¹H ∈ p` -/
@@ -300,7 +400,15 @@ theorem minIdempotentWitnessesShiftIntersectionLargeness
 (H : Set S) (hH : isThick H) :
 ∃ (p : Ultrafilter S), p ∈ closure ((pure : S → Ultrafilter S) '' H) ∧
 isMinimalUltrafilter p ∧ p * p = p ∧ ∀ (F : Set S), F.Finite → (⋂ f ∈ F, (leftMult f) ⁻¹' H) ∈ p :=
-  by sorry
+  by
+  -- `closure H` contains a minimal left ideal `L`, which contains an idempotent `p`
+  obtain ⟨L, hLmin, hLH⟩ := thickIffClosureContainsMinLeftIdeal.mp hH
+  obtain ⟨p, hpL, hpIdem⟩ := leftIdealContainsIdempotent (S := Ultrafilter S) L (hL := hLmin.1)
+  refine ⟨p, hLH hpL, ⟨L, hLmin, hpL⟩, hpIdem, fun F hF ↦ ?_⟩
+  -- `p ∈ L ⊆ closure (f⁻¹H)` for every `f`, and `p` is closed under finite intersections
+  refine (Filter.biInter_mem hF).mpr fun f _ ↦ ?_
+  have hfpL : (pure f : Ultrafilter S) * p ∈ L := hLmin.1.2 (pure f) ⟨p, hpL, rfl⟩
+  exact (membershipInLeftMultByPrincipal f H p).mp ((memClosurePureIff H _).mp (hLH hfpL))
 
 end Syndetic_and_thick_sets
 
@@ -425,7 +533,7 @@ isdcSSet B := by
 
 /-- The family of `dcS` sets -/
 def dcSFamily
-{S : Type*} [Semigroup S] [Nonempty S] :
+(S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 {
   sets := {A : Set S | isdcSSet A}
@@ -529,6 +637,46 @@ visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
 
 end dcS_sets
 
+section IP_sets
+
+/- A subset `A` of a semigroup `S` is an IP set if there exists a sequence
+x_1, x_2, ... of elements of S such that all finite, increasing products are
+in A -/
+-- def isIP
+-- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+-- Prop :=
+-- ∃ (x : Stream' S), ∀ (s : S), Hindman.FP x s → s ∈ A
+
+/-- A subset `A` of a semigroup `S` is an IP set if it belongs to an
+idempotent ultrafilter on `S` -/
+def isIP
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (p : Ultrafilter S) (_ : p * p = p), A ∈ p
+
+/-- The property of being an `IP` set is upward closed -/
+theorem IPIsMonotone
+{S : Type*} [Semigroup S] [Nonempty S]
+{A B : Set S} (hA : isIP A) (hAB : A ⊆ B) :
+isIP B := by
+  obtain ⟨p, hip, rest⟩ := hA
+  use p
+  use hip
+  exact Filter.mem_of_superset rest hAB
+
+/-- The family of `IP` sets -/
+def IPFamily
+(S : Type*) [Semigroup S] [Nonempty S] :
+Family S :=
+{
+  sets := {A : Set S | isIP A}
+  upward_closed := by
+    intro A B hA hAB
+    exact IPIsMonotone hA hAB
+}
+
+end IP_sets
+
 section central_sets
 
 /-- A subset `A` of a semigroup `S` is a central set if it belongs to a
@@ -551,7 +699,7 @@ isCentral B := by
 
 /-- The family of `central` sets -/
 def centralFamily
-{S : Type*} [Semigroup S] [Nonempty S] :
+(S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 {
   sets := {A : Set S | isCentral A}
@@ -762,7 +910,7 @@ theorem dcSCapThickIsCentral
       {s | (fun x ↦ s * x) ⁻¹' A ∈ F} {s | (fun x ↦ s * x) ⁻¹' A ∈ q} Fidemp h9
     have := Set.mem_iInter.mp hp {s | (fun x ↦ s * x) ⁻¹' A ∈ q}
     exact Set.mem_iInter.mp this h10
-  obtain ⟨L,LminIdeal,LinHclos⟩ := thickClosureContainsIdeal HisThick
+  obtain ⟨L,LminIdeal,LinHclos⟩ := thickIffClosureContainsMinLeftIdeal.mp HisThick
   let FcapL := Fclos ∩ L
   let FcapL2 := L ∩ Fclos
   have FcapL2nonempety : FcapL2.Nonempty := by
@@ -871,21 +1019,58 @@ theorem dcSCapThickIsCentral
   use p, pMin, pIdemp
 
 
-/- central is dcs family join thick. -/
--- theorem centralIsdcSCapThick
--- {S : Type*} [Semigroup S] [Nonempty S] :
--- centralFamily = dcSFamily ⋎ thickFamily := by sorry
+/-- central is dcs family join thick. -/
+theorem centralIsdcSCapThick
+(S : Type*) [Semigroup S] [Nonempty S] :
+centralFamily S = (dcSFamily S) ⋎ (thickFamily S) := by sorry
 -- The proof is contained above.
 -- dcSCapThickIsCentral shows that dcSFamily ⋎ thickFamily ⊆ centralFamily
 -- centralSetsAreVisitsOfPtToProxURPoint shows central is visit times of pt to set
 -- Then visitsOfPtToProxURPointAredcSCapThick gives that visit times of pt to set is dcs cap thick
 
-/- dcS sets are central along every thick set -/
--- theorem dcsIsSyndeticMeetCentral
--- {S : Type*} [Semigroup S] [Nonempty S] :
--- dcSFamily ⊆ syndeticFamily ⋏ centralFamily := by sorry
+/-- dcS sets are central along every thick set -/
+theorem dcsIsSyndeticMeetCentral
+(S : Type*) [Semigroup S] [Nonempty S] :
+dcSFamily S ⊆ (syndeticFamily S) ⋏ (centralFamily S) := by sorry
 -- Proof is to combine algebra lemma with centralIsdcSCapThick and simplify
 
+/--  set `A ⊆ S` is Central* if and only if it is a set of recurrence
+along all thick sets -/
+theorem cStarIffSetOfRecAlongAllThick
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ (dcSFamily S)* := by sorry
+
+/-- A set `A ⊆ S` is Central* if and only if `R(x,U) ∩ A` is syndetic for all
+`x ∈ U` in any minimal system -/
+theorem cStarIffSyndeticAlongdcS
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+A ∈ (centralFamily S)* ↔ (∀ (X : Type*) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) (x : X)
+(U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+isSyndetic (A ∩ (visitTimeSet dSystem x U))) := by sorry
+
+
+theorem thickIndicatorLemmaInCountCommSemi
+{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S]
+{H : Set S} (Hthick : isThick H) :
+∃ (G : Set S), ∀ (B : Set S) (L : Set (Ultrafilter S)),
+  isLeftIdeal L → L ⊆ (closure ((pure : S → Ultrafilter S) '' B)) →
+    (L ∩ (closure ((pure : S → Ultrafilter S) '' G))).Nonempty → isThick (B ∩ H) :=
+by sorry
+
+theorem strongIPIffStrongCentralInCountCommSemi
+(S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
+(syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) :=
+  by sorry
+
+/-- A subset of a countable, commutative semigroup is central star if and only if
+it is strongly piecewise IP*, if and only if it is strongly piecewise central* -/
+theorem cStarIsStronglyPiecewiseIPStarAndCStar
+(S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
+(centralFamily S)* = (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) ∧
+(centralFamily S)* = (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) :=
+by sorry -- Wait. Will rely on Furstenburg algebra.
 
 end central_sets
 
@@ -1732,7 +1917,7 @@ theorem bohrZeroSetsContainEquiReturns
 isBohrZero A → ∃ (X : Type) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
-(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_xInU : x ∈ U) (_ : IsOpen U),
+(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
 visitTimeSet dSystem x U ⊆ A :=
 by
   intro hBZA
@@ -1932,13 +2117,50 @@ isBohrZero A := by
     _ ⊆ A := visitsxUinA
   use d, φ, φHom, V, VisOpen, oneInV, φpreimInA
 
-/-- A set `A ⊆ S` is a set of Bohr recurrence if for all minimal, equicontinuous
-actions of `S` on a compact, Hausdorff space `X`, all points `x ∈ X` and
-all neighborhoods `U` of `x`, `A ∩ R(x,U) ≠ ∅` -/
+-- /-- A set `A ⊆ S` is a set of Bohr recurrence if for all minimal, equicontinuous
+-- actions of `S` on a compact, Hausdorff space `X`, all points `x ∈ X` and
+-- all neighborhoods `U` of `x`, `A ∩ R(x,U) ≠ ∅` -/
+-- def isSetOfBohrRecurrence
+-- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+-- Prop :=
+-- by sorry
+
+-- /-- If `A ⊆ S` is a set of Bohr recurrence and `A ⊆ B`, then `B`
+-- is a set of Bohr recurrence. -/
+-- theorem setOfBohrRecurrenceIsMonotone
+-- {S : Type*} [Semigroup S] [Nonempty S]
+-- {A B : Set S} (hA : isSetOfBohrRecurrence A) (hAB : A ⊆ B) :
+-- isSetOfBohrRecurrence B :=
+-- by sorry
+
+-- /-- The family of Bohr_0 subsets of a semigroup -/
+-- def setOfBohrRecurrenceFamily
+-- (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
+-- {
+--   sets := {A : Set S | isSetOfBohrRecurrence A}
+--   upward_closed := by
+--     intro A B hA hAB
+--     exact setOfBohrRecurrenceIsMonotone hA hAB
+-- }
+
+/- The family of Bohr_0 sets is a filter -/
+theorem bohrZeroFamilyIsFilter
+{S : Type*} [CommSemigroup S] [Nonempty S] :
+isFilterFamily (bohrZeroFamily S) :=
+by sorry --Wait. Make sure completely up-to-date filterFamily definition.
+
+/-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if it has
+non-empty intersection with every `Bohr_0` subset of `S` -/
 def isSetOfBohrRecurrence
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-by sorry
+A ∈ (bohrZeroFamily S)*
+
+/-- The family of Bohr_0 subsets of a semigroup -/
+def setOfBohrRecurrenceFamily
+(S : Type*) [Semigroup S] [Nonempty S] :
+Family S :=
+(bohrZeroFamily S)*
 
 /-- If `A ⊆ S` is a set of Bohr recurrence and `A ⊆ B`, then `B`
 is a set of Bohr recurrence. -/
@@ -1946,31 +2168,21 @@ theorem setOfBohrRecurrenceIsMonotone
 {S : Type*} [Semigroup S] [Nonempty S]
 {A B : Set S} (hA : isSetOfBohrRecurrence A) (hAB : A ⊆ B) :
 isSetOfBohrRecurrence B :=
-by sorry
+(setOfBohrRecurrenceFamily S).2 A B hA hAB
 
-/-- The family of Bohr_0 subsets of a semigroup -/
-def setOfBohrRecurrenceFamily
-(S : Type*) [Semigroup S] [Nonempty S] : Family S :=
-{
-  sets := {A : Set S | isSetOfBohrRecurrence A}
-  upward_closed := by
-    intro A B hA hAB
-    exact setOfBohrRecurrenceIsMonotone hA hAB
-}
-
-theorem bohrZeroiffCompNotSetOfRec
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isSetOfBohrRecurrence A ↔ ¬(isBohrZero Aᶜ) :=
-  by sorry
+-- theorem bohrZeroiffCompNotSetOfRec
+-- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+-- isSetOfBohrRecurrence A ↔ ¬(isBohrZero Aᶜ) :=
+--   by sorry
   -- This should be easy logical consequence of the definitions
 
 /-- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
 -- Something happens upstream regarding "dualEquivForm" that the proof no longer work
 -- Need to fix
-theorem dualBohrZeroSetsOfBohrRecurrence
-{S : Type*} [Semigroup S] [Nonempty S] :
-(bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
-by sorry
+-- theorem dualBohrZeroSetsOfBohrRecurrence
+-- {S : Type*} [Semigroup S] [Nonempty S] :
+-- (bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
+-- by sorry
   -- ext A
   -- have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=
   --   famDualAlt (bohrZeroFamily S)
@@ -1981,18 +2193,34 @@ by sorry
   -- simp only [Set.mem_ofPred_eq]
   -- exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
-/- In a commutative semigroup, the family of Bohr_0 sets is a filter -/
-theorem commBohrZeroFamilyIsFilter
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-isFilterFamily (bohrZeroFamily S) :=
-by sorry
-
 /- In a commutative semigroup, the family of sets of Bohr
 recurrence is partition regular -/
-theorem commSetOfBohrRecurrenceFamilyIsPR
-{S : Type*} [CommSemigroup S][Nonempty S] :
+theorem setOfBohrRecurrenceFamilyIsPR
+(S : Type*) [Semigroup S] [Nonempty S] :
 isPRFamily (setOfBohrRecurrenceFamily S) :=
 by sorry
+
+/-- A set is a set of Bohr recurrence if and only if it contains
+the time of return of 1 to a neighborhood of itself under a homomorphism
+from S into the d-torus -/
+theorem setOfBohrRecurrenceIffHomReturnTime
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isSetOfBohrRecurrence A ↔ ∀ (d : ℕ) (φ : S → (Fin d → Circle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
+  (_ : IsOpen U) (_ : 1 ∈ U), ∃ (s : S) (_ : s ∈ A), φ s ∈ U :=
+  by sorry
+
+/-- A set is a set of Bohr recurrence in a commutative semigroup if and only
+if it contains the time of return of a point to a neighborhood of itself
+in any minimal dynamical system. -/
+theorem setOfBohrRecurrenceIffMinEquiReturnTime
+{S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
+isSetOfBohrRecurrence A ↔ ∀ (X : Type) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+∃ (s : S) (_ : s ∈ A), dSystem.map s x ∈ U :=
+  by sorry
 
 /-- In a commutative semigroup, a Delta_0 set is a set of Bohr recurrence -/
 theorem commDeltaZeroImpliesSetOfBohrRecurrence

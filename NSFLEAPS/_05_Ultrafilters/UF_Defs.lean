@@ -1503,7 +1503,7 @@ isEquicontinuousSystem dSystem → isSemisimpleSystem dSystem := by
 /-- If a system is backward equicontinuous, then it is semisimple -/
 theorem backEquiSystemsAreSemisimple
 (dSystem : DynamicalSystem S X) :
-isBackwardEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by
+isBackwardEquicontinuousSystem dSystem → isSemisimpleSystem dSystem := by
   classical
   intro hback x U hU
   obtain ⟨W, hWU, hWopen, hxW⟩ := mem_nhds_iff.mp hU
@@ -1624,7 +1624,7 @@ if the regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equiSurjectiveIffBackEqui
 (dSystem : DynamicalSystem S X) :
 (isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem) ↔
-  isBackwardEquicontinuousSystemv2 dSystem := by
+  isBackwardEquicontinuousSystem dSystem := by
   constructor
   · -- `X × X` is surjective and equicontinuous, hence semisimple, so `RP = RPM ⊆ Δ`
     rintro ⟨hsurj, hequi⟩
@@ -1648,14 +1648,14 @@ backward equicontinuous, distal, semisimple, and S acts on them by homeomorphism
 theorem surjEquiOrBackEquiImpliesEquiBackEquiDistalSemisimpleHomeo
 (dSystem : DynamicalSystem S X) :
 ((isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem) ∨
-isBackwardEquicontinuousSystemv2 dSystem) →
+isBackwardEquicontinuousSystem dSystem) →
   isEquicontinuousSystem dSystem ∧
-  isBackwardEquicontinuousSystemv2 dSystem ∧
+  isBackwardEquicontinuousSystem dSystem ∧
   isSemisimpleSystem dSystem ∧
   isDistalSystem dSystem ∧
   isHomeoSystem dSystem := by
   intro hhyp
-  have hback : isBackwardEquicontinuousSystemv2 dSystem := by
+  have hback : isBackwardEquicontinuousSystem dSystem := by
     rcases hhyp with h | h
     · exact (equiSurjectiveIffBackEqui dSystem).mp h
     · exact h
@@ -1682,7 +1682,7 @@ theorem equicontinuousIffRPTrivialAndSurjective
 RP dSystem ⊆ Set.diagonal X ↔
   (isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem) :=
     calc
-      RP dSystem ⊆ Set.diagonal X ↔ isBackwardEquicontinuousSystemv2 dSystem :=
+      RP dSystem ⊆ Set.diagonal X ↔ isBackwardEquicontinuousSystem dSystem :=
         (backEquiSystemIffRPInDiag dSystem).symm
       _ ↔ isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem :=
         (equiSurjectiveIffBackEqui dSystem).symm

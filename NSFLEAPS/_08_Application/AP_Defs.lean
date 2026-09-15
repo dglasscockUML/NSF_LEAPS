@@ -424,11 +424,11 @@ theorem commURSetsOfBohrRecurrenceAreDelta
     simp only [setOfBohrRecurrenceFamily]
     exact hBrec
   have hBohrPR : isPRFamily (setOfBohrRecurrenceFamily S) := by
-    exact commSetOfBohrRecurrenceFamilyIsPR
+    exact setOfBohrRecurrenceFamilyIsPR S
   have hUClosed : IsClosed U := by
     unfold IsClopen at hUClopen
     exact hUClopen.1
-  have hNew := visitTimeConcentrationForPRFamily dSystemX x U hUClosed
+  have hNew := visitTimeConcentrationForPRFamily dSystemX x U hUClosed ⟨x, hxU⟩
     (setOfBohrRecurrenceFamily S) hBohrPR
   rw [<- hBvis] at hNew
   specialize hNew hBinBohr
@@ -488,7 +488,6 @@ theorem commURSetsOfBohrRecurrenceAreDelta
           · simp only [Set.mem_preimage]
             exact hW2
         specialize hy1 (π⁻¹' W) hWNeigh
-        simp only [← dualBohrZeroSetsOfBohrRecurrence] at hy1
         have hNonemptyInter : (visitTimeSet dSystemX x (π ⁻¹' W) ∩
           visitTimeSet dSystemK (π x) V).Nonempty := by
           apply (mem_famDual (bohrZeroFamily S) (visitTimeSet dSystemX x (π ⁻¹' W))).mp
@@ -591,7 +590,6 @@ theorem commDeltaStarImpliesLocallyBohrZero
   rw [<- dualSyndeticThick]
   have h1 : syndeticFamily S ⋏ (bohrZeroFamily S)* ⊆ syndeticFamily S ⋏ deltaFamily S := by
     rw [commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence]
-    rw [dualBohrZeroSetsOfBohrRecurrence]
     intro x hx
     exact hx
   have h2 : (bohrZeroFamily S)** = bohrZeroFamily S := by
