@@ -1458,7 +1458,7 @@ isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) ↔ isDistalSystem dSys
 then it is semisimple -/
 theorem equiSurjectiveSystemsAreSemisimple
 (dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
-isEquicontinuousSystemv2 dSystem → isSemisimpleSystem dSystem := by
+isEquicontinuousSystem dSystem → isSemisimpleSystem dSystem := by
   classical
   intro hequi x U hU
   obtain ⟨W, hWU, hWopen, hxW⟩ := mem_nhds_iff.mp hU
@@ -1623,7 +1623,7 @@ RP dSys = RPM dSys := by
 if the regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equiSurjectiveIffBackEqui
 (dSystem : DynamicalSystem S X) :
-(isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem) ↔
+(isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem) ↔
   isBackwardEquicontinuousSystemv2 dSystem := by
   constructor
   · -- `X × X` is surjective and equicontinuous, hence semisimple, so `RP = RPM ⊆ Δ`
@@ -1647,9 +1647,9 @@ or if the system is backward equi, then any product system is equicontinuous,
 backward equicontinuous, distal, semisimple, and S acts on them by homeomorphisms -/
 theorem surjEquiOrBackEquiImpliesEquiBackEquiDistalSemisimpleHomeo
 (dSystem : DynamicalSystem S X) :
-((isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem) ∨
+((isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem) ∨
 isBackwardEquicontinuousSystemv2 dSystem) →
-  isEquicontinuousSystemv2 dSystem ∧
+  isEquicontinuousSystem dSystem ∧
   isBackwardEquicontinuousSystemv2 dSystem ∧
   isSemisimpleSystem dSystem ∧
   isDistalSystem dSystem ∧
@@ -1680,11 +1680,11 @@ if the regionally proximal relation is contained in the diagonal of `X × X` -/
 theorem equicontinuousIffRPTrivialAndSurjective
 (dSystem : DynamicalSystem S X) :
 RP dSystem ⊆ Set.diagonal X ↔
-  (isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem) :=
+  (isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem) :=
     calc
       RP dSystem ⊆ Set.diagonal X ↔ isBackwardEquicontinuousSystemv2 dSystem :=
         (backEquiSystemIffRPInDiag dSystem).symm
-      _ ↔ isSurjectiveSystem dSystem ∧ isEquicontinuousSystemv2 dSystem :=
+      _ ↔ isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem :=
         (equiSurjectiveIffBackEqui dSystem).symm
 
 /- If a system is distal for some d >= 1, then it is distal and semisimple for all d.

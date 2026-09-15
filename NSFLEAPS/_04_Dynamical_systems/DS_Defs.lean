@@ -6278,15 +6278,15 @@ instance : UniformSpace X := uniformSpaceOfCompactR1
 -- We might consider defining Equicontinuous system ``by hand'' using
 -- open sets containing the diagonal.  This will allow us to avoid talking
 -- about the uniform structure on X at all.
+
+-- def isEquicontinuousSystem
+-- (dSystem : DynamicalSystem S X) :
+-- Prop :=
+-- UniformEquicontinuous dSystem.map
+
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
 def isEquicontinuousSystem
-(dSystem : DynamicalSystem S X) :
-Prop :=
-UniformEquicontinuous dSystem.map
-
--- Here is a ``by hand'' attempt at equicontinuity
-def isEquicontinuousSystemv2
 (dSystem : DynamicalSystem S X) :
 Prop :=
 ∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
@@ -6297,8 +6297,8 @@ Prop :=
 theorem arbProdOfEquiIsEqui
 {I : Type*} {Z : I → Type*}
 [∀ i, TopologicalSpace (Z i)] [∀ i, CompactSpace (Z i)] [∀ i, T2Space (Z i)] [∀ i, Nonempty (Z i)]
-{dSystems : ∀ i, DynamicalSystem S (Z i)} (hEquis : ∀ i, isEquicontinuousSystemv2 (dSystems i)) :
-isEquicontinuousSystemv2 (arbProdDynamicalSystem dSystems) := by
+{dSystems : ∀ i, DynamicalSystem S (Z i)} (hEquis : ∀ i, isEquicontinuousSystem (dSystems i)) :
+isEquicontinuousSystem (arbProdDynamicalSystem dSystems) := by
   -- shrink `α` to a box determined by finitely many coordinates, and apply equicontinuity
   -- of each of those finitely many factors
   intro α hαopen hαdiag
@@ -6311,8 +6311,8 @@ isEquicontinuousSystemv2 (arbProdDynamicalSystem dSystems) := by
 
 /-- The square of an equicontinuous system is equicontinuous -/
 lemma diagOfEquiIsEqui
-{dSystem : DynamicalSystem S X} (hequi : isEquicontinuousSystemv2 dSystem) :
-isEquicontinuousSystemv2 (diagDynamicalSystem dSystem dSystem) := by
+{dSystem : DynamicalSystem S X} (hequi : isEquicontinuousSystem dSystem) :
+isEquicontinuousSystem (diagDynamicalSystem dSystem dSystem) := by
   intro α hαopen hαdiag
   obtain ⟨β, hβopen, hβdiag, hβprop⟩ :=
     arbProdOfEquiIsEqui (dSystems := fun _ : Bool ↦ dSystem) (fun _ ↦ hequi)
@@ -6405,7 +6405,7 @@ diagonal action of `S` on `X × Y` is an equicontinuous dynamical system -/
 /-- A system is equicontinuous iff RPM is contained in the diagonal -/
 theorem equiSystemIffRPMInDiag
 (dSystem : DynamicalSystem S X) :
-isEquicontinuousSystemv2 dSystem ↔ RPM dSystem ⊆ Set.diagonal X := by
+isEquicontinuousSystem dSystem ↔ RPM dSystem ⊆ Set.diagonal X := by
   constructor
   · -- if `z ∉ Δ`, pick `γ` with `z ∉ closure γ`; equicontinuity puts `Sβ ⊆ γ` for some `β`,
     -- and `RPM ⊆ closure (Sβ) ⊆ closure γ`
@@ -6694,7 +6694,7 @@ backward regionally proximal relation is contained in the diagonal of `X × X` -
 --     exact hα5 ht1
 
 -- Here is a ``by hand'' attempt at backward equicontinuity
-def isBackwardEquicontinuousSystemv2
+def isBackwardEquicontinuousSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 ∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
@@ -6706,8 +6706,8 @@ theorem arbProdOfBackEquiIsBackEqui
 {I : Type*} {Z : I → Type*}
 [∀ i, TopologicalSpace (Z i)] [∀ i, CompactSpace (Z i)] [∀ i, T2Space (Z i)] [∀ i, Nonempty (Z i)]
 {dSystems : ∀ i, DynamicalSystem S (Z i)}
-(hEquis : ∀ i, isBackwardEquicontinuousSystemv2 (dSystems i)) :
-isBackwardEquicontinuousSystemv2 (arbProdDynamicalSystem dSystems) := by
+(hEquis : ∀ i, isBackwardEquicontinuousSystem (dSystems i)) :
+isBackwardEquicontinuousSystem (arbProdDynamicalSystem dSystems) := by
   -- shrink `α` to a box determined by finitely many coordinates, and apply backward
   -- equicontinuity of each of those finitely many factors
   intro α hαopen hαdiag
@@ -6720,8 +6720,8 @@ isBackwardEquicontinuousSystemv2 (arbProdDynamicalSystem dSystems) := by
 
 /-- The square of a backward equicontinuous system is backward equicontinuous -/
 lemma diagOfBackEquiIsBackEqui
-{dSys : DynamicalSystem S X} (hback : isBackwardEquicontinuousSystemv2 dSys) :
-isBackwardEquicontinuousSystemv2 (diagDynamicalSystem dSys dSys) := by
+{dSys : DynamicalSystem S X} (hback : isBackwardEquicontinuousSystem dSys) :
+isBackwardEquicontinuousSystem (diagDynamicalSystem dSys dSys) := by
   intro α hαopen hαdiag
   obtain ⟨β, hβopen, hβdiag, hβprop⟩ :=
     arbProdOfBackEquiIsBackEqui (dSystems := fun _ : Bool ↦ dSys) (fun _ ↦ hback)
@@ -6742,7 +6742,7 @@ isBackwardEquicontinuousSystemv2 (diagDynamicalSystem dSys dSys) := by
 /-- A system is backward equicontinuous iff RP is contained in the diagonal -/
 theorem backEquiSystemIffRPInDiag
 (dSystem : DynamicalSystem S X) :
-isBackwardEquicontinuousSystemv2 dSystem ↔ RP dSystem ⊆ Set.diagonal X := by
+isBackwardEquicontinuousSystem dSystem ↔ RP dSystem ⊆ Set.diagonal X := by
   constructor
   · -- if `z ∉ Δ`, pick `γ` with `z ∉ closure γ`; backward equicontinuity puts `S⁻¹β ⊆ γ`
     -- for some `β`, and `RP ⊆ closure (S⁻¹β) ⊆ closure γ`
@@ -6793,7 +6793,7 @@ isBackwardEquicontinuousSystemv2 dSystem ↔ RP dSystem ⊆ Set.diagonal X := by
 /-- If a system is backward equicontinuous, then S acts surjectively -/
 theorem backEqImpliesSurjective
 (dSystem : DynamicalSystem S X) :
-isBackwardEquicontinuousSystemv2 dSystem → isSurjectiveSystem dSystem := by
+isBackwardEquicontinuousSystem dSystem → isSurjectiveSystem dSystem := by
   classical
   intro hback s x
   have hclosed : IsClosed (Set.range (dSystem.map s)) :=
@@ -6931,10 +6931,10 @@ dynamical system. (DGG: v2 is the form I need it in later.) -/
 
 -- DGG: Can we prove this?  I think this would suffice for our purposes
 theorem subsysOfEquiIsEqui
-{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystemv2 dSystem)
+{dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
 {Z : Set X} [CompactSpace Z] [Nonempty Z]
 (hZ : isNonemptyCompactT2InvariantSubset dSystem Z) :
-isEquicontinuousSystemv2 (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := by
+isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ) := by
   intro α hαopen hαdiag
   -- extend `α` to a neighbourhood `U` of the diagonal of `X`, apply equicontinuity on `X`,
   -- and restrict the resulting `β` back to `Z`
@@ -6961,30 +6961,23 @@ by sorry -/
 theorem homSystemOfEquicontinuousSystemIsEquicontinuous
 {T} [Semigroup T] [Nonempty T]
 (φ : T → S) [hSemiHom : SemigroupHom φ]
-{dSystem : DynamicalSystem S X} (hXEqu : isEquicontinuousSystemv2 dSystem) :
-isEquicontinuousSystemv2 (homDynamicalSystem φ dSystem) := by
+{dSystem : DynamicalSystem S X} (hXEqu : isEquicontinuousSystem dSystem) :
+isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
   let hYSys := homDynamicalSystem φ dSystem
   have hYDef : hYSys = homDynamicalSystem φ dSystem := by
     rfl
   rw [<- hYDef]
-  unfold isEquicontinuousSystemv2
+  unfold isEquicontinuousSystem
   simp only [homDynamicalSystem, hYSys]
-  simp only [isEquicontinuousSystemv2] at hXEqu
-  intro α hα β
-  sorry -- needs to be update for equiv2
-  -- simp only [Set.mem_ofPred_eq]
-  -- unfold UniformEquicontinuous at hXEqu
-  -- specialize hXEqu α hα hβ
-  -- simp only [Set.mem_ofPred_eq] at hXEqu
-  -- have hSub : {x : X × X | ∀ (i : S), (dSystem.map i x.1, dSystem.map i x.2) ∈ α}
-  --   ⊆ {x : X × X | ∀ (i : T), (dSystem.map (φ i) x.1, dSystem.map (φ i) x.2) ∈ α} := by
-  --   intro x hx
-  --   simp only [Set.mem_ofPred_eq] at hx
-  --   simp only [Set.mem_ofPred_eq]
-  --   intro t
-  --   specialize hx (φ t)
-  --   exact hx
-  -- exact Filter.mem_of_superset hXEqu hSub
+  simp only [isEquicontinuousSystem] at hXEqu
+  intro α hα hαDiag
+  specialize hXEqu α hα hαDiag
+  obtain ⟨β, hβOpen, hβDiag, hβ⟩ := hXEqu
+  have hSub : ∀ (i : T), ((diagDynamicalSystem dSystem dSystem).map (φ i)) '' β ⊆ α := by
+    intro t
+    specialize hβ (φ t)
+    exact hβ
+  exact ⟨β, hβOpen, hβDiag, hSub⟩
 
 /-- An ICER `I` on `X` is equicontinuous if
 the quotient system `X/I` is equicontinuous -/
@@ -6997,7 +6990,7 @@ by
   nonemptyQuotient X hI.2.2
   have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
-  exact isEquicontinuousSystemv2 (quotientDynamicalSystem dSystem hI)
+  exact isEquicontinuousSystem (quotientDynamicalSystem dSystem hI)
 
 end Equicontinuity_and_regional_proximality
 
@@ -7147,7 +7140,7 @@ Lean cannot parse it. So I had to separate into a new section where we
 don't assume S is Semigroup, but a Commutative Semigroup -/
 
 /-- A factor `π : X → Y` of a minimal system is equicontinuous
-iff `RP_X ⊆ R_π` -/
+iff `RP_X ⊆ R_π`, provided `S` is commutative -/
 theorem minimalFactorEquicontinuousIffRPInFactorRelation
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -7155,10 +7148,10 @@ theorem minimalFactorEquicontinuousIffRPInFactorRelation
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
-(RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystemv2 dSystemY)
+(RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY)
 ∧
-(RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystemv2 dSystemY) := by
-  have RPMgoal : RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystemv2 dSystemY := by
+(RP dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY) := by
+  have RPMgoal : RPM dSystem ⊆ mapRelation π ↔ isEquicontinuousSystem dSystemY := by
     constructor
     · intro h1
       unfold mapRelation at h1
@@ -7279,25 +7272,184 @@ isICER dSystem (equiStructureRelation dSystem) := by
   rcases hI with ⟨hI1, hI2⟩
   exact hI1
 
+/-- Given a dynamical system dSystem, the factor X / S_eq -/
+def equiStructureFactorSystem
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+let I := equiStructureRelation dSystem
+let hI := equiStructureRelationIsICER dSystem
+let Y := Quotient ⟨setToRelation I, hI.2.2⟩
+have : Nonempty Y :=
+  nonemptyQuotient X hI.2.2
+have : T2Space Y :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+quotientDynamicalSystem dSystem (equiStructureRelationIsICER dSystem)
+
+/-- A system `Y` admitting a continuous, injective, equivariant map into an equicontinuous
+system `Z` is equicontinuous.  This packages the two steps "`Y` is isomorphic to its image,
+a subsystem of `Z`" and "a subsystem of an equicontinuous system is equicontinuous". -/
+lemma equiOfInjectiveIntoEqui
+{S : Type*} [Semigroup S] [Nonempty S]
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{Z : Type*} [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z]
+(dSystemY : DynamicalSystem S Y) (dSystemZ : DynamicalSystem S Z)
+{φ : Y → Z} (hφCont : Continuous φ) (hφInj : Function.Injective φ)
+(hφEqui : isEquivariant dSystemY.map dSystemZ.map φ)
+(hZEqui : isEquicontinuousSystem dSystemZ) :
+isEquicontinuousSystem dSystemY := by
+  intro α hαOpen hαDiag
+  have hφφCont : Continuous (Prod.map φ φ) := hφCont.prodMap hφCont
+  -- the image `K` of the closed set `αᶜ` is closed and, by injectivity, misses the
+  -- diagonal of `Z`
+  have hKClosed : IsClosed ((Prod.map φ φ) '' αᶜ) :=
+    (hαOpen.isClosed_compl.isCompact.image hφφCont).isClosed
+  have hKDiag : Set.diagonal Z ⊆ ((Prod.map φ φ) '' αᶜ)ᶜ := by
+    rintro ⟨z, z'⟩ hz ⟨⟨y, y'⟩, hy, hyz⟩
+    have hz' : z = z' := hz
+    subst hz'
+    have hyy : y = y' := hφInj ((congrArg Prod.fst hyz).trans (congrArg Prod.snd hyz).symm)
+    subst hyy
+    exact hy (hαDiag rfl)
+  obtain ⟨δ, hδOpen, hδDiag, hδProp⟩ := hZEqui _ hKClosed.isOpen_compl hKDiag
+  refine ⟨(Prod.map φ φ) ⁻¹' δ, hδOpen.preimage hφφCont, ?_, ?_⟩
+  · rintro ⟨y, y'⟩ hyy'
+    have h : y = y' := hyy'
+    subst h
+    exact hδDiag rfl
+  · rintro s w ⟨p, hp, rfl⟩
+    by_contra hcon
+    have hEq : ∀ y : Y, dSystemZ.map s (φ y) = φ (dSystemY.map s y) :=
+      fun y ↦ congrFun (hφEqui s) y
+    refine hδProp s ⟨(φ p.1, φ p.2), hp, rfl⟩
+      ⟨(dSystemY.map s p.1, dSystemY.map s p.2), hcon, ?_⟩
+    change (φ (dSystemY.map s p.1), φ (dSystemY.map s p.2))
+      = (dSystemZ.map s (φ p.1), dSystemZ.map s (φ p.2))
+    rw [hEq p.1, hEq p.2]
+
+theorem equiStructureFactorSystemIsEquicontinuous
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+let I := equiStructureRelation dSystem
+let hI := equiStructureRelationIsICER dSystem
+let Y := Quotient ⟨setToRelation I, hI.2.2⟩
+have : Nonempty Y :=
+  nonemptyQuotient X hI.2.2
+have : T2Space Y :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+isEquicontinuousSystem (equiStructureFactorSystem dSystem) := by
+  intro I hI Y hYNonempty hYT2
+  -- `(R i)` is the collection of equicontinuous ICERs of `X`, so that `I = ⋂ i, R i`
+  have hMem : ∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      ∃ h : (i : Set (X × X)) ∈ setOfICERS dSystem, isEquicontinuousICER dSystem h :=
+    fun i ↦ i.2
+  let hICER : ∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      isICER dSystem (i : Set (X × X)) := fun i ↦ (hMem i).choose
+  have hQEqui : ∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      isEquicontinuousICER dSystem (hICER i) := fun i ↦ (hMem i).choose_spec
+  have : ∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      Nonempty (Quotient ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩) :=
+    fun i ↦ nonemptyQuotient X (hICER i).2.2
+  have : ∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      T2Space (Quotient ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩) :=
+    fun i ↦ quotientOfCompactT2ByClosedIsT2 (hICER i).2.1 (hICER i).2.2
+  -- the product `∏ i, X / R i` of the equicontinuous factors is equicontinuous
+  let dQ : ∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      DynamicalSystem S (Quotient ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩) :=
+    fun i ↦ quotientDynamicalSystem dSystem (hICER i)
+  have hProdEqui : isEquicontinuousSystem (arbProdDynamicalSystem dQ) :=
+    arbProdOfEquiIsEqui (dSystems := dQ) fun i ↦ hQEqui i
+  -- `φ : X / I → ∏ i, X / R i`, `[x] ↦ (i ↦ [x])`
+  let φ : Y → (∀ i : ↥(setOfEquicontinuousICERS dSystem),
+      Quotient ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩) :=
+    Quotient.lift
+      (fun x i ↦ Quotient.mk ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩ x)
+      (by
+        intro x y hxy
+        funext i
+        exact Quotient.sound (hxy (i : Set (X × X)) i.2))
+  have hφCont : Continuous φ := by
+    apply Continuous.quotient_lift
+    exact continuous_pi fun i ↦ continuous_quotient_mk'
+  have hφInj : Function.Injective φ := by
+    intro a b hab
+    obtain ⟨x, rfl⟩ := Quotient.exists_rep a
+    obtain ⟨y, rfl⟩ := Quotient.exists_rep b
+    refine Quotient.sound ?_
+    change (x, y) ∈ ⋂₀ (setOfEquicontinuousICERS dSystem)
+    intro J hJ
+    have h : Quotient.mk ⟨setToRelation J, (hICER ⟨J, hJ⟩).2.2⟩ x
+        = Quotient.mk ⟨setToRelation J, (hICER ⟨J, hJ⟩).2.2⟩ y := congrFun hab ⟨J, hJ⟩
+    exact Quotient.exact h
+  have hφEqui : isEquivariant (equiStructureFactorSystem dSystem).map
+      (arbProdDynamicalSystem dQ).map φ := by
+    intro s
+    funext a
+    obtain ⟨x, rfl⟩ := Quotient.exists_rep a
+    funext i
+    -- both sides are the class of `s x`, by equivariance of the two quotient maps
+    have hqi : (quotientDynamicalSystem dSystem (hICER i)).map s
+          (Quotient.mk ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩ x)
+        = Quotient.mk ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩ (dSystem.map s x) :=
+      congrFun ((quotientMapIsFactorMap dSystem (hICER i)).2.2 s) x
+    have hqI : (quotientDynamicalSystem dSystem hI).map s
+          (Quotient.mk ⟨setToRelation I, hI.2.2⟩ x)
+        = Quotient.mk ⟨setToRelation I, hI.2.2⟩ (dSystem.map s x) :=
+      congrFun ((quotientMapIsFactorMap dSystem hI).2.2 s) x
+    change (quotientDynamicalSystem dSystem (hICER i)).map s
+          (Quotient.mk ⟨setToRelation (i : Set (X × X)), (hICER i).2.2⟩ x)
+        = φ ((quotientDynamicalSystem dSystem hI).map s
+          (Quotient.mk ⟨setToRelation I, hI.2.2⟩ x)) i
+    rw [hqi, hqI]
+    rfl
+  -- `X / I` is isomorphic to its image, a subsystem of the product
+  exact equiOfInjectiveIntoEqui (equiStructureFactorSystem dSystem) (arbProdDynamicalSystem dQ)
+    hφCont hφInj hφEqui hProdEqui
+
+/-- The equicontinuous structure relation of a dynamical system is an
+equicontinuous ICER -/
 theorem equiStructRelIsEquiICER
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
 isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) := by sorry
 
--- Placeholder: want to say that X/S_eq is the largest equicontinuous factor of X
---theorem equiStructRelYieldsLargestEquiFactor
+-- pasted here for easier reference to the quotient api
+-- theorem quotientMapIsFactorMap
 -- {S : Type*} [Semigroup S] [Nonempty S]
 -- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) :
--- ∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
--- ∀ (dSystemV : DynamicalSystem S V),
--- ∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystem ρ) (_ : isHomeoSystem dSystemV),
--- ∃ (ξ : V → natExtSet dSystem) (_ : isFactorMap dSystemV (natExtSystem hSurject) ξ),
--- ρ = (natExtFactorMap dSystem) ∘ ξ := by sorry
+-- (dSystem : DynamicalSystem S X)
+-- {I : Set (X × X)} (hI : isICER dSystem I) :
+-- have : Nonempty (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+--   nonemptyQuotient X hI.2.2
+-- have : T2Space (Quotient ⟨setToRelation I, hI.2.2⟩) :=
+--   quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+-- isFactorMap dSystem (quotientDynamicalSystem dSystem hI)
+--   (Quotient.mk ⟨setToRelation I, hI.2.2⟩)
 
--- The following will be depracted for stronger equiStructRelIsEquiICER and
--- equiStructRelIsLargestEquiICER
+/-- All equicontinuous factors `X → V` factor through `X → X/S_eq`.
+Together with equiStructureFactorSystemIsEquicontinuous, this shows that
+`X → X/S_eq` is the largest equicontinuous factor of `X` -/
+theorem equiStructFactorIsLargestEquiFactor
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+let I := equiStructureRelation dSystem
+let hI := equiStructureRelationIsICER dSystem
+let Y := Quotient ⟨setToRelation I, hI.2.2⟩
+have : Nonempty Y :=
+  nonemptyQuotient X hI.2.2
+have : T2Space Y :=
+  quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
+∀ (dSystemV : DynamicalSystem S V),
+∀ (ρ : X → V) (_ : isFactorMap dSystem dSystemV ρ) (_ : isEquicontinuousSystem dSystemV),
+∃ (ξ : Y → V) (_ : isFactorMap (equiStructureFactorSystem dSystem) dSystemV ξ),
+ρ = ξ ∘ (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by sorry
+
+-- The following will be depracted for stronger equiStructRelIsEquiICER
 /-- The equicontinuous structure relation of a dynamical system is an
 equicontinuous ICER -/
 theorem equiStructureRelationIsEquiICER
