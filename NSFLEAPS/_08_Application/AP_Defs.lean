@@ -51,9 +51,9 @@ isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 -- the following statement needs to be modified. We cannot prove as written since X may not be
 -- of Type. In fact X : Set (S → Bool)
 /-- An UR set can be written as R(x, U) -/
-theorem urSetIsRxU
-{S : Type*} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
-∃ (X : Type) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
+theorem urSetIsRxU.{u}
+{S : Type u} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
+∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
 ∃ (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem),
 ∃ x : X, ∃ U : Set X, x ∈ U ∧ IsClopen U ∧ A = visitTimeSet dSystem x U := by
   sorry
