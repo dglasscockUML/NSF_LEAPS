@@ -465,7 +465,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
         apply factorOfMinimalIsMinimal hXMin hFactor
       have hKEquiC : isEquicontinuousSystem dSystemK := by
         unfold isEquicontinuousICER at hIEq
-        sorry
+        exact hIEq
       have hπxy : π x = π y := by
         by_contra hContra
         let hSep := t2_separation hContra
@@ -474,7 +474,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
         have hCBohr : isBohrZero C := by
           apply equiReturnsAreBohrZero
           use K, inferInstance, inferInstance, inferInstance, inferInstance
-          sorry
+          use dSystemK, hKEquiC, hKMin, π x, V
         have hWNeigh : π⁻¹' W ∈ nhds y := by
           apply mem_nhds_iff.mpr
           use π⁻¹' W
