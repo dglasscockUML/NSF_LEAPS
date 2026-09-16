@@ -131,6 +131,7 @@ def thickFamily
     exact thickIsMonotone hA hAB
 }
 
+-- DGG: Some things around this are aready present at end of SG file
 /-- A set is thick iff its complement is not syndetic -/
 theorem thickIffComplementNotSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
@@ -657,31 +658,48 @@ theorem dcTIsMonotone
 isdcTSet B :=
 (dcTFamily S).2 A B hA hAB
 
-
-theorem dcTIffTimeOfRecurrenceForMinSystems
+/-- If A is a dcT set, then A contains a time of return of any point
+to any neighborhood of itself in any minimal system -/
+theorem dcTImpliesTimeOfRecurrenceForMinSystems
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isdcTSet A ↔ ∀ (X : Type*) (_ : TopologicalSpace X)
+isdcTSet A → ∀ (X : Type*) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
 (x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U), ∃ (s : S) (_ : s ∈ A),
 dSystem.map s x ∈ U := by
-  constructor
-  · intro hA X Xtop Xcmpt XT2 XNon dSystem hMin x U xInU UOpen
-    have : ∀ (B : Set S), ((∃ (X : Type u_2) (_ : TopologicalSpace X)
-      (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-      (dSystem : DynamicalSystem S X) (x : X) (_ : isUniformlyRecurrent dSystem x)
-      (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
-      visitTimeSet dSystem x U ⊆ B) → isdcSSet B) := returnTimesImpliesdcS
-    have : isdcSSet (visitTimeSet dSystem x U) := by
-      apply this (visitTimeSet dSystem x U)
-      have xUR : isUniformlyRecurrent dSystem x := by sorry
-        -- points in minimal systems are uniformly recurrent
-      use X, Xtop, Xcmpt, XT2, XNon, dSystem, x, xUR, U, xInU, UOpen
-    have : (A ∩ (visitTimeSet dSystem x U)).Nonempty := by sorry
-      --dcT sets are dual to dcS sets, so follows by def of dual
-    obtain ⟨s, hsA, hsV⟩ := this
-    use s, hsA, hsV
-  · sorry
+  intro hA X Xtop Xcmpt XT2 XNon dSystem hMin x U xInU UOpen
+  have : ∀ (B : Set S), ((∃ (X : Type u_2) (_ : TopologicalSpace X)
+    (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+    (dSystem : DynamicalSystem S X) (x : X) (_ : isUniformlyRecurrent dSystem x)
+    (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+    visitTimeSet dSystem x U ⊆ B) → isdcSSet B) := returnTimesImpliesdcS
+  have visitdcS : isdcSSet (visitTimeSet dSystem x U) := by
+    apply this (visitTimeSet dSystem x U)
+    have xUR : isUniformlyRecurrent dSystem x :=
+      minimalImpliesUniformlyRecurrent dSystem (hMin := hMin) x
+    use X, Xtop, Xcmpt, XT2, XNon, dSystem, x, xUR, U, xInU, UOpen
+  obtain ⟨s, hsA, hsV⟩ := hA (visitTimeSet dSystem x U) visitdcS
+  use s, hsA, hsV
+
+/-- If A contains a time of return of any point to any neighborhood
+of itself in a minimal system (with phase space X : Type u, where S : Type u),
+then A is a dcT set. -/
+theorem timeOfRecurrenceForMinSystemsImpliesdcT
+{S : Type u} [Semigroup S] [Nonempty S] (A : Set S) :
+(∀ (X : Type u) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem)
+(x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U), ∃ (s : S) (_ : s ∈ A),
+dSystem.map s x ∈ U) → isdcTSet A := by
+  intro h B BdcS
+  obtain ⟨X, Xtop, Xcmpt, XT2, XNon, dSystem, hMin,
+    x, U, xInU, UOpen, visitsInB⟩ := isdcSSetImpliesVisitsFromCompactHausdorffSpace B BdcS
+  obtain ⟨s,sinA,smap⟩ := h X Xtop Xcmpt XT2 XNon dSystem hMin x U xInU UOpen
+  have sinB : s ∈ B := by
+    apply visitsInB
+    exact smap
+  use s
+  exact ⟨sinA, sinB⟩
 
 end dcS_sets
 
@@ -1091,35 +1109,82 @@ centralFamily S = (dcSFamily S) ⋎ (thickFamily S) := by
     use B, dcSB, H, thickH
     exact le_of_eq_of_le (id (Eq.symm intersectionEqual)) fun ⦃a⦄ a_1 ↦ a_1
 
+-- *Algebra* that I need that we can reindex later
+
+theorem lemma_useful_identity
+{S : Type*} (F G H : Family S) :
+F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
+
+theorem de_morgan_variant
+{S : Type*} (F G : Family S) :
+(F ⋎ G)* = F* ⋏ G* := by sorry
+
+theorem dual_dual
+{S : Type*} (F : Family S) :
+F** = F := by sorry
+
+theorem explicit_Curly_Wedge_one
+{S : Type*} (A : Set S) (F G : Family S) :
+A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ F* → A ∩ B ∈ G := by rfl
+
+theorem explicit_Curly_Wedge_two
+{S : Type*} (A : Set S) (F G : Family S) :
+A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ G* → A ∩ B ∈ F := by sorry
+--Use commutativity, then rfl
+
+-- End *Algebra*
+
 /-- dcS sets are central along every thick set -/
 theorem dcsIsSyndeticMeetCentral
 (S : Type*) [Semigroup S] [Nonempty S] :
-dcSFamily S ⊆ (syndeticFamily S) ⋏ (centralFamily S) :=
-  by sorry -- Wait for algebra.
--- Proof is to combine algebra lemma with centralIsdcSCapThick and simplify
+dcSFamily S ⊆ (centralFamily S) ⋏ (syndeticFamily S) :=
+  by
+    have := (centralIsdcSCapThick S).symm
+    have : dcSFamily S ⋎ thickFamily S ⊆ centralFamily S := by
+      change (dcSFamily S ⋎ thickFamily S).sets ⊆ (centralFamily S).sets
+      have : (dcSFamily S ⋎ thickFamily S).sets = (centralFamily S).sets := by
+        exact Filter.principal_eq_iff_eq.mp (congrArg Filter.principal (congrArg Family.sets this))
+      exact this.le
+    have := (lemma_useful_identity (dcSFamily S) (thickFamily S) (centralFamily S)).mp this
+    rw [dualThickSyndetic] at this
+    exact this
 
 /-- Central * is syndetic ⋏ dcSyndetic* -/
 theorem cStarIsSyndeticMeetdcThick
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-(centralFamily S)* = (syndeticFamily S) ⋏ (dcTFamily S) := by sorry
--- follows from centralIsdcSCapThick and demorgan algebra
+(S : Type*) [Semigroup S] [Nonempty S] :
+(centralFamily S)* =(dcTFamily S) ⋏ (syndeticFamily S) := by
+  have := centralIsdcSCapThick S
+  have : (centralFamily S)* = (dcSFamily S⋎thickFamily S)* := congrArg Family.famDual this
+  have deMorg := de_morgan_variant (dcSFamily S) (thickFamily S)
+  rw [deMorg] at this
+  rw [dualThickSyndetic] at this
+  exact this
 
 /-- A set `A ⊆ S` is Central* if and only if it is a set of recurrence
 along all thick sets -/
 theorem cStarIffSetOfRecAlongAllThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ dcTFamily S := by sorry
+A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ dcTFamily S := by
+  rw [cStarIsSyndeticMeetdcThick S]
+  have := explicit_Curly_Wedge_two A (dcTFamily S) (syndeticFamily S)
+  rw [dualSyndeticThick] at this
+  exact this
 
 /-- A set `A ⊆ S` is Central* if and only if `R(x,U) ∩ A` is syndetic for all
 `x ∈ U` in any minimal system -/
 theorem cStarIffSyndeticAlongdcS
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-A ∈ (centralFamily S)* ↔ (∀ (X : Type*) (_ : TopologicalSpace X)
-(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
-(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) (x : X)
-(U : Set X) (_ : x ∈ U) (_ : IsOpen U),
-isSyndetic (A ∩ (visitTimeSet dSystem x U))) := by sorry
--- should follow from dcS characterizations and abcde immediately
+A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isdcSSet H → A ∩ H ∈ syndeticFamily S := by
+  rw [cStarIsSyndeticMeetdcThick S]
+  have := explicit_Curly_Wedge_one A (dcTFamily S) (syndeticFamily S)
+  unfold dcTFamily at this
+  rw [dual_dual (dcSFamily S)] at this
+  exact this
+-- (∀ (X : Type*) (_ : TopologicalSpace X)
+-- (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+-- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) (x : X)
+-- (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+-- isSyndetic (A ∩ (visitTimeSet dSystem x U)))
 
 
 theorem thickIndicatorLemmaInCountCommSemi

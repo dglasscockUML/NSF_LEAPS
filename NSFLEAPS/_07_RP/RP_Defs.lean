@@ -1165,24 +1165,62 @@ isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)) := by
     · exact RPgoal
     · exact hMin
 
+/-- A factor of a system on which `S` acts by surjections is again such a system -/
+lemma factorOfSurjectiveIsSurjective
+{T : Type*} [Semigroup T] [Nonempty T]
+{W : Type*} [TopologicalSpace W] [CompactSpace W] [T2Space W] [Nonempty W]
+{V : Type*} [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V]
+{dSystemW : DynamicalSystem T W} {dSystemV : DynamicalSystem T V}
+{π : W → V} (hπ : isFactorMap dSystemW dSystemV π)
+(hSurj : isSurjectiveSystem dSystemW) :
+isSurjectiveSystem dSystemV := by
+  intro t z
+  obtain ⟨w, rfl⟩ := hπ.2.1 z
+  obtain ⟨v, rfl⟩ := hSurj t w
+  exact ⟨π v, congrFun (hπ.2.2 t) v⟩
+
 /-- In a minimal commutative system, the equicontinuous structure relation
 is strongly `S`-invariant -/
 theorem equiStructureRelationIsStrongSInvariant
 (hMin : isMinimalSystem dSystem) :
 equiStructureRelation dSystem =
   inverseSetOrbit (diagDynamicalSystem dSystem dSystem) (equiStructureRelation dSystem) := by
-    apply Set.Subset.antisymm_iff.mpr
-    constructor
-    · unfold equiStructureRelation
-      have hSub : setOrbit (diagDynamicalSystem dSystem dSystem) (⋂₀ setOfEquicontinuousICERS dSystem)
-        ⊆ (⋂₀ setOfEquicontinuousICERS dSystem) := by
-        sorry
-      intro z hz
-      simp only [inverseSetOrbit]
-      simp
-      simp at hz
-      sorry
-    · sorry
+  apply Set.Subset.antisymm
+  · -- the equicontinuous structure relation is an ICER, hence `S`-invariant
+    intro z hz
+    obtain ⟨s⟩ : Nonempty S := inferInstance
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage]
+    exact ⟨s, (equiStructureRelationIsICER dSystem).1 s hz⟩
+  · rintro ⟨x, y⟩ hz
+    simp only [inverseSetOrbit, Set.mem_iUnion, Set.mem_preimage] at hz
+    obtain ⟨s, hs⟩ := hz
+    -- it suffices to see that `(x,y)` belongs to each equicontinuous ICER `I`
+    simp only [equiStructureRelation, Set.mem_sInter]
+    intro I hI
+    obtain ⟨hIcerMem, hIequi⟩ := hI
+    have hIcer : isICER dSystem I := hIcerMem
+    have hYNonempty : Nonempty (Quotient ⟨setToRelation I, hIcer.2.2⟩) :=
+      nonemptyQuotient X hIcer.2.2
+    have hYT2 : T2Space (Quotient ⟨setToRelation I, hIcer.2.2⟩) :=
+      quotientOfCompactT2ByClosedIsT2 hIcer.2.1 hIcer.2.2
+    -- `π : X → X / I` is an equicontinuous factor on which `S` acts by surjections,
+    -- hence by homeomorphisms
+    let dY := quotientDynamicalSystem dSystem hIcer
+    have hπ : isFactorMap dSystem dY (Quotient.mk ⟨setToRelation I, hIcer.2.2⟩) :=
+      quotientMapIsFactorMap dSystem hIcer
+    have hYequi : isEquicontinuousSystem dY := hIequi
+    have hYsurj : isSurjectiveSystem dY :=
+      factorOfSurjectiveIsSurjective hπ (minimalCommActionIsSurjective hMin)
+    have hYhomeo : isHomeoSystem dY :=
+      (surjEquiOrBackEquiImpliesEquiBackEquiDistalSemisimpleHomeo dY
+        (Or.inl ⟨hYsurj, hYequi⟩)).2.2.2.2
+    -- `s` is injective on `X / I`, so `π (s x) = π (s y)` forces `π x = π y`
+    have hEquivar : ∀ w : X, dY.map s (Quotient.mk ⟨setToRelation I, hIcer.2.2⟩ w)
+        = Quotient.mk ⟨setToRelation I, hIcer.2.2⟩ (dSystem.map s w) :=
+      fun w ↦ congrFun (hπ.2.2 s) w
+    refine Quotient.exact ((hYhomeo s).bijective.1 ?_)
+    rw [hEquivar x, hEquivar y]
+    exact Quotient.sound (hs I ⟨hIcerMem, hIequi⟩)
 
 /-- In a minimal commutative system, `RP` and `RPM` are strongly `S`-invariant -/
 theorem RPIsStrongSInvariant
