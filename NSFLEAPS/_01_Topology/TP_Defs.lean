@@ -648,3 +648,74 @@ lemma existsDiagonalNbhdExtendingSubspaceDiagonalNbhd
     · rw [← hVα]
       exact h
     · exact absurd (Set.mk_mem_prod z.2 w.2) h
+
+/-- The quotient of a compact Hausdorff space by a closed equivalence relation, endowed with
+the quotient topology, is a compact Hausdorff space.
+
+Compactness is immediate from continuity and surjectivity of the quotient map `π`.  For the
+Hausdorff property, the fibres `π⁻¹{y}` and `π⁻¹{z}` of two distinct points are disjoint
+closed sets, so normality of `X` separates them by disjoint open sets `U` and `V`; the sets
+`(π Uᶜ)ᶜ` and `(π Vᶜ)ᶜ` then separate `y` and `z`.  These are open because `π` is a closed
+map: the saturation of a closed set `K` is `Prod.snd '' ((K ×ˢ univ) ∩ R)`, which is compact,
+hence closed. -/
+theorem quotientByCERIsCompactHausdorff
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+{R : X → X → Prop} (hEquiv : Equivalence R)
+(hClosed : IsClosed {p : X × X | R p.1 p.2}) :
+CompactSpace (Quotient ⟨R, hEquiv⟩) ∧ T2Space (Quotient ⟨R, hEquiv⟩) := by
+  set π : X → Quotient ⟨R, hEquiv⟩ := Quotient.mk ⟨R, hEquiv⟩ with hπdef
+  have hπcont : Continuous π := continuous_quot_mk
+  have hπsurj : Function.Surjective π := Quot.mk_surjective
+  have hπeq : ∀ a b : X, π a = π b ↔ R a b := fun a b ↦ Equivalence.quot_mk_eq_iff hEquiv a b
+  refine ⟨hπsurj.compactSpace hπcont, ?_⟩
+  -- `π` is a closed map
+  have hπclosedmap : IsClosedMap π := by
+    intro K hK
+    have hpre : π ⁻¹' (π '' K)
+        = Prod.snd '' ((K ×ˢ (Set.univ : Set X)) ∩ {p : X × X | R p.1 p.2}) := by
+      ext x
+      constructor
+      · rintro ⟨k, hk, hkx⟩
+        exact ⟨(k, x), ⟨⟨hk, Set.mem_univ x⟩, (hπeq k x).mp hkx⟩, rfl⟩
+      · rintro ⟨⟨k, x'⟩, ⟨⟨hk, -⟩, hR⟩, rfl⟩
+        exact ⟨k, hk, (hπeq k x').mpr hR⟩
+    have hcompact : IsCompact (π ⁻¹' (π '' K)) := by
+      rw [hpre]
+      exact ((hK.isCompact.prod isCompact_univ).inter_right hClosed).image continuous_snd
+    have hquot : Topology.IsQuotientMap π := isQuotientMap_quot_mk
+    exact ((Topology.isQuotientMap_iff_isClosed.mp hquot).2 (π '' K)).mpr hcompact.isClosed
+  -- the fibres of distinct points are disjoint closed sets
+  have hfibre : ∀ a : X, IsClosed (π ⁻¹' {π a}) := by
+    intro a
+    have hEq : π ⁻¹' {π a} = (fun x ↦ (x, a)) ⁻¹' {p : X × X | R p.1 p.2} := by
+      ext x
+      simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_ofPred_eq]
+      exact hπeq x a
+    rw [hEq]
+    exact hClosed.preimage (continuous_id.prodMk continuous_const)
+  rw [t2Space_iff]
+  intro y z hyz
+  obtain ⟨a, rfl⟩ := hπsurj y
+  obtain ⟨b, rfl⟩ := hπsurj z
+  have hdisj : Disjoint (π ⁻¹' {π a}) (π ⁻¹' {π b}) := by
+    refine Set.disjoint_left.mpr fun w hwa hwb ↦ hyz ?_
+    have h1 : π w = π a := hwa
+    have h2 : π w = π b := hwb
+    rw [← h1, h2]
+  obtain ⟨U, V, hUopen, hVopen, hUa, hVb, hUV⟩ :=
+    normal_separation (hfibre a) (hfibre b) hdisj
+  refine ⟨(π '' Uᶜ)ᶜ, (π '' Vᶜ)ᶜ, (hπclosedmap Uᶜ hUopen.isClosed_compl).isOpen_compl,
+    (hπclosedmap Vᶜ hVopen.isClosed_compl).isOpen_compl, ?_, ?_, ?_⟩
+  · rintro ⟨w, hwU, hwa⟩
+    exact hwU (hUa hwa)
+  · rintro ⟨w, hwV, hwb⟩
+    exact hwV (hVb hwb)
+  · refine Set.disjoint_left.mpr fun w hwU hwV ↦ ?_
+    obtain ⟨x, rfl⟩ := hπsurj w
+    have hxU : x ∈ U := by
+      by_contra hx
+      exact hwU ⟨x, hx, rfl⟩
+    have hxV : x ∈ V := by
+      by_contra hx
+      exact hwV ⟨x, hx, rfl⟩
+    exact Set.disjoint_left.mp hUV hxU hxV

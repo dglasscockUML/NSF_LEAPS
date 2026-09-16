@@ -1165,20 +1165,6 @@ isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)) := by
     · exact RPgoal
     · exact hMin
 
-/-- A factor of a system on which `S` acts by surjections is again such a system -/
-lemma factorOfSurjectiveIsSurjective
-{T : Type*} [Semigroup T] [Nonempty T]
-{W : Type*} [TopologicalSpace W] [CompactSpace W] [T2Space W] [Nonempty W]
-{V : Type*} [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V]
-{dSystemW : DynamicalSystem T W} {dSystemV : DynamicalSystem T V}
-{π : W → V} (hπ : isFactorMap dSystemW dSystemV π)
-(hSurj : isSurjectiveSystem dSystemW) :
-isSurjectiveSystem dSystemV := by
-  intro t z
-  obtain ⟨w, rfl⟩ := hπ.2.1 z
-  obtain ⟨v, rfl⟩ := hSurj t w
-  exact ⟨π v, congrFun (hπ.2.2 t) v⟩
-
 /-- In a minimal commutative system, the equicontinuous structure relation
 is strongly `S`-invariant -/
 theorem equiStructureRelationIsStrongSInvariant

@@ -930,6 +930,29 @@ isMinimalSystem dSystem ↔ isMinimalSystem (natExtSystem hSurject) := by
     exact factorOfMinimalIsMinimal hWMin
       ⟨natExtFactorMap dSystem, natExtFactorMapIsFactorMap hSurject⟩
 
+/-- Corollary: for a minimal system over a commutative semigroup, the natural extension
+`π : W → X` exists (Theorem 6.5), satisfies the universal property (Theorem 6.6), and is
+itself minimal (Theorem 6.7).
+
+The only thing to check is that the hypothesis `isSurjectiveSystem dSystem` of those three
+results is met, which is `minimalCommActionIsSurjective`. -/
+theorem natExtOfMinimalCommSystem
+{S} [CommSemigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+let hSurject := minimalCommActionIsSurjective hMin
+letI : Nonempty ↑(natExtSet dSystem) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+isFactorMap (natExtSystem hSurject) dSystem (natExtFactorMap dSystem) ∧
+(∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
+  ∀ (dSystemV : DynamicalSystem S V),
+  ∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystem ρ) (_ : isHomeoSystem dSystemV),
+  ∃ (ξ : V → natExtSet dSystem) (_ : isFactorMap dSystemV (natExtSystem hSurject) ξ),
+  ρ = (natExtFactorMap dSystem) ∘ ξ) ∧
+isMinimalSystem (natExtSystem hSurject) := by
+  intro hSurject
+  exact ⟨natExtFactorMapIsFactorMap hSurject, natExtUniversalProperty hSurject,
+    (natExtMinimalIffSystemIsMinimal hSurject).mp hMin⟩
+
 /-! ### Theorem 6.9
 
 Theorem 6.9 has two halves: the equality `(π × π)⁻¹ RP_X = RP_W`
