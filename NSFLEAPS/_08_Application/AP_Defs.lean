@@ -634,6 +634,7 @@ theorem strongIPIffStrongCentralInCountCommSemi
  by sorry
 -- Proof: by urContainmentSufficesForFamilyContainment, it suffices to consider UR sets only
 -- For UR sets, this is proven in preStrongIPIffStrongCentralInCountCommSemi
+-- Will wait to write proof until def of UR sets is fixed
 
 /-- A subset of a countable, commutative semigroup is central star if and only if
 it is strongly piecewise IP*, if and only if it is strongly piecewise central* -/

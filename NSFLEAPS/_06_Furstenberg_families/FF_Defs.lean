@@ -156,51 +156,6 @@ def thickFamily
     exact thickIsMonotone hA hAB
 }
 
--- DGG: Some things around this are aready present at end of SG file
-/-- A set is thick iff its complement is not syndetic -/
-theorem thickIffComplementNotSyndetic
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isThick A ↔ ¬isSyndetic Aᶜ := by
-  constructor
-  -- prove the only if direction
-  · intro hA
-    by_contra hAc
-    obtain ⟨F, hF1, hF2⟩ := hAc
-    specialize hA F hF1
-    obtain ⟨s, hs⟩ := hA
-    specialize hF2 s
-    have h1 : ∀ f ∈ F, f * s ∈ A := by
-      intro f hf0
-      apply hs
-      exact ⟨f, hf0, rfl⟩
-    obtain ⟨f, hf1, hf2⟩ := hF2
-    specialize h1 f hf1
-    exact hf2 h1
-  -- prove the if direction
-  · contrapose
-    intro hA_nThick
-    have hA1 : ¬ (∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A) := by
-      exact hA_nThick
-    have hA4 : ∃ F : Set S, (F.Finite ∧ ∀ s : S, ¬(· * s) '' F ⊆ A) := by
-      push Not at hA1
-      exact hA1
-    obtain ⟨F, hF1, hF2⟩ := hA4
-    use F
-    constructor
-    · apply hF1
-    · intro s
-      specialize hF2 s
-      have hA5 : ((fun x ↦ x * s) '' F ∩ Aᶜ).Nonempty := by
-        simp only [Set.image_inter_nonempty_iff, Set.preimage_compl]
-        sorry
-      simp only [Set.mem_compl_iff]
-      obtain ⟨fs,hfs1,hfs2⟩ := hA5
-      obtain ⟨f,hf1,hf2⟩ := hfs1
-      use f
-      rw [←hf2] at hfs2
-      simp only at hfs2
-      exact ⟨hf1,hfs2⟩
-
 /-- The families of syndetic sets and thick sets are dual -/
 -- This used to work but something happens upstream now dualEquivForm no longer work
 -- Need to fix
@@ -1258,7 +1213,7 @@ by
           by_contra hnm
           push Not at hnm
           refine hxH ?_
-          show s * (f * t n) ∈ H
+          change s * (f * t n) ∈ H
           rw [← mul_assoc]
           exact ht n s (hFmono hnm hsF) f hf
         have hfin : ((⋃ n, (fun x ↦ x * t n) '' (F n)) ∩ ((leftMult s) ⁻¹' H)ᶜ).Finite :=
@@ -1338,7 +1293,7 @@ visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (IPFamily S) →
       (hU := hαopen) r ?_
     rw [ultraDiagAction]
     refine hαdiag ?_
-    show (ultraAction dSystem).map r x = (ultraAction dSystem).map r y
+    change (ultraAction dSystem).map r x = (ultraAction dSystem).map r y
     rcases hr with rfl | ⟨q, rfl⟩
     · rw [hpy]
     · rw [(ultraAction dSystem).mapMult q p x, (ultraAction dSystem).mapMult q p y, hpy, ← hy]
@@ -1361,8 +1316,6 @@ visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (IPFamily S) →
 end central_sets
 
 section Bohr_prelims
-
-/- ChatGPT helped me write the following -/
 
 /-- In a compact submonoid of a topological monoid
 with the property that "idempotent implies unit", every

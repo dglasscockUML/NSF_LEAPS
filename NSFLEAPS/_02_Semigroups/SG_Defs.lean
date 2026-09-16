@@ -224,6 +224,52 @@ lemma syndeticThickIntersect
       use f
     apply hs hIn
 
+/-- A set is syndetic exactly when it meets every thick set.  One direction is
+`syndeticThickIntersect`; for the other, if `A` is not syndetic then `Aᶜ` is thick. -/
+lemma syndeticIffMeetsEveryThickSet
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isSyndetic A ↔ ∀ H : Set S, isThick H → (A ∩ H).Nonempty := by
+  constructor
+  · intro hA H hH
+    exact syndeticThickIntersect A H hA hH
+  · intro h
+    by_contra hnot
+    have hthick : isThick Aᶜ := by
+      intro F hF
+      unfold isSyndetic at hnot
+      push Not at hnot
+      obtain ⟨t, ht⟩ := hnot F hF
+      refine ⟨t, ?_⟩
+      rintro _ ⟨f, hf, rfl⟩
+      exact ht f hf
+    obtain ⟨x, hxA, hxAc⟩ := h Aᶜ hthick
+    exact hxAc hxA
+
+-- DGG: Some things around this are aready present at end of SG file
+/-- A set is thick iff its complement is not syndetic -/
+theorem thickIffComplementNotSyndetic
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isThick A ↔ ¬isSyndetic Aᶜ := by
+  constructor
+  · by_contra name
+    push Not at name
+    have := (syndeticIffMeetsEveryThickSet Aᶜ).mp name.2 A name.1
+    have that := Set.compl_inter_self A
+    rw [that] at this
+    simp only [Set.not_nonempty_empty] at this
+  · intro h
+    have : ¬( ∀ (H : Set S), isThick H →
+      (Aᶜ ∩ H).Nonempty) := (not_congr (syndeticIffMeetsEveryThickSet Aᶜ)).mp h
+    push Not at this
+    obtain ⟨H,hH1,hH2⟩ := this
+    have : H ⊆ A := by
+      intro x hx
+      by_contra hxA
+      have : x ∈ Aᶜ ∩ H := ⟨hxA, hx⟩
+      rw [hH2] at this
+      exact this
+    exact thickIsMonotone hH1 this
+
 /-- If H is thick, then Ht is thick for all t ∈ S -/
 theorem rightTransOfThickIsThick
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -369,29 +415,6 @@ def leftQuotientSet
 {S : Type*} [Semigroup S] (A B : Set S) :
 Set S :=
 {s | ∃ a ∈ A, a * s ∈ B}
-
--- DGG: this is proven a number of times in our files and repeats syndeticThickIntersect above.
--- Consolidate.
-/-- A set is syndetic exactly when it meets every thick set.  One direction is
-`syndeticThickIntersect`; for the other, if `A` is not syndetic then `Aᶜ` is thick. -/
-lemma syndeticIffMeetsEveryThickSet
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isSyndetic A ↔ ∀ H : Set S, isThick H → (A ∩ H).Nonempty := by
-  constructor
-  · intro hA H hH
-    exact syndeticThickIntersect A H hA hH
-  · intro h
-    by_contra hnot
-    have hthick : isThick Aᶜ := by
-      intro F hF
-      unfold isSyndetic at hnot
-      push Not at hnot
-      obtain ⟨t, ht⟩ := hnot F hF
-      refine ⟨t, ?_⟩
-      rintro _ ⟨f, hf, rfl⟩
-      exact ht f hf
-    obtain ⟨x, hxA, hxAc⟩ := h Aᶜ hthick
-    exact hxAc hxA
 
 /-- Lemma (syndeticity of quotient sets): for every finite cover `S = ⋃ i, C i`, the set
 `⋃ i, C i (C i)⁻¹` is syndetic.  Only the covering property of a partition is used. -/
