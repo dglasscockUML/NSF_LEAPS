@@ -28,7 +28,11 @@ DynamicalSystem S (X → Bool) := {
     mapMult := by
         intro s1 s2 φ
         simp only [rightAction.mapMult]
-    mapCont := by sorry
+    mapCont := by
+        intro s
+        apply continuous_pi
+        intro x
+        apply continuous_apply
 }
 
 def basicRightAction
@@ -46,20 +50,20 @@ def selfSymbolicSystem
 DynamicalSystem S (S → Bool) :=
 symbolicSystem S S (basicRightAction S)
 
-
 def rightActionOfSOnMonoidExt
 (S : Type*) [Semigroup S] [Nonempty S] :
-RightSemigroupAction S (WithOne S) :=
-by sorry
+RightSemigroupAction S (WithOne S) := {
+    map := fun (x : WithOne S) ↦ (fun (s : S) ↦ x * s)
+    mapMult := by
+        intro s1 s2 x
+        exact Eq.symm (mul_assoc x s1 s2)
+}
 
-
-
+/-- The symbolic S-system on {0, 1}^(WithOne S) -/
 def monoidExtSymbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S ((WithOne S) → Bool) :=
 symbolicSystem S (WithOne S) (rightActionOfSOnMonoidExt S)
-
-
 
 /-- indicator `A` gives the indicator function of `A` -/
 noncomputable
@@ -72,7 +76,7 @@ S → Bool := by
 /-- For a set `S`, a boolean value val, and `s ∈ S`, the cylinder set
 `[value]_s` is the set of functions `S → Bool` whose value at `s` is `val` -/
 def cylinderSet
-{S : Type*} (val : Bool) (s : S) :
+(S : Type*) (val : Bool) (s : S) :
 Set (S → Bool) :=
 {f : S → Bool | f s = val}
 
