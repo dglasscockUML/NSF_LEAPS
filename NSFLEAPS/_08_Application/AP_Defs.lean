@@ -574,7 +574,7 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFam
       have h11 : deltaFamily S ⊆ deltaZeroFamily S := by
         exact deltaFamilyContainedInDeltaZeroFamily
       have h12 : deltaZeroFamily S ⊆ setOfBohrRecurrenceFamily S := by
-        exact commDeltaZeroImpliesSetOfBohrRecurrence
+        exact deltaZeroImpliesSetOfBohrRecurrence
       intro x hx
       exact h12 (h11 hx)
     have h3 : ∀ (B H : Set S), isURSet B → isThick H →
@@ -604,7 +604,7 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := b
   have h2 : syndeticFamily S ⋏ deltaZeroFamily S ⊆
   syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
     apply familyMeetIsMonotonic
-    exact commDeltaZeroImpliesSetOfBohrRecurrence
+    exact deltaZeroImpliesSetOfBohrRecurrence
   have h3 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S = syndeticFamily S ⋏ deltaFamily S := by
     rw [commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence]
   have h4 : syndeticFamily S ⋏ deltaZeroFamily S ⊆ syndeticFamily S ⋏ deltaFamily S := by
@@ -626,5 +626,21 @@ theorem commDeltaStarImpliesLocallyBohrZero
   rw [<- h2]
   exact (familyLocalImplicationEquivalence (syndeticFamily S)
   (bohrZeroFamily S)* (deltaFamily S)).mpr h1
+
+/-- In a countable, commutative semigroup S ⋏ IP = S ⋏ C -/
+theorem strongIPIffStrongCentralInCountCommSemi
+(S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
+(syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) :=
+ by sorry
+-- Proof: by urContainmentSufficesForFamilyContainment, it suffices to consider UR sets only
+-- For UR sets, this is proven in preStrongIPIffStrongCentralInCountCommSemi
+
+/-- A subset of a countable, commutative semigroup is central star if and only if
+it is strongly piecewise IP*, if and only if it is strongly piecewise central* -/
+theorem cStarIsStronglyPiecewiseIPStarAndCStar
+(S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
+(centralFamily S)* = (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) ∧
+(centralFamily S)* = (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) :=
+by sorry -- Wait. Will rely on Furstenburg algebra.
 
 end Application
