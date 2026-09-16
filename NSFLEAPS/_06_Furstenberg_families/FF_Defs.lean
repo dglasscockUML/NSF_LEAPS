@@ -5,6 +5,31 @@ import NSFLEAPS._06_Furstenberg_families.FF_Pontryagin
 
 /-! This is a module docstring -/
 
+-- *Algebra* that I need that we can reindex later
+
+theorem lemma_useful_identity
+{S : Type*} (F G H : Family S) :
+F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
+
+theorem de_morgan_variant
+{S : Type*} (F G : Family S) :
+(F ⋎ G)* = F* ⋏ G* := by sorry
+
+theorem dual_dual
+{S : Type*} (F : Family S) :
+F** = F := by sorry
+
+theorem explicit_Curly_Wedge_one
+{S : Type*} (A : Set S) (F G : Family S) :
+A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ F* → A ∩ B ∈ G := by rfl
+
+theorem explicit_Curly_Wedge_two
+{S : Type*} (A : Set S) (F G : Family S) :
+A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ G* → A ∩ B ∈ F := by sorry
+--Use commutativity, then rfl
+
+-- End *Algebra*
+
 section Abstract_results
 
 /-- If `R(x,U) ∈ F` and `F` is a partition regular family, then there exists
@@ -1108,31 +1133,6 @@ centralFamily S = (dcSFamily S) ⋎ (thickFamily S) := by
     apply dcSCapThickIsCentral A
     use B, dcSB, H, thickH
     exact le_of_eq_of_le (id (Eq.symm intersectionEqual)) fun ⦃a⦄ a_1 ↦ a_1
-
--- *Algebra* that I need that we can reindex later
-
-theorem lemma_useful_identity
-{S : Type*} (F G H : Family S) :
-F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
-
-theorem de_morgan_variant
-{S : Type*} (F G : Family S) :
-(F ⋎ G)* = F* ⋏ G* := by sorry
-
-theorem dual_dual
-{S : Type*} (F : Family S) :
-F** = F := by sorry
-
-theorem explicit_Curly_Wedge_one
-{S : Type*} (A : Set S) (F G : Family S) :
-A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ F* → A ∩ B ∈ G := by rfl
-
-theorem explicit_Curly_Wedge_two
-{S : Type*} (A : Set S) (F G : Family S) :
-A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ G* → A ∩ B ∈ F := by sorry
---Use commutativity, then rfl
-
--- End *Algebra*
 
 /-- dcS sets are central along every thick set -/
 theorem dcsIsSyndeticMeetCentral
@@ -2279,11 +2279,45 @@ isBohrZero A := by
 --     exact setOfBohrRecurrenceIsMonotone hA hAB
 -- }
 
-/- The family of Bohr_0 sets is a filter -/
+/-- The family of Bohr_0 sets is a filter -/
+-- Here I've spelled out the requirement for a filter.
+-- Later update with isFilterFamily (bohrZeroFamily S)
 theorem bohrZeroFamilyIsFilter
 {S : Type*} [CommSemigroup S] [Nonempty S] :
-isFilterFamily (bohrZeroFamily S) :=
-by sorry --Wait. Make sure completely up-to-date filterFamily definition.
+(bohrZeroFamily S).sets.Nonempty ∧ (∀ (A B : Set S), A ∈ (bohrZeroFamily S) →
+  B ∈ (bohrZeroFamily S) → A ∩ B ∈ (bohrZeroFamily S)) :=
+by
+  constructor
+  · -- `S` is Bohr_0 in itself, via the trivial homomorphism into the `0`-dimensional torus
+    exact ⟨Set.univ, 0, fun _ ↦ 1, fun _ _ ↦ (one_mul 1).symm, Set.univ, isOpen_univ,
+      Set.mem_univ 1, Set.subset_univ _⟩
+  · rintro A B ⟨k, φ, hφ, U, hUopen, h1U, hUA⟩ ⟨l, ψ, hψ, V, hVopen, h1V, hVB⟩
+    -- `s ↦ (φ s, ψ s) : S → 𝕋^(k+l)` is a homomorphism and `U × V` is an open
+    -- neighbourhood of the identity of `𝕋^(k+l)`
+    refine ⟨k + l, fun s ↦ Fin.append (φ s) (ψ s), fun s t ↦ ?_,
+      (fun x : (Fin (k + l) → Circle) ↦ (fun i ↦ x (Fin.castAdd l i))) ⁻¹' U ∩
+        (fun x : (Fin (k + l) → Circle) ↦ (fun i ↦ x (Fin.natAdd k i))) ⁻¹' V, ?_, ?_, ?_⟩
+    · -- appending pointwise products is the pointwise product of the appended families
+      funext i
+      induction i using Fin.addCases with
+      | left i => simp only [Pi.mul_apply, Fin.append_left, hφ]
+      | right i => simp only [Pi.mul_apply, Fin.append_right, hψ]
+    · exact (hUopen.preimage (continuous_pi fun i ↦ continuous_apply (Fin.castAdd l i))).inter
+        (hVopen.preimage (continuous_pi fun i ↦ continuous_apply (Fin.natAdd k i)))
+    · exact ⟨h1U, h1V⟩
+    · -- `(φ ⊗ ψ)⁻¹ (U × V) = φ⁻¹ U ∩ ψ⁻¹ V ⊆ A ∩ B`
+      rintro s ⟨hsU, hsV⟩
+      have hφs : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.castAdd l i)) = φ s := by
+        funext i
+        exact Fin.append_left _ _ i
+      have hψs : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.natAdd k i)) = ψ s := by
+        funext i
+        exact Fin.append_right _ _ i
+      have hsU' : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.castAdd l i)) ∈ U := hsU
+      have hsV' : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.natAdd k i)) ∈ V := hsV
+      rw [hφs] at hsU'
+      rw [hψs] at hsV'
+      exact ⟨hUA hsU', hVB hsV'⟩
 
 /-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if it has
 non-empty intersection with every `Bohr_0` subset of `S` -/
@@ -2329,40 +2363,97 @@ isSetOfBohrRecurrence B :=
   -- simp only [Set.mem_ofPred_eq]
   -- exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
-/- In a commutative semigroup, the family of sets of Bohr
+/- The family of sets of Bohr
 recurrence is partition regular -/
 theorem setOfBohrRecurrenceFamilyIsPR
 (S : Type*) [Semigroup S] [Nonempty S] :
 isPRFamily (setOfBohrRecurrenceFamily S) :=
 by sorry
+-- This will be immediate using FA_theorems result (duality of filter and PR)
 
-/-- A set is a set of Bohr recurrence if and only if it contains
-the time of return of 1 to a neighborhood of itself under a homomorphism
-from S into the d-torus -/
-theorem setOfBohrRecurrenceIffHomReturnTime
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isSetOfBohrRecurrence A ↔ ∀ (d : ℕ) (φ : S → (Fin d → Circle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
-  (_ : IsOpen U) (_ : 1 ∈ U), ∃ (s : S) (_ : s ∈ A), φ s ∈ U :=
-  by sorry
-
-/-- A set is a set of Bohr recurrence in a commutative semigroup if and only
-if it contains the time of return of a point to a neighborhood of itself
-in any minimal dynamical system. -/
-theorem setOfBohrRecurrenceIffMinEquiReturnTime
+/-- In a commutative semigroup, if set is a set of Bohr recurrence,
+then it contains the time of return of a point to a neighborhood of itself
+in a minimal dynamical system. -/
+theorem setOfBohrRecurrenceImpliesTimeOfRecForMinEqui
 {S : Type*} [CommSemigroup S] [Nonempty S] (A : Set S) :
-isSetOfBohrRecurrence A ↔ ∀ (X : Type) (_ : TopologicalSpace X)
+isSetOfBohrRecurrence A → ∀ (X : Type*) (_ : TopologicalSpace X)
 (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
 (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
 (_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
-∃ (s : S) (_ : s ∈ A), dSystem.map s x ∈ U :=
-  by sorry
+∃ (s : S) (_ : s ∈ A), dSystem.map s x ∈ U := by
+  intro hA X Xtop Xcmpt XT2 XNon dSystem hEqui hMin x U xInU UOpen
+  have : ∀ (B : Set S), ((∃ (X : Type u_2) (_ : TopologicalSpace X)
+    (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+    (dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+    (_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+    visitTimeSet dSystem x U ⊆ B) → isBohrZero B) := equiReturnsAreBohrZero
+  have visitdcS : isBohrZero (visitTimeSet dSystem x U) := by
+    apply this (visitTimeSet dSystem x U)
+    use X, Xtop, Xcmpt, XT2, XNon, dSystem, hEqui, hMin, x, U, xInU, UOpen
+  obtain ⟨s, hsA, hsV⟩ := hA (visitTimeSet dSystem x U) visitdcS
+  use s, hsA, hsV
 
-/-- In a commutative semigroup, a Delta_0 set is a set of Bohr recurrence -/
-theorem commDeltaZeroImpliesSetOfBohrRecurrence
+/-- In a commutative semigroup, if a set contains the time of return of
+a point to a neighborhood of itself in any minimal equicontinuous system,
+then it is a set of Bohr recurrence. -/
+theorem timeOfRecurrenceForMinEquiImpliesSetOfBohrRecurrence
+{S : Type u} [CommSemigroup S] [Nonempty S] (A : Set S) :
+(∀ (X : Type) (_ : TopologicalSpace X)
+(_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)
+(dSystem : DynamicalSystem S X) (_ : isEquicontinuousSystem dSystem)
+(_ : isMinimalSystem dSystem) (x : X) (U : Set X) (_ : x ∈ U) (_ : IsOpen U),
+∃ (s : S) (_ : s ∈ A), dSystem.map s x ∈ U) → isSetOfBohrRecurrence A := by
+  intro h B BdcS
+  obtain ⟨X, Xtop, Xcmpt, XT2, XNon, dSystem, hEqui, hMin,
+    x, U, xInU, UOpen, visitsInB⟩ := bohrZeroSetsContainEquiReturns B BdcS
+  obtain ⟨s,sinA,smap⟩ := h X Xtop Xcmpt XT2 XNon dSystem hEqui hMin x U xInU UOpen
+  have sinB : s ∈ B := by
+    apply visitsInB
+    exact smap
+  use s
+  exact ⟨sinA, sinB⟩
+
+/-- A Delta_0 set is a set of Bohr recurrence -/
+theorem deltaZeroImpliesSetOfBohrRecurrence
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 deltaZeroFamily S ⊆ setOfBohrRecurrenceFamily S :=
-by sorry
+by
+  classical
+  intro A hA B hB
+  obtain ⟨d, φ, hφ, U, hUopen, h1U, hUB⟩ := hB
+  -- `W = {(x,y) | x⁻¹ y ∈ U}` is an open neighbourhood of the diagonal of the torus
+  have hWopen : IsOpen
+      ((fun p : (Fin d → Circle) × (Fin d → Circle) ↦ p.1⁻¹ * p.2) ⁻¹' U) :=
+    hUopen.preimage (continuous_fst.inv.mul continuous_snd)
+  have hWdiag : Set.diagonal (Fin d → Circle) ⊆
+      (fun p : (Fin d → Circle) × (Fin d → Circle) ↦ p.1⁻¹ * p.2) ⁻¹' U := by
+    rintro ⟨x, x'⟩ hx
+    have hx' : x = x' := hx
+    subst hx'
+    change x⁻¹ * x ∈ U
+    rw [inv_mul_cancel]
+    exact h1U
+  -- total boundedness: finitely many sets of "diameter" `U` cover the torus
+  obtain ⟨F, V, hcover, hmemV, hVW⟩ := existsFiniteCoverBySmallSets hWopen hWdiag
+  -- `A` is Delta_0, so there are `card F + 1` elements `s i` with `s j ∈ s i * A` for `i < j`
+  obtain ⟨s, hs⟩ := hA (F.card + 1)
+  choose y hyF hyV using fun i : Fin (F.card + 1) ↦ hcover (φ (s i))
+  -- if two of the `φ (s i)` lie in a common piece of the cover, we are done
+  have key : ∀ i j : Fin (F.card + 1), i < j → y i = y j → (A ∩ B).Nonempty := by
+    intro i j hlt hyij
+    obtain ⟨a, haA, hsa⟩ := hs i j hlt
+    have hpair : (φ (s i), φ (s j)) ∈ V (y i) ×ˢ V (y i) :=
+      Set.mk_mem_prod (hyV i) (hyij ▸ hyV j)
+    have hmem : (φ (s i))⁻¹ * φ (s j) ∈ U := hVW (y i) hpair
+    rw [← hsa, hφ (s i) a, inv_mul_cancel_left] at hmem
+    exact ⟨a, haA, hUB hmem⟩
+  -- pigeonhole: `card F + 1` points, `card F` pieces
+  obtain ⟨i, j, hij, hyij⟩ :=
+    Fintype.exists_ne_map_eq_of_card_lt (fun i ↦ (⟨y i, hyF i⟩ : ↥F)) (by simp)
+  have hyij' : y i = y j := congrArg Subtype.val hyij
+  rcases lt_or_gt_of_ne hij with hlt | hgt
+  · exact key i j hlt hyij'
+  · exact key j i hgt hyij'.symm
 
 
 end Bohr_sets
