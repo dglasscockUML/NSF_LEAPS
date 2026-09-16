@@ -8,8 +8,8 @@ import Mathlib.Topology.UniformSpace.OfCompactT2
 /-- The image of the closure of a set `A` under a
 continuous map `f` is the closure of the image of `A` -/
 theorem imageClosureIsClosureImage
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X]
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
 {f : X → Y} (fc : Continuous f) (A : Set X) :
 f '' (closure A) = closure (f '' A) :=
   by
@@ -17,11 +17,26 @@ f '' (closure A) = closure (f '' A) :=
     have h2 : IsClosedMap f := by apply IsProperMap.isClosedMap h1
     rw [<- IsClosedMap.closure_image_eq_of_continuous h2 fc]
 
+/-- If f, g: X → X commute, then f g⁻¹ A = g⁻¹ f A -/
+theorem preimageOfCommutingMapsCommutes
+{X : Type*} {f g : X → X} (hfgComm : f ∘ g = g ∘ f) (A : Set X) :
+f '' (g ⁻¹' A) ⊆ g ⁻¹' (f '' A) := by
+  intro x hx
+  --simp only [Set.mem_image, Set.mem_preimage] at hx
+  obtain ⟨y, hy1, hy2⟩ := hx
+  have := congrArg g hy2
+  simp only [Set.mem_preimage, Set.mem_image]
+  use g y
+  constructor
+  · exact hy1
+  · rw [←this]
+    exact (imp_iff_right (congrFun hfgComm y)).mp fun a ↦ a
+
 /-- Given an entourage `α` of `X` and a point `x ∈ X`
 there exists an open neighborhood `U` of `x` such that
 the closure of `U × U` is a subset of `α` -/
 theorem openClosureProductInEntourage
-{X} [UniformSpace X] (x : X)
+{X : Type*} [UniformSpace X] (x : X)
 (α : Set (X × X)) {ha : α ∈ uniformity X} :
 ∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) := by
 -- Show that there exists a neighborhood V of x such that V × V ⊆ α

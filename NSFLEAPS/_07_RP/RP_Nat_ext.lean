@@ -506,16 +506,7 @@ RP dSystem ⊆ RP (groGroupDynamicalSystem hHomeo) := by
   exact hs
 
 /-- If `S` acts by homeomorphisms, then `RP` for the original action is the
-same as `RP` for the extended action, `groGroupDynamicalSystem`.
-
-DGG/CLAUDE: **the hypothesis `hMin` was added.**  This statement is Corollary 6.4 of the
-paper, whose proof reads "Apply Theorem D, noting that `S` and `Gr(S)` are commutative
-semigroups whose actions commute and are minimal".  Theorem D is
-`forTwoMinCommActionsRPsAreSame`, which requires *both* actions to be minimal, so minimality
-of the `S`-system is genuinely needed and is indeed assumed in Corollary 6.4.  Without it only
-the inclusion `RPSubsetExtendedActionRP` above is available: the reverse inclusion would
-require replacing an arbitrary `g = i(t)i(s)⁻¹ ∈ Gr(S)` by an element of `S`, which is exactly
-what minimality buys via Theorem D. -/
+same as `RP` for the extended action, `groGroupDynamicalSystem`.-/
 theorem extendedActionRPisActionRP
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
