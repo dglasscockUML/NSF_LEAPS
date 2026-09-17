@@ -157,29 +157,27 @@ def thickFamily
 }
 
 /-- The families of syndetic sets and thick sets are dual -/
--- This used to work but something happens upstream now dualEquivForm no longer work
--- Need to fix
 theorem dualSyndeticThick
 {S : Type*} [Semigroup S] [Nonempty S] :
-(syndeticFamily S)* = (thickFamily S) :=
-  by sorry
-    -- ext A
-    -- have dualEquivForm : ((syndeticFamily S)*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
-    --   famDualAlt (syndeticFamily S)
-    -- rw [dualEquivForm]
-    -- change A ∈ {A | Aᶜ ∉ (syndeticFamily S).sets} ↔ A ∈ (thickFamily S).sets
-    -- unfold syndeticFamily
-    -- unfold thickFamily
-    -- simp only [Set.mem_ofPred_eq]
-    -- exact Iff.symm (thickIffComplementNotSyndetic A)
+(syndeticFamily S)* = thickFamily S :=
+  by
+    ext A
+    have this : Aᶜ ∉ syndeticFamily S ↔ A ∈ thickFamily S := (thickIffComplementNotSyndetic A).symm
+    have that := mem_dual_alt (F := syndeticFamily S) (A := A)
+    exact Iff.trans that this
 
 /-- Dual of thick family is syndetic family -/
 theorem dualThickSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] :
-(thickFamily S)* = (syndeticFamily S) := by
-  rw [<- dualSyndeticThick]
-  sorry
-  --apply dual_dual_smth_smth
+(thickFamily S)* = (syndeticFamily S) :=
+  by
+    ext A
+    have this : Aᶜ ∉ thickFamily S ↔ A ∈ syndeticFamily S := by
+      have := Iff.not (thickIffComplementNotSyndetic Aᶜ)
+      simp only [compl_compl, not_not] at this
+      exact this
+    have that := mem_dual_alt (F := thickFamily S) (A := A)
+    exact Iff.trans that this
 
 /-- If A is a thick set and K is a finite set of a semigroup S,
 then ⋂ k ∈ K, (k * ·) ⁻¹' A is thick -/
@@ -2468,6 +2466,8 @@ isSetOfBohrRecurrence B :=
 
 /- The family of sets of Bohr
 recurrence is partition regular -/
+-- Here I've spelled out the requirement for PR family.
+-- Later update with isPRFamily (bohrZeroFamily S)
 theorem setOfBohrRecurrenceFamilyIsPR
 (S : Type*) [Semigroup S] [Nonempty S] :
 isPRFamily (setOfBohrRecurrenceFamily S) :=
