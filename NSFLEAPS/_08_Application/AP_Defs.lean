@@ -453,8 +453,14 @@ theorem commVisitTimeSetForRPPairIsDelta
 (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem)
 (x y : X) (hxyRP : (x, y) ∈ RP dSystem)
 {V : Set X} (hV : V ∈ nhds y) :
-∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) :=
-  by sorry
+∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) := by
+  intro H hHThick
+  unfold isDelta
+  let C := (visitTimeSet dSystem x V) ∩ H
+  -- have hClaim : ∀ N : ℕ+, ∀ s : Fin N → S, ∀ i j : Fin N, (i < j) →  s j ∈ (fun x ↦ (s i) * x) '' C ∧
+  --   (⋂ i : Fin N, (dSystem.map (∏ j : Fin N, ∏ (_ : j ≠ i), s j)) ⁻¹' V).Nonempty := by
+  --   sorry
+  sorry
 
 end Delta_builder
 
