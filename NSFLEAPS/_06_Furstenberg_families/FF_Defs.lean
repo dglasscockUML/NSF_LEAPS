@@ -2433,6 +2433,13 @@ def setOfBohrRecurrenceFamily
 Family S :=
 (bohrZeroFamily S)*
 
+/-- A set of Bohr recurrence is nonempty -/
+theorem setOfBohrRecurrenceNonempty
+{S : Type*} [Semigroup S] [Nonempty S]
+(A : Set S) (hABohrRec : isSetOfBohrRecurrence A) :
+A.Nonempty := by
+  sorry
+
 /-- If `A ⊆ S` is a set of Bohr recurrence and `A ⊆ B`, then `B`
 is a set of Bohr recurrence. -/
 theorem setOfBohrRecurrenceIsMonotone
