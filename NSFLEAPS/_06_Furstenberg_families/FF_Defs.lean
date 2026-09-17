@@ -2438,7 +2438,32 @@ theorem setOfBohrRecurrenceNonempty
 {S : Type*} [Semigroup S] [Nonempty S]
 (A : Set S) (hABohrRec : isSetOfBohrRecurrence A) :
 A.Nonempty := by
-  sorry
+  simp only [isSetOfBohrRecurrence, HasFamDual.famDual] at hABohrRec
+  unfold Family.famDual at hABohrRec
+  simp only [famDual] at hABohrRec
+  have hExist1 : ∃ B : Set S, isBohrZero B := by
+    simp only [isBohrZero, exists_prop]
+    use Set.univ
+    use 0
+    use fun _ ↦ 1
+    constructor
+    · intro s t
+      simp
+    · use Set.univ
+      constructor
+      · simp
+      constructor
+      · simp
+      · simp
+  have hExistBohrZero : ∃ B : Set S, B ∈ bohrZeroFamily S := by
+    rcases hExist1 with ⟨B, hB⟩
+    use B
+    exact hB
+  rcases hExistBohrZero with ⟨B, hB⟩
+  specialize hABohrRec B hB
+  apply Set.inter_nonempty.mp at hABohrRec
+  rcases hABohrRec with ⟨x, hx1, hx2⟩
+  exact ⟨x, hx1⟩
 
 /-- If `A ⊆ S` is a set of Bohr recurrence and `A ⊆ B`, then `B`
 is a set of Bohr recurrence. -/
