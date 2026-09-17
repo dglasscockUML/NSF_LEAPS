@@ -48,17 +48,26 @@ def isURSet
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
--- the following statement needs to be modified. We cannot prove as written since X may not be
--- of Type. In fact X : Set (S → Bool)
 /-- An UR set can be written as R(x, U) -/
 theorem urSetIsRxU.{u}
 {S : Type u} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
 ∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
-∃ (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem),
-∃ x : X, ∃ U : Set X, x ∈ U ∧ IsClopen U ∧ A = visitTimeSet dSystem x U := by
+∃ (dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem),
+∃ x : X, ∃ U : Set X, IsClopen U ∧ A = visitTimeSet dSystem x U := by
   let π : (WithOne S → Bool) → (S → Bool) := fun w ↦ (fun s ↦ w s)
   have hπFacMap : isFactorMap (monoidExtSymbolicSystem S) (selfSymbolicSystem S) π := by
-    sorry
+    unfold isFactorMap
+    constructor
+    · continuity
+    constructor
+    · intro y
+      let z : WithOne S → Bool := Option.elim' true y
+      use z
+      simp [π]
+      rfl
+    · unfold isEquivariant
+      intro s
+      rfl
   unfold isURSet at hA
   let hLiftUnif := liftUniformRecurrentPoint hπFacMap (indicator A) hA
   rcases hLiftUnif with ⟨w, hw1, hw2⟩
@@ -71,6 +80,10 @@ theorem urSetIsRxU.{u}
   rcases hMinCopy with ⟨h1, h2⟩
   have hXInv := h1
   rcases h1 with ⟨h1a, h1b, h1c, h1d⟩
+  have hXCompact : CompactSpace X := by
+    apply isCompact_iff_compactSpace.mp h1b
+  have hXNonempty : Nonempty X := by
+    apply Set.Nonempty.to_subtype h1a
   use X, inferInstance, isCompact_iff_compactSpace.mp h1b, h1c, Set.Nonempty.to_subtype h1a
   have hMinSubsystem :=
     (minimalSubsetIffMinimalSubsystem (monoidExtSymbolicSystem S) hXInv).mp hMinSubset
@@ -85,41 +98,48 @@ theorem urSetIsRxU.{u}
     exact hw2
   let U := cylinderSet (WithOne S) true none
   use dSystemX, hMinSubsystem, ⟨w, hwInX⟩, Subtype.val ⁻¹' U
-  sorry
-
--- next is the old version of urSetIsRxU
--- /-- An UR set can be written as R(x, U) -/
--- theorem urSetIsRxUv1
--- {S : Type*} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
--- ∃ (U : Set (WithOne S → Bool)) (UClopen : IsClopen U) (UNonempty : U.Nonempty),
--- ∃ (x : WithOne S → Bool) (xMin : isUniformlyRecurrent (monoidExtSymbolicSystem S) x),
--- A = visitTimeSet (monoidExtSymbolicSystem S) x U := by
---   simp only [exists_prop]
---   let U := {x : WithOne S → Bool | x none = true}
---   use U
---   constructor
---   · sorry
---   constructor
---   · sorry
---   let liftSet : Set S → Set (WithOne S) := fun A : Set S ↦ {s : WithOne S | ∃ t ∈ A, some t = s}
---   let A_wOne := liftSet A
---   classical
---   let x0 := fun (s : WithOne S) ↦ if s ∈ A_wOne then true else false
---   let x1 := fun (s : WithOne S) ↦ if s ∈ A_wOne ∪ {none} then true else false
---   have h1 : isUniformlyRecurrent (monoidExtSymbolicSystem S) x0 ∨ isUniformlyRecurrent
---     (monoidExtSymbolicSystem S) x0 := by
---     sorry
---   rcases h1 with hx0 | hx1
---   · use x0
---     use hx0
---     ext s
---     constructor
---     · intro hs
---       unfold visitTimeSet
---       simp
---       sorry
---     sorry
---   sorry
+  have hEquiInt : ∀ s : S, ∀ z : (WithOne S → Bool), ((monoidExtSymbolicSystem S).map s z) none
+    = true ↔ z s = true := by
+    intro s z
+    constructor
+    · intro h
+      simp only [monoidExtSymbolicSystem, symbolicSystem, rightActionOfSOnMonoidExt] at h
+      exact h
+    · intro h
+      simp only [monoidExtSymbolicSystem, symbolicSystem, rightActionOfSOnMonoidExt]
+      exact h
+  constructor
+  · apply IsClopen.preimage
+    · simp only [cylinderSet, U]
+      apply (isClopen_discrete ({true} : Set Bool)).preimage
+      apply continuous_apply none
+    · continuity
+  apply Set.Subset.antisymm_iff.mpr
+  constructor
+  · intro s hs
+    simp only [visitTimeSet, cylinderSet, Set.preimage_ofPred_eq, Set.mem_ofPred_eq, U]
+    have hEqMap : (dSystemX.map s ⟨w, hwInX⟩) = ((monoidExtSymbolicSystem S).map s w) := by
+      rfl
+    rw [hEqMap]
+    apply (hEquiInt s w).mpr
+    simp only [π] at hw1
+    apply congr_fun at hw1
+    specialize hw1 s
+    rw [hw1]
+    simp only [indicator, decide_eq_true_eq]
+    exact hs
+  · intro s hs
+    simp only [visitTimeSet, cylinderSet, Set.preimage_ofPred_eq, Set.mem_ofPred_eq, U] at hs
+    have hEqMap : (dSystemX.map s ⟨w, hwInX⟩) = ((monoidExtSymbolicSystem S).map s w) := by
+      rfl
+    rw [hEqMap] at hs
+    simp only [hEquiInt] at hs
+    simp only [π] at hw1
+    apply congr_fun at hw1
+    specialize hw1 s
+    rw [hs] at hw1
+    simp only [indicator, true_eq_decide_iff] at hw1
+    exact hw1
 
 /-- Given a syndetic set `A` and a thick set `H`, there exists a
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
@@ -448,7 +468,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
 ∀ (H : Set S), isThick H → isDelta (B ∩ H) := by
   intro H hHThick
   rcases (urSetIsRxU hBur) with
-    ⟨X, _, _, _, hXNonempty, dSystemX, hXMin, x, U, hxU, hUClopen, hBvis⟩
+    ⟨X, _, _, _, hXNonempty, dSystemX, hXMin, x, U, hUClopen, hBvis⟩
   have hBinBohr : B ∈ setOfBohrRecurrenceFamily S := by
     simp only [setOfBohrRecurrenceFamily]
     exact hBrec
@@ -457,108 +477,109 @@ theorem commURSetsOfBohrRecurrenceAreDelta
   have hUClosed : IsClosed U := by
     unfold IsClopen at hUClopen
     exact hUClopen.1
-  have hNew := visitTimeConcentrationForPRFamily dSystemX x U hUClosed ⟨x, hxU⟩
-    (setOfBohrRecurrenceFamily S) hBohrPR
-  rw [<- hBvis] at hNew
-  specialize hNew hBinBohr
-  rcases hNew with ⟨y, hyU, hy1⟩
-  have hxyEQ : (x, y) ∈ equiStructureRelation dSystemX := by
-    simp only [equiStructureRelation, Set.mem_sInter]
-    intro I hI
-    unfold setOfEquicontinuousICERS at hI
-    rcases hI with ⟨hIicer, hIEq⟩
-    simp only [setOfICERS, Set.mem_ofPred_eq] at hIicer
-    have hGoal : (setToRelation I) x y := by
-      have hIEquiRel : Equivalence (setToRelation I) := by
-        unfold isICER at hIicer
-        rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
-        unfold isEquivalenceRelation at hIicer3
-        exact hIicer3
-      let K := Quotient ⟨setToRelation I, hIEquiRel⟩
-      let dSystemK := quotientDynamicalSystem dSystemX hIicer
-      let π : X → K := (Quotient.mk ⟨setToRelation I, hIEquiRel⟩)
-      have hKT2 : T2Space K := by
-        apply quotientOfCompactT2ByClosedIsT2
-        · unfold isICER at hIicer
-          rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
-          exact hIicer2
-      have hKNonempty : Nonempty K := by
-        apply nonemptyQuotient X hIEquiRel
-      apply (Equivalence.quot_mk_eq_iff hIEquiRel x y).mp
-      have hπFactorMap : isFactorMap dSystemX dSystemK π := by
-        apply quotientMapIsFactorMap
-      have hFactor : isFactor dSystemK dSystemX := by
-        unfold isFactor
-        use π
-      have hKMin : isMinimalSystem dSystemK := by
-        apply factorOfMinimalIsMinimal hXMin hFactor
-      have hKEquiC : isEquicontinuousSystem dSystemK := by
-        unfold isEquicontinuousICER at hIEq
-        exact hIEq
-      have hπxy : π x = π y := by
-        by_contra hContra
-        let hSep := t2_separation hContra
-        rcases hSep with ⟨V, W, hV1, hW1, hV2, hW2, hVW⟩
-        let C := visitTimeSet dSystemK (π x) V
-        have hCBohr : isBohrZero C := by
-          apply equiReturnsAreBohrZero
-          use K, inferInstance, inferInstance, inferInstance, inferInstance
-          use dSystemK, hKEquiC, hKMin, π x, V
-        have hWNeigh : π⁻¹' W ∈ nhds y := by
-          apply mem_nhds_iff.mpr
-          use π⁻¹' W
-          constructor
-          · simp
-          constructor
-          · apply IsOpen.preimage
-            · unfold isFactorMap at hπFactorMap
-              exact hπFactorMap.1
-            · exact hW1
-          · simp only [Set.mem_preimage]
-            exact hW2
-        specialize hy1 (π⁻¹' W) hWNeigh
-        have hNonemptyInter : (visitTimeSet dSystemX x (π ⁻¹' W) ∩
-          visitTimeSet dSystemK (π x) V).Nonempty := by
-          apply (mem_famDual (bohrZeroFamily S) (visitTimeSet dSystemX x (π ⁻¹' W))).mp
-          · exact hy1
-          · simp only [bohrZeroFamily, SetLike.mem_coe]
-            exact hCBohr
-        apply Set.inter_nonempty.mp at hNonemptyInter
-        rcases hNonemptyInter with ⟨s, hs1, hs2⟩
-        simp only [visitTimeSet, Set.mem_preimage] at hs1
-        simp only [visitTimeSet, Set.mem_preimage] at hs2
-        rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
-        simp only [isEquivariant] at hπ3
-        specialize hπ3 s
-        have hπ3x : (dSystemK.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
-          apply congr_fun hπ3
-        have hπ3x1 : (dSystemK.map s ∘ π) x = dSystemK.map s (π x) := by
-          rfl
-        have hπ3x2 : (π ∘ dSystemX.map s) x = π (dSystemX.map s x) := by
-          rfl
-        rw [<- hπ3x2, <- hπ3x, hπ3x1] at hs1
-        have hVWNotDisjoint : ¬Disjoint V W := by
-          apply Set.not_disjoint_iff.mpr
-          use dSystemK.map s (π x)
-        exact hVWNotDisjoint hVW
-      exact hπxy
-    unfold setToRelation at hGoal
-    exact hGoal
-  have hxyRP : (x, y) ∈ RP dSystemX := by
-    rw [RPisEquiStructureRelation hXMin]
-    exact hxyEQ
-  have hUNeigh : U ∈ nhds y := by
-    apply mem_nhds_iff.mpr
-    use U
-    constructor
-    · simp
-    constructor
-    · exact hUClopen.2
-    · exact hyU
-  have hDelta := commVisitTimeSetForRPPairIsDelta dSystemX hXMin x y hxyRP hUNeigh
-  specialize hDelta H hHThick
-  rw [hBvis]
-  exact hDelta
+  sorry
+  -- have hNew := visitTimeConcentrationForPRFamily dSystemX x U hUClosed x
+  --   (setOfBohrRecurrenceFamily S) hBohrPR
+  -- rw [<- hBvis] at hNew
+  -- specialize hNew hBinBohr
+  -- rcases hNew with ⟨y, hyU, hy1⟩
+  -- have hxyEQ : (x, y) ∈ equiStructureRelation dSystemX := by
+  --   simp only [equiStructureRelation, Set.mem_sInter]
+  --   intro I hI
+  --   unfold setOfEquicontinuousICERS at hI
+  --   rcases hI with ⟨hIicer, hIEq⟩
+  --   simp only [setOfICERS, Set.mem_ofPred_eq] at hIicer
+  --   have hGoal : (setToRelation I) x y := by
+  --     have hIEquiRel : Equivalence (setToRelation I) := by
+  --       unfold isICER at hIicer
+  --       rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
+  --       unfold isEquivalenceRelation at hIicer3
+  --       exact hIicer3
+  --     let K := Quotient ⟨setToRelation I, hIEquiRel⟩
+  --     let dSystemK := quotientDynamicalSystem dSystemX hIicer
+  --     let π : X → K := (Quotient.mk ⟨setToRelation I, hIEquiRel⟩)
+  --     have hKT2 : T2Space K := by
+  --       apply quotientOfCompactT2ByClosedIsT2
+  --       · unfold isICER at hIicer
+  --         rcases hIicer with ⟨hIicer1, hIicer2, hIicer3⟩
+  --         exact hIicer2
+  --     have hKNonempty : Nonempty K := by
+  --       apply nonemptyQuotient X hIEquiRel
+  --     apply (Equivalence.quot_mk_eq_iff hIEquiRel x y).mp
+  --     have hπFactorMap : isFactorMap dSystemX dSystemK π := by
+  --       apply quotientMapIsFactorMap
+  --     have hFactor : isFactor dSystemK dSystemX := by
+  --       unfold isFactor
+  --       use π
+  --     have hKMin : isMinimalSystem dSystemK := by
+  --       apply factorOfMinimalIsMinimal hXMin hFactor
+  --     have hKEquiC : isEquicontinuousSystem dSystemK := by
+  --       unfold isEquicontinuousICER at hIEq
+  --       exact hIEq
+  --     have hπxy : π x = π y := by
+  --       by_contra hContra
+  --       let hSep := t2_separation hContra
+  --       rcases hSep with ⟨V, W, hV1, hW1, hV2, hW2, hVW⟩
+  --       let C := visitTimeSet dSystemK (π x) V
+  --       have hCBohr : isBohrZero C := by
+  --         apply equiReturnsAreBohrZero
+  --         use K, inferInstance, inferInstance, inferInstance, inferInstance
+  --         use dSystemK, hKEquiC, hKMin, π x, V
+  --       have hWNeigh : π⁻¹' W ∈ nhds y := by
+  --         apply mem_nhds_iff.mpr
+  --         use π⁻¹' W
+  --         constructor
+  --         · simp
+  --         constructor
+  --         · apply IsOpen.preimage
+  --           · unfold isFactorMap at hπFactorMap
+  --             exact hπFactorMap.1
+  --           · exact hW1
+  --         · simp only [Set.mem_preimage]
+  --           exact hW2
+  --       specialize hy1 (π⁻¹' W) hWNeigh
+  --       have hNonemptyInter : (visitTimeSet dSystemX x (π ⁻¹' W) ∩
+  --         visitTimeSet dSystemK (π x) V).Nonempty := by
+  --         apply (mem_famDual (bohrZeroFamily S) (visitTimeSet dSystemX x (π ⁻¹' W))).mp
+  --         · exact hy1
+  --         · simp only [bohrZeroFamily, SetLike.mem_coe]
+  --           exact hCBohr
+  --       apply Set.inter_nonempty.mp at hNonemptyInter
+  --       rcases hNonemptyInter with ⟨s, hs1, hs2⟩
+  --       simp only [visitTimeSet, Set.mem_preimage] at hs1
+  --       simp only [visitTimeSet, Set.mem_preimage] at hs2
+  --       rcases hπFactorMap with ⟨hπ1, hπ2, hπ3⟩
+  --       simp only [isEquivariant] at hπ3
+  --       specialize hπ3 s
+  --       have hπ3x : (dSystemK.map s ∘ π) x = (π ∘ dSystemX.map s) x := by
+  --         apply congr_fun hπ3
+  --       have hπ3x1 : (dSystemK.map s ∘ π) x = dSystemK.map s (π x) := by
+  --         rfl
+  --       have hπ3x2 : (π ∘ dSystemX.map s) x = π (dSystemX.map s x) := by
+  --         rfl
+  --       rw [<- hπ3x2, <- hπ3x, hπ3x1] at hs1
+  --       have hVWNotDisjoint : ¬Disjoint V W := by
+  --         apply Set.not_disjoint_iff.mpr
+  --         use dSystemK.map s (π x)
+  --       exact hVWNotDisjoint hVW
+  --     exact hπxy
+  --   unfold setToRelation at hGoal
+  --   exact hGoal
+  -- have hxyRP : (x, y) ∈ RP dSystemX := by
+  --   rw [RPisEquiStructureRelation hXMin]
+  --   exact hxyEQ
+  -- have hUNeigh : U ∈ nhds y := by
+  --   apply mem_nhds_iff.mpr
+  --   use U
+  --   constructor
+  --   · simp
+  --   constructor
+  --   · exact hUClopen.2
+  --   · exact hyU
+  -- have hDelta := commVisitTimeSetForRPPairIsDelta dSystemX hXMin x y hxyRP hUNeigh
+  -- specialize hDelta H hHThick
+  -- rw [hBvis]
+  -- exact hDelta
 
 end Dynamical_sets_of_bohr_recurrence
 
