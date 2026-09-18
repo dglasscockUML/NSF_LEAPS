@@ -1143,7 +1143,7 @@ A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isdcSSet H → A ∩ H ∈ syndeti
 theorem thickIndicatorLemmaInCountCommSemi
 {S : Type*} [CommSemigroup S] [Nonempty S] [Countable S]
 {H : Set S} (Hthick : isThick H) :
-∃ (G : Set S), isThick G ∧ (∀ (B : Set S) (L : Set (Ultrafilter S)),
+∃ (G : Set S), G ⊆ H ∧ isThick G ∧ (∀ (B : Set S) (L : Set (Ultrafilter S)),
   isLeftIdeal L → L ⊆ (closure ((pure : S → Ultrafilter S) '' B)) →
     (L ∩ (closure ((pure : S → Ultrafilter S) '' G))).Nonempty → isThick (B ∩ H)) :=
 by
@@ -1159,14 +1159,22 @@ by
     choose g hg using he
     obtain ⟨n, hn⟩ := (hK.image g).bddAbove
     exact ⟨n, fun k hk ↦ ⟨g k, hn ⟨k, hk, rfl⟩, hg k⟩⟩
-  -- thickness of `H` gives `t n` with `F n * F n * t n ⊆ H`
-  have hprod : ∀ n : ℕ, ∃ t : S, ∀ f ∈ F n, ∀ g ∈ F n, (f * g) * t ∈ H := by
+  -- thickness of `H` applied to the finite set `F n ∪ (F n * F n)` gives `t n` with
+  -- `F n * t n ⊆ H` and `F n * F n * t n ⊆ H`
+  have hprod : ∀ n : ℕ, ∃ t : S, ∀ f ∈ F n, ∀ g ∈ F n, f * t ∈ H ∧ (f * g) * t ∈ H := by
     intro n
-    obtain ⟨t, ht⟩ := Hthick ((fun q : S × S ↦ q.1 * q.2) '' ((F n) ×ˢ (F n)))
-      (((hFfin n).prod (hFfin n)).image _)
-    exact ⟨t, fun f hf g hg ↦ ht ⟨f * g, ⟨(f, g), Set.mk_mem_prod hf hg, rfl⟩, rfl⟩⟩
+    obtain ⟨t, ht⟩ := Hthick ((F n) ∪ ((fun q : S × S ↦ q.1 * q.2) '' ((F n) ×ˢ (F n))))
+      ((hFfin n).union (((hFfin n).prod (hFfin n)).image _))
+    exact ⟨t, fun f hf g hg ↦
+      ⟨ht ⟨f, Set.mem_union_left _ hf, rfl⟩,
+        ht ⟨f * g, Set.mem_union_right _ ⟨(f, g), Set.mk_mem_prod hf hg, rfl⟩, rfl⟩⟩⟩
   choose t ht using hprod
-  refine ⟨⋃ n, (fun x ↦ x * t n) '' (F n), ?_, ?_⟩
+  refine ⟨⋃ n, (fun x ↦ x * t n) '' (F n), ?_, ?_, ?_⟩
+  · -- `G ⊆ H` holds by construction, since `F n * t n ⊆ H`
+    rintro x hx
+    obtain ⟨n, hn⟩ := Set.mem_iUnion.mp hx
+    obtain ⟨f, hf, rfl⟩ := hn
+    exact (ht n f hf f hf).1
   · -- `G` is thick: a finite set sits inside some `F n`, and `F n * t n ⊆ G`
     intro K hK
     obtain ⟨n, hn⟩ := hFcovers K hK
@@ -1213,7 +1221,7 @@ by
           refine hxH ?_
           change s * (f * t n) ∈ H
           rw [← mul_assoc]
-          exact ht n s (hFmono hnm hsF) f hf
+          exact (ht n s (hFmono hnm hsF) f hf).2
         have hfin : ((⋃ n, (fun x ↦ x * t n) '' (F n)) ∩ ((leftMult s) ⁻¹' H)ᶜ).Finite :=
           Set.Finite.subset ((Set.finite_Iio m).biUnion fun n _ ↦ (hFfin n).image _) hsub
         obtain ⟨x, -, hpx⟩ := Ultrafilter.eq_pure_of_finite_mem hfin
@@ -1230,39 +1238,102 @@ by
       exact hx f hf
 
 
-/-- In countable, commutative semigroups,
+/- In countable, commutative semigroups,
 (syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S)
 for UR sets -/
+-- theorem preStrongIPIffStrongCentralInCountCommSemi
+-- (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S]
+-- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
+-- (x : X) {U : Set X} (UClopen : IsClopen U) :
+-- visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (IPFamily S) →
+--   visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (centralFamily S) :=
+--     by
+--   intro hR B hB
+--   -- `B` meets every syndetic set, so `B` is thick
+--   have hBthick : isThick B := by
+--     by_contra hnot
+--     unfold isThick at hnot
+--     push Not at hnot
+--     obtain ⟨F, hFfin, hF⟩ := hnot
+--     have hsyn : isSyndetic Bᶜ := by
+--       refine ⟨F, hFfin, fun s ↦ ?_⟩
+--       obtain ⟨w, hw, hwB⟩ := Set.not_subset.mp (hF s)
+--       obtain ⟨f, hfF, rfl⟩ := hw
+--       exact ⟨f, hfF, hwB⟩
+--     obtain ⟨z, hzB, hzBc⟩ := hB Bᶜ hsyn
+--     exact hzBc hzB
+--   -- Lemma 4.4 produces a thick set `G` with the stipulated property
+--   obtain ⟨G, -, hGthick, hGprop⟩ := thickIndicatorLemmaInCountCommSemi (H := B) hBthick
+--   have hGdual : G ∈ (syndeticFamily S)* := by
+--     intro C hC
+--     obtain ⟨z, hzC, hzG⟩ := syndeticThickIntersect C G hC hGthick
+--     exact ⟨z, hzG, hzC⟩
+--   -- `R(x,U) ∩ G` is an IP set, so it lies in an idempotent ultrafilter `p`
+--   obtain ⟨p, hpidem, hpRG⟩ := hR G hGdual
+--   have hRp : visitTimeSet dSystem x U ∈ p := Filter.mem_of_superset hpRG Set.inter_subset_left
+--   have hGp : G ∈ p := Filter.mem_of_superset hpRG Set.inter_subset_right
+--   -- `p x ∈ U` is uniformly recurrent (the system is minimal) and proximal to `x`
+--   set y := (ultraAction dSystem).map p x with hy
+--   have hyU : y ∈ U := by
+--     have hcl := visitTimeSetInUltraImpliesUltraActInClosure dSystem x U p hRp
+--     rwa [UClopen.1.closure_eq] at hcl
+--   have hyUR : isUniformlyRecurrent dSystem y :=
+--     minimalImpliesUniformlyRecurrent dSystem (hMin := hMin) y
+--   have hpy : (ultraAction dSystem).map p y = y := by
+--     rw [hy, ← (ultraAction dSystem).mapMult p p x, hpidem]
+--   -- Lemma 2.1: `R((x,y),α) ∩ R(y,V) ⊆ R(x,U)`
+--   obtain ⟨V, hVopen, hyV, α, hαopen, hαdiag, hVα⟩ :=
+--     nbhdOfDiagForcesOtherSetContainment UClopen.2 hyU
+--   -- `L = {p} ∪ βS p` is a left ideal meeting `closure G` and contained in `closure R((x,y),α)`
+--   set L : Set (Ultrafilter S) := {r | r = p ∨ ∃ q : Ultrafilter S, q * p = r} with hLdef
+--   have hLideal : isLeftIdeal L := by
+--     refine ⟨⟨p, Or.inl rfl⟩, ?_⟩
+--     rintro s w ⟨r, hr, rfl⟩
+--     rcases hr with rfl | ⟨q, rfl⟩
+--     · exact Or.inr ⟨s, rfl⟩
+--     · exact Or.inr ⟨s * q, mul_assoc s q p⟩
+--   have hLdiag : ∀ r ∈ L, visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∈ r := by
+--     intro r hr
+--     refine visitTimeSetBelongsToUltrafilter (diagDynamicalSystem dSystem dSystem) (x, y) α
+--       (hU := hαopen) r ?_
+--     rw [ultraDiagAction]
+--     refine hαdiag ?_
+--     change (ultraAction dSystem).map r x = (ultraAction dSystem).map r y
+--     rcases hr with rfl | ⟨q, rfl⟩
+--     · rw [hpy]
+--     · rw [(ultraAction dSystem).mapMult q p x, (ultraAction dSystem).mapMult q p y, hpy, ← hy]
+--   have hLsub : L ⊆ closure ((pure : S → Ultrafilter S) ''
+--       (visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α)) :=
+--     fun r hr ↦ (memClosurePureIff _ r).mpr (hLdiag r hr)
+--   have hLmeet : (L ∩ closure ((pure : S → Ultrafilter S) '' G)).Nonempty :=
+--     ⟨p, Or.inl rfl, (memClosurePureIff G p).mpr hGp⟩
+--   have hthick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ B) :=
+--     hGprop _ L hLideal hLsub hLmeet
+--   -- `R(y,V)` is a dcS set, so Theorem 4.1 applies
+--   have hdcS : isdcSSet (visitTimeSet dSystem y V) :=
+--     returnTimesImpliesdcS _ ⟨X, inferInstance, inferInstance, inferInstance, inferInstance,
+--       dSystem, y, hyUR, V, hyV, hVopen, subset_rfl⟩
+--   refine dcSCapThickIsCentral _ ⟨visitTimeSet dSystem y V, hdcS,
+--     visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ B, hthick, ?_⟩
+--   rintro s ⟨hsV, hsα, hsB⟩
+--   exact ⟨hVα (dSystem.map s x) (dSystem.map s y) hsα hsV, hsB⟩
+
+/-- Precursor to result in AP_Defs: In countable, commutative semigroups,
+(syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) -/
 theorem preStrongIPIffStrongCentralInCountCommSemi
 (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
-(x : X) {U : Set X} (UClopen : IsClopen U) :
-visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (IPFamily S) →
-  visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (centralFamily S) :=
-    by
-  intro hR B hB
-  -- `B` meets every syndetic set, so `B` is thick
-  have hBthick : isThick B := by
-    by_contra hnot
-    unfold isThick at hnot
-    push Not at hnot
-    obtain ⟨F, hFfin, hF⟩ := hnot
-    have hsyn : isSyndetic Bᶜ := by
-      refine ⟨F, hFfin, fun s ↦ ?_⟩
-      obtain ⟨w, hw, hwB⟩ := Set.not_subset.mp (hF s)
-      obtain ⟨f, hfF, rfl⟩ := hw
-      exact ⟨f, hfF, hwB⟩
-    obtain ⟨z, hzB, hzBc⟩ := hB Bᶜ hsyn
-    exact hzBc hzB
-  -- Lemma 4.4 produces a thick set `G` with the stipulated property
-  obtain ⟨G, hGthick, hGprop⟩ := thickIndicatorLemmaInCountCommSemi (H := B) hBthick
-  have hGdual : G ∈ (syndeticFamily S)* := by
-    intro C hC
-    obtain ⟨z, hzC, hzG⟩ := syndeticThickIntersect C G hC hGthick
-    exact ⟨z, hzG, hzC⟩
-  -- `R(x,U) ∩ G` is an IP set, so it lies in an idempotent ultrafilter `p`
-  obtain ⟨p, hpidem, hpRG⟩ := hR G hGdual
+(x : X) {U : Set X} (UClopen : IsClopen U)
+(H : Set S) (_Hthick : isThick H) :
+(∀ (H' : Set S), H' ⊆ H → isThick H' → visitTimeSet dSystem x U ∩ H' ∈ IPFamily S) →
+  (∀ (H' : Set S), H' ⊆ H → isThick H' → visitTimeSet dSystem x U ∩ H' ∈ centralFamily S) := by
+  intro hIP H' hH'H hH'thick
+  -- Lemma 4.3 produces a thick set `G ⊆ H'` with the stipulated property
+  obtain ⟨G, hGH', hGthick, hGprop⟩ := thickIndicatorLemmaInCountCommSemi (H := H') hH'thick
+  -- `G ⊆ H' ⊆ H` is thick, so `R(x,U) ∩ G` is an IP set: it lies in an idempotent `p`
+  obtain ⟨p, hpidem, hpRG⟩ := hIP G (hGH'.trans hH'H) hGthick
   have hRp : visitTimeSet dSystem x U ∈ p := Filter.mem_of_superset hpRG Set.inter_subset_left
   have hGp : G ∈ p := Filter.mem_of_superset hpRG Set.inter_subset_right
   -- `p x ∈ U` is uniformly recurrent (the system is minimal) and proximal to `x`
@@ -1300,16 +1371,18 @@ visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (IPFamily S) →
     fun r hr ↦ (memClosurePureIff _ r).mpr (hLdiag r hr)
   have hLmeet : (L ∩ closure ((pure : S → Ultrafilter S) '' G)).Nonempty :=
     ⟨p, Or.inl rfl, (memClosurePureIff G p).mpr hGp⟩
-  have hthick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ B) :=
+  have hthick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ H') :=
     hGprop _ L hLideal hLsub hLmeet
   -- `R(y,V)` is a dcS set, so Theorem 4.1 applies
   have hdcS : isdcSSet (visitTimeSet dSystem y V) :=
     returnTimesImpliesdcS _ ⟨X, inferInstance, inferInstance, inferInstance, inferInstance,
       dSystem, y, hyUR, V, hyV, hVopen, subset_rfl⟩
   refine dcSCapThickIsCentral _ ⟨visitTimeSet dSystem y V, hdcS,
-    visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ B, hthick, ?_⟩
-  rintro s ⟨hsV, hsα, hsB⟩
-  exact ⟨hVα (dSystem.map s x) (dSystem.map s y) hsα hsV, hsB⟩
+    visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ H', hthick, ?_⟩
+  rintro s ⟨hsV, hsα, hsH'⟩
+  exact ⟨hVα (dSystem.map s x) (dSystem.map s y) hsα hsV, hsH'⟩
+
+
 
 end central_sets
 
