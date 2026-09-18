@@ -381,65 +381,128 @@ A ∩ H' = B ∩ H' := by
     · exact hs2
     · exact hs3
 
-/-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
-for all sets. -/
+-- /-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
+-- for all sets. -/ -- this is the old version. The new version is below
+-- theorem urContainmentSufficesForFamilyContainment
+-- {S : Type*} [Semigroup S] [Nonempty S]
+-- (F G : Family S)
+-- {hFG : ∀ (B H : Set S), isURSet B → isThick H → B ∩ H ∈ F → B ∩ H ∈ G} :
+-- (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
+--     intro A hA
+--     have h0 : isSyndetic A := by
+--       have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
+--         apply familyMeetContainedInIntersection
+--       have h02 : A ∈ syndeticFamily S ∩ F := by
+--         exact h01 hA
+--       have h03 : A ∈ syndeticFamily S := by
+--         exact h02.1
+--       simpa
+--     have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
+--       intro H hH
+--       have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+--       A ∩ H' = B ∩ H' := by
+--         apply syndSetIsUROnThickSet
+--         · exact h0
+--         exact hH
+--       obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
+--       have h12 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
+--         exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
+--       have h13 : A ∩ H' ∈ F := by
+--         specialize h12 H'
+--         rw [dualSyndeticThick] at h12
+--         apply h12
+--         exact hH'
+--       have h14 : B ∩ H' ∈ F := by
+--         rw [<- h2]
+--         exact h13
+--       have h15 : B ∩ H' ∈ G := by
+--         apply hFG
+--         · exact hB
+--         · exact hH'
+--         exact h14
+--       have h16 : A ∩ H' ∈ G := by
+--         rw [h2]
+--         exact h15
+--       have h17 : A ∩ H' ⊆ A ∩ H := by
+--         apply Set.inter_subset_inter_right
+--         exact hHH'
+--       apply Family.upward_closed
+--       · exact h16
+--       exact h17
+--     simp only [SetLike.mem_coe] at hA
+--     simp only [SetLike.mem_coe]
+--     have h2 : (syndeticFamily S)* = (thickFamily S) := by
+--       exact dualSyndeticThick
+--     have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
+--       rw [<- dualSyndeticThick]
+--       exact (unfoldFamMeet (syndeticFamily S) G A).mpr
+--     apply h3
+--     intro H hH2
+--     specialize h1 H hH2
+--     exact h1
+
 theorem urContainmentSufficesForFamilyContainment
 {S : Type*} [Semigroup S] [Nonempty S]
 (F G : Family S)
-{hFG : ∀ (B H : Set S), isURSet B → isThick H → B ∩ H ∈ F → B ∩ H ∈ G} :
+{hFG : ∀ (B H : Set S) (_ : isURSet B) (_ : isThick H),
+  (∀ (H' : Set S) (_ : H' ⊆ H) (_ : isThick H'), (B ∩ H' ∈ F))
+    → (∀ (H' : Set S) (_ : H' ⊆ H) (_ : isThick H'), (B ∩ H' ∈ G))} :
 (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
-    intro A hA
-    have h0 : isSyndetic A := by
-      have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
-        apply familyMeetContainedInIntersection
-      have h02 : A ∈ syndeticFamily S ∩ F := by
-        exact h01 hA
-      have h03 : A ∈ syndeticFamily S := by
-        exact h02.1
-      simpa
-    have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
-      intro H hH
-      have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
-      A ∩ H' = B ∩ H' := by
-        apply syndSetIsUROnThickSet
-        · exact h0
-        exact hH
-      obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
-      have h12 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
-        exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
-      have h13 : A ∩ H' ∈ F := by
-        specialize h12 H'
-        rw [dualSyndeticThick] at h12
-        apply h12
-        exact hH'
-      have h14 : B ∩ H' ∈ F := by
-        rw [<- h2]
-        exact h13
-      have h15 : B ∩ H' ∈ G := by
-        apply hFG
-        · exact hB
-        · exact hH'
-        exact h14
-      have h16 : A ∩ H' ∈ G := by
-        rw [h2]
-        exact h15
-      have h17 : A ∩ H' ⊆ A ∩ H := by
-        apply Set.inter_subset_inter_right
-        exact hHH'
-      apply Family.upward_closed
-      · exact h16
-      exact h17
-    simp only [SetLike.mem_coe] at hA
-    simp only [SetLike.mem_coe]
-    have h2 : (syndeticFamily S)* = (thickFamily S) := by
-      exact dualSyndeticThick
-    have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
-      rw [<- dualSyndeticThick]
-      exact (unfoldFamMeet (syndeticFamily S) G A).mpr
-    apply h3
-    intro H hH2
-    specialize h1 H hH2
-    exact h1
+  intro A hA
+  have h0 : isSyndetic A := by
+    have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
+      apply familyMeetContainedInIntersection
+    have h02 : A ∈ syndeticFamily S ∩ F := by
+      exact h01 hA
+    have h03 : A ∈ syndeticFamily S := by
+      exact h02.1
+    simpa
+  have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
+    intro H hHThick
+    have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+    A ∩ H' = B ∩ H' := by
+      apply syndSetIsUROnThickSet
+      · exact h0
+      · exact hHThick
+    obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
+    have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
+      intro H'' hH'' hH''Thick
+      have hABH'' : B ∩ H'' = A ∩ H'' := by
+        have hAB0 : H' ∩ H'' = H'' := by
+          exact Set.inter_eq_self_of_subset_right hH''
+        have hAB1 : B ∩ H'' = B ∩ H' ∩ H'' := by
+          nth_rw 1 [<- hAB0]
+          rw [Set.inter_assoc]
+        have hAB2 : A ∩ H'' = A ∩ H' ∩ H'' := by
+          nth_rw 1 [<- hAB0]
+          rw [Set.inter_assoc]
+        rw [hAB1, hAB2, h2]
+      rw [hABH'']
+      apply (unfoldFamMeet (syndeticFamily S) F A).mp hA
+      rw [dualSyndeticThick]
+      exact hH''Thick
+    have hH'Triv : H' ⊆ H' := by
+      simp
+    specialize hFG B H' hB hH' h12 H' hH'Triv hH'
+    rw [<- h2] at hFG
+    have hSub : A ∩ H' ⊆ A ∩ H := by
+      intro a ha
+      simp only [Set.mem_inter_iff] at ha
+      rcases ha with ⟨ha1, ha2⟩
+      simp only [Set.mem_inter_iff]
+      constructor
+      · exact ha1
+      · apply hHH' ha2
+    apply G.upward_closed (A ∩ H') (A ∩ H) hFG hSub
+  have h2 : (syndeticFamily S)* = (thickFamily S) := by
+    exact dualSyndeticThick
+  have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
+    rw [<- dualSyndeticThick]
+    exact (unfoldFamMeet (syndeticFamily S) G A).mpr
+  apply h3
+  intro H hH2
+  specialize h1 H hH2
+  exact h1
 
 end Reduction_to_UR_sets
 
@@ -457,7 +520,8 @@ theorem commVisitTimeSetForRPPairIsDelta
   intro H hHThick
   unfold isDelta
   let C := (visitTimeSet dSystem x V) ∩ H
-  -- have hClaim : ∀ N : ℕ+, ∀ s : Fin N → S, ∀ i j : Fin N, (i < j) →  s j ∈ (fun x ↦ (s i) * x) '' C ∧
+  -- have hClaim : ∀ N : ℕ+, ∀ s : Fin N → S, ∀ i j : Fin N, (i < j) →  s j
+  --    ∈ (fun x ↦ (s i) * x) '' C ∧
   --   (⋂ i : Fin N, (dSystem.map (∏ j : Fin N, ∏ (_ : j ≠ i), s j)) ⁻¹' V).Nonempty := by
   --   sorry
   sorry
@@ -624,6 +688,9 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFam
     have h2 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S
       ⊆ syndeticFamily S ⋏ deltaFamily S := by
       apply urContainmentSufficesForFamilyContainment
+      intro B H hBUR hHThick hCond H' hH'H hH'Thick
+      specialize hCond H' hH'H hH'Thick
+      specialize h3 B H' hBUR hH'Thick hCond
       exact h3
     simpa using Set.Subset.antisymm h1 h2
 
@@ -663,11 +730,11 @@ theorem commDeltaStarImpliesLocallyBohrZero
 /-- In a countable, commutative semigroup S ⋏ IP = S ⋏ C -/
 theorem strongIPIffStrongCentralInCountCommSemi
 (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
-(syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) :=
- by sorry
+(syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) := by
 -- Proof: by urContainmentSufficesForFamilyContainment, it suffices to consider UR sets only
 -- For UR sets, this is proven in preStrongIPIffStrongCentralInCountCommSemi
 -- Will wait to write proof until def of UR sets is fixed
+  sorry
 
 /-- A subset of a countable, commutative semigroup is central star if and only if
 it is strongly piecewise IP*, if and only if it is strongly piecewise central* -/
