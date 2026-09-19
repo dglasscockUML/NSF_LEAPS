@@ -508,6 +508,36 @@ end Reduction_to_UR_sets
 
 section Delta_builder
 
+-- Next three definitions were written by ChatGPT. The definitions help with product
+-- on commutative semigroups
+
+-- Product of f over a nonempty finset.
+noncomputable def prodNonempty
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{ι : Type*} (t : Finset ι) (ht : t.Nonempty) (f : ι → S) : S := by
+  classical
+  let a : ι := Classical.choose ht
+  exact (t.erase a).fold (· * ·) (f a) f
+
+-- Product over all indices in Fin N.
+noncomputable def prodAll
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{N : ℕ} (hN : N ≥ 2) (s : Fin N → S) : S :=
+  prodNonempty (Finset.univ : Finset (Fin N)) (by
+    apply Finset.card_pos.mp
+    simp only [Finset.card_univ, Fintype.card_fin]
+    omega) s
+
+-- Product over all indices in Fin N except i.
+noncomputable def prodExcept
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{N : ℕ} (hN : N ≥ 2) (s : Fin N → S) (i : Fin N) : S :=
+prodNonempty ((Finset.univ : Finset (Fin N)).erase i) (by
+    apply Finset.card_pos.mp
+    rw [Finset.card_erase_of_mem (Finset.mem_univ i)]
+    simp only [Finset.card_univ, Fintype.card_fin]
+    omega) s
+
 /-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
 then for all thick set H, R(x, V) ∩ H is a Delta set -/
 theorem commVisitTimeSetForRPPairIsDelta
@@ -520,10 +550,17 @@ theorem commVisitTimeSetForRPPairIsDelta
   intro H hHThick
   unfold isDelta
   let C := (visitTimeSet dSystem x V) ∩ H
-  -- have hClaim : ∀ N : ℕ+, ∀ s : Fin N → S, ∀ i j : Fin N, (i < j) →  s j
-  --    ∈ (fun x ↦ (s i) * x) '' C ∧
-  --   (⋂ i : Fin N, (dSystem.map (∏ j : Fin N, ∏ (_ : j ≠ i), s j)) ⁻¹' V).Nonempty := by
-  --   sorry
+  have hClaim : ∀ (N : ℕ) (hN : N ≥ 2), ∀ s : Fin N → S,
+    ((∀ i j : Fin N, (i < j) →  s j ∈ (fun x ↦ (s i) * x) '' C) ∧
+    (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V).Nonempty)
+    →
+    (∃ r : S, (∀ i : Fin N, r ∈ (fun x ↦ (s i) * x) '' C) ∧
+    (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V))
+    ∩ (dSystem.map (prodAll hN s)) ⁻¹' V).Nonempty) := by
+    sorry
+  have hSNonempty : (Set.univ : Set S).Nonempty := by
+    simp
+  rcases (Set.nonempty_def.mp hSNonempty) with ⟨s0, hs0⟩
   sorry
 
 end Delta_builder
