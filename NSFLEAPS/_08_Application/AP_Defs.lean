@@ -19,6 +19,7 @@ theorem familyMeetContainedInIntersection
 
 /-- Familymeet is monotone -/
 -- We will move this theorem to FA_Theorems file later
+-- Here's an easier-to-apply version of the arguments:  (F) {G H} : G ⊆ H → F ⋏ G ⊆ F ⋏ H
 theorem familyMeetIsMonotonic
 {S : Type*} (F G H : Family S) (hGH : G ⊆ H) : F ⋏ G ⊆ F ⋏ H := by
   sorry
@@ -36,6 +37,24 @@ lemma unfoldFamMeet
 theorem familyLocalImplicationEquivalence
 {S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
   sorry
+
+theorem familyJoinCommutative
+{S : Type*} (F G : Family S) : F ⋎ G = G ⋎ F := by sorry
+
+theorem familyJoinMonotoneSlot1
+{S : Type*} {F G : Family S} (H : Family S) : F ⊆ G → F ⋎ H ⊆ G ⋎ H := by sorry
+
+theorem familyJoinMonotoneSlot2
+{S : Type*} (F : Family S) {G H : Family S} : G ⊆ H → F ⋎ G ⊆ F ⋎ H := by sorry
+
+theorem dualIsAntitone
+{S : Type*} {F G : Family S} : F ⊆ G → G* ⊆ F* := by sorry
+
+theorem deMorganOverJoin
+{S : Type*} {F G : Family S} : (F ⋎ G)* = F* ⋏ G* := by sorry
+
+theorem deMorganOverMeet
+{S : Type*} {F G : Family S} : (F ⋏ G)* = F* ⋎ G* := by sorry
 
 end Theorems_needed_from_FA_Theorems
 
@@ -768,10 +787,22 @@ theorem commDeltaStarImpliesLocallyBohrZero
 theorem strongIPIffStrongCentralInCountCommSemi
 (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
 (syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) := by
--- Proof: by urContainmentSufficesForFamilyContainment, it suffices to consider UR sets only
--- For UR sets, this is proven in preStrongIPIffStrongCentralInCountCommSemi
--- Will wait to write proof until def of UR sets is fixed
-  sorry
+  have contain1 : (syndeticFamily S) ⋏ (IPFamily S) ⊆ (syndeticFamily S) ⋏ (centralFamily S) := by
+    apply urContainmentSufficesForFamilyContainment
+    intro B H hB Hthick hypoth H' H'inH H'thick
+    obtain ⟨X,_,_,_,_,dSystem,hMin,x,U,Uclopen,Bvisits⟩ := urSetIsRxU hB
+    have applyPre := preStrongIPIffStrongCentralInCountCommSemi hMin x Uclopen H Hthick
+    rw [Bvisits] at hypoth
+    rw [Bvisits]
+    exact applyPre hypoth H' H'inH H'thick
+  have contain2 := familyMeetIsMonotonic (syndeticFamily S) (centralFamily S)
+    (IPFamily S) (centralFamilyContainedInIPFamily S)
+  ext A
+  constructor
+  · intro hA
+    exact contain1 hA
+  · intro hA
+    exact contain2 hA
 
 /-- A subset of a countable, commutative semigroup is central star if and only if
 it is strongly piecewise IP*, if and only if it is strongly piecewise central* -/
@@ -779,6 +810,47 @@ theorem cStarIsStronglyPiecewiseIPStarAndCStar
 (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
 (centralFamily S)* = (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) ∧
 (centralFamily S)* = (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) :=
-by sorry -- Wait. Will rely on Furstenburg algebra.
+by
+  have contain0 : (syndeticFamily S) ⋏ (IPFamily S) ⊆ (syndeticFamily S) ⋏ (centralFamily S) := by
+    rw [strongIPIffStrongCentralInCountCommSemi S]
+    exact
+      familyMeetIsMonotonic (syndeticFamily S) (centralFamily S) (centralFamily S) fun ⦃a⦄ a_1 ↦ a_1
+  have contain1 : (centralFamily S)* ⊆
+    (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) := by
+      have := (familyLocalImplicationEquivalence (syndeticFamily S)
+        (IPFamily S) (centralFamily S)).mpr contain0
+      rw [familyJoinCommutative] at this
+      rw [dualSyndeticThick] at this
+      exact this
+  have contain2 : (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) ⊆
+    (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) := by
+      have := dualIsAntitone (centralFamilyContainedInIPFamily S)
+      have := familyJoinMonotoneSlot1 (thickFamily S) this
+      exact familyMeetIsMonotonic (syndeticFamily S) ((IPFamily S)* ⋎ thickFamily S)
+        ((centralFamily S)* ⋎ thickFamily S) this
+  have contain3 : (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) ⊆
+    (centralFamily S)* := by
+      have := familyJoinMonotoneSlot2 (thickFamily S) (dcsIsSyndeticMeetCentral S)
+      rw [familyJoinCommutative] at this
+      rw [←centralIsdcSCapThick S] at this
+      have := dualIsAntitone this
+      rw [deMorganOverJoin] at this
+      rw [deMorganOverMeet] at this
+      rw [dualThickSyndetic] at this
+      rw [dualSyndeticThick] at this
+      exact this
+  constructor
+  · ext A
+    constructor
+    · intro hA
+      exact contain1 hA
+    · intro hA
+      exact contain3 (contain2 hA)
+  · ext A
+    constructor
+    · intro hA
+      exact contain2 (contain1 hA)
+    · intro hA
+      exact contain3 hA
 
 end Application

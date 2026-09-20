@@ -752,6 +752,19 @@ Family S :=
     exact centralIsMonotone hA hAB
 }
 
+theorem centralIsIP
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isCentral A → isIP A := by
+  intro hA
+  obtain ⟨p,-,pIdemp,Ainp⟩ := hA
+  use p
+
+theorem centralFamilyContainedInIPFamily
+(S : Type*) [Semigroup S] [Nonempty S] :
+centralFamily S ⊆ IPFamily S := by
+  intro A hA
+  exact centralIsIP A hA
+
 /- The following theorems taken together show that TFAE:
   1. A is central
   2. A = R(x,U), where x is proximal to an S-uniformly recurrent point in the open set U
@@ -1322,7 +1335,7 @@ for UR sets -/
 /-- Precursor to result in AP_Defs: In countable, commutative semigroups,
 (syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) -/
 theorem preStrongIPIffStrongCentralInCountCommSemi
-(S : Type*) [CommSemigroup S] [Nonempty S] [Countable S]
+{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
 (x : X) {U : Set X} (UClopen : IsClopen U)
