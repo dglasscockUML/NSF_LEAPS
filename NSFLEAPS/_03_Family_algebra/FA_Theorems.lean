@@ -279,26 +279,6 @@ theorem thm_familyJoinIsCommutative (F G : Family α) : F ⋎ G = G ⋎ F :=
       rcases h with ⟨D, hD, C, hC, rfl⟩
       exact ⟨C, hC, D, hD, Set.inter_comm D C⟩
 
---thm_classcap_associative
- /- For all F, G, H ∈
-P(P(S)),
-(F ⋎ G) ⋎ H = F ⋎ (G ⋎ H).
-Proof. Let F, G, H ∈ P(P(S)). We must show that
-(F ⋎ G) ⋎ H = F ⋎ (G ⋎ H).
-If F = ∅ or G = ∅ or H = ∅, it is quick to check that this equality holds. Therefore, we will
-assume F, G, H̸ = ∅.
-Since F, G̸ = ∅,
-F ⋎ G = {A ∩ B : A ∈ F, B ∈ G}.
-Similarly, since G, H̸ = ∅,
-G ⋎ H = {A ∩ B : A ∈ G, B ∈ H}.
-Let X ⊆ S. Each line is equivalent to the one that follows it.
-1. X ∈ (F ⋎ G) ⋎ H
-2. there exists A ∈ (F ⋎ G) and B ∈ H such that X = A ∩ B
-3. there exists C ∈ F, D ∈ G, and B ∈ H such that X = (C ∩ D) ∩ B
-4. there exists C ∈ F, D ∈ G, and B ∈ H such that X = C ∩ (D ∩ B)
-5. there exists C ∈ F and E ∈ G ⋎ H such that X = C ∩ E
-6. X ∈ F ⋎ (G ⋎ H)
-Therefore, (F ⋎ G) ⋎ H = F ⋎ (G ⋎ H), as desired. -/
 -- NEW ***
 theorem thm_famJoinEmptyIfEitherEmpty (F G : Family α) : F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G =
 emptyFam α :=
@@ -384,9 +364,20 @@ theorem thm_familyMeetIsAssociative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((
 --thm_classcapdual_monotone ***
 -- follow more general version as seen above join
 theorem thm_familyMeetIsMonotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
-  by sorry
+  by
+  intro hFG S hS
+  rcases hS with ⟨f, hf, h, hh, rfl⟩
+  have hfG : f ∈ G := hFG hf
+  use f, hfG, h, hh
+
 theorem thm_famMeetFullIfEitherFull (F G : Family α) : F ⋏ G = fullFam α ↔ F = fullFam α ∨ G =
-fullFam α := by sorry
+fullFam α := by
+  change Family.famMeet F G = fullFam α ↔ F = fullFam α ∨ G = fullFam α
+  constructor
+  · intro h
+    sorry
+  · intro h
+    sorry
 
 theorem thm_famMeetIsEmptyFamIffFnotinGDual (F G : Family α) : F ⋎ G = emptyFam α ↔ ¬(F* ⊆ G) :=
 by sorry
@@ -418,7 +409,20 @@ theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
 --thm_combo_algebra_statement_one
 theorem thm_partialModularity (F G H : Family α) : (F ⋎ (G ⋏ H)) ⊆ (F ⋎ G) ⋏ H := by sorry
 theorem thm_partialDistrubityivty (F G H : Family α) : (F ⋏ G) ⋎ (F ⋏ H) ⊆ F ⋏ (G ⋎ H) := by sorry
-theorem thm_identityOne (F G : Family α) : F ⊆ (F ⋎ G) ⋏ G* := by sorry
+theorem thm_identityOne (F G : Family α) : F ⊆ (F ⋎ G) ⋏ G* := by
+  intro A hA
+  change A ∈ (F ⋎ G) ⋏ G* at ⊢
+  change A ∈ F at hA
+  have hAinFG : A ∈ F ⋎ G := by
+    change A ∈ famJoin F G
+    unfold _root_.famJoin
+    simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+    sorry
+  have hAinGstar : A ∈ G* := by
+    intro B hBinG
+    sorry
+  exact ⟨hAinFG, hAinGstar⟩
+
 theorem thm_identityTwo (F G H : Family α) : F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
 theorem thm_familyMeetIsIdempotentAtPRFamiliesnew (F : Family α) : F ⋏ F = F ↔ isPRFamily F := by
   constructor
@@ -459,6 +463,8 @@ by
       exact hmono
     exact h4 hA
   · intro h
+    rw [←step] at ⊢
+    rw [thm_de_morgan_v1_dual]
 
     sorry
   /- classical
