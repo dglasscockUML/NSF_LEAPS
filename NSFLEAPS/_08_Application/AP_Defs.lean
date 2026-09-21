@@ -569,6 +569,19 @@ theorem commVisitTimeSetForRPPairIsDelta
   intro H hHThick
   unfold isDelta
   let C := (visitTimeSet dSystem x V) ∩ H
+  have hSNonempty : (Set.univ : Set S).Nonempty := by
+    simp
+  rcases (Set.nonempty_def.mp hSNonempty) with ⟨s0, hs0⟩
+  -- build s1 by hand
+  -- this is to avoid issue of empty product that appears for N = 1 in the general case
+  -- (shown below)
+  have hs1Exist : ∃ s1 : S, (s1 ∈ (fun x ↦ s0 * x) '' C) ∧
+    ((dSystem.map s1) ⁻¹' V ∩ (dSystem.map s0) ⁻¹' V).Nonempty := by
+    let U := V
+    let G := H
+    sorry
+  rcases hs1Exist with ⟨s1, hs1a, hs1b⟩
+  -- build sN from the previous sn given N ≥ 2
   have hClaim : ∀ (N : ℕ) (hN : N ≥ 2), ∀ s : Fin N → S,
     ((∀ i j : Fin N, (i < j) →  s j ∈ (fun x ↦ (s i) * x) '' C) ∧
     (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V).Nonempty)
@@ -577,10 +590,143 @@ theorem commVisitTimeSetForRPPairIsDelta
     (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V))
     ∩ (dSystem.map (prodAll hN s)) ⁻¹' V).Nonempty) := by
     sorry
-  have hSNonempty : (Set.univ : Set S).Nonempty := by
-    simp
-  rcases (Set.nonempty_def.mp hSNonempty) with ⟨s0, hs0⟩
-  sorry
+  choose! pick hpick using hClaim
+  let step : (N : ℕ) → ((k : ℕ) → k < N → S) → S := fun N prev ↦
+    if N = 0 then s0
+    else if N = 1 then s1
+    else pick N (fun i : Fin N ↦ prev i.val i.isLt)
+  -- define the sequence s
+  let s : ℕ → S := Nat.strongRec step
+  -- prove properties of the sequence s
+  have hs_rec (N : ℕ) :
+    s N =
+      if N = 0 then s0
+      else if N = 1 then s1
+      else pick N (fun i : Fin N => s i.val) := by
+    exact Nat.strongRec_eq step N
+  have hs0 : s 0 = s0 := by
+    simpa using hs_rec 0
+  have hs1 : s 1 = s1 := by
+    simpa using hs_rec 1
+  have hs_step (N : ℕ) (hN : 2 ≤ N) : s N = pick N (fun i : Fin N => s i.val) := by
+    have h0 : N ≠ 0 := by omega
+    have h1 : N ≠ 1 := by omega
+    simpa [h0, h1] using hs_rec N
+  -- base cases
+  have h01 : s 1 ∈ (fun x ↦ (s 0) * x) '' C := by
+    rw [hs0, hs1]
+    exact hs1a
+  have hstart : ((dSystem.map (s 0) ⁻¹' V) ∩ (dSystem.map (s 1) ⁻¹' V)).Nonempty := by
+    rw [hs0, hs1]
+    simp only [Set.inter_nonempty_iff_exists_right, Set.mem_preimage]
+    simp only [Set.inter_nonempty_iff_exists_right, Set.mem_preimage] at hs1b
+    rcases hs1b with ⟨x, hx1, hx2⟩
+    use x
+  -- The two product identities needed for the base case.
+  have hprodTwoZero : prodExcept (by decide : 2 ≤ 2) (fun k : Fin 2 ↦ s k.val) 0 = s 1 := by
+    simp [prodExcept, prodNonempty]
+    have hset : (Finset.univ : Finset (Fin 2)).erase 0 = {1} := by
+      decide
+    have hchoose (h : ((Finset.univ : Finset (Fin 2)).erase 0).Nonempty) :
+      Classical.choose h = (1 : Fin 2) := by
+      simpa only [hset, Finset.mem_singleton] using (Classical.choose_spec h)
+    simp [hchoose]
+    simp [hset]
+  have hprodTwoOne : prodExcept (by decide : 2 ≤ 2) (fun k : Fin 2 ↦ s k.val) 1 = s 0 := by
+    simp [prodExcept, prodNonempty]
+    have hset : (Finset.univ : Finset (Fin 2)).erase 1 = {0} := by
+      decide
+    have hchoose (h : ((Finset.univ : Finset (Fin 2)).erase 1).Nonempty) :
+      Classical.choose h = (0 : Fin 2) := by
+      simpa only [hset, Finset.mem_singleton] using (Classical.choose_spec h)
+    simp [hchoose]
+    simp [hset]
+  -- Prove BOTH prefix properties simultaneously.
+  have hprefix_all : ∀ (N : ℕ) (hN : 2 ≤ N), (∀ a b : Fin N, a < b → s b.val
+    ∈ (fun y ↦ (s a.val) * y) '' C) ∧
+    (⋂ a : Fin N, dSystem.map (prodExcept hN (fun k : Fin N ↦ s k.val) a) ⁻¹' V).Nonempty := by
+    intro N hN
+    induction N, hN using Nat.le_induction with
+    | base =>
+        constructor
+        · -- For a < b in Fin 2, necessarily a = 0 and b = 1.
+          intro a b hab
+          have hab' : a.val < b.val := hab
+          have hb_lt : b.val < 2 := b.isLt
+          have ha0 : a.val = 0 := by omega
+          have hb1 : b.val = 1 := by omega
+          simpa only [ha0, hb1] using h01
+        · -- Use the common witness for the initial pair.
+          rcases hstart with ⟨z, hz0, hz1⟩
+          refine ⟨z, Set.mem_iInter.mpr ?_⟩
+          intro a
+          fin_cases a
+          · simpa [hprodTwoZero] using hz1
+          · simpa [hprodTwoOne] using hz0
+    | succ N hN ih =>
+        -- The induction hypothesis contains the full
+        -- antecedent needed to apply hpick.
+        rcases hpick N hN
+            (fun k : Fin N ↦ s k.val) ih with
+          ⟨hnew, z, hzold, hzall⟩
+        -- The selected new term is s N.
+        rw [← hs_step N hN] at hnew hzold
+        constructor
+        · -- Pairwise membership for the enlarged prefix.
+          intro a b hab
+          have hab' : a.val < b.val := hab
+          by_cases hb : b.val < N
+          · -- Both indices belong to the old prefix.
+            exact ih.1
+              ⟨a.val, lt_trans hab' hb⟩
+              ⟨b.val, hb⟩
+              hab'
+          · -- The larger index is the new index N.
+            have hbN : b.val = N := by
+              have hb_lt := b.isLt
+              omega
+            have haN : a.val < N := by omega
+            simpa only [hbN] using
+              hnew ⟨a.val, haN⟩
+        · -- Nonempty intersection for the enlarged prefix.
+          -- The witness z supplied by hpick works.
+          refine ⟨z, Set.mem_iInter.mpr ?_⟩
+          intro a
+          refine Fin.lastCases ?_ (fun i ↦ ?_) a
+          · -- when the omitted index is the new index.
+            unfold prodExcept
+            unfold prodExcept at hzold
+            unfold prodAll at hzall
+            sorry
+          · -- when the omitted index is an old index.
+            sorry
+  -- prove the sequence s satisfies the conclusion
+  use s
+  intro i j hij
+  by_cases hj2 : j ≥ 2
+  · specialize hs_step j hj2
+    change s j ∈ (fun x ↦ (s i) * x) '' C
+    rw [hs_step]
+    refine (hpick j hj2 (fun k : Fin j ↦ s k.val) ?_).1 ⟨i, hij⟩
+    constructor
+    · exact (hprefix_all j hj2).1
+    · exact (hprefix_all j hj2).2
+  · have hjlesseq1 : j ≤ 1 := by
+      omega
+    have hjequal1 : j = 1 := by
+      by_contra hContra
+      have hjequal0 : j = 0 := by
+        omega
+      have hiatleast0 : i ≥ 0 := by
+        omega
+      have hjatleast1 : j ≥ 1 := by
+        omega
+      rw [hjequal0] at hjatleast1
+      omega
+    have hiequal0 : i = 0 := by
+      omega
+    rw [hjequal1, hiequal0, hs0, hs1]
+    exact hs1a
 
 end Delta_builder
 

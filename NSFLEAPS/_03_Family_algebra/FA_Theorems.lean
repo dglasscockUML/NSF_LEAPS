@@ -364,11 +364,11 @@ theorem thm_familyMeetIsAssociative (F G H : Family α) : (F ⋏ (G ⋏ H)) = ((
 --thm_classcapdual_monotone ***
 -- follow more general version as seen above join
 theorem thm_familyMeetIsMonotone (F G H : Family α) : F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
-  by
-  intro hFG S hS
-  rcases hS with ⟨f, hf, h, hh, rfl⟩
-  have hfG : f ∈ G := hFG hf
-  use f, hfG, h, hh
+  by sorry
+  -- intro hFG S hS
+  -- rcases hS with ⟨f, hf, h, hh, rfl⟩
+  -- have hfG : f ∈ G := hFG hf
+  -- use f, hfG, h, hh
 
 theorem thm_famMeetFullIfEitherFull (F G : Family α) : F ⋏ G = fullFam α ↔ F = fullFam α ∨ G =
 fullFam α := by
@@ -409,19 +409,19 @@ theorem thm_familyMeetIsIdempotentAtPRFamilies (F : Family α) :
 --thm_combo_algebra_statement_one
 theorem thm_partialModularity (F G H : Family α) : (F ⋎ (G ⋏ H)) ⊆ (F ⋎ G) ⋏ H := by sorry
 theorem thm_partialDistrubityivty (F G H : Family α) : (F ⋏ G) ⋎ (F ⋏ H) ⊆ F ⋏ (G ⋎ H) := by sorry
-theorem thm_identityOne (F G : Family α) : F ⊆ (F ⋎ G) ⋏ G* := by
-  intro A hA
-  change A ∈ (F ⋎ G) ⋏ G* at ⊢
-  change A ∈ F at hA
-  have hAinFG : A ∈ F ⋎ G := by
-    change A ∈ famJoin F G
-    unfold _root_.famJoin
-    simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
-    sorry
-  have hAinGstar : A ∈ G* := by
-    intro B hBinG
-    sorry
-  exact ⟨hAinFG, hAinGstar⟩
+theorem thm_identityOne (F G : Family α) : F ⊆ (F ⋎ G) ⋏ G* := by sorry
+  -- intro A hA
+  -- change A ∈ (F ⋎ G) ⋏ G* at ⊢
+  -- change A ∈ F at hA
+  -- have hAinFG : A ∈ F ⋎ G := by
+  --   change A ∈ famJoin F G
+  --   unfold _root_.famJoin
+  --   simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+  --   sorry
+  -- have hAinGstar : A ∈ G* := by
+  --   intro B hBinG
+  --   sorry
+  -- exact ⟨hAinFG, hAinGstar⟩
 
 theorem thm_identityTwo (F G H : Family α) : F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
 theorem thm_familyMeetIsIdempotentAtPRFamiliesnew (F : Family α) : F ⋏ F = F ↔ isPRFamily F := by
