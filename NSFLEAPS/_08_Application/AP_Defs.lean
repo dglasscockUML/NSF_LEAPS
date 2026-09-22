@@ -573,13 +573,67 @@ theorem commVisitTimeSetForRPPairIsDelta
     simp
   rcases (Set.nonempty_def.mp hSNonempty) with ⟨s0, hs0⟩
   -- build s1 by hand
-  -- this is to avoid issue of empty product that appears for N = 1 in the general case
-  -- (shown below)
+  -- this is to avoid issue of empty product that appears for N = 1 in the general case below
   have hs1Exist : ∃ s1 : S, (s1 ∈ (fun x ↦ s0 * x) '' C) ∧
     ((dSystem.map s1) ⁻¹' V ∩ (dSystem.map s0) ⁻¹' V).Nonempty := by
-    let U := V
+    simp only [mem_nhds_iff] at hV
+    rcases hV with ⟨V0, hV0a, hV0b, hV0c⟩
+    let U := V0
     let G := H
-    sorry
+    have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1 hxyRP U V0
+    have hUOpen : IsOpen U := by
+      simp only [U]
+      exact hV0b
+    have hUNonempty : U.Nonempty := by
+      simp only [U]
+      exact ⟨y, hV0c⟩
+    specialize hInterSynd hUOpen hV0b hUNonempty hV0c
+    have hInterN : (visitTimeSet dSystem x U ∩ setVisitTimeSet dSystem V0 U ∩ G).Nonempty := by
+      apply syndeticThickIntersect
+      · exact hInterSynd
+      · simp only [G]
+        exact hHThick
+    rcases (Set.inter_nonempty_iff_exists_right.mp hInterN) with ⟨t, ht1, ht2, ht3⟩
+    let s1 := s0 * t
+    use s1
+    constructor
+    · simp only [Set.mem_image, Set.mem_inter_iff, C]
+      use t
+      constructor
+      · constructor
+        · simp only [visitTimeSet, Set.mem_preimage]
+          simp only [visitTimeSet, Set.mem_preimage, U] at ht2
+          apply hV0a ht2
+        · simp only [G] at ht1
+          exact ht1
+      · simp [s1]
+    · have hExz : ∃ z ∈ V, (dSystem.map t) z ∈ V := by
+        simp only [setVisitTimeSet, Set.inter_nonempty_iff_exists_right, Set.mem_image,
+          ↓existsAndEq, and_true, Set.mem_ofPred_eq] at ht3
+        rcases ht3 with ⟨z, hz1, hz2⟩
+        use z
+        constructor
+        · simp [U] at hz1
+          apply hV0a hz2
+        · simp only [U] at hz1
+          apply hV0a hz1
+      rcases hExz with ⟨z, hz1, hz2⟩
+      have hSurj := minimalCommActionIsSurjective hMin
+      unfold isSurjectiveSystem at hSurj
+      specialize hSurj s0
+      simp only [Function.Surjective] at hSurj
+      specialize hSurj z
+      rcases hSurj with ⟨a, ha⟩
+      use a
+      simp only [Set.mem_inter_iff, Set.mem_preimage]
+      constructor
+      · simp only [s1]
+        rw [CommSemigroup.mul_comm s0 t]
+        rw [dSystem.mapMult t s0]
+        rw [ha]
+        exact hz2
+      · rw [ha]
+        exact hz1
   rcases hs1Exist with ⟨s1, hs1a, hs1b⟩
   -- build sN from the previous sn given N ≥ 2
   have hClaim : ∀ (N : ℕ) (hN : N ≥ 2), ∀ s : Fin N → S,
@@ -589,6 +643,18 @@ theorem commVisitTimeSetForRPPairIsDelta
     (∃ r : S, (∀ i : Fin N, r ∈ (fun x ↦ (s i) * x) '' C) ∧
     (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V))
     ∩ (dSystem.map (prodAll hN s)) ⁻¹' V).Nonempty) := by
+    intro N hN s hs
+    rcases hs with ⟨hs1, hs2⟩
+    simp only [mem_nhds_iff] at hV
+    rcases hV with ⟨V0, hV0a, hV0b, hV0c⟩
+    let U := (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V0)
+    let G := ⋂ i : Fin N, ((prodExcept hN s i) * ·) ⁻¹' H
+    have hUNonempty : U.Nonempty := by
+      sorry
+    have hUOpen : IsOpen U := by
+      sorry
+    have hGThick : isThick G := by
+      sorry
     sorry
   choose! pick hpick using hClaim
   let step : (N : ℕ) → ((k : ℕ) → k < N → S) → S := fun N prev ↦
