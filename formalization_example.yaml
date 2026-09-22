@@ -1,0 +1,312 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+#
+# Provenance and status metadata for the Lean 4 formalization in this repository, following the
+# formalization.yaml v0.4 reporting schema (https://github.com/mathlib-initiative/formalization.yaml).
+# It records what was formalized (the blueprint in blueprint/), how it was produced (largely by
+# autoformalization agents under human supervision), what has been checked and by what means, and
+# where the formal statements corresponding to the blueprint's statements live. This is
+# informational metadata only: nothing in the Lean build depends on it.
+#
+# Companion documents: blueprint/blueprint.tex (the source manuscript, carrying inline \lean{...}
+# and \leanok metadata), automation/Instructions.md (the instruction set the formalization agents worked
+# from), automation/Status.md (per-label formalization status), comparator.json together with Challenge.lean
+# (machine-checkable audit of the main statements), LeanNct.lean (axiom check on every build).
+#
+# This file has been created with the assistance of Claude Code.
+
+version: "v0.4"
+
+# project - the formalization itself (not the source).
+project:
+  name: Formalization of norm-variation of multiple ergodic averages for commuting transformations
+  description: >-
+    This is a Lean 4 formalization of norm-variation of multiple ergodic averages for commuting transformations, 
+    including Tao's norm-convergence theorem.
+    At the heart of the argument is an explicit real-variable estimate for twisted multilinear averages.
+    This formalization is based on the blueprint available at arXiv:2608.27321.
+    The statements of the main theorems have been hand-formalized, 
+    while the proof was autoformalized during a one-week period using coding agents under human supervision. 
+    This produced roughly 107k lines of code (excluding comments and blank lines) and includes proofs of several 
+    prerequisite theorems currently not in mathlib such as multilinear complex interpolation, 
+    the Calderón transference principle, and properties of Wiener space functions.
+  authors:
+      - "Floris van Doorn"
+      - "Polona Durcik"
+      - "Joris Roos"
+      - "Lenka Slavíková"
+      - "Christoph Thiele"
+  responsible_maintainers: # people responsible for the formalization repository
+    - "Joris Roos"
+  license: "Apache-2.0"
+
+sources:
+  - title: "A blueprint for the formalization of norm-variation of multiple ergodic averages for commuting transformations"
+    authors:
+      - "Floris van Doorn"
+      - "Polona Durcik"
+      - "Joris Roos"
+      - "Lenka Slavíková"
+      - "Christoph Thiele"
+    type: "blueprint"
+    id: "arXiv:2608.27321"
+    location: "Theorem 1.2 (thm:ergodicthm) and Theorem 1.4 (thm:nct main real), with adapted supporting results"
+    relationship: "formalizes"
+    note: >-
+      The selected main quantitative theorems formalize these blueprint results.
+      The supporting development adapts some intermediate statements, definitions,
+      constructions, and constants as recorded in automation/ErrorReport.md and
+      fidelity.divergences. The relationship does not assert that every intermediate
+      blueprint statement or displayed constant is proved verbatim. Several report
+      entries explicitly leave the blueprint unchanged while Lean uses corrected or
+      weaker versions. The report at the reviewed source revision is:
+      https://github.com/roos-j/lean-nct/blob/ce643698d651a0824e672ef46894d40a6b69fb00/automation/ErrorReport.md
+    license: "Apache-2.0"
+    author_endorsement: "participated"
+
+  - title: "Norm convergence of multiple ergodic averages for commuting transformations"
+    authors:
+      - "Terence Tao"
+    type: "paper"
+    id: >-
+      Ergodic Theory and Dynamical Systems 28(2), 657-688 (2008).
+      https://doi.org/10.1017/S0143385708000011; https://arxiv.org/abs/0707.1117v3
+    location: "Theorem 1.1"
+    relationship: "independently-proves"
+    note: >-
+      The declaration nCT.tao_norm_convergence proves the norm-convergence result
+      on a probability space. For n >= 2, the proof derives convergence from this
+      project's norm-variation estimate; for n = 1, it uses Mathlib's mean ergodic
+      theorem. The implementation is in LeanNct/Auto/Tao.lean and also includes
+      the trivial case n = 0. It does not formalize Tao's original proof.
+
+  - title: "Formalisation of the Calderón Transference Principle in Ergodic Theory"
+    authors:
+      - "Felix Pernegger"
+    type: "thesis"
+    location: "Theorem 2.5"
+    relationship: "background"
+    note: >-
+      Bachelor's thesis, Rheinische Friedrich-Wilhelms-Universität Bonn, September 2025.
+      This repository contains its own complete proof of the instance it needs
+      (Auto.calderon_transference_external), so nothing is assumed.
+    author_endorsement: "n/a"
+
+  - title: "Interpolation Spaces: An Introduction"
+    authors:
+      - "Jöran Bergh"
+      - "Jörgen Löfström"
+    id: "Springer-Verlag, Berlin, 1976"
+    type: "book"
+    location: "multilinear complex interpolation"
+    relationship: "background"
+    note: >-
+      This repository contains a complete proof of the interpolation theorem it needs
+      (Auto.multilinear_interpolation_external, LeanNct/Auto/MultilinearInterpolation.lean).
+    author_endorsement: "n/a"
+
+classification:
+  arxiv: ["math.CA", "math.DS"]
+  msc2020: ["42B20", "42B15", "37A30"]
+
+status:
+  scope: >-
+    The three selected main results listed below are proved in Lean. The supporting
+    development follows the blueprint with corrections and adaptations recorded in
+    automation/ErrorReport.md. Completion entries in automation/Status.md describe
+    the implemented Lean versions, not a proof of every original blueprint statement
+    and constant verbatim. In particular, some intermediate cardinality estimates and
+    numerical bounds are weaker, and a series estimate uses an extended nonnegative
+    sum. These differences do not change the selected main theorem statements.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "nCT.main_ergodic_theorem"
+      file: "LeanNct/Theorems.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "nCT.tao_norm_convergence"
+      file: "LeanNct/Theorems.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "nCT.main_twisted_theorem"
+      file: "LeanNct/Theorems.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: "manual"
+      tool_setup: >-
+        The main theorem statements in LeanNct/Theorems.lean and their associated
+        definitions in LeanNct/Defs.lean were formalized by hand. The authors designed
+        the mathematical statements and proof organization and supervised the automated
+        proof development; see blueprint/blueprint.tex, sections on the use of automation
+        and formalization in Lean.
+    - method: "copilot"
+      models: ["GPT-5.6-Sol-Pro"]
+      tool_setup: >-
+        Manuscript editing, and mathematical communication with human
+        instructions and feedback. After a human-written first draft had fixed the
+        statements, proof organization, and dependencies, parts and eventually the
+        entire blueprint were processed over several automation passes. The model
+        generated and edited informal proof text, filled routine arguments and
+        arguments by analogy, and computed and optimized explicit constants.
+        Its communication role was the written exposition of the mathematics in
+        the blueprint. This is distinct from generating the Lean proofs.
+      prompting_notes: >-
+        The manuscript marks machine-generated content and reports separate automated
+        checks of local correctness. Automatically generated informal proofs were not
+        thoroughly hand-checked; those checks do not establish literal fidelity of
+        every manuscript statement to the corrected Lean development.
+        Fuller disclosure: blueprint/blueprint.tex, section "Use of automation",
+        at the immutable source revision:
+        https://github.com/roos-j/lean-nct/blob/ce643698d651a0824e672ef46894d40a6b69fb00/blueprint/blueprint.tex#L242-L255
+    - method: "agent"
+      models: ["gpt-5.6-terra-ultra"]
+      framework: "Codex"
+      tool_setup: >-
+        Long autonomous coding-agent sessions driven by a custom instruction set (automation/Instructions.md)
+        that fixes scope, file organization, naming, faithfulness rules and proof obligations. The
+        supporting harness in this repository: automation/Status.md, a continuously maintained per-label status
+        table (\label{...}: [Status] (Lean: name) (timestamp)) that the agent had to update in
+        lockstep with the code; automation/ErrorReport.md, where the agent had to record substantive blueprint
+        errors and constant discrepancies instead of silently diverging; two Codex skills under
+        .codex/skills/ (update-lean-metadata, which syncs \lean{...}/\leanok metadata in
+        blueprint.tex from automation/Status.md, and update-dependency-graph, which regenerates the blueprint
+        dependency graph); and the dependency_graph/ scripts that turn blueprint labels into a
+        browsable graph linked to the generated API docs. The workflow was two-stage: first
+        formalize all statements and definitions (proofs left as sorry), then discharge the proofs
+        one theorem at a time in blueprint order, with only local parallelization.
+      cost:
+        wall_time: "concentrated in many extended sessions over about one week"
+        spend_usd: "subscription-based usage, two $200/mo GPT Pro 20x subscriptions"
+      prompting_notes: >-
+        The instruction set was designed to counteract known failure modes of long agent runs:
+        drifting away from the target, substituting trivial wrapper lemmas for real work, and
+        creating an opaque zoo of auxiliary statements and files. Concretely it mandates one Lean
+        file per blueprint leaf subsection; a single flat namespace (Auto) with aux_-prefixed
+        auxiliary results; theorem (never lemma/def) for every source result; copied LaTeX
+        statements (never proofs) in docstrings; eLpNorm for L^p norms; raw function-to-function
+        maps rather than mathlib bundled operators; explicit named constants
+        def C_<theorem name> mirroring the blueprint's recursive definitions; no invented
+        definitions and no added hypotheses beyond those needed for faithful Lean semantics
+        (MemLp, measurability, junk-value guards). Where a displayed constant could not be
+        justified exactly but a proved bound was worse by at most about a factor of two, the agent
+        was instructed to keep the proved bound, log it in automation/ErrorReport.md, and continue rather than
+        stall on sharpness.
+
+    - method: "agent"
+      models: ["opus-5-high"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Post-completion cleanup on an already sorry-free development, run interactively with review
+        of every diff. Work included: docstring repair
+        (LaTeX delimiters converted to KaTeX-compatible $ / $$, math moved out of code spans,
+        removal of bracket artifacts around cross-references, and a fix to broken \left\langle
+        markup that failed to render); clearing linter warnings; and CI work.
+        No mathematical content was changed; the build stayed sorry-free with an unchanged axiom set
+        throughout.
+      cost:
+        wall_time: "less than one hour"
+        spend_usd: "subscription-based usage"
+      prompting_notes: ""
+  notes: ""
+
+fidelity:
+  divergences: >-
+    The selected main quantitative theorem statements and their explicit constants
+    agree with the blueprint's Theorems 1.2 and 1.4. This statement is limited to
+    those final results and is not a claim of exact fidelity throughout the supporting
+    development. automation/ErrorReport.md records the following intermediate
+    differences for which it explicitly says the blueprint text was left unchanged.
+    (1) "prism sum le sum prism-L1": convergence of symmetric partial sums in L1
+    does not imply convergence of the real-valued absolute prism-form series. Lean
+    uses the supremum of symmetric finite partial sums in ENNReal, allowing infinity.
+    (2) "Gaussian domination combined": the case-1 construction requires 30 slots;
+    the shared Lean cardinality cap is 36 to accommodate case 3, rather than the
+    manuscript's cap 28. The case-1 proof also contains the smaller unsupported
+    intermediate counts 16 and 22 described in the report.
+    (3) "Gauss domination case 1": the Lean defining constant has an additional
+    factor 2, although the bound below 2^117 and common bound 2^153 are retained.
+    (4) Cases 2 and 3 use local coefficient 9 instead of 8. Case 2 requires 18
+    active labels in the orientation-zero branch instead of 14 and uses a padded
+    range-30 witness. Case 3 requires 36 multiplicity-preserving slots instead of 28.
+    Sharper later estimates retain the public case-2 and case-3 constant bounds.
+    (5) "constant induct positive terms imply increase data": the shared cap 36
+    gives 324 * 2^163, with the proved bound below 2^172 instead of below 2^171.
+    (6) "constant induct positive terms theorem": Lean proves a bound below 2^359
+    instead of the manuscript's bound below (253/256) * 2^358 and hence below 2^358.
+    The last two bounds are factor-two relaxations, not proofs of the sharper
+    manuscript inequalities.
+    The report distinguishes resolved changes: the mean-value bump constant was
+    reconciled in pass 8, and the finite-variation definition for "shortlongJumps"
+    was corrected to allow at most J jumps. Lean encodes the latter using monotone
+    chains with repeated entries, which contribute zero in the intended range r >= 1.
+    Statement-level Lean conventions also need interpretation: averages allow N = 0,
+    the Bochner integral is total with value zero for nonintegrable integrands,
+    eLpNorm is extended nonnegative valued, and MemLp includes almost-everywhere
+    strong measurability and finite norm. The variation seminorm uses positive
+    indices. The twisted theorem permits J = 0, and Tao's theorem permits n = 0.
+    These conventions are separate from the intermediate corrections above.
+  known_gaps: >-
+    Exact formal proofs of the unchanged, sharper intermediate blueprint claims
+    listed above are not supplied by the corrected or weaker Lean versions.
+    The discrepancy report has not been fully reconciled into the manuscript;
+    this metadata does not claim that all intermediate statements or constants
+    were made to agree. The machine-checked selected theorems do not certify the
+    correctness of every informal proof in the blueprint. Generated informal proofs
+    were not thoroughly hand-checked, and a complete human audit of the supporting
+    formal proofs is not claimed. This is a source-fidelity and review limitation,
+    not an additional axiom or an unproved selected Lean theorem.
+    Detailed report at the immutable source revision:
+    https://github.com/roos-j/lean-nct/blob/ce643698d651a0824e672ef46894d40a6b69fb00/automation/ErrorReport.md
+
+review:
+  status: "author-verified"
+  notes: >-
+    Author verification concerns the hand-formalized main theorem statements and their
+    associated definitions. It does not certify exact agreement of all supporting
+    statements and constants: the outstanding source differences are recorded in
+    fidelity.divergences, fidelity.known_gaps, and automation/ErrorReport.md.
+    The proofs were developed largely by coding agents under human supervision and checked
+    by Lean. This status does not claim independent peer review or a complete human audit
+    of every generated proof. As disclosed in blueprint/blueprint.tex, automatically
+    generated informal proofs underwent machine checks but were not thoroughly hand-checked.
+
+alignment:
+  namespace: nCT
+  statements:
+    - source: "\\label{thm:ergodicthm}"
+      lean: "nCT.main_ergodic_theorem"
+      module: "LeanNct/Theorems.lean"
+      status: "proved"
+      note: ""
+    - source: "arXiv:0707.1117v3, Theorem 1.1"
+      lean: "nCT.tao_norm_convergence"
+      module: "LeanNct/Theorems.lean"
+      status: "proved"
+      note: >-
+        Norm convergence on a probability space, obtained from the norm-variation
+        estimate for n >= 2 and Mathlib's mean ergodic theorem for n = 1;
+        the Lean statement also allows n = 0.
+    - source: "\\label{thm:nct main real}"
+      lean: "nCT.main_twisted_theorem"
+      module: "LeanNct/Theorems.lean"
+      status: "proved"
+      note: ""
+
+acknowledgements: >-
+  Built on Lean 4 and mathlib. The API
+  documentation is generated with a fork of doc-gen4; the dependency graph is rendered with MathJax and
+  Graphviz. The comparator setup uses leanprover/comparator, leanprover/lean4export and landrun.
+  The Calderón transference principle was first formalized in Lean by Felix Pernegger. Funding
+  acknowledged in the blueprint: ERC Synergy Grant 101224275 and Germany's Excellence Strategy
+  grant EXC-2047/1-390685813; NSF grants DMS-2554859 and DMS-2154835 and grants from the Simons
+  Foundation; Czech Science Foundation grant 26-21107S.

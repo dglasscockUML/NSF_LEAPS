@@ -1,4 +1,4 @@
-import NSFLEAPS
+import NSFLEAPS.delta_palomar_landing
 
 /-!
 # Proved solution
