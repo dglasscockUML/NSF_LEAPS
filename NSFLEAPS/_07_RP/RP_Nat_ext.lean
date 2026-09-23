@@ -506,7 +506,7 @@ RP dSystem ⊆ RP (groGroupDynamicalSystem hHomeo) := by
   exact hs
 
 /-- If `S` acts by homeomorphisms, then `RP` for the original action is the
-same as `RP` for the extended action, `groGroupDynamicalSystem`.-/
+same as `RP` for the extended action, `groGroupDynamicalSystem` -/
 theorem extendedActionRPisActionRP
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]

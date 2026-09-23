@@ -527,8 +527,10 @@ end Reduction_to_UR_sets
 
 section Delta_builder
 
--- Next three definitions were written by ChatGPT. The definitions help with product
--- on commutative semigroups
+-- Next three definitions and the three lemmas below were written by ChatGPT.
+-- The definitions help with product on commutative semigroups and the lemmas
+-- provide simple equalities regarding these definitions
+-- These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
 
 -- Product of f over a nonempty finset.
 noncomputable def prodNonempty
@@ -557,6 +559,306 @@ prodNonempty ((Finset.univ : Finset (Fin N)).erase i) (by
     simp only [Finset.card_univ, Fintype.card_fin]
     omega) s
 
+lemma mul_prodNonempty_erase
+    {I S : Type*} [DecidableEq I] [CommSemigroup S] [Nonempty S]
+    (t : Finset I) (ht : t.Nonempty) (f : I → S)
+    (i : I) (hi : i ∈ t) (he : (t.erase i).Nonempty) :
+    (f i) * prodNonempty (t.erase i) he f =
+      prodNonempty t ht f := by
+  classical
+  let : Std.Commutative (fun x y : S ↦ x * y) :=
+    ⟨fun x y ↦ mul_comm x y⟩
+  let : Std.Associative (fun x y : S ↦ x * y) :=
+    ⟨fun x y z ↦ mul_assoc x y z⟩
+  -- Swap an outside factor with the starting value of a fold.
+  have hswap (u : Finset I) (x y : S) :
+      x * u.fold (· * ·) y f =
+        y * u.fold (· * ·) x f := by
+    induction u using Finset.induction_on with
+    | empty =>
+        simpa only [Finset.fold_empty] using mul_comm x y
+    | @insert k u hk ih =>
+        simp only [Finset.fold_insert hk]
+        rw [
+          mul_left_comm x (f k),
+          ih,
+          mul_left_comm (f k) y
+        ]
+  -- Separate one indexed factor from a fold.
+  have hsplit (u : Finset I) (a : I)
+      (ha : a ∈ u) (b : S) :
+      u.fold (· * ·) b f =
+        (f a) * (u.erase a).fold (· * ·) b f := by
+    simpa only [Finset.insert_erase ha] using
+      (Finset.fold_insert
+        (op := (· * ·)) (b := b) (f := f)
+        (by simp : a ∉ u.erase a))
+  -- Any member can be used as the starting factor.
+  have hanchor (u : Finset I) (hu : u.Nonempty)
+      (a : I) (ha : a ∈ u) :
+      prodNonempty u hu f =
+        (u.erase a).fold (· * ·) (f a) f := by
+    let c : I := Classical.choose hu
+    have hc : c ∈ u := Classical.choose_spec hu
+    have hdef :
+        prodNonempty u hu f =
+          (u.erase c).fold (fun x y : S => x * y) (f c) f := by
+      unfold prodNonempty
+      apply congrArg
+        (fun t : Finset I =>
+          t.fold (fun x y : S => x * y) (f c) f)
+      ext k
+      simp only [Finset.mem_erase, c]
+    rw [hdef]
+    by_cases hca : c = a
+    · rw [hca]
+    · rw [
+        hsplit (u.erase c) a
+          (Finset.mem_erase.mpr ⟨Ne.symm hca, ha⟩) (f c),
+        hsplit (u.erase a) c
+          (Finset.mem_erase.mpr ⟨hca, hc⟩) (f a),
+        Finset.erase_right_comm
+      ]
+      exact hswap _ _ _
+  -- Choose a common starting index from the remaining indices.
+  let a : I := Classical.choose he
+  have ha : a ∈ t.erase i := Classical.choose_spec he
+  have hi' : i ∈ t.erase a :=
+    Finset.mem_erase.mpr
+      ⟨Ne.symm (Finset.mem_erase.mp ha).1, hi⟩
+  -- Rewrite both products with starting factor f a,
+  -- then separate the factor f i.
+  rw [
+    hanchor (t.erase i) he a ha,
+    hanchor t ht a (Finset.mem_of_mem_erase ha),
+    hsplit (t.erase a) i hi' (f a),
+    Finset.erase_right_comm
+  ]
+
+lemma prodExcept_last_eq_prodAll
+    {S : Type*} [CommSemigroup S] [Nonempty S]
+    {N : ℕ}
+    (hN : 2 ≤ N)
+    (hNSucc : 2 ≤ N.succ)
+    (s : Fin N.succ → S) :
+    prodExcept hNSucc s (Fin.last N) =
+      prodAll hN (fun k : Fin N ↦ s k.castSucc) := by
+  classical
+  -- A product over a singleton is its only factor.
+  have hsingleton {I : Type}
+      (a : I) (f : I → S)
+      (h : ({a} : Finset I).Nonempty) :
+      prodNonempty {a} h f = f a := by
+    have hc : Classical.choose h = a :=
+      Finset.mem_singleton.mp (Classical.choose_spec h)
+    simp only [
+      prodNonempty, hc,
+      Finset.erase_singleton, Finset.fold_empty
+    ]
+  -- This is the step that uses mul_prodNonempty_erase.
+  have hinsert {I : Type}
+      (t : Finset I) (ht : t.Nonempty)
+      (a : I) (ha : a ∉ t) (f : I → S)
+      (h : (insert a t).Nonempty) :
+      prodNonempty (insert a t) h f =
+        (f a) * prodNonempty t ht f := by
+    have he : ((insert a t).erase a).Nonempty := by
+      simpa [ha] using ht
+    simpa [ha] using
+      (mul_prodNonempty_erase
+        (insert a t) h f a
+        (Finset.mem_insert_self a t) he).symm
+  -- Reindex a nonempty product along an embedding.
+  --
+  -- We allow an explicit equality t.map e = u, so that
+  -- the nonemptiness proofs are handled inside this helper.
+  have hreindex {I J : Type}
+      (e : I ↪ J)
+      (t : Finset I) (u : Finset J)
+      (he : t.map e = u)
+      (ht : t.Nonempty) (hu : u.Nonempty)
+      (f : J → S) :
+      prodNonempty u hu f =
+        prodNonempty t ht (fun k ↦ f (e k)) := by
+    subst u
+    revert ht hu
+    induction t using Finset.induction_on with
+    | empty =>
+        intro ht
+        simp at ht
+    | @insert a t ha ih =>
+        intro ht hu
+        obtain rfl | ht' := t.eq_empty_or_nonempty
+        · -- Singleton case.
+          simp only [
+            Finset.insert_empty,
+            Finset.map_singleton,
+            hsingleton
+          ]
+        · -- Insert into a nonempty finset.
+          have hmt : (t.map e).Nonempty :=
+            Finset.map_nonempty.mpr ht'
+          have hea : e a ∉ t.map e := by
+            simpa using ha
+          -- Split off f (e a) on both sides, then use ih.
+          simpa only [
+            Finset.map_insert,
+            hinsert t ht' a ha (fun k ↦ f (e k)),
+            hinsert (t.map e) hmt (e a) hea f
+          ] using
+            congrArg
+              (fun z : S ↦ (f (e a)) * z)
+              (ih ht' hmt)
+  -- castSucc maps the old univ onto the new univ
+  -- with the last index erased.
+  have hindex :
+      (Finset.univ : Finset (Fin N)).map Fin.castSuccEmb =
+        (Finset.univ : Finset (Fin N.succ)).erase
+          (Fin.last N) := by
+    rw [Finset.map_eq_image]
+    change
+      (Finset.univ : Finset (Fin N)).image
+          (fun k : Fin N ↦ k.castSucc) =
+        (Finset.univ : Finset (Fin N.succ)).erase
+          (Fin.last N)
+    rw [Fin.image_castSucc N]
+    ext k
+    simp
+  have hU : (Finset.univ : Finset (Fin N)).Nonempty :=
+    ⟨⟨0, by omega⟩, Finset.mem_univ _⟩
+  have hE :
+      ((Finset.univ : Finset (Fin N.succ)).erase
+        (Fin.last N)).Nonempty := by
+    rw [← hindex]
+    exact Finset.map_nonempty.mpr hU
+  unfold prodExcept prodAll
+  exact hreindex Fin.castSuccEmb
+    Finset.univ _ hindex hU hE s
+
+lemma prodExcept_castSucc_eq
+    {S : Type*} [CommSemigroup S] [Nonempty S]
+    {N : ℕ}
+    (hN : 2 ≤ N) (hNSucc : 2 ≤ N.succ)
+    (s : ℕ → S) (i : Fin N) :
+    prodExcept hNSucc
+        (fun k : Fin N.succ => s k.val) i.castSucc =
+      (prodExcept hN
+        (fun k : Fin N => s k.val) i) * s N := by
+  classical
+  -- A nonempty product over a singleton is its only factor.
+  have hsingleton {I : Type}
+      (a : I) (f : I → S)
+      (h : ({a} : Finset I).Nonempty) :
+      prodNonempty {a} h f = f a := by
+    have hc : Classical.choose h = a :=
+      Finset.mem_singleton.mp (Classical.choose_spec h)
+    simp only [
+      prodNonempty, hc,
+      Finset.erase_singleton, Finset.fold_empty
+    ]
+  -- Derive an insertion rule from your existing lemma.
+  have hinsert {I : Type}
+      (t : Finset I) (ht : t.Nonempty)
+      (a : I) (ha : a ∉ t) (f : I → S)
+      (h : (insert a t).Nonempty) :
+      prodNonempty (insert a t) h f =
+        (f a) * prodNonempty t ht f := by
+    have he : ((insert a t).erase a).Nonempty := by
+      simpa [ha] using ht
+    simpa [ha] using
+      (mul_prodNonempty_erase
+        (insert a t) h f a
+        (Finset.mem_insert_self a t) he).symm
+  -- Reindexing along an embedding preserves prodNonempty.
+  -- All supporting work is local to this proof.
+  have hreindex {I J : Type}
+      (e : I ↪ J)
+      (t : Finset I) (u : Finset J)
+      (htu : t.map e = u)
+      (ht : t.Nonempty) (hu : u.Nonempty)
+      (f : J → S) :
+      prodNonempty u hu f =
+        prodNonempty t ht (fun k => f (e k)) := by
+    subst u
+    revert ht hu
+    induction t using Finset.induction_on with
+    | empty =>
+        intro ht
+        simp at ht
+    | @insert a t ha ih =>
+        intro ht hu
+        obtain rfl | ht' := t.eq_empty_or_nonempty
+        · -- Singleton case.
+          simp only [
+            Finset.insert_empty,
+            Finset.map_singleton,
+            hsingleton
+          ]
+        · -- Split off corresponding factors and use induction.
+          have hmt : (t.map e).Nonempty :=
+            Finset.map_nonempty.mpr ht'
+          have hea : e a ∉ t.map e := by
+            simpa using ha
+          simpa only [
+            Finset.map_insert,
+            hinsert t ht' a ha (fun k => f (e k)),
+            hinsert (t.map e) hmt (e a) hea f
+          ] using
+            congrArg
+              (fun z : S => (f (e a)) * z)
+              (ih ht' hmt)
+  -- The old and enlarged index sets, each omitting i.
+  let t : Finset (Fin N) :=
+    Finset.univ.erase i
+  let u : Finset (Fin N.succ) :=
+    Finset.univ.erase i.castSucc
+  have ht : t.Nonempty := by
+    dsimp [t]
+    apply Finset.card_pos.mp
+    rw [Finset.card_erase_of_mem (Finset.mem_univ i)]
+    simp only [Finset.card_univ, Fintype.card_fin]
+    omega
+  -- The new index belongs to u.
+  have hlast : Fin.last N ∈ u := by
+    exact Finset.mem_erase.mpr
+      ⟨ne_of_gt (Fin.castSucc_lt_last i), Finset.mem_univ _⟩
+  have hu : u.Nonempty :=
+    ⟨Fin.last N, hlast⟩
+  -- After removing the new index, u is exactly the image of t.
+  have hindex :
+      t.map Fin.castSuccEmb = u.erase (Fin.last N) := by
+    dsimp [t, u]
+    rw [
+      Finset.map_erase,
+      Finset.erase_right_comm,
+      Fin.univ_castSuccEmb N,
+      Finset.erase_cons
+    ]
+    rfl
+  have he : (u.erase (Fin.last N)).Nonempty := by
+    rw [← hindex]
+    exact Finset.map_nonempty.mpr ht
+  -- Identify the product over the remaining indices.
+  have hrest :
+      prodNonempty (u.erase (Fin.last N)) he
+          (fun k : Fin N.succ => s k.val) =
+        prodNonempty t ht
+          (fun k : Fin N => s k.val) := by
+    exact hreindex Fin.castSuccEmb
+      t (u.erase (Fin.last N)) hindex ht he
+      (fun k : Fin N.succ => s k.val)
+  -- Unfold prodExcept, split off s N, and use hrest.
+  change
+    prodNonempty u hu (fun k : Fin N.succ => s k.val) =
+      (prodNonempty t ht (fun k : Fin N => s k.val)) * s N
+  rw [
+    ← mul_prodNonempty_erase
+      u hu (fun k : Fin N.succ => s k.val)
+      (Fin.last N) hlast he,
+    hrest
+  ]
+  exact mul_comm _ _
+
 /-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
 then for all thick set H, R(x, V) ∩ H is a Delta set -/
 theorem commVisitTimeSetForRPPairIsDelta
@@ -566,18 +868,19 @@ theorem commVisitTimeSetForRPPairIsDelta
 (x y : X) (hxyRP : (x, y) ∈ RP dSystem)
 {V : Set X} (hV : V ∈ nhds y) :
 ∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) := by
+  simp only [mem_nhds_iff] at hV
+  rcases hV with ⟨V0, hV0a, hV0b, hV0c⟩
   intro H hHThick
   unfold isDelta
-  let C := (visitTimeSet dSystem x V) ∩ H
+  -- instead of V, we work with an open set V0 ⊆ V such that y ∈ V0
+  let C := (visitTimeSet dSystem x V0) ∩ H
   have hSNonempty : (Set.univ : Set S).Nonempty := by
     simp
   rcases (Set.nonempty_def.mp hSNonempty) with ⟨s0, hs0⟩
   -- build s1 by hand
   -- this is to avoid issue of empty product that appears for N = 1 in the general case below
   have hs1Exist : ∃ s1 : S, (s1 ∈ (fun x ↦ s0 * x) '' C) ∧
-    ((dSystem.map s1) ⁻¹' V ∩ (dSystem.map s0) ⁻¹' V).Nonempty := by
-    simp only [mem_nhds_iff] at hV
-    rcases hV with ⟨V0, hV0a, hV0b, hV0c⟩
+    ((dSystem.map s1) ⁻¹' V0 ∩ (dSystem.map s0) ⁻¹' V0).Nonempty := by
     let U := V0
     let G := H
     have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1 hxyRP U V0
@@ -599,24 +902,11 @@ theorem commVisitTimeSetForRPPairIsDelta
     constructor
     · simp only [Set.mem_image, Set.mem_inter_iff, C]
       use t
-      constructor
-      · constructor
-        · simp only [visitTimeSet, Set.mem_preimage]
-          simp only [visitTimeSet, Set.mem_preimage, U] at ht2
-          apply hV0a ht2
-        · simp only [G] at ht1
-          exact ht1
-      · simp [s1]
-    · have hExz : ∃ z ∈ V, (dSystem.map t) z ∈ V := by
+    · have hExz : ∃ z ∈ V0, (dSystem.map t) z ∈ V0 := by
         simp only [setVisitTimeSet, Set.inter_nonempty_iff_exists_right, Set.mem_image,
           ↓existsAndEq, and_true, Set.mem_ofPred_eq] at ht3
         rcases ht3 with ⟨z, hz1, hz2⟩
         use z
-        constructor
-        · simp [U] at hz1
-          apply hV0a hz2
-        · simp only [U] at hz1
-          apply hV0a hz1
       rcases hExz with ⟨z, hz1, hz2⟩
       have hSurj := minimalCommActionIsSurjective hMin
       unfold isSurjectiveSystem at hSurj
@@ -638,24 +928,87 @@ theorem commVisitTimeSetForRPPairIsDelta
   -- build sN from the previous sn given N ≥ 2
   have hClaim : ∀ (N : ℕ) (hN : N ≥ 2), ∀ s : Fin N → S,
     ((∀ i j : Fin N, (i < j) →  s j ∈ (fun x ↦ (s i) * x) '' C) ∧
-    (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V).Nonempty)
+    (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V0).Nonempty)
     →
     (∃ r : S, (∀ i : Fin N, r ∈ (fun x ↦ (s i) * x) '' C) ∧
-    (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V))
-    ∩ (dSystem.map (prodAll hN s)) ⁻¹' V).Nonempty) := by
+    (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V0))
+    ∩ (dSystem.map (prodAll hN s)) ⁻¹' V0).Nonempty) := by
     intro N hN s hs
     rcases hs with ⟨hs1, hs2⟩
-    simp only [mem_nhds_iff] at hV
-    rcases hV with ⟨V0, hV0a, hV0b, hV0c⟩
     let U := (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V0)
     let G := ⋂ i : Fin N, ((prodExcept hN s i) * ·) ⁻¹' H
     have hUNonempty : U.Nonempty := by
-      sorry
+      simp only [U]
+      exact hs2
     have hUOpen : IsOpen U := by
       sorry
     have hGThick : isThick G := by
+      simp [G, isThick]
+      intro F hF
       sorry
-    sorry
+    have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1
+      hxyRP U V0 hUOpen hV0b hUNonempty hV0c
+    have hInterN : (visitTimeSet dSystem x U ∩ setVisitTimeSet dSystem V0 U ∩ G).Nonempty := by
+      apply syndeticThickIntersect
+      · exact hInterSynd
+      · exact hGThick
+    rcases (Set.inter_nonempty_iff_exists_right.mp hInterN) with ⟨t, ht1, ht2, ht3⟩
+    simp only [visitTimeSet, Set.mem_preimage] at ht2 ht3
+    simp only [setVisitTimeSet, Set.image_inter_nonempty_iff, Set.mem_ofPred_eq] at ht3
+    let r := (prodAll hN s) * t
+    use r
+    constructor
+    · intro i
+      simp only [Set.mem_iInter, Set.mem_preimage, U] at ht2
+      specialize ht2 i
+      simp only [← dSystem.mapMult] at ht2
+      simp only [Set.mem_image, Set.mem_inter_iff, C, r]
+      use (prodExcept hN s i) * t
+      constructor
+      · constructor
+        · simp only [visitTimeSet, Set.mem_preimage]
+          exact ht2
+        · simp only [Set.mem_iInter, Set.mem_preimage, G] at ht1
+          specialize ht1 i
+          exact ht1
+      · simp only [← Semigroup.mul_assoc]
+        have hEq : (s i) * prodExcept hN s i = prodAll hN s := by
+          simp only [prodExcept, prodAll]
+          have hUnivNon : (Finset.univ : Finset (Fin N)).Nonempty := by
+            sorry
+          apply mul_prodNonempty_erase
+          simp
+        rw [hEq]
+    · have hExz : ∃ z ∈ V0, (dSystem.map t) z ∈ U := by
+        simp only [Set.inter_nonempty_iff_exists_right] at ht3
+        rcases ht3 with ⟨z, hz1, hz2⟩
+        use z
+        constructor
+        · exact hz2
+        · simp only [Set.mem_preimage] at hz1
+          exact hz1
+      rcases hExz with ⟨z, hz1, hz2⟩
+      have hSurj := minimalCommActionIsSurjective hMin
+      unfold isSurjectiveSystem at hSurj
+      specialize hSurj (prodAll hN s)
+      simp only [Function.Surjective] at hSurj
+      specialize hSurj z
+      rcases hSurj with ⟨a, ha⟩
+      use a
+      simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage]
+      constructor
+      · intro i
+        simp only [Set.mem_iInter, Set.mem_preimage, U] at hz2
+        specialize hz2 i
+        simp only [← dSystem.mapMult] at hz2
+        simp only [r]
+        rw [<- ha] at hz2
+        simp only [← dSystem.mapMult] at hz2
+        simp only [CommSemigroup.mul_comm]
+        simp only [← Semigroup.mul_assoc]
+        exact hz2
+      · rw [ha]
+        exact hz1
   choose! pick hpick using hClaim
   let step : (N : ℕ) → ((k : ℕ) → k < N → S) → S := fun N prev ↦
     if N = 0 then s0
@@ -682,7 +1035,7 @@ theorem commVisitTimeSetForRPPairIsDelta
   have h01 : s 1 ∈ (fun x ↦ (s 0) * x) '' C := by
     rw [hs0, hs1]
     exact hs1a
-  have hstart : ((dSystem.map (s 0) ⁻¹' V) ∩ (dSystem.map (s 1) ⁻¹' V)).Nonempty := by
+  have hstart : ((dSystem.map (s 0) ⁻¹' V0) ∩ (dSystem.map (s 1) ⁻¹' V0)).Nonempty := by
     rw [hs0, hs1]
     simp only [Set.inter_nonempty_iff_exists_right, Set.mem_preimage]
     simp only [Set.inter_nonempty_iff_exists_right, Set.mem_preimage] at hs1b
@@ -710,7 +1063,7 @@ theorem commVisitTimeSetForRPPairIsDelta
   -- Prove BOTH prefix properties simultaneously.
   have hprefix_all : ∀ (N : ℕ) (hN : 2 ≤ N), (∀ a b : Fin N, a < b → s b.val
     ∈ (fun y ↦ (s a.val) * y) '' C) ∧
-    (⋂ a : Fin N, dSystem.map (prodExcept hN (fun k : Fin N ↦ s k.val) a) ⁻¹' V).Nonempty := by
+    (⋂ a : Fin N, dSystem.map (prodExcept hN (fun k : Fin N ↦ s k.val) a) ⁻¹' V0).Nonempty := by
     intro N hN
     induction N, hN using Nat.le_induction with
     | base =>
@@ -760,39 +1113,68 @@ theorem commVisitTimeSetForRPPairIsDelta
           intro a
           refine Fin.lastCases ?_ (fun i ↦ ?_) a
           · -- when the omitted index is the new index.
-            unfold prodExcept
-            unfold prodExcept at hzold
-            unfold prodAll at hzall
-            sorry
+            have hNSucc : 2 ≤ N.succ := by
+              omega
+            have hEq : prodExcept hNSucc (fun k ↦ s k) (Fin.last N) = prodAll hN fun k ↦ s k := by
+              apply prodExcept_last_eq_prodAll
+            rw [hEq]
+            exact hzall
           · -- when the omitted index is an old index.
-            sorry
+            have hNSucc : 2 ≤ N.succ := by
+              omega
+            simp only [Set.mem_iInter] at hzold
+            specialize hzold i
+            have hEq : prodExcept hNSucc (fun k ↦ s k) i.castSucc
+              = (prodExcept hN (fun k ↦ s ↑k) i) * s N := by
+              apply prodExcept_castSucc_eq
+            rw [hEq]
+            exact hzold
   -- prove the sequence s satisfies the conclusion
+  have hGoalV0 : ∃ s : ℕ → S, ∀ (i j : ℕ), i < j → s j
+    ∈ (fun x ↦ (s i) * x) '' (visitTimeSet dSystem x V0 ∩ H) := by
+    use s
+    intro i j hij
+    by_cases hj2 : j ≥ 2
+    · specialize hs_step j hj2
+      change s j ∈ (fun x ↦ (s i) * x) '' C
+      rw [hs_step]
+      refine (hpick j hj2 (fun k : Fin j ↦ s k.val) ?_).1 ⟨i, hij⟩
+      constructor
+      · exact (hprefix_all j hj2).1
+      · exact (hprefix_all j hj2).2
+    · have hjlesseq1 : j ≤ 1 := by
+        omega
+      have hjequal1 : j = 1 := by
+        by_contra hContra
+        have hjequal0 : j = 0 := by
+          omega
+        have hiatleast0 : i ≥ 0 := by
+          omega
+        have hjatleast1 : j ≥ 1 := by
+          omega
+        rw [hjequal0] at hjatleast1
+        omega
+      have hiequal0 : i = 0 := by
+        omega
+      rw [hjequal1, hiequal0, hs0, hs1]
+      exact hs1a
+  -- finish the proof by using the sequence s
+  rcases hGoalV0 with ⟨s, hs⟩
   use s
   intro i j hij
-  by_cases hj2 : j ≥ 2
-  · specialize hs_step j hj2
-    change s j ∈ (fun x ↦ (s i) * x) '' C
-    rw [hs_step]
-    refine (hpick j hj2 (fun k : Fin j ↦ s k.val) ?_).1 ⟨i, hij⟩
-    constructor
-    · exact (hprefix_all j hj2).1
-    · exact (hprefix_all j hj2).2
-  · have hjlesseq1 : j ≤ 1 := by
-      omega
-    have hjequal1 : j = 1 := by
-      by_contra hContra
-      have hjequal0 : j = 0 := by
-        omega
-      have hiatleast0 : i ≥ 0 := by
-        omega
-      have hjatleast1 : j ≥ 1 := by
-        omega
-      rw [hjequal0] at hjatleast1
-      omega
-    have hiequal0 : i = 0 := by
-      omega
-    rw [hjequal1, hiequal0, hs0, hs1]
-    exact hs1a
+  specialize hs i j hij
+  simp only [Set.mem_image, Set.mem_inter_iff] at hs
+  rcases hs with ⟨r, hr1, hr2⟩
+  rcases hr1 with ⟨hr1a, hr1b⟩
+  simp only [Set.mem_image, Set.mem_inter_iff]
+  use r
+  constructor
+  · constructor
+    · simp only [visitTimeSet, Set.mem_preimage]
+      simp only [visitTimeSet, Set.mem_preimage] at hr1a
+      apply hV0a hr1a
+    · exact hr1b
+  · exact hr2
 
 end Delta_builder
 
