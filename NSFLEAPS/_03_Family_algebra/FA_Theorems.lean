@@ -41,21 +41,6 @@ F* = {A : Set α | Aᶜ ∉ F} :=
     exact AcninF this
  --complement of A in S not in F
 
-/- @[simp]
-lemma dual_sets (F : Family α) :
-  (F* : Set (Set α)) = {A : Set α | Aᶜ ∉ F} :=
-by
-  simpa using thm_equiv_dual_formulation (F := F) -/
-
--- #check famDualAlt
-/-have dualEquivForm : (F*).sets = {A : Set S | Aᶜ ∉ syndeticFamily S} :=
-    thm_equiv_dual_formulation (F)
-  rw [dualEquivForm]-/
--- @[simp]
--- theorem Family.coe_sets (F : Family α) :
---     (↑F : Set (Set α)) = F.sets :=
---   rfl
-
 lemma mem_dual_alt
 {α : Type*} {F : Family α} {A : Set α} :
 A ∈ F* ↔ Aᶜ ∉ F :=
@@ -276,11 +261,15 @@ F ⋏ G = G ⋏ F :=
 theorem thm_familyMeetIsMonotone
 {α : Type*} (F G H : Family α) :
 F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
-  by sorry
-  -- intro hFG S hS
-  -- rcases hS with ⟨f, hf, h, hh, rfl⟩
-  -- have hfG : f ∈ G := hFG hf
-  -- use f, hfG, h, hh
+  by
+    intro hFG S hS
+    change S ∈ { h | ∀ A ∈ F*, S ∩ A ∈ H } at hS
+    change S ∈ { h | ∀ A ∈ G*, S ∩ A ∈ H }
+    intro A hAinGstar
+    have hAinFstar : A ∈ F* := by
+      sorry
+    exact hS A hAinFstar
+
 
 --familyMeetContainedInIntersection
 --thm_classcapdual_contained_in_intersection *** UPDATED
@@ -310,7 +299,7 @@ F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
 --emptyFamilyMeetCondition
 theorem thm_famMeetIsEmptyFamIffFnotinGDual
 {α : Type*} (F G : Family α) :
-F ⋎ G = emptyFam α ↔ ¬(F* ⊆ G) :=
+F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) :=
 by sorry
 
 end Meet
@@ -518,88 +507,6 @@ end PartialModAndConsequences
 
 section Unused_Or_still_to_sort
 
-
-
-theorem thm_de_morgan_union_v1old
-{α : Type*} (F G : Family α) :
-(F ⋎ G)* = (F* ⋏ G*) :=
-  by sorry
-  /-ext A
-  let BinFuG := ∀ B ∈ F ⋎ G, A ∩ B = ∅
-  let CDinter := ∀ C ∈ F, ∀ D ∈ G, A ∩ C ∩ D = ∅
-  let CinterAinGdual := ∀ C ∈ F, A ∩ C ∈ (G*)
-  let goalR := A ∈ F* ⋏ G*
-  have equiv23 : BinFuG ↔ CDinter := by
-    simp_all only [BinFuG, CDinter]
-    apply Iff.intro
-    · intro h C hC D hD
-      specialize h (C ∩ D)
-      have hCDinFuG : C ∩ D ∈ F ⋎ G := by
-        change C ∩ D ∈ famJoin F G
-        unfold _root_.famJoin
-        split_ifs with hF hG
-        · have h_false : C ∈ F := hC
-          rw [Set.ext_iff] at hF
-          have h_memF := (hF C).mp hC
-          exact False.elim h_memF
-        · have h_false : C ∈ F := hC
-          rw [Set.ext_iff] at hG
-          have h_memG := (hG D).mp hD
-          exact False.elim h_memG
-        · exact ⟨C, hC, D, hD, rfl⟩
-      rw [Set.inter_assoc]
-      exact h hCDinFuG
-    · intro h B hBinFuG
-      change B ∈ famJoin F G at hBinFuG
-      unfold _root_.famJoin at hBinFuG
-      by_cases hF : F.sets = ∅
-      split_ifs at hBinFuG with hF hG
-      · -- If F is empty, B ∈ ∅ is a contradiction
-        rw [Set.ext_iff] at hF
-        have h_memF := (hF B).mp sorry
-        exact False.elim h_memF
-      -- assuming F ⋎ G reduces to ∅ here, hBinFuG is False/Empty
-        --exact False.elim hBinFuG
-      · -- If G is empty, B ∈ ∅ is a contradiction
-        rw [Set.ext_iff] at hG
-        have h_memG := (hG B).mp sorry
-        exact False.elim h_memG
-      · -- Main case: B = C ∩ D for some C ∈ F, D ∈ G
-        rcases hBinFuG with ⟨C, hC, D, hD, rfl⟩
-        have h_goal := h C hC D hD
-        rw [←Set.inter_assoc]
-        exact h_goal
-      · sorry
-  have equiv34 : CDinter ↔ CinterAinGdual := by
-    simp_all only [CDinter, CinterAinGdual]
-    apply Iff.intro
-    · intro h C hC
-      rw [mem_dual_alt]
-      intro hG
-      sorry
-
-    · intro h C hC D hD
-      have h_goal := h C hC
-      specialize h_goal D hD
-      rw [Set.inter_assoc] at h_goal
-      sorry
-  have equiv24 : BinFuG ↔ CinterAinGdual := by exact Iff.trans equiv23 equiv34
-  have equiv45 : CinterAinGdual ↔ goalR := by sorry
-  have equiv25 : BinFuG ↔ goalR := by exact Iff.trans equiv24 equiv45
-  sorry -/
-
-
---thm_de_morgan_union_v2
-/- A ∈ (F ∪ G)∗
-– definition
-2. for all B ∈ F ∪ G, A ∩ B̸ = ∅
-– logic
-3. for all B ∈ F, A ∩ B̸ = ∅ and for all B ∈ G, A ∩ B̸ = ∅
-– definition
-4. A ∈ F∗ and A ∈ G∗
-– logic
-5. A ∈ F∗ ∩ G∗
--/
 theorem thm_familySetDeMorganLaw1
 {α : Type*} (F G : Family α) :
 (F ∪ G)* = (F* ∩ G*) :=
@@ -647,18 +554,9 @@ theorem thm_familySetDeMorganLaw2
 
 end Unused_Or_still_to_sort
 
-
-
 --thm_family_equal_to_dual_iff_ultrafilter
 --theorem thm_family_equal_to_dual_iff_ultrafilter (F : Family α) : F* = F ↔ UltrafilterFamily F :=
  -- by sorry
-
-
-
-
-
-
-
 
 
 

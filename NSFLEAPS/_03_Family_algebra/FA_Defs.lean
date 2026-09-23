@@ -206,13 +206,6 @@ instance {α : Type*} : HasFamDual (Set (Set α)) where
 
 lemma mem_dual_star {α : Type*} (F : Family α) (A : Set α) :
     A ∈ F* ↔ ∀ B ∈ F, (A ∩ B).Nonempty := Iff.rfl
-/- open Classical in
-noncomputable def famJoin (F G : Set (Set α)) : Set (Set α) :=
-  if F = ∅ then G
-  else if G = ∅ then F
-  else { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B } -/
---F ⋏ G = {A ⊆ S: ∀ B ∈ F*, A ∩ B ∈ G} if both not P(S),
---if F = P(S), then G, if G = P(S) then F
 
 end Dual
 
@@ -248,38 +241,6 @@ instance {α : Type*} : HasFamJoin (Set (Set α))  where
 noncomputable instance {α : Type*} : HasFamJoin (Family α) where
   famJoin := @Family.famJoin α
 
-/- open Classical in
-noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
-{
-  sets := _root_.famJoin famA.sets famB.sets,
-  upward_closed := by
-    intro A B hA hAB
-    -- prove B ∈ famMeet famA famB
-    unfold _root_.famJoin at hA ⊢
-    split_ifs at hA ⊢ with hF hG
-    · exact famB.upward_closed A B hA hAB
-    · exact famA.upward_closed A B hA hAB
-    · rcases hA with ⟨C, hCF, D, hDG, hAeq⟩
-      -- C ∩ D = A ⊆ B, so B ⊆ (C ∪ B) and B ⊆ (D ∪ B).
-      have hC' : (B ∪ C) ∈ famA.sets := famA.upward_closed C (B ∪ C) hCF Set.subset_union_right
-      have hD' : (B ∪ D) ∈ famB.sets := famB.upward_closed D (B ∪ D) hDG Set.subset_union_right
-      -- Now, (B ∪ C) ∩ (B ∪ D) = B ∪ (C ∩ D) = B ∪ A = B, so B ∈ famMeet famA famB.
-      have hsub : C ∩ D ⊆ B := by simpa [hAeq] using hAB
-      have hB : B = (B ∪ C) ∩ (B ∪ D) := by
-        calc B = B ∪ (C ∩ D) := by exact (Set.union_eq_left.mpr hsub).symm
-        _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
-      exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
-}
-
-lemma mem_famJoin (F G : Set (Set α)) (A : Set α) :
-  A ∈ famJoin F G ↔ (F = ∅ → A ∈ G) ∧ (G = ∅ → A ∈ F) ∧
-    (F ≠ ∅ → G ≠ ∅ → ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) :=
-by sorry
-noncomputable instance : HasFamJoin (Set (Set α))  where
-  famJoin := _root_.famJoin
-noncomputable instance : HasFamJoin (Family α) where
-  famJoin := @Family.famJoin α -/
-
 end Join
 
 section Meet
@@ -311,38 +272,5 @@ instance {α : Type*} : HasFamMeet (Set (Set α))  where
 
 instance {α : Type*} : HasFamMeet (Family α) where
   famMeet := @Family.famMeet α
-
-
-/- open Classical in
-noncomputable def famMeet (F G : Set (Set α)) : Set (Set α) :=
-  if F = fullCollection α then G
-  else if G = fullCollection α then F
-  else { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
-
-open Classical in
-noncomputable def Family.famMeet (famA famB : Family α) : Family α := {
-  sets := _root_.famMeet famA.sets famB.sets,
-  upward_closed := by
-    intro A B hA hAB
-    -- prove B ∈ famMeet famA famB
-    unfold _root_.famMeet at hA ⊢
-    split_ifs at hA ⊢ with hF hG
-    · exact famB.upward_closed A B hA hAB
-    · exact famA.upward_closed A B hA hAB
-    · intro C hCF
-      have hBCmem : B ∩ C ∈ famB.sets :=
-        famB.upward_closed (A ∩ C) (B ∩ C) (hA C hCF)
-        (Set.inter_subset_inter hAB (Set.Subset.refl C))
-      exact hBCmem
-}
-lemma mem_famMeet (F G : Set (Set α)) (A : Set α) :
-  A ∈ famMeet F G ↔ (F = fullCollection α → A ∈ G) ∧
-    (F ≠ fullCollection α → ∀ B ∈ F*, A ∩ B ∈ G) :=
-by sorry
-instance : HasFamMeet (Set (Set α))  where
-  famMeet := _root_.famMeet
-noncomputable instance : HasFamMeet (Family α) where
-  famMeet := @Family.famMeet α -/
-
 
 end Meet
