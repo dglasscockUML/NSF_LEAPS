@@ -46,8 +46,7 @@ lemma mem_dual_alt
 A ∈ F* ↔ Aᶜ ∉ F :=
   Set.ext_iff.mp (famDualAlt F) A
 
--- dualIsInvolutionOnFamilies
-theorem thm_dual_is_involution
+theorem dualIsInvolutionOnFamilies
 {α : Type*} (F : Family α) :
 F** = F := by
   ext A
@@ -73,8 +72,7 @@ F** = F := by
 --     use dual F
 --     exact h F
 
--- dualIsAntitone
-theorem thm_dual_is_antitone
+theorem dualIsAntitone
 {α : Type*} (F G : Family α) :
 F ⊆ G → G* ⊆ F* :=
  by
@@ -92,10 +90,8 @@ end Dual
 
 section DeMorgan
 
---familyDeMorgan1
---thm_de_morgan_union_v1
 --∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty
-theorem thm_de_morgan_union_v1
+theorem familyDeMorgan1
 {α : Type*} (F G : Family α) :
 (F ⋎ G)* = (F* ⋏ G*) :=
 by
@@ -123,11 +119,11 @@ by
     constructor
     · intro h C hC B hB
       change C ∈ F** at hC
-      rw [thm_dual_is_involution] at hC
+      rw [dualIsInvolutionOnFamilies] at hC
       exact h C hC B hB
     · intro h C hC B hB
       change ∀ B ∈ F**, A ∩ B ∈ G* at h
-      rw [thm_dual_is_involution] at h
+      rw [dualIsInvolutionOnFamilies] at h
       exact h C hC B hB
   have final_equiv : (∀ B ∈ F ⋎ G, A ∩ B ≠ ∅) ↔ A ∈ F* ⋏ G* :=
     Iff.trans (Iff.trans equiv23 equiv34) equiv45
@@ -135,16 +131,15 @@ by
   simp_rw [Set.nonempty_iff_ne_empty]
   exact final_equiv
 
---familyDeMorgan2
-theorem thm_de_morgan_v1_dual
+theorem familyDeMorgan2
 {α : Type*} (F G : Family α) :
 (F ⋏ G)* = (F* ⋎ G*) :=
   by
   -- h : (F* ⋎ G*)* = F** ⋏ G**
-  have h := thm_de_morgan_union_v1 F* G*
-  repeat rw [thm_dual_is_involution] at h
+  have h := familyDeMorgan1 F* G*
+  repeat rw [dualIsInvolutionOnFamilies] at h
   rw [← h]
-  rw [thm_dual_is_involution]
+  rw [dualIsInvolutionOnFamilies]
 
 end DeMorgan
 
@@ -153,8 +148,7 @@ end DeMorgan
 section Join
 
 
---familyJoinIsAssociative
-theorem thm_familyJoinIsAssociative
+theorem familyJoinIsAssociative
 {α : Type*} (F G H : Family α) :
 (F ⋎ (G ⋎ H)) = ((F ⋎ G) ⋎ H) :=
   by
@@ -169,9 +163,7 @@ theorem thm_familyJoinIsAssociative
       refine ⟨X, hX, W ∩ Z, ⟨W, hW, Z, hZ, rfl⟩, ?_⟩
       exact (Set.inter_assoc X W Z)
 
---familyJoinIsCommutative
---thm_classcap_commutative
-theorem thm_familyJoinIsCommutative
+theorem familyJoinIsCommutative
 {α : Type*} (F G : Family α) :
 F ⋎ G = G ⋎ F :=
   by
@@ -185,10 +177,13 @@ F ⋎ G = G ⋎ F :=
       rcases h with ⟨D, hD, C, hC, rfl⟩
       exact ⟨C, hC, D, hD, Set.inter_comm D C⟩
 
---thm_classcap_monotone
--- DGG NEEDS TO BE FORMULATED MORE GENERALLY:
---  *****for all F1, F2, G1, G2 ∈ Fam(S), if F1 ⊆ G1 and F2 ⊆ G2, then F1 ⋎ G1 ⊆ F2 ⋎ G2.
-theorem thm_familyJoinIsMonotone
+theorem familyJoinIsMonotonic
+{α : Type*} (F1 G1 F2 G2 : Family α) :
+F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋎ F2) ⊆ (G1 ⋎ G2) :=
+  by sorry
+
+-- Can derive from familyJoinIsMonotonic
+theorem familyJoinIsMonotonicSlot1
 {α : Type*} (F G H : Family α) :
 F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   by
@@ -199,25 +194,29 @@ F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   have hC_in_G : C ∈ G.sets := h_sub hC
   exact ⟨C, hC_in_G, D, hD, rfl⟩
 
+-- Can derive from familyJoinIsMonotonic
+theorem familyJoinIsMonotonicSlot2
+{α : Type*} (F G H : Family α) :
+G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) :=
+  by sorry
 
---familyContainedInFamilyJoin
--- UPDATED STATEMENT
-theorem thm_familyJoinContainsUnion
+
+
+
+theorem familyContainedInFamilyJoin
 {α : Type*} (F G : Family α) :
 G ≠ emptyFam α → F ⊆ (F ⋎ G) :=
   by
   intro h A hA
   sorry
 
---emptyFamilyJoinCondition
--- NEW ***
-theorem thm_famJoinEmptyIfEitherEmpty
+
+theorem emptyFamilyJoinCondition
 {α : Type*} (F G : Family α) :
 F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α :=
 by sorry
 
---fullFamilyJoinCondition
-theorem thm_famJoinIsFullFamIffFnotinGDual
+theorem fullFamilyJoinCondition
 {α : Type*} (F G : Family α) :
 F ⋎ G = fullFam α ↔ ¬(F ⊆ G*) :=
 by sorry
@@ -228,37 +227,37 @@ end Join
 
 section Meet
 
---familyMeetIsAssociative
---thm_classcapdual_associative
-theorem thm_familyMeetIsAssociative
+theorem familyMeetIsAssociative
 {α : Type*} (F G H : Family α) :
 (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
   by
-  nth_rw 1 [← thm_dual_is_involution (F ⋏ (G ⋏ H))]
-  rw [thm_de_morgan_v1_dual]
-  rw [thm_de_morgan_v1_dual]
-  rw [thm_familyJoinIsAssociative]
-  repeat rw [thm_de_morgan_union_v1]
-  repeat rw [thm_dual_is_involution]
+  nth_rw 1 [← dualIsInvolutionOnFamilies (F ⋏ (G ⋏ H))]
+  rw [familyDeMorgan2]
+  rw [familyDeMorgan2]
+  rw [familyJoinIsAssociative]
+  repeat rw [familyDeMorgan1]
+  repeat rw [dualIsInvolutionOnFamilies]
 
---familyMeetIsCommutative
---thm_classcapdual_commutative
-theorem thm_familyMeetIsCommutative
+
+theorem familyMeetIsCommutative
 {α : Type*} (F G : Family α) :
 F ⋏ G = G ⋏ F :=
   by
   have h_dual_meet : F** ⋏ G** = G** ⋏ F** := by
       ext A
-      rw [← thm_de_morgan_union_v1 (F*) (G*)]
-      rw [← thm_de_morgan_union_v1 (G*) (F*)]
-      rw [thm_familyJoinIsCommutative (F*) (G*)]
-  simp_rw [thm_dual_is_involution] at h_dual_meet
+      rw [← familyDeMorgan1 (F*) (G*)]
+      rw [← familyDeMorgan1 (G*) (F*)]
+      rw [familyJoinIsCommutative (F*) (G*)]
+  simp_rw [dualIsInvolutionOnFamilies] at h_dual_meet
   exact h_dual_meet
 
---familyMeetIsMonotonic
---thm_classcapdual_monotone ***
--- follow more general version as seen above join
-theorem thm_familyMeetIsMonotone
+theorem familyMeetIsMonotonic
+{α : Type*} (F1 G1 F2 G2 : Family α) :
+F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) :=
+  by sorry
+
+-- can derive from familyMeetIsMonotonic
+theorem familyMeetIsMonotonicSlot1
 {α : Type*} (F G H : Family α) :
 F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by
@@ -270,23 +269,19 @@ F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
       sorry
     exact hS A hAinFstar
 
+-- can derive from familyMeetIsMonotonic
+theorem familyMeetIsMonotonicSlot2
+{α : Type*} (F G H : Family α) :
+G ⊆ H → (F ⋏ G) ⊆ (F ⋏ H) := by sorry
 
---familyMeetContainedInIntersection
---thm_classcapdual_contained_in_intersection *** UPDATED
-theorem thm_familyMeetIsContainedInIntersection
+
+theorem familyMeetContainedInIntersection
 {α : Type*} (F G : Family α) :
 G ≠ fullFam α → F ⋏ G ⊆ F :=
   by sorry
 
 
-
-
-
-
-
-
---fullFamilyMeetCondition
-theorem thm_famMeetFullIfEitherFull
+theorem fullFamilyMeetCondition
 {α : Type*} (F G : Family α) :
 F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
   change Family.famMeet F G = fullFam α ↔ F = fullFam α ∨ G = fullFam α
@@ -296,8 +291,7 @@ F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
   · intro h
     sorry
 
---emptyFamilyMeetCondition
-theorem thm_famMeetIsEmptyFamIffFnotinGDual
+theorem emptyFamilyMeetCondition
 {α : Type*} (F G : Family α) :
 F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) :=
 by sorry
@@ -306,9 +300,7 @@ end Meet
 
 section Filters_and_PR
 
--- F ⋏ F = F ↔ (isPRFamilyv2 F ∨ F = fullFam α)
---familyIsIdempotentForMeetIffPR
-theorem thm_familyMeetIsIdempotentAtPRFamilies
+theorem familyIsIdempotentForMeetIffPR
 {α : Type*} (F : Family α) :
   F ⋏ F = F ↔ (isPRFamilyv2 F ∨ F = fullFam α) := by sorry
 -- H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H
@@ -316,9 +308,9 @@ theorem thm_familyMeetIsIdempotentAtPRFamilies
 -- H* ⊆ (F* ⋎ (F* ⋎ G*)\*)* ↔ F ⋏ G ⊆ F ⋏ H
 -- H* ⊆ (F* ⋎ (F ⋏ G)**)* ↔ F ⋏ G ⊆ F ⋏ H
 -- H* ⊆ (F* ⋎ (F ⋏ G))* ↔ F ⋏ G ⊆ F ⋏ H
---thm_combo_algebra_statement_one
+--familyLocalImplicationEquivalence
 
--- theorem thm_familyMeetIsIdempotentAtPRFamiliesnew
+-- theorem familyIsIdempotentForMeetIffPRnew
 -- {α : Type*} (F : Family α) :
 -- F ⋏ F = F ↔ isPRFamily F := by
 --   constructor
@@ -330,18 +322,17 @@ theorem thm_familyMeetIsIdempotentAtPRFamilies
 --     unfold isPRFamily at h
 --     sorry
 
---familyIsIdempotentForJoinIffFilter
-theorem thm_familyJoinIsIdempotentAtFilterFamilies
+theorem familyIsIdempotentForJoinIffFilter
 {α : Type*} (F : Family α) :
   F ⋎ F = F ↔ (isFilterFamilyv2 F ∨ F = emptyFam α) := by sorry
 
 
 -- Can we prove this as familyIsPRIffDualIsFilter below instead?
-theorem thm_familyIsPRIffDualIsFilter
-{α : Type*} (F : Family α) :
-isIntersectionClosed (F.sets)* ↔
-  partitionRegularTwoSets (F.sets) :=
-  by sorry
+-- theorem thm_familyIsPRIffDualIsFilter
+-- {α : Type*} (F : Family α) :
+-- isIntersectionClosed (F.sets)* ↔
+--   partitionRegularTwoSets (F.sets) :=
+--   by sorry
 
 /- extendedFilterPRDuality in the paper is gotten by combining
 familyIsPRIffDualIsFilter, dualFFilterIffFMeetDualFIsDualF,
@@ -363,12 +354,24 @@ theorem ifFMeetDualFIsDualFAndNonemptyThenDualFInF
 {α : Type*} (F : Family α) :
 F ≠ emptyFam α → F ⋏ F* = F* → F* ⊆ F := by sorry
 
-/- DGG: can we prove "isPRFamilyv2 (F ⋎ F*)"-/
---thm_family_classcap_dual_is_partition_regular
---joinOfFamilyAndDualIsPR
-theorem thm_familyJoinIsPartitionRegular
+
+theorem meetOfFamilyAndDualIsFilter
 {α : Type*} (F : Family α) :
-isPRTwoSets (F ⋎ F*) :=
+isFilterFamily (F ⋏ F*) := /- DGG: can we prove "isFilterFamilyv2 (F ⋏ F*) instead"-/
+ by
+ unfold isFilterFamily
+ intro A B hAinFFstar hBinFFstar
+ change ∀ C ∈ F*, A ∩ C ∈ F* at hAinFFstar
+ change ∀ C ∈ F*, B ∩ C ∈ F* at hBinFFstar
+ change ∀ C ∈ F*, (A ∩ B) ∩ C ∈ F* at ⊢
+ intro C hC
+ have hBC : B ∩ C ∈ F* := hBinFFstar C hC
+ have hABC : A ∩ (B ∩ C) ∈ F* := hAinFFstar (B ∩ C) hBC
+ simpa [Set.inter_assoc]
+
+theorem joinOfFamilyAndDualIsPR
+{α : Type*} (F : Family α) :
+isPRTwoSets (F ⋎ F*) := /- DGG: can we prove "isPRFamilyv2 (F ⋎ F*) instead"-/
 by
   rw [isPRTwoSets]
   intro A hA c
@@ -382,40 +385,21 @@ by
   · use 1
     sorry
 
-/- DGG: can we prove "isFilterFamilyv2 (F ⋏ F*)"-/
---thm_family_classcapdual_dual_is_filter &&&&&&&&& WORK ON THIS
---meetOfFamilyAndDualIsFilter
-theorem thm_familyMeetIsFilter
-{α : Type*} (F : Family α) :
-isFilterFamily (F ⋏ F*) :=
- by
- unfold isFilterFamily
- intro A B hAinFFstar hBinFFstar
- change ∀ C ∈ F*, A ∩ C ∈ F* at hAinFFstar
- change ∀ C ∈ F*, B ∩ C ∈ F* at hBinFFstar
- change ∀ C ∈ F*, (A ∩ B) ∩ C ∈ F* at ⊢
- intro C hC
- have hBC : B ∩ C ∈ F* := hBinFFstar C hC
- have hABC : A ∩ (B ∩ C) ∈ F* := hAinFFstar (B ∩ C) hBC
- simpa [Set.inter_assoc]
-
 
 end Filters_and_PR
 
 section PartialModAndConsequences
 
---familyPartialModularity
-theorem thm_partialModularity
+theorem familyPartialModularity
 {α : Type*} (F G H : Family α) :
 (F ⋎ (G ⋏ H)) ⊆ (F ⋎ G) ⋏ H := by sorry
 
---familyPartialDistributivity
-theorem thm_partialDistrubityivty
+
+theorem familyPartialDistributivity
 {α : Type*} (F G H : Family α) :
 (F ⋏ G) ⋎ (F ⋏ H) ⊆ F ⋏ (G ⋎ H) := by sorry
 
---familyAbsorptionAdjacent
-theorem thm_identityOne
+theorem familyAbsorptionAdjacent
 {α : Type*} (F G : Family α) :
 F ⊆ (F ⋎ G) ⋏ G* := by sorry
   -- intro A hA
@@ -432,37 +416,36 @@ F ⊆ (F ⋎ G) ⋏ G* := by sorry
   -- exact ⟨hAinFG, hAinGstar⟩
 
 --familyUsefulIdentity
-theorem thm_identityTwo
+theorem familyUsefulIdentity
 {α : Type*} (F G H : Family α) :
 F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
 
---familyLocalImplicationEquivalence
-theorem thm_combo_algebra_statement_one
+theorem familyLocalImplicationEquivalence
 {α : Type*} (F G H : Family α) :
 H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
 by
-  nth_rw 1 [← thm_dual_is_involution (F ⋏ (F* ⋎ G*))]
-  rw [thm_de_morgan_v1_dual]
-  rw [thm_de_morgan_union_v1]
-  repeat rw [thm_dual_is_involution]
-  rw [← thm_de_morgan_v1_dual]
+  nth_rw 1 [← dualIsInvolutionOnFamilies (F ⋏ (F* ⋎ G*))]
+  rw [familyDeMorgan2]
+  rw [familyDeMorgan1]
+  repeat rw [dualIsInvolutionOnFamilies]
+  rw [← familyDeMorgan2]
   have step : H* ⊆ F⋏(F⋏G)* ↔ ((H* ⊆ F) ∧ (H* ⊆ (F ⋏ G)*)) := by sorry
   rw [step]
   constructor
   · intro h
     have h2 : H* ⊆ (F ⋏ G)* := h.2
-    have h_anti := thm_dual_is_antitone _ _ h2
-    rw [thm_dual_is_involution, thm_dual_is_involution] at h_anti
+    have h_anti := dualIsAntitone _ _ h2
+    rw [dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies] at h_anti
     intro A hA
     have hmono : (F ⋏ G) ⋏ F ⊆ H ⋏ F :=
-      thm_familyMeetIsMonotone (F ⋏ G) H F h_anti
+      familyMeetIsMonotonicSlot1 (F ⋏ G) H F h_anti
     have h2 : (F ⋏ G) ⋏ F = F ⋏ G := by
-      rw [←thm_familyMeetIsAssociative]
-      rw [thm_familyMeetIsCommutative G F]
-      rw [thm_familyMeetIsAssociative]
+      rw [←familyMeetIsAssociative]
+      rw [familyMeetIsCommutative G F]
+      rw [familyMeetIsAssociative]
       sorry
     have h3 : H ⋏ F = F ⋏ H := by
-      rw [thm_familyMeetIsCommutative]
+      rw [familyMeetIsCommutative]
     have h4 : F ⋏ G ⊆ F ⋏ H := by
       rw [← h2]
       rw [←h3]
@@ -470,7 +453,7 @@ by
     exact h4 hA
   · intro h
     rw [←step] at ⊢
-    rw [thm_de_morgan_v1_dual]
+    rw [familyDeMorgan2]
 
     sorry
   /- classical
@@ -547,9 +530,9 @@ theorem thm_familySetDeMorganLaw2
  by
   have ugdualdual : (F* ∪ G*)* = F ∩ G := by
     rw [thm_familySetDeMorganLaw1]
-    repeat rw [thm_dual_is_involution]
+    repeat rw [dualIsInvolutionOnFamilies]
   rw [← ugdualdual]
-  rw [thm_dual_is_involution]
+  rw [dualIsInvolutionOnFamilies]
 
 
 end Unused_Or_still_to_sort

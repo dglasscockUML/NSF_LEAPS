@@ -1372,7 +1372,7 @@ theorem commDeltaStarImpliesLocallyBohrZero
     intro x hx
     exact hx
   have h2 : (bohrZeroFamily S)** = bohrZeroFamily S := by
-    apply thm_dual_is_involution
+    apply dualIsInvolutionOnFamilies
   rw [<- h2]
   exact (familyLocalImplicationEquivalence (syndeticFamily S)
   (bohrZeroFamily S)* (deltaFamily S)).mpr h1
