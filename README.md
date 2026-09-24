@@ -1,29 +1,28 @@
 # Regional proximality for semigroup actions and the local dynamical structure of delta* sets
 
-A Lean 4 formalization of all of the results and underlying machinery of these two papers:
-
-- [The regionally proximal relation for commutative semigroup actions](link)
-- [The local dynamical structure of difference sets via a new Furstenberg family algebra](link)
-
-Both papers jointly authored by Angelina Blahodatna (U. Massachusetts Lowell), Lauren Detmold (U. Massachusetts Lowell), Daniel Glasscock (U. Massachusetts Lowell), and Anh N. Le (U. Denver) with support from the US National Science Foundation under a LEAPS Grant, Award Number 2418589. See below for contact information.
+A Lean 4 formalization of all of the results and underlying machinery of the two papers below. Both papers jointly authored by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le with support from the US National Science Foundation under a LEAPS Grant, Award Number 2418589. See below for affiliation and contact information.
 
 There are two associated Palomar submissions, one for each of the papers: LINKS TO PALOMAR.
 
-## Abstracts
+## Papers and abstracts
 
 ### The regionally proximal relation for commutative semigroup actions
+
+- [The regionally proximal relation for commutative semigroup actions](link)
 
 Abstract: The regionally proximal and equicontinuous structure relations are fundamental relations in topological dynamics that capture the equicontinuous behavior in a topological dynamical system and its factors. For minimal actions of abelian groups, these relations are known to be equivalence relations and are known to coincide. In this paper, we generalize these facts to semigroup actions: for minimal actions of commutative semigroups, the regionally proximal and equicontinuous structure relations are equivalence relations and the two coincide. We also develop the machinery of natural extensions for commutative semigroup actions that act by surjections, concluding that the maximal equicontinuous factor of a minimal action of a commutative semigroup is the same as the maximal equicontinuous factor of the group action into which it embeds.
 
 ### The local dynamical structure of delta* sets via a new Furstenberg family algebra
 
+- [The local dynamical structure of difference sets via a new Furstenberg family algebra](link)
+
 Abstract: In this paper, we strengthen the connection between the combinatorics of difference sets and the dynamics of group rotations. Our main result shows that sets which have non-empty intersection with all difference subsets of a commutative semigroup possess local Bohr structure. This generalizes results of Bergelson, Furstenberg, and Weiss and Host and Kra from the integers to arbitrary commutative semigroups. We accomplish this by utilizing a recent result showing that the regionally proximal relation is an equivalence relation for minimal actions of commutative semigroups and by describing a new, DeMorgan-type algebra on Furstenberg families that allows for efficient manipulation and computation.
 
 See the Organization section below for more detailed information.
 
-## Mathematical machinery
+## Math in this formalization
 
-The formalization in this repository includes the following machinery:
+Beyond the results in the papers, the formalization in this repository includes the following machinery:
 
 - the topological dynamics of actions of discrete semigroups on compact Hausdorff spaces by continuous maps, including structures such as factors, ICERs, quotient systems, and natural extensions, and special dynamical properties such as minimality, semisimplicity, distality, proximality, and equicontinuity;
 - ultrafilters as a tool in topological dynamics, including, for a discrete semigroup S, $\beta S$ as a universal S-system and the induced action of $\beta S$ on an S-system, and the link between algebraic and dynamical properties of ultrafilters (ideals and subsystems, minimal ultrafilters and minimal systems, and idempotency);
@@ -50,19 +49,21 @@ The code in this repository is organized as follows. The main results from the i
 6. **Furstenberg families**  
    Specific families and the relations and machinery around them
 7. **The regionally proximal relation**  
-   The main results of the ``regionally proximal'' paper
+   The main results of the "regionally proximal" paper
 8. **Delta star sets are locally Bohr**  
-   The main results of the ``delta*'' paper
+   The main results of the "delta*" paper
 
 ## Autoformalization
 
-Parts of this formalization were developed with the assistance of AI-based coding agents, including Claude Opus 5 and ChatGPT 5.6 Luna. Specifically:
+Parts of this formalization were written with the help of AI-based coding agents, including Claude Opus 5 and ChatGPT 5.6 Luna. Specifically:
 
 - definitions, theorems, and proofs in the files `TP_Cylinders.lean`, `FF_CXX.lean`, and `FF_Pontryagin.lean` were written by Claude Opus 5;
-- some definitions and proofs in the file `RP_Nat_ext.lean` were written by Claude Opus 5;
-- approximately 15 proofs of theorem scattered throughout the project were written by Claude Opus 5.
+- some definitions and most proofs in the file `RP_Nat_ext.lean` were written by Claude Opus 5;
+- approximately 15 proofs of theorems scattered throughout the project were written by Claude Opus 5.
 
-Beyond these specific files, ChatGPT 5.6 Luna was used to help with tactics at particular places in proofs, diagnose compilation errors, and search Mathlib. All submitted code was reviewed by the authors and checked by the Lean elaborator and compiler. The authors are responsible for the mathematical content of the formalization, the correctness of the statements, and the interpretation of the resulting code. A more detailed accounting of our use of coding agents can be found included in the Palomar submissions at the links above.
+ChatGPT 5.6 Luna was used to help with tactics at particular places in proofs, diagnose compilation errors, and search Mathlib. Beyond these specific callouts, all code was written by hand.  In particular, all definition and theorem statements outside of the specific files mentioned above were written by hand.
+
+All submitted code was reviewed by the authors and checked by the Lean elaborator and compiler. The authors are responsible for the mathematical content of the formalization, the correctness of the statements, and the interpretation of the resulting code. A more detailed accounting of our use of coding agents can be found included in the Palomar submissions at the links above.
 
 ## Requirements
 
@@ -70,12 +71,6 @@ Beyond these specific files, ChatGPT 5.6 Luna was used to help with tactics at p
 - Mathlib 082e2d37e8b0463410cdb532e111cd43d5a66174
 
 The `lean-toolchain` and `lakefile.toml` files contain the authoritative version information.
-
-## Documentation
-
-- [Generated API documentation](link)
-- [Associated paper](link)
-- [Supplementary notes](link)
 
 ## References
 
@@ -107,3 +102,7 @@ Angelina Blahodatna, U. Massachusetts Lowell, [angelina_blahodatna@student.uml.e
 Lauren Detmold, U. Massachusetts Lowell, [lauren_detmold@student.uml.edu](mailto:lauren_detmold@student.uml.edu)  
 Daniel Glasscock, U. Massachusetts Lowell, [daniel_glasscock@uml.edu](mailto:daniel_glasscock@uml.edu)  
 Anh N. Le, U. Denver, [anh.n.le@du.edu](mailto:anh.n.le@du.edu)
+
+## Support
+
+The authors gratefully acknowledge support from the US National Science Foundation under a LEAPS Grant, Award Number 2418589.
