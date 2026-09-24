@@ -73,7 +73,7 @@ F** = F := by
 --     exact h F
 
 theorem dualIsAntitone
-{α : Type*} (F G : Family α) :
+{α : Type*} {F G : Family α} :
 F ⊆ G → G* ⊆ F* :=
  by
   intro h A hAinF
@@ -178,13 +178,12 @@ F ⋎ G = G ⋎ F :=
       exact ⟨C, hC, D, hD, Set.inter_comm D C⟩
 
 theorem familyJoinIsMonotonic
-{α : Type*} (F1 G1 F2 G2 : Family α) :
+{α : Type*} {F1 G1 F2 G2 : Family α} :
 F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋎ F2) ⊆ (G1 ⋎ G2) :=
   by sorry
 
--- Can derive from familyJoinIsMonotonic
 theorem familyJoinIsMonotonicSlot1
-{α : Type*} (F G H : Family α) :
+{α : Type*} {F G : Family α} (H : Family α) :
 F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   by
   intro h_sub A hA
@@ -194,11 +193,11 @@ F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   have hC_in_G : C ∈ G.sets := h_sub hC
   exact ⟨C, hC_in_G, D, hD, rfl⟩
 
--- Can derive from familyJoinIsMonotonic
 theorem familyJoinIsMonotonicSlot2
-{α : Type*} (F G H : Family α) :
-G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) :=
-  by sorry
+{α : Type*} (F : Family α) {G H : Family α} :
+G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) := by
+  intro GinH
+  exact familyJoinIsMonotonic (Family.rfl F) GinH
 
 
 
@@ -251,14 +250,19 @@ F ⋏ G = G ⋏ F :=
   simp_rw [dualIsInvolutionOnFamilies] at h_dual_meet
   exact h_dual_meet
 
+lemma mem_famMeetv2 {α : Type*} (F G : Family α) (A : Set α) :
+  A ∈ F ⋏ G ↔ (∀ B ∈ G*, A ∩ B ∈ F) := by sorry
+  -- use commutativity, then mem_famMeet
+
+
 theorem familyMeetIsMonotonic
-{α : Type*} (F1 G1 F2 G2 : Family α) :
+{α : Type*} {F1 G1 F2 G2 : Family α} :
 F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) :=
   by sorry
 
 -- can derive from familyMeetIsMonotonic
 theorem familyMeetIsMonotonicSlot1
-{α : Type*} (F G H : Family α) :
+{α : Type*} {F G : Family α} (H : Family α) :
 F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
   by
     intro hFG S hS
@@ -269,10 +273,11 @@ F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
       sorry
     exact hS A hAinFstar
 
--- can derive from familyMeetIsMonotonic
 theorem familyMeetIsMonotonicSlot2
-{α : Type*} (F G H : Family α) :
-G ⊆ H → (F ⋏ G) ⊆ (F ⋏ H) := by sorry
+{α : Type*} (F : Family α) {G H : Family α} :
+G ⊆ H → (F ⋏ G) ⊆ (F ⋏ H) := by
+  intro GinH
+  exact familyMeetIsMonotonic (Family.rfl F) GinH
 
 
 theorem familyMeetContainedInIntersection
@@ -434,11 +439,11 @@ by
   constructor
   · intro h
     have h2 : H* ⊆ (F ⋏ G)* := h.2
-    have h_anti := dualIsAntitone _ _ h2
+    have h_anti := dualIsAntitone h2
     rw [dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies] at h_anti
     intro A hA
     have hmono : (F ⋏ G) ⋏ F ⊆ H ⋏ F :=
-      familyMeetIsMonotonicSlot1 (F ⋏ G) H F h_anti
+      familyMeetIsMonotonicSlot1 F h_anti
     have h2 : (F ⋏ G) ⋏ F = F ⋏ G := by
       rw [←familyMeetIsAssociative]
       rw [familyMeetIsCommutative G F]

@@ -48,6 +48,8 @@ instance {α : Type*} : Union (Family α) where
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
+lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by sorry
+
 end Family_structure
 
 section Empty_and_full_families
@@ -263,7 +265,7 @@ def Family.famMeet {α : Type*} (famA famB : Family α) : Family α := {
     exact hBCmem
 }
 
-lemma mem_famMeet {α : Type*} (F G : Set (Set α)) (A : Set α) :
+lemma mem_famMeet {α : Type*} (F G : Family α) (A : Set α) :
   A ∈ famMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
   rfl
 

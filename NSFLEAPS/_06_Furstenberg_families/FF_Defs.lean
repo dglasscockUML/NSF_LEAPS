@@ -7,26 +7,26 @@ import NSFLEAPS._06_Furstenberg_families.FF_Pontryagin
 
 -- *Algebra* that I need that we can reindex later
 
-theorem lemma_useful_identity
-{S : Type*} (F G H : Family S) :
-F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
+-- theorem familyUsefulIdentity
+-- {S : Type*} (F G H : Family S) :
+-- F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
 
-theorem de_morgan_variant
-{S : Type*} (F G : Family S) :
-(F ⋎ G)* = F* ⋏ G* := by sorry
+-- theorem familyDeMorgan1
+-- {S : Type*} (F G : Family S) :
+-- (F ⋎ G)* = F* ⋏ G* := by sorry
 
-theorem dual_dual
-{S : Type*} (F : Family S) :
-F** = F := by sorry
+-- theorem dualIsInvolutionOnFamilies
+-- {S : Type*} (F : Family S) :
+-- F** = F := by sorry
 
-theorem explicit_Curly_Wedge_one
-{S : Type*} (A : Set S) (F G : Family S) :
-A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ F* → A ∩ B ∈ G := by rfl
+-- theorem mem_famMeet
+-- {S : Type*} (A : Set S) (F G : Family S) :
+-- A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ F* → A ∩ B ∈ G := by rfl
 
-theorem explicit_Curly_Wedge_two
-{S : Type*} (A : Set S) (F G : Family S) :
-A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ G* → A ∩ B ∈ F := by sorry
---Use commutativity, then rfl
+-- theorem mem_famMeetv2
+-- {S : Type*} (A : Set S) (F G : Family S) :
+-- A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ G* → A ∩ B ∈ F := by sorry
+-- --Use commutativity, then rfl
 
 -- End *Algebra*
 
@@ -1111,7 +1111,7 @@ dcSFamily S ⊆ (centralFamily S) ⋏ (syndeticFamily S) :=
       have : (dcSFamily S ⋎ thickFamily S).sets = (centralFamily S).sets := by
         exact Filter.principal_eq_iff_eq.mp (congrArg Filter.principal (congrArg Family.sets this))
       exact this.le
-    have := (lemma_useful_identity (dcSFamily S) (thickFamily S) (centralFamily S)).mp this
+    have := (familyUsefulIdentity (dcSFamily S) (thickFamily S) (centralFamily S)).mp this
     rw [dualThickSyndetic] at this
     exact this
 
@@ -1121,7 +1121,7 @@ theorem cStarIsSyndeticMeetdcThick
 (centralFamily S)* =(dcTFamily S) ⋏ (syndeticFamily S) := by
   have := centralIsdcSCapThick S
   have : (centralFamily S)* = (dcSFamily S⋎thickFamily S)* := congrArg Family.famDual this
-  have deMorg := de_morgan_variant (dcSFamily S) (thickFamily S)
+  have deMorg := familyDeMorgan1 (dcSFamily S) (thickFamily S)
   rw [deMorg] at this
   rw [dualThickSyndetic] at this
   exact this
@@ -1132,7 +1132,7 @@ theorem cStarIffSetOfRecAlongAllThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ dcTFamily S := by
   rw [cStarIsSyndeticMeetdcThick S]
-  have := explicit_Curly_Wedge_two A (dcTFamily S) (syndeticFamily S)
+  have := mem_famMeetv2 (dcTFamily S) (syndeticFamily S) A
   rw [dualSyndeticThick] at this
   exact this
 
@@ -1142,9 +1142,9 @@ theorem cStarIffSyndeticAlongdcS
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isdcSSet H → A ∩ H ∈ syndeticFamily S := by
   rw [cStarIsSyndeticMeetdcThick S]
-  have := explicit_Curly_Wedge_one A (dcTFamily S) (syndeticFamily S)
+  have := mem_famMeet (dcTFamily S) (syndeticFamily S) A
   unfold dcTFamily at this
-  rw [dual_dual (dcSFamily S)] at this
+  rw [dualIsInvolutionOnFamilies (dcSFamily S)] at this
   exact this
 -- (∀ (X : Type*) (_ : TopologicalSpace X)
 -- (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X)

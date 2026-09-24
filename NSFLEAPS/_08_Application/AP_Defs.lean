@@ -5,58 +5,63 @@ import NSFLEAPS._08_Application.AP_Symbolic_system
 /-! This is a module docstring -/
 
 
-section Theorems_needed_from_FA_Theorems
+-- section Theorems_needed_from_FA_Theorems
 -- This section contains theorems from FA_Theorems which are not stated yet
 -- I state them here to use for theorems in this file
 -- After we state corresponding theorems in FA_Theorems, the statements in this
 -- section will be removed
 
-/-- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
--- This theorem will be moved to FA_Theorems later
-theorem familyMeetContainedInIntersection
-{S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
-  sorry
+-- theorem familyMeetContainedInIntersection
+-- {α : Type*} (F G : Family α) :
+-- G ≠ fullFam α → F ⋏ G ⊆ F :=
+--   by sorry
 
-/-- Familymeet is monotone -/
+/- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
+-- This theorem will be moved to FA_Theorems later
+-- theorem familyMeetContainedInIntersectionv2
+-- {S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
+--   sorry
+
+/- Familymeet is monotone -/
 -- We will move this theorem to FA_Theorems file later
 -- Here's an easier-to-apply version of the arguments:  (F) {G H} : G ⊆ H → F ⋏ G ⊆ F ⋏ H
-theorem familyMeetIsMonotonic
-{S : Type*} (F G H : Family S) (hGH : G ⊆ H) : F ⋏ G ⊆ F ⋏ H := by
-  sorry
+-- theorem familyMeetIsMonotonicSlot2
+-- {S : Type*} (F G H : Family S) (hGH : G ⊆ H) : F ⋏ G ⊆ F ⋏ H := by
+--   sorry
 
-/-- This lemma helps us unfold the definition of FamilyMeet -/
+/- This lemma helps us unfold the definition of FamilyMeet -/
 -- This may be redundant eventually.
 -- But for now, I am struggling to unfold the definition of FamilyMeet, so I use this lemma
-lemma unfoldFamMeet
-{S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
-  sorry
+-- lemma mem_famMeet
+-- {S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
+--   sorry
 
-/-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
+/- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
 -- This theorem should be also in FA_Theorems. I state it here since it's needed for this section
 -- and the corresponding theorem in FA_Theorems is not there yet
-theorem familyLocalImplicationEquivalence
-{S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
-  sorry
+-- theorem familyLocalImplicationEquivalence
+-- {S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
+--   sorry
 
-theorem familyJoinCommutative
-{S : Type*} (F G : Family S) : F ⋎ G = G ⋎ F := by sorry
+-- theorem familyJoinIsCommutative
+-- {S : Type*} (F G : Family S) : F ⋎ G = G ⋎ F := by sorry
 
-theorem familyJoinMonotoneSlot1
-{S : Type*} {F G : Family S} (H : Family S) : F ⊆ G → F ⋎ H ⊆ G ⋎ H := by sorry
+-- theorem familyJoinIsMonotonicSlot1
+-- {S : Type*} {F G : Family S} (H : Family S) : F ⊆ G → F ⋎ H ⊆ G ⋎ H := by sorry
 
-theorem familyJoinMonotoneSlot2
-{S : Type*} (F : Family S) {G H : Family S} : G ⊆ H → F ⋎ G ⊆ F ⋎ H := by sorry
+-- theorem familyJoinIsMonotonicSlot2
+-- {S : Type*} (F : Family S) {G H : Family S} : G ⊆ H → F ⋎ G ⊆ F ⋎ H := by sorry
 
-theorem dualIsAntitone
-{S : Type*} {F G : Family S} : F ⊆ G → G* ⊆ F* := by sorry
+-- theorem dualIsAntitone
+-- {S : Type*} {F G : Family S} : F ⊆ G → G* ⊆ F* := by sorry
 
-theorem deMorganOverJoin
-{S : Type*} {F G : Family S} : (F ⋎ G)* = F* ⋏ G* := by sorry
+-- theorem familyDeMorgan1
+-- {S : Type*} {F G : Family S} : (F ⋎ G)* = F* ⋏ G* := by sorry
 
-theorem deMorganOverMeet
-{S : Type*} {F G : Family S} : (F ⋏ G)* = F* ⋎ G* := by sorry
+-- theorem familyDeMorgan2
+-- {S : Type*} {F G : Family S} : (F ⋏ G)* = F* ⋎ G* := by sorry
 
-end Theorems_needed_from_FA_Theorems
+-- end Theorems_needed_from_FA_Theorems
 
 section Reduction_to_UR_sets
 
@@ -410,7 +415,7 @@ A ∩ H' = B ∩ H' := by
 --     intro A hA
 --     have h0 : isSyndetic A := by
 --       have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
---         apply familyMeetContainedInIntersection
+--         apply familyMeetContainedInIntersectionv2
 --       have h02 : A ∈ syndeticFamily S ∩ F := by
 --         exact h01 hA
 --       have h03 : A ∈ syndeticFamily S := by
@@ -425,7 +430,7 @@ A ∩ H' = B ∩ H' := by
 --         exact hH
 --       obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
 --       have h12 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
---         exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
+--         exact (mem_famMeet (syndeticFamily S) F A).mp hA
 --       have h13 : A ∩ H' ∈ F := by
 --         specialize h12 H'
 --         rw [dualSyndeticThick] at h12
@@ -454,7 +459,7 @@ A ∩ H' = B ∩ H' := by
 --       exact dualSyndeticThick
 --     have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
 --       rw [<- dualSyndeticThick]
---       exact (unfoldFamMeet (syndeticFamily S) G A).mpr
+--       exact (mem_famMeet (syndeticFamily S) G A).mpr
 --     apply h3
 --     intro H hH2
 --     specialize h1 H hH2
@@ -467,61 +472,65 @@ theorem urContainmentSufficesForFamilyContainment
   (∀ (H' : Set S) (_ : H' ⊆ H) (_ : isThick H'), (B ∩ H' ∈ F))
     → (∀ (H' : Set S) (_ : H' ⊆ H) (_ : isThick H'), (B ∩ H' ∈ G))} :
 (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
-  intro A hA
-  have h0 : isSyndetic A := by
-    have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
-      apply familyMeetContainedInIntersection
-    have h02 : A ∈ syndeticFamily S ∩ F := by
-      exact h01 hA
-    have h03 : A ∈ syndeticFamily S := by
-      exact h02.1
-    simpa
-  have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
-    intro H hHThick
-    have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
-    A ∩ H' = B ∩ H' := by
-      apply syndSetIsUROnThickSet
-      · exact h0
-      · exact hHThick
-    obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
-    have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
-      intro H'' hH'' hH''Thick
-      have hABH'' : B ∩ H'' = A ∩ H'' := by
-        have hAB0 : H' ∩ H'' = H'' := by
-          exact Set.inter_eq_self_of_subset_right hH''
-        have hAB1 : B ∩ H'' = B ∩ H' ∩ H'' := by
-          nth_rw 1 [<- hAB0]
-          rw [Set.inter_assoc]
-        have hAB2 : A ∩ H'' = A ∩ H' ∩ H'' := by
-          nth_rw 1 [<- hAB0]
-          rw [Set.inter_assoc]
-        rw [hAB1, hAB2, h2]
-      rw [hABH'']
-      apply (unfoldFamMeet (syndeticFamily S) F A).mp hA
-      rw [dualSyndeticThick]
-      exact hH''Thick
-    have hH'Triv : H' ⊆ H' := by
-      simp
-    specialize hFG B H' hB hH' h12 H' hH'Triv hH'
-    rw [<- h2] at hFG
-    have hSub : A ∩ H' ⊆ A ∩ H := by
-      intro a ha
-      simp only [Set.mem_inter_iff] at ha
-      rcases ha with ⟨ha1, ha2⟩
-      simp only [Set.mem_inter_iff]
-      constructor
-      · exact ha1
-      · apply hHH' ha2
-    apply G.upward_closed (A ∩ H') (A ∩ H) hFG hSub
-  have h2 : (syndeticFamily S)* = (thickFamily S) := by
-    exact dualSyndeticThick
-  have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
-    rw [<- dualSyndeticThick]
-    exact (unfoldFamMeet (syndeticFamily S) G A).mpr
-  apply h3
-  intro H hH2
-  specialize h1 H hH2
-  exact h1
+  by_cases FisFull : F = fullFam S
+  · -- Case that F = fullFam S
+    -- This casework is done in the paper, top of Thm. 5.5
+    sorry
+  · -- Case that F ≠ fullFam S
+    intro A hA
+    have h0 : isSyndetic A := by
+      have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
+        exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
+      have h03 : A ∈ syndeticFamily S := by
+        exact h01 hA
+      simpa
+    have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
+      intro H hHThick
+      have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+      A ∩ H' = B ∩ H' := by
+        apply syndSetIsUROnThickSet
+        · exact h0
+        · exact hHThick
+      obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
+      have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
+        intro H'' hH'' hH''Thick
+        have hABH'' : B ∩ H'' = A ∩ H'' := by
+          have hAB0 : H' ∩ H'' = H'' := by
+            exact Set.inter_eq_self_of_subset_right hH''
+          have hAB1 : B ∩ H'' = B ∩ H' ∩ H'' := by
+            nth_rw 1 [<- hAB0]
+            rw [Set.inter_assoc]
+          have hAB2 : A ∩ H'' = A ∩ H' ∩ H'' := by
+            nth_rw 1 [<- hAB0]
+            rw [Set.inter_assoc]
+          rw [hAB1, hAB2, h2]
+        rw [hABH'']
+        apply (mem_famMeet (syndeticFamily S) F A).mp hA
+        rw [dualSyndeticThick]
+        exact hH''Thick
+      have hH'Triv : H' ⊆ H' := by
+        simp
+      specialize hFG B H' hB hH' h12 H' hH'Triv hH'
+      rw [<- h2] at hFG
+      have hSub : A ∩ H' ⊆ A ∩ H := by
+        intro a ha
+        simp only [Set.mem_inter_iff] at ha
+        rcases ha with ⟨ha1, ha2⟩
+        simp only [Set.mem_inter_iff]
+        constructor
+        · exact ha1
+        · apply hHH' ha2
+      apply G.upward_closed (A ∩ H') (A ∩ H) hFG hSub
+    have h2 : (syndeticFamily S)* = (thickFamily S) := by
+      exact dualSyndeticThick
+    have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
+      rw [<- dualSyndeticThick]
+      exact (mem_famMeet (syndeticFamily S) G A).mpr
+    apply h3
+    intro H hH2
+    specialize h1 H hH2
+    exact h1
+
 
 end Reduction_to_UR_sets
 
@@ -1317,7 +1326,7 @@ theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:= by
     have h1 : syndeticFamily S ⋏ deltaFamily S
       ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
-      apply familyMeetIsMonotonic
+      apply familyMeetIsMonotonicSlot2
       have h11 : deltaFamily S ⊆ deltaZeroFamily S := by
         exact deltaFamilyContainedInDeltaZeroFamily
       have h12 : deltaZeroFamily S ⊆ setOfBohrRecurrenceFamily S := by
@@ -1349,11 +1358,11 @@ theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := by
   have h1 : syndeticFamily S ⋏ deltaFamily S ⊆ syndeticFamily S ⋏ deltaZeroFamily S := by
-    apply familyMeetIsMonotonic
+    apply familyMeetIsMonotonicSlot2
     exact deltaFamilyContainedInDeltaZeroFamily
   have h2 : syndeticFamily S ⋏ deltaZeroFamily S ⊆
   syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
-    apply familyMeetIsMonotonic
+    apply familyMeetIsMonotonicSlot2
     exact deltaZeroImpliesSetOfBohrRecurrence
   have h3 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S = syndeticFamily S ⋏ deltaFamily S := by
     rw [commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence]
@@ -1389,8 +1398,8 @@ theorem strongIPIffStrongCentralInCountCommSemi
     rw [Bvisits] at hypoth
     rw [Bvisits]
     exact applyPre hypoth H' H'inH H'thick
-  have contain2 := familyMeetIsMonotonic (syndeticFamily S) (centralFamily S)
-    (IPFamily S) (centralFamilyContainedInIPFamily S)
+  have contain2 := familyMeetIsMonotonicSlot2
+    (syndeticFamily S) (centralFamilyContainedInIPFamily S)
   ext A
   constructor
   · intro hA
@@ -1408,28 +1417,27 @@ by
   have contain0 : (syndeticFamily S) ⋏ (IPFamily S) ⊆ (syndeticFamily S) ⋏ (centralFamily S) := by
     rw [strongIPIffStrongCentralInCountCommSemi S]
     exact
-      familyMeetIsMonotonic (syndeticFamily S) (centralFamily S) (centralFamily S) fun ⦃a⦄ a_1 ↦ a_1
+      familyMeetIsMonotonicSlot2 (syndeticFamily S) (fun ⦃a⦄ a_1 ↦ a_1)
   have contain1 : (centralFamily S)* ⊆
     (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) := by
       have := (familyLocalImplicationEquivalence (syndeticFamily S)
         (IPFamily S) (centralFamily S)).mpr contain0
-      rw [familyJoinCommutative] at this
+      rw [familyJoinIsCommutative] at this
       rw [dualSyndeticThick] at this
       exact this
   have contain2 : (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) ⊆
     (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) := by
       have := dualIsAntitone (centralFamilyContainedInIPFamily S)
-      have := familyJoinMonotoneSlot1 (thickFamily S) this
-      exact familyMeetIsMonotonic (syndeticFamily S) ((IPFamily S)* ⋎ thickFamily S)
-        ((centralFamily S)* ⋎ thickFamily S) this
+      have := familyJoinIsMonotonicSlot1 (thickFamily S) this
+      exact familyMeetIsMonotonicSlot2 (syndeticFamily S) this
   have contain3 : (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) ⊆
     (centralFamily S)* := by
-      have := familyJoinMonotoneSlot2 (thickFamily S) (dcsIsSyndeticMeetCentral S)
-      rw [familyJoinCommutative] at this
+      have := familyJoinIsMonotonicSlot2 (thickFamily S) (dcsIsSyndeticMeetCentral S)
+      rw [familyJoinIsCommutative] at this
       rw [←centralIsdcSCapThick S] at this
       have := dualIsAntitone this
-      rw [deMorganOverJoin] at this
-      rw [deMorganOverMeet] at this
+      rw [familyDeMorgan1] at this
+      rw [familyDeMorgan2] at this
       rw [dualThickSyndetic] at this
       rw [dualSyndeticThick] at this
       exact this
