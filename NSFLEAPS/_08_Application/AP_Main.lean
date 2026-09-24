@@ -541,8 +541,8 @@ end Reduction_to_UR_sets
 
 section Delta_builder
 
--- Next three definitions and the three lemmas below were written by ChatGPT.
--- The definitions help with product on commutative semigroups and the lemmas
+-- Next three definitions and the three lemmas below were written by ChatGPT
+-- These definitions help with product on commutative semigroups and the lemmas
 -- provide simple equalities regarding these definitions
 -- These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
 
@@ -955,11 +955,36 @@ theorem commVisitTimeSetForRPPairIsDelta
       simp only [U]
       exact hs2
     have hUOpen : IsOpen U := by
-      sorry
+      unfold U
+      apply isOpen_iInter_of_finite
+      intro i
+      apply IsOpen.preimage
+      · apply dSystem.mapCont
+      · exact hV0b
     have hGThick : isThick G := by
-      simp [G, isThick]
+      simp only [G, isThick]
       intro F hF
-      sorry
+      let E := (⋃ i : Fin N, ((prodExcept hN s i) * ·) '' F)
+      have hFinite: ∀ i : Fin N, (((prodExcept hN s i) * ·) '' F).Finite := by
+        intro i
+        apply hF.image ((prodExcept hN s i) * ·)
+      have hEFinite: E.Finite := by
+        exact Set.finite_iUnion hFinite
+      unfold isThick at hHThick
+      specialize hHThick E hEFinite
+      rcases hHThick with ⟨t, ht⟩
+      use t
+      simp only [E] at ht
+      simp only [Set.subset_iInter_iff, Set.image_subset_iff]
+      simp only [Set.image_subset_iff, Set.iUnion_subset_iff] at ht
+      intro i
+      specialize ht i
+      intro f hf
+      specialize ht hf
+      simp only [Set.mem_preimage] at ht
+      simp only [Set.mem_preimage]
+      rw [<- Semigroup.mul_assoc]
+      exact ht
     have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1
       hxyRP U V0 hUOpen hV0b hUNonempty hV0c
     have hInterN : (visitTimeSet dSystem x U ∩ setVisitTimeSet dSystem V0 U ∩ G).Nonempty := by
@@ -989,7 +1014,7 @@ theorem commVisitTimeSetForRPPairIsDelta
         have hEq : (s i) * prodExcept hN s i = prodAll hN s := by
           simp only [prodExcept, prodAll]
           have hUnivNon : (Finset.univ : Finset (Fin N)).Nonempty := by
-            sorry
+            exact ⟨⟨0, by omega⟩, Finset.mem_univ _⟩
           apply mul_prodNonempty_erase
           simp
         rw [hEq]
