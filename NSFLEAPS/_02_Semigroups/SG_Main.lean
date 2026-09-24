@@ -1,6 +1,11 @@
-import NSFLEAPS._00_Imports.IM_Base
+import NSFLEAPS._00_Imports.IM_Main
 
-/-! This is a module docstring. -/
+/-!
+# Semigroup properties
+
+This file develops the basic properties of semigroups that are not
+available (or not convenient) from Mathlib.
+-/
 
 -- We may want to assume [Nonempty S] throughout, but I've not implemented that yet.
 

@@ -55,13 +55,14 @@ The code in this repository is organized as follows. The main results from the i
 
 ## Autoformalization
 
-Parts of this formalization were written with the help of AI-based coding agents, including Claude Opus 5 and ChatGPT 5.6 Luna. Specifically:
+Parts of this formalization were written with the help of AI-based coding agents, including Claude Opus 5 and ChatGPT. Specifically:
 
-- definitions, theorems, and proofs in the files `TP_Cylinders.lean`, `FF_CXX.lean`, and `FF_Pontryagin.lean` were written by Claude Opus 5;
+- definitions, theorems, and proofs in the files `TP_Cylinders.lean` and `FF_Pontryagin.lean` were written by Claude Opus 5;
+- definitions, theorems, and proofs in the file `FF_CXX.lean` were written by ChatGPT 5.6 Sol;
 - some definitions and most proofs in the file `RP_Nat_ext.lean` were written by Claude Opus 5;
 - approximately 15 proofs of theorems scattered throughout the project were written by Claude Opus 5.
 
-ChatGPT 5.6 Luna was used to help with tactics at particular places in proofs, diagnose compilation errors, and search Mathlib. Beyond these specific callouts, all code was written by hand.  In particular, all definition and theorem statements outside of the specific files mentioned above were written by hand.
+ChatGPT 5.6 Sol and Luna were used to help with tactics at particular places in proofs, diagnose compilation errors, and search Mathlib. Beyond these specific callouts, all code was written by hand.  In particular, all definition and theorem statements outside of the specific files mentioned above were written by hand.
 
 All submitted code was reviewed by the authors and checked by the Lean elaborator and compiler. The authors are responsible for the mathematical content of the formalization, the correctness of the statements, and the interpretation of the resulting code. A more detailed accounting of our use of coding agents can be found included in the Palomar submissions at the links above.
 

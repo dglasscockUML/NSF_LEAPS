@@ -1,8 +1,11 @@
-import NSFLEAPS._04_Dynamical_systems.DS_Defs
+import NSFLEAPS._04_Dynamical_systems.DS_Main
 
-/-! This is a module docstring -/
+/-!
+# Symbolic dynamics
 
-/- This file is intended to keep the code describing the dynamical system {0,1}^S with the shift -/
+This file contains the code describing the dynamical system {0,1}^S
+together with the shift.
+-/
 
 /- A general note: Bool is a type with terms `true` and `false`.
 Apparently, Lean automatically gives it the discrete topology?

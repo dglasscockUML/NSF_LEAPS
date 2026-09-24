@@ -1,6 +1,12 @@
-import NSFLEAPS._00_Imports.IM_Base
+import NSFLEAPS._00_Imports.IM_Main
 
-/-! This is a module docstring-/
+/-!
+# Furstenberg family structure objects
+
+This file defines the objects that capture Furstenberg families
+and their basic properties.  It also establishes notation for the family
+dual, meet, and join operators.
+-/
 
 section Family_structure
 

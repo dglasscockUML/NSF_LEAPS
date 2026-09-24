@@ -1,8 +1,13 @@
-import NSFLEAPS._06_Furstenberg_families.FF_Defs
+import NSFLEAPS._06_Furstenberg_families.FF_Main
 import NSFLEAPS._07_RP.RP_Nat_ext
 import NSFLEAPS._08_Application.AP_Symbolic_system
 
-/-! This is a module docstring -/
+/-!
+# Applications
+
+This file contains the main results from the paper "The local dynamical
+structure of delta* sets via a new Furstenberg family algebra".
+-/
 
 
 -- section Theorems_needed_from_FA_Theorems

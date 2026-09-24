@@ -1,8 +1,13 @@
-import Mathlib.Topology.CompactOpen
-import Mathlib.Topology.Separation.Hausdorff
-import Mathlib.Topology.Algebra.Monoid.Defs
+import NSFLEAPS._00_Imports.IM_Main
 
-/- ChatGPT 5.6 Sol helped write the following -/
+/-!
+# C(X,X) as a monoid under compositions
+
+Native support for a monoid structure on `C(X,X)` in Mathlib seems to be for
+pointwise multiplication.  In this file, we define ContinuousMap.End to give
+monoid structure on `C(X,X)` under composition.
+(This file was written by ChatGPT 5.6 Sol.)
+-/
 
 namespace ContinuousMap
 

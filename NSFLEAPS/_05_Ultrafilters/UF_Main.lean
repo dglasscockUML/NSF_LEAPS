@@ -1,6 +1,10 @@
-import NSFLEAPS._04_Dynamical_systems.DS_Defs
+import NSFLEAPS._04_Dynamical_systems.DS_Main
 
-/-! This is a module docstring -/
+/-!
+# Ultrafilters as tools in topological dynamics
+
+This file develops the machinery of ultrafilters as tools in topological dynamics.
+-/
 
 section Right_topological_semigroups
 

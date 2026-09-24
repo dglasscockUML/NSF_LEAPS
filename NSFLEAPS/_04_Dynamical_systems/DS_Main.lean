@@ -1,11 +1,12 @@
-import NSFLEAPS._01_Topology.TP_Defs
-import NSFLEAPS._02_Semigroups.SG_Defs
+import NSFLEAPS._01_Topology.TP_Main
+import NSFLEAPS._02_Semigroups.SG_Main
 
-import Mathlib.Topology.UniformSpace.Equicontinuity
-import Mathlib.Topology.UniformSpace.OfCompactT2
-import Mathlib.Topology.Category.TopCat.OpenNhds
+/-!
+# Topological Dynamical Systems
 
-/-! This is a module docstring -/
+This file develops definitions, structures, and properies of actions of discrete
+semigroups on compact Hausdorff spaces by continuous maps.
+-/
 
 /- Sections are used for organizational purposes only.  See the `Outline` pane under `Explorer`. -/
 section Structures

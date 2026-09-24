@@ -1,9 +1,11 @@
-import NSFLEAPS._07_RP.RP_Defs
-import NSFLEAPS._01_Topology.TP_Cylinders
-import Mathlib.Algebra.Group.WithOne.Basic
-import Mathlib.GroupTheory.Subgroup.Centralizer
+import NSFLEAPS._07_RP.RP_Main
 
-/-! This is a module docstring -/
+/-!
+# The natural extension
+
+This file develops the machinery around the natural extension.  It was
+scaffoleded by hand and the proofs were written by Claude Opus 5.
+-/
 
 /-- One inclusion of `forTwoMinCommActionsRPsAreSame`, for the backward regionally proximal
 relation.  This is stated separately only so that it can be applied twice, once with the

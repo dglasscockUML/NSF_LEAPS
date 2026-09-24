@@ -1,6 +1,12 @@
-import NSFLEAPS._05_Ultrafilters.UF_Defs
+import NSFLEAPS._05_Ultrafilters.UF_Main
 
-/-! This is a module docstring -/
+/-!
+# The regionally proximal relation is an equivalence relation
+
+This file contains the proofs of the main results concerning the regionally
+proximal relation from the paper "The regionally proximal relation for
+commutative semigroup actions"
+-/
 
 variable {S} [CommSemigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]

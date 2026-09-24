@@ -1,34 +1,14 @@
-import NSFLEAPS._03_Family_algebra.FA_Theorems
-import NSFLEAPS._05_Ultrafilters.UF_Defs
+import NSFLEAPS._03_Family_algebra.FA_Main
+import NSFLEAPS._05_Ultrafilters.UF_Main
 import NSFLEAPS._06_Furstenberg_families.FF_CXX
 import NSFLEAPS._06_Furstenberg_families.FF_Pontryagin
 
-/-! This is a module docstring -/
+/-!
+# Furstenberg families
 
--- *Algebra* that I need that we can reindex later
-
--- theorem familyUsefulIdentity
--- {S : Type*} (F G H : Family S) :
--- F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
-
--- theorem familyDeMorgan1
--- {S : Type*} (F G : Family S) :
--- (F ⋎ G)* = F* ⋏ G* := by sorry
-
--- theorem dualIsInvolutionOnFamilies
--- {S : Type*} (F : Family S) :
--- F** = F := by sorry
-
--- theorem mem_famMeet
--- {S : Type*} (A : Set S) (F G : Family S) :
--- A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ F* → A ∩ B ∈ G := by rfl
-
--- theorem mem_famMeetv2
--- {S : Type*} (A : Set S) (F G : Family S) :
--- A ∈ F ⋏ G ↔ ∀ (B : Set S), B ∈ G* → A ∩ B ∈ F := by sorry
--- --Use commutativity, then rfl
-
--- End *Algebra*
+This file develops the machinery around concrete Furstenberg families:
+syndetic sets, thick sets, Delta sets, Bohr sets, etc...
+-/
 
 section Abstract_results
 

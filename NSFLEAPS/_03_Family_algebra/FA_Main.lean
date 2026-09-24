@@ -1,6 +1,11 @@
 import NSFLEAPS._03_Family_algebra.FA_Defs
 
-/-! This is a module docstring -/
+/-!
+# Furstenberg family theorems
+
+This file develops the main abstract theorems governing the algebra
+of Furstenberg families.
+-/
 
 section Dual
 

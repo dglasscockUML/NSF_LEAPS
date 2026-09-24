@@ -1,6 +1,4 @@
-import Mathlib.Topology.Separation.Regular
-import Mathlib.Topology.Constructions
-import Mathlib.Topology.Compactness.Compact
+import NSFLEAPS._00_Imports.IM_Main
 
 /-!
 # Cylinder neighbourhoods of the diagonal
@@ -14,6 +12,7 @@ neighbourhood `α₀` of the diagonal of `X`.
 
 This is the concrete form of the statement that the product uniformity has a basis of
 cylinders, proved here without introducing a `UniformSpace` structure.
+(This file was written by Claude Opus 5.)
 -/
 
 /-- In a compact Hausdorff space, a pair of distinct points is avoided by some closed

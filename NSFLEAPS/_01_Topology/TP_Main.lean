@@ -1,9 +1,12 @@
-import NSFLEAPS._00_Imports.IM_Base
+import NSFLEAPS._00_Imports.IM_Main
+import NSFLEAPS._01_Topology.TP_Cylinders
 
-import Mathlib.Topology.UniformSpace.Equicontinuity
-import Mathlib.Topology.UniformSpace.OfCompactT2
+/-!
+# Facts from topology
 
-/-! This is a module docstring. -/
+This file records basic facts from topology that are not available
+(or not convenient) from Mathlib.
+-/
 
 /-- The image of the closure of a set `A` under a
 continuous map `f` is the closure of the image of `A` -/
