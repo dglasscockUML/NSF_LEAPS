@@ -479,8 +479,56 @@ theorem urContainmentSufficesForFamilyContainment
 (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
   by_cases FisFull : F = fullFam S
   · -- Case that F = fullFam S
-    -- This casework is done in the paper, top of Thm. 5.5
-    sorry
+    intro A hA
+    let B := ({} : Set S)
+    let H := (Set.univ : Set S)
+    have hBUnif : isURSet B := by
+      simp only [isURSet, isUniformlyRecurrent]
+      intro U hU
+      have hVis : (visitTimeSet (selfSymbolicSystem S) (indicator B) U) = Set.univ := by
+        apply Set.Subset.antisymm
+        · simp
+        · intro t ht
+          simp only [visitTimeSet, Set.mem_preimage]
+          have hEq : (selfSymbolicSystem S).map t (indicator B) = indicator B := by
+            apply funext
+            intro s
+            have hB0 : indicator B s = false := by
+              simp [indicator, B]
+            rw [hB0]
+            simp [selfSymbolicSystem, basicRightAction, symbolicSystem, indicator, B]
+          rw [hEq]
+          simp only [mem_nhds_iff] at hU
+          rcases hU with ⟨V, hV1, hV2, hV3⟩
+          apply hV1 hV3
+      rw [hVis]
+      simp only [isSyndetic, Set.mem_univ, and_true, forall_const]
+      have hSNonempty : (Set.univ : Set S).Nonempty := by
+        simp
+      rcases hSNonempty with ⟨t, ht⟩
+      use {t}
+      constructor
+      · simp
+      · use t
+        simp
+    have hUnivThick : isThick (Set.univ : Set S) := by
+      simp [isThick]
+    have hHThick : isThick H := by
+      exact hUnivThick
+    specialize hFG B H hBUnif hHThick
+    have hStart : (∀ H' ⊆ H, isThick H' → B ∩ H' ∈ F) := by
+      intro H' hH'H hH'Thick
+      apply F.upward_closed ∅
+      · simp [FisFull, fullFam, fullCollection]
+      · simp
+    have hSub : Set.univ ⊆ H := by
+      simp
+      rfl
+    specialize hFG hStart (Set.univ : Set S) hSub hUnivThick
+    simp only [Set.inter_univ, B] at hFG
+    intro C hC
+    apply G.upward_closed ∅ (A ∩ C) hFG
+    simp only [Set.subset_inter_iff, Set.empty_subset, and_self]
   · -- Case that F ≠ fullFam S
     intro A hA
     have h0 : isSyndetic A := by
