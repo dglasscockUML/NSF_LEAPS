@@ -5438,7 +5438,7 @@ setOrbit (diagDynamicalSystem dSystemX dSystemX) U
 theorem forwardEqualsBackwardRPInMinCommSystem
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem} :
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
 RP dSystem = RPM dSystem := by
   simp only [Set.Subset.antisymm_iff]
   constructor
@@ -7160,7 +7160,7 @@ iff `RP_X ⊆ R_π`, provided `S` is commutative -/
 theorem minimalFactorEquicontinuousIffRPInFactorRelation
 {S} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) {hMin : isMinimalSystem dSystem}
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem)
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
 {π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
@@ -7215,10 +7215,9 @@ theorem minimalICEREquicontinuousIffRPInICER
     constructor
     · intro h1
       have h3 : RPM dSystem ⊆ mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) := by
-        apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
+        apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem hMin
           (quotientDynamicalSystem dSystem hI) hFactorMap).1.mpr
         · exact h1
-        · exact hMin
       have h4 : mapRelation (Quotient.mk ⟨setToRelation I, hI.2.2⟩) ⊆ I := by
         intro t ht
         unfold mapRelation at ht
@@ -7236,10 +7235,9 @@ theorem minimalICEREquicontinuousIffRPInICER
           unfold setToRelation
           exact ht
         apply Quotient.eq.mpr h2a
-      apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem
+      apply (minimalFactorEquicontinuousIffRPInFactorRelation dSystem hMin
         (quotientDynamicalSystem dSystem hI) hFactorMap).1.mp
       · exact h1.trans h2
-      · exact hMin
   refine ⟨?_, ?_⟩
   · exact RPMgoal
   · rw [forwardEqualsBackwardRPInMinCommSystem dSystem]

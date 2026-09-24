@@ -9,23 +9,23 @@ Explain
 /- # Essential Definitions
 For those definitions that are repeated, decide what to do ... -/
 
-/-- A set `A` of a semigroup `S` is thick if for all finite
+/- A set `A` of a semigroup `S` is thick if for all finite
 subsets `F ⊆ S`, there exists `s ∈ S` such that `Fs ⊆ A` -/
-def isThick
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ (F : Set S), F.Finite → ∃ s : S, (· * s) '' F ⊆ A
+-- def isThick
+-- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+-- Prop :=
+-- ∀ (F : Set S), F.Finite → ∃ s : S, (· * s) '' F ⊆ A
 
-/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
+/- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
 A subset `A` of a semigroup `S`is Bohr_0 if there exists a
 semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
 containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
-def isBohrZero
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
-  (_ : IsOpen U) (_ : 1 ∈ U),
-  Set.preimage φ U ⊆ A
+-- def isBohrZero
+-- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+-- Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
+--   (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
+--   (_ : IsOpen U) (_ : 1 ∈ U),
+--   Set.preimage φ U ⊆ A
 
 /-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
 A subset `A` of a semigroup `S` is a set of Bohr recurrence if for all `d ∈ ℕ`,
@@ -39,12 +39,12 @@ Prop :=
   (_ : IsOpen U) (_ : 1 ∈ U),
   ∃ (a : S) (_ : a ∈ A), φ a ∈ U
 
-/-- A set `A` of a semigroup `S` is a Delta set if there exist
+/- A set `A` of a semigroup `S` is a Delta set if there exist
 `s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
-def isDelta
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
+-- def isDelta
+-- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+-- Prop :=
+-- ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
 
 /-- A set `A` of a semigroup `S` is Delta* if it has nonempty
 intersection with all Delta subsets of `S` -/

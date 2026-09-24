@@ -89,8 +89,8 @@ theorem forTwoMinCommActionsRPsAreSame
   (dSystemS.map s) ∘ (dSystemT.map t) = (dSystemT.map t) ∘ (dSystemS.map s)) :
 RP dSystemS = RP dSystemT := by
   -- Both systems are minimal with a commutative acting semigroup, so `RP = RPM` for each.
-  rw [forwardEqualsBackwardRPInMinCommSystem dSystemS (hMin := hMin),
-    forwardEqualsBackwardRPInMinCommSystem dSystemT (hMin := hMinT)]
+  rw [forwardEqualsBackwardRPInMinCommSystem dSystemS hMin,
+    forwardEqualsBackwardRPInMinCommSystem dSystemT hMinT]
   -- By the symmetry of `S` and `T` it suffices to prove one inclusion.
   apply Set.Subset.antisymm
   · exact RPMSubsetOfRPMForTwoMinCommActions hMin hMinT hCommActions
@@ -1267,9 +1267,9 @@ letI : Nonempty ↑(natExtSet dSystem) :=
     rw [he]
     rfl
 
-/-! ### Theorem E
+/-! ### Theorem F
 
-Theorem E identifies three `S`-systems: `X / RP_X`, `W / RP_{W,S}` and `W / RP_{W,Gr(S)}`.
+Theorem F identifies three `S`-systems: `X / RP_X`, `W / RP_{W,S}` and `W / RP_{W,Gr(S)}`.
 The first two are identified by Theorem 6.9 above, so what remains is to identify
 `W / RP_{W,S}` with `W / RP_{W,Gr(S)}`; this rests on Theorem D applied to the two commuting
 actions on `W`.
@@ -1326,7 +1326,7 @@ RP (natExtSystem (minimalCommActionIsSurjective hMin))
     (natExtGroSystemIsMinimal hMin)
     (natExtActionsCommute hSurject)
 
-/-- Theorem E, (2) is isomorphic to (3): the largest equicontinuous factor of `W` as an
+/-- Theorem F, (2) is isomorphic to (3): the largest equicontinuous factor of `W` as an
 `S`-system is the largest equicontinuous factor of `W` as a `groGroup S`-system, viewed as
 an `S`-system via `groGroupHom`.  The two relations are equal by Theorem D, so the identity
 descends to the isomorphism. -/
@@ -1375,27 +1375,3 @@ letI : Nonempty ↑(natExtSet dSystem) :=
       = Quotient.lift _ hwell ((maxEquiFactor hWMin).map s (Quotient.mk (RPSetoid hWMin) w))
     rw [maxEquiFactorMap, maxEquiFactorMap]
     rfl
-
-/-- **Theorem E.**  For a minimal system `X` with natural extension `π : W → X`, the three
-`S`-systems
-
-1. `X / RP_X`, the largest equicontinuous factor of `X`;
-2. `W / RP_{W,S}`, the largest equicontinuous factor of `W` as an `S`-system;
-3. `W / RP_{W,Gr(S)}`, the largest equicontinuous factor of `W` as a `Gr(S)`-system, made
-   into an `S`-system via `groGroupHom`,
-
-are the same up to isomorphism.  Both isomorphisms are stated with (2) as the source. -/
-theorem theoremE
-{S} [CommSemigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
-letI : Nonempty ↑(natExtSet dSystem) :=
-  natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
-(∃ ξ : Quotient (RPSetoid (natExtSystemIsMinimal hMin)) → Quotient (RPSetoid hMin),
-    isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin)) (maxEquiFactor hMin) ξ)
-∧
-(∃ ζ : Quotient (RPSetoid (natExtSystemIsMinimal hMin))
-     → Quotient (RPSetoid (natExtGroSystemIsMinimal hMin)),
-    isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin))
-      (homDynamicalSystem groGroupHom (maxEquiFactor (natExtGroSystemIsMinimal hMin))) ζ) :=
-⟨maxEquiFactorOfNatExtIsoMaxEquiFactor hMin, maxEquiFactorOfNatExtIsoGroMaxEquiFactor hMin⟩

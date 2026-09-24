@@ -1,5 +1,5 @@
 import NSFLEAPS._06_Furstenberg_families.FF_Defs
-import NSFLEAPS._07_RP.RP_Defs
+import NSFLEAPS._07_RP.RP_Nat_ext
 import NSFLEAPS._08_Application.AP_Symbolic_system
 
 /-! This is a module docstring -/
