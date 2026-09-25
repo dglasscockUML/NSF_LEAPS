@@ -184,8 +184,19 @@ F ⋎ G = G ⋎ F :=
 
 theorem familyJoinIsMonotonic
 {α : Type*} {F1 G1 F2 G2 : Family α} :
-F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋎ F2) ⊆ (G1 ⋎ G2) :=
-  by sorry
+F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋎ F2) ⊆ (G1 ⋎ G2) := by
+  intro h1 h2
+  simp only [HasFamJoin.famJoin, Family.famJoin, famJoin]
+  intro B hB
+  simp only [SetLike.mem_coe] at hB
+  rcases hB with ⟨C, hC, D, hD, hB2⟩
+  use C
+  constructor
+  · apply h1 hC
+  · use D
+    constructor
+    · apply h2 hD
+    · exact hB2
 
 theorem familyJoinIsMonotonicSlot1
 {α : Type*} {F G : Family α} (H : Family α) :
@@ -204,16 +215,21 @@ G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) := by
   intro GinH
   exact familyJoinIsMonotonic (Family.rfl F) GinH
 
-
-
-
 theorem familyContainedInFamilyJoin
 {α : Type*} (F G : Family α) :
-G ≠ emptyFam α → F ⊆ (F ⋎ G) :=
-  by
-  intro h A hA
+G ≠ emptyFam α → F ⊆ (F ⋎ G) := by
   sorry
-
+  -- intro h A hA
+  -- use A
+  -- constructor
+  -- · exact hA
+  -- · use Set.univ
+  --   constructor
+  --   · simp [emptyFam] at h
+  --     have hG : G.sets ≠ ∅ := by
+  --       exact h.1
+  --     have hEx : ∃ B : Set α, B ∈ G := by
+  --       simp [emptyFam] at h
 
 theorem emptyFamilyJoinCondition
 {α : Type*} (F G : Family α) :

@@ -479,8 +479,56 @@ theorem urContainmentSufficesForFamilyContainment
 (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
   by_cases FisFull : F = fullFam S
   · -- Case that F = fullFam S
-    -- This casework is done in the paper, top of Thm. 5.5
-    sorry
+    intro A hA
+    let B := ({} : Set S)
+    let H := (Set.univ : Set S)
+    have hBUnif : isURSet B := by
+      simp only [isURSet, isUniformlyRecurrent]
+      intro U hU
+      have hVis : (visitTimeSet (selfSymbolicSystem S) (indicator B) U) = Set.univ := by
+        apply Set.Subset.antisymm
+        · simp
+        · intro t ht
+          simp only [visitTimeSet, Set.mem_preimage]
+          have hEq : (selfSymbolicSystem S).map t (indicator B) = indicator B := by
+            apply funext
+            intro s
+            have hB0 : indicator B s = false := by
+              simp [indicator, B]
+            rw [hB0]
+            simp [selfSymbolicSystem, basicRightAction, symbolicSystem, indicator, B]
+          rw [hEq]
+          simp only [mem_nhds_iff] at hU
+          rcases hU with ⟨V, hV1, hV2, hV3⟩
+          apply hV1 hV3
+      rw [hVis]
+      simp only [isSyndetic, Set.mem_univ, and_true, forall_const]
+      have hSNonempty : (Set.univ : Set S).Nonempty := by
+        simp
+      rcases hSNonempty with ⟨t, ht⟩
+      use {t}
+      constructor
+      · simp
+      · use t
+        simp
+    have hUnivThick : isThick (Set.univ : Set S) := by
+      simp [isThick]
+    have hHThick : isThick H := by
+      exact hUnivThick
+    specialize hFG B H hBUnif hHThick
+    have hStart : (∀ H' ⊆ H, isThick H' → B ∩ H' ∈ F) := by
+      intro H' hH'H hH'Thick
+      apply F.upward_closed ∅
+      · simp [FisFull, fullFam, fullCollection]
+      · simp
+    have hSub : Set.univ ⊆ H := by
+      simp
+      rfl
+    specialize hFG hStart (Set.univ : Set S) hSub hUnivThick
+    simp only [Set.inter_univ, B] at hFG
+    intro C hC
+    apply G.upward_closed ∅ (A ∩ C) hFG
+    simp only [Set.subset_inter_iff, Set.empty_subset, and_self]
   · -- Case that F ≠ fullFam S
     intro A hA
     have h0 : isSyndetic A := by
@@ -541,8 +589,8 @@ end Reduction_to_UR_sets
 
 section Delta_builder
 
--- Next three definitions and the three lemmas below were written by ChatGPT.
--- The definitions help with product on commutative semigroups and the lemmas
+-- Next three definitions and the three lemmas below were written by ChatGPT
+-- These definitions help with product on commutative semigroups and the lemmas
 -- provide simple equalities regarding these definitions
 -- These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
 
@@ -955,11 +1003,36 @@ theorem commVisitTimeSetForRPPairIsDelta
       simp only [U]
       exact hs2
     have hUOpen : IsOpen U := by
-      sorry
+      unfold U
+      apply isOpen_iInter_of_finite
+      intro i
+      apply IsOpen.preimage
+      · apply dSystem.mapCont
+      · exact hV0b
     have hGThick : isThick G := by
-      simp [G, isThick]
+      simp only [G, isThick]
       intro F hF
-      sorry
+      let E := (⋃ i : Fin N, ((prodExcept hN s i) * ·) '' F)
+      have hFinite: ∀ i : Fin N, (((prodExcept hN s i) * ·) '' F).Finite := by
+        intro i
+        apply hF.image ((prodExcept hN s i) * ·)
+      have hEFinite: E.Finite := by
+        exact Set.finite_iUnion hFinite
+      unfold isThick at hHThick
+      specialize hHThick E hEFinite
+      rcases hHThick with ⟨t, ht⟩
+      use t
+      simp only [E] at ht
+      simp only [Set.subset_iInter_iff, Set.image_subset_iff]
+      simp only [Set.image_subset_iff, Set.iUnion_subset_iff] at ht
+      intro i
+      specialize ht i
+      intro f hf
+      specialize ht hf
+      simp only [Set.mem_preimage] at ht
+      simp only [Set.mem_preimage]
+      rw [<- Semigroup.mul_assoc]
+      exact ht
     have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1
       hxyRP U V0 hUOpen hV0b hUNonempty hV0c
     have hInterN : (visitTimeSet dSystem x U ∩ setVisitTimeSet dSystem V0 U ∩ G).Nonempty := by
@@ -989,7 +1062,7 @@ theorem commVisitTimeSetForRPPairIsDelta
         have hEq : (s i) * prodExcept hN s i = prodAll hN s := by
           simp only [prodExcept, prodAll]
           have hUnivNon : (Finset.univ : Finset (Fin N)).Nonempty := by
-            sorry
+            exact ⟨⟨0, by omega⟩, Finset.mem_univ _⟩
           apply mul_prodNonempty_erase
           simp
         rw [hEq]
