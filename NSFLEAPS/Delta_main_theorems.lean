@@ -1,4 +1,4 @@
-import NSFLEAPS._08_Application.AP_Defs
+import NSFLEAPS._08_Application.AP_Main
 
 /-!
 # Main results in the Delta paper
@@ -7,44 +7,50 @@ Explain
 -/
 
 /- # Essential Definitions
-For those definitions that are repeated, decide what to do ... -/
+This is the minimal set of definitions necessary to state the
+main theorems as they appear in the introduction.  Those definitions
+that are commented out already appear upstream. Those definitions
+that are new are simplified versions of those that appear upstream
+and are quick to check in order to verify the statement of the main
+theorems. -/
 
 /- A set `A` of a semigroup `S` is thick if for all finite
 subsets `F ⊆ S`, there exists `s ∈ S` such that `Fs ⊆ A` -/
--- def isThick
--- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
--- Prop :=
--- ∀ (F : Set S), F.Finite → ∃ s : S, (· * s) '' F ⊆ A
+/-
+_def isThick_ APPEARS ALREADY UPSTREAM
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (F : Set S), F.Finite → ∃ s : S, (· * s) '' F ⊆ A
+-/
 
 /- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
-A subset `A` of a semigroup `S`is Bohr_0 if there exists a
+A subset `A` of a semigroup `S` is Bohr_0 if there exists a
 semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
 containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
--- def isBohrZero
--- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
--- Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
---   (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
---   (_ : IsOpen U) (_ : 1 ∈ U),
---   Set.preimage φ U ⊆ A
+/-
+_def isBohrZero_ APPEARS ALREADY UPSTREAM
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
+  (_ : IsOpen U) (_ : 1 ∈ U),
+  Set.preimage φ U ⊆ A
+-/
 
-/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
-A subset `A` of a semigroup `S` is a set of Bohr recurrence if for all `d ∈ ℕ`,
-all semigroup homomorphisms `φ : S → U(1)^d`, all open sets `U ⊆ U(1)^d`
-containing `1`, there is `a ∈ A` such that `φ a ∈ U` -/
+/-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if
+it has non-empty intersection with all Bohr_0 subsets of `S` -/
 def isSetOfBohrRec
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-∀ (d : ℕ) (φ : S → (Fin d → Circle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
-  (_ : IsOpen U) (_ : 1 ∈ U),
-  ∃ (a : S) (_ : a ∈ A), φ a ∈ U
+∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
 
 /- A set `A` of a semigroup `S` is a Delta set if there exist
 `s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
--- def isDelta
--- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
--- Prop :=
--- ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
+/-
+_def isDelta_ APPEARS ALREADY UPSTREAM
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
+-/
 
 /-- A set `A` of a semigroup `S` is Delta* if it has nonempty
 intersection with all Delta subsets of `S` -/
@@ -81,7 +87,10 @@ def familyJoin
 Set (Set S) :=
 {A : Set S | ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C}
 
-/- # Theorems -/
+/- # Theorems
+These are the theorems from the introduction.  Their short proofs
+are possible by importing the full development and putting together
+or calling the more detailed theorems from the body of the paper. -/
 
 /-- # Theorem A
     Let `S` be a commutative semigroup and `A ⊆ S`.
@@ -93,8 +102,20 @@ theorem DeltaTheoremA
 ∀ (A : Set S), isDeltaStar A →
   ∀ (H : Set S), isThick H →
     ∃ (B H' : Set S),
-      (isBohrZero B) ∧ (isThick H') ∧ (H' ⊆ H) ∧ (A ∩ H' = B ∩ H') := by sorry
-
+      (isBohrZero B) -- B is a Bohr_0 set
+      ∧ (isThick H') -- H' is thick
+      ∧ (H' ⊆ H) -- H' is contained in H
+      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
+by
+  intro A hA H hH
+  have AinDeltaStarFam : A ∈ (deltaFamily S)* := by sorry
+  have HinSyndeticStarFam : H ∈ (syndeticFamily S)* := by sorry
+  obtain ⟨Hpre,hHpre,B,hB,capCondition⟩ := commDeltaStarImpliesLocallyBohrZero AinDeltaStarFam H HinSyndeticStarFam
+  let H' := Hpre ∩ H
+  have hH' : isThick H' := by sorry
+  have H'inH : H' ⊆ H := by sorry
+  have AcapH'isBcapH' : A ∩ H' = B ∩ H' := by sorry
+  use B, H', hB, hH', H'inH, AcapH'isBcapH'
 
 /-- # Theorem B
     Let `S` be a commutative semigroup and `A ⊆ S`.

@@ -9,65 +9,6 @@ This file contains the main results from the paper "The local dynamical
 structure of delta* sets via a new Furstenberg family algebra".
 -/
 
-
--- section Theorems_needed_from_FA_Theorems
--- This section contains theorems from FA_Theorems which are not stated yet
--- I state them here to use for theorems in this file
--- After we state corresponding theorems in FA_Theorems, the statements in this
--- section will be removed
-
--- theorem familyMeetContainedInIntersection
--- {α : Type*} (F G : Family α) :
--- G ≠ fullFam α → F ⋏ G ⊆ F :=
---   by sorry
-
-/- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
--- This theorem will be moved to FA_Theorems later
--- theorem familyMeetContainedInIntersectionv2
--- {S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
---   sorry
-
-/- Familymeet is monotone -/
--- We will move this theorem to FA_Theorems file later
--- Here's an easier-to-apply version of the arguments:  (F) {G H} : G ⊆ H → F ⋏ G ⊆ F ⋏ H
--- theorem familyMeetIsMonotonicSlot2
--- {S : Type*} (F G H : Family S) (hGH : G ⊆ H) : F ⋏ G ⊆ F ⋏ H := by
---   sorry
-
-/- This lemma helps us unfold the definition of FamilyMeet -/
--- This may be redundant eventually.
--- But for now, I am struggling to unfold the definition of FamilyMeet, so I use this lemma
--- lemma mem_famMeet
--- {S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
---   sorry
-
-/- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
--- This theorem should be also in FA_Theorems. I state it here since it's needed for this section
--- and the corresponding theorem in FA_Theorems is not there yet
--- theorem familyLocalImplicationEquivalence
--- {S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
---   sorry
-
--- theorem familyJoinIsCommutative
--- {S : Type*} (F G : Family S) : F ⋎ G = G ⋎ F := by sorry
-
--- theorem familyJoinIsMonotonicSlot1
--- {S : Type*} {F G : Family S} (H : Family S) : F ⊆ G → F ⋎ H ⊆ G ⋎ H := by sorry
-
--- theorem familyJoinIsMonotonicSlot2
--- {S : Type*} (F : Family S) {G H : Family S} : G ⊆ H → F ⋎ G ⊆ F ⋎ H := by sorry
-
--- theorem dualIsAntitone
--- {S : Type*} {F G : Family S} : F ⊆ G → G* ⊆ F* := by sorry
-
--- theorem familyDeMorgan1
--- {S : Type*} {F G : Family S} : (F ⋎ G)* = F* ⋏ G* := by sorry
-
--- theorem familyDeMorgan2
--- {S : Type*} {F G : Family S} : (F ⋏ G)* = F* ⋎ G* := by sorry
-
--- end Theorems_needed_from_FA_Theorems
-
 section Reduction_to_UR_sets
 
 /-- A set `A ⊆ S` is uniformly recurrent if `1_A` is `S`-uniformly recurrent
@@ -78,7 +19,7 @@ Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
 /-- An UR set can be written as R(x, U) -/
-theorem urSetIsRxU.{u}
+theorem urSetIsRxU
 {S : Type u} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
 ∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
 ∃ (dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem),
@@ -589,10 +530,12 @@ end Reduction_to_UR_sets
 
 section Delta_builder
 
--- Next three definitions and the three lemmas below were written by ChatGPT
--- These definitions help with product on commutative semigroups and the lemmas
--- provide simple equalities regarding these definitions
--- These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
+/-
+Next three definitions and the three lemmas below were written by ChatGPT
+These definitions help with product on commutative semigroups and the lemmas
+provide simple equalities regarding these definitions
+These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
+-/
 
 -- Product of f over a nonempty finset.
 noncomputable def prodNonempty
