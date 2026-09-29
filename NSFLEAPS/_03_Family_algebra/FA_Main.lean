@@ -389,27 +389,43 @@ F ⋏ G = G ⋏ F :=
   exact h_dual_meet
 
 lemma mem_famMeetv2 {α : Type*} (F G : Family α) (A : Set α) :
-  A ∈ F ⋏ G ↔ (∀ B ∈ G*, A ∩ B ∈ F) := by sorry
-  -- use commutativity, then mem_famMeet
-
+  A ∈ F ⋏ G ↔ (∀ B ∈ G*, A ∩ B ∈ F) := by
+  rw [familyMeetIsCommutative]
+  constructor
+  · intro hA
+    simp only [HasFamMeet.famMeet, Family.famMeet, famMeet] at hA
+    intro B hB
+    specialize hA B hB
+    exact hA
+  · intro hA
+    simp only [HasFamMeet.famMeet, Family.famMeet, famMeet]
+    intro B hB
+    specialize hA B hB
+    exact hA
 
 theorem familyMeetIsMonotonic
 {α : Type*} {F1 G1 F2 G2 : Family α} :
-F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) :=
-  by sorry
+F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) := by
+  intro h1 h2 A hA
+  simp only [HasFamMeet.famMeet, Family.famMeet, famMeet]
+  intro B hB
+  have hBinF1star : B ∈ F1* := by
+    have hG1F1 : G1* ⊆ F1* := by
+      apply dualIsAntitone
+      exact h1
+    apply hG1F1 hB
+  specialize hA B hBinF1star
+  apply h2 hA
 
 -- can derive from familyMeetIsMonotonic
 theorem familyMeetIsMonotonicSlot1
 {α : Type*} {F G : Family α} (H : Family α) :
-F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) :=
-  by
-    intro hFG S hS
-    change S ∈ { h | ∀ A ∈ F*, S ∩ A ∈ H } at hS
-    change S ∈ { h | ∀ A ∈ G*, S ∩ A ∈ H }
-    intro A hAinGstar
-    have hAinFstar : A ∈ F* := by
-      sorry
-    exact hS A hAinFstar
+F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) := by
+  intro hFG
+  apply familyMeetIsMonotonic
+  · exact hFG
+  · intro t ht
+    exact ht
 
 theorem familyMeetIsMonotonicSlot2
 {α : Type*} (F : Family α) {G H : Family α} :
@@ -417,22 +433,94 @@ G ⊆ H → (F ⋏ G) ⊆ (F ⋏ H) := by
   intro GinH
   exact familyMeetIsMonotonic (Family.rfl F) GinH
 
-
 theorem familyMeetContainedInIntersection
 {α : Type*} (F G : Family α) :
-G ≠ fullFam α → F ⋏ G ⊆ F :=
-  by sorry
+G ≠ fullFam α → F ⋏ G ⊆ F := by
+  intro hG A hA
+  rw [familyMeetIsCommutative] at hA
+  have hGstarNonEmp : Set.univ ∈ G* := by
+    simp only [HasFamDual.famDual, Family.famDual, famDual]
+    intro B hB
+    have hBNonempty : B.Nonempty := by
+      by_contra hContra
+      simp only [Set.not_nonempty_iff_eq_empty] at hContra
+      have hGFullFam : G = fullFam α := by
+        ext C
+        constructor
+        · intro hC
+          simp only [fullFam, fullCollection, Set.powerset_univ]
+          have hCinUniv : C ∈ Set.univ := by
+            simp
+          exact hCinUniv
+        · intro hC
+          apply G.upward_closed ∅
+          · rw [hContra] at hB
+            exact hB
+          · simp
+      exact hG hGFullFam
+    have hUnivB : Set.univ ∩ B = B := by
+      simp
+    rw [hUnivB]
+    exact hBNonempty
+  specialize hA Set.univ hGstarNonEmp
+  simp only [Set.inter_univ] at hA
+  exact hA
 
+lemma fullFamDual
+{α : Type*} : (fullFam α)* = emptyFam α := by
+  sorry
+
+lemma emptyFamDual
+{α : Type*} : (emptyFam α)* = fullFam α := by
+  sorry
 
 theorem fullFamilyMeetCondition
 {α : Type*} (F G : Family α) :
 F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
-  change Family.famMeet F G = fullFam α ↔ F = fullFam α ∨ G = fullFam α
   constructor
-  · intro h
-    sorry
-  · intro h
-    sorry
+  · intro hFG
+    have hFGs : (F ⋏ G)* = (fullFam α)* := by
+      rw [hFG]
+    rw [familyDeMorgan2, fullFamDual] at hFGs
+    have hFGstarOr : F* = emptyFam α ∨ G* = emptyFam α := by
+      by_contra hContra
+      simp at hContra
+      sorry
+    rcases hFGstarOr with h1 | h2
+    · have hEq : (F*)* = (emptyFam α)* := by
+        rw [h1]
+      have hFfull : F = fullFam α := by
+        rw [<- dualIsInvolutionOnFamilies F, hEq, emptyFamDual]
+      simp [hFfull]
+    · have hEq : (G*)* = (emptyFam α)* := by
+        rw [h2]
+      have hFfull : G = fullFam α := by
+        rw [<- dualIsInvolutionOnFamilies G, hEq, emptyFamDual]
+      simp [hFfull]
+  · intro hFG
+    rcases hFG with h1 | h2
+    · ext A
+      constructor
+      · intro hA
+        have hAUniv : A ∈ Set.univ := by
+          simp
+        simp only [fullFam, fullCollection, Set.powerset_univ]
+        exact hAUniv
+      · intro hA
+        rw [familyMeetIsCommutative]
+        intro B hB
+        rw [h1]
+        simp [fullFam, fullCollection]
+    · ext A
+      constructor
+      · intro hA
+        have hAUniv : A ∈ Set.univ := by
+          simp
+        simp only [fullFam, fullCollection, Set.powerset_univ]
+        exact hAUniv
+      · intro hA B hB
+        rw [h2]
+        simp [fullFam, fullCollection]
 
 theorem emptyFamilyMeetCondition
 {α : Type*} (F G : Family α) :
