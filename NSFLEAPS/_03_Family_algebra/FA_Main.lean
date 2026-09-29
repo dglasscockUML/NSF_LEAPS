@@ -215,32 +215,149 @@ G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) := by
   intro GinH
   exact familyJoinIsMonotonic (Family.rfl F) GinH
 
+lemma famNotEmptyFam
+{α : Type*} (F : Family α) :
+F ≠ emptyFam α → F.sets.Nonempty := by
+  intro hF
+  by_contra hContra
+  simp only [Set.not_nonempty_iff_eq_empty] at hContra
+  have hGEq : F = emptyFam α := by
+    simp only [emptyFam]
+    ext B
+    constructor
+    · intro hB
+      have hBIn : B ∈ F.sets := by
+        exact hB
+      rw [hContra] at hBIn
+      exact hBIn
+    · intro hB
+      have hBIn : B ∈ F.sets := by
+        rw [hContra]
+        exact hB
+      exact hBIn
+  exact hF hGEq
+
 theorem familyContainedInFamilyJoin
 {α : Type*} (F G : Family α) :
 G ≠ emptyFam α → F ⊆ (F ⋎ G) := by
-  sorry
-  -- intro h A hA
-  -- use A
-  -- constructor
-  -- · exact hA
-  -- · use Set.univ
-  --   constructor
-  --   · simp [emptyFam] at h
-  --     have hG : G.sets ≠ ∅ := by
-  --       exact h.1
-  --     have hEx : ∃ B : Set α, B ∈ G := by
-  --       simp [emptyFam] at h
+  intro hG A hA
+  simp only [HasFamJoin.famJoin, Family.famJoin, famJoin, SetLike.mem_coe]
+  use A
+  constructor
+  · exact hA
+  · use Set.univ
+    constructor
+    · have hGSets : G.sets.Nonempty := by
+        apply famNotEmptyFam
+        · exact hG
+      simp only [Set.nonempty_def] at hGSets
+      rcases hGSets with ⟨B, hB⟩
+      apply G.upward_closed B
+      · exact hB
+      · simp
+    · simp
 
 theorem emptyFamilyJoinCondition
 {α : Type*} (F G : Family α) :
-F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α :=
-by sorry
+F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α := by
+  constructor
+  · intro hFG
+    by_contra hContra1
+    simp only [not_or] at hContra1
+    rcases hContra1 with ⟨hF, hG⟩
+    have hFNonEmp := famNotEmptyFam F hF
+    have hGNonEmp := famNotEmptyFam G hG
+    rcases hFNonEmp with ⟨A, hA⟩
+    rcases hGNonEmp with ⟨B, hB⟩
+    have hAB : A ∩ B ∈ F ⋎ G := by
+      use A
+      constructor
+      · exact hA
+      · use B
+    rw [hFG] at hAB
+    simp only [emptyFam] at hAB
+    exact hAB
+  · intro hFG
+    rcases hFG with hF | hG
+    · by_contra hContra
+      have hFGNon := famNotEmptyFam (F ⋎ G) hContra
+      rcases hFGNon with ⟨A, hA⟩
+      simp only [HasFamJoin.famJoin, Family.famJoin, famJoin, Set.mem_ofPred_eq] at hA
+      rcases hA with ⟨B, hB, C, hC, hBC⟩
+      rcases hF
+      exact hB
+    · by_contra hContra
+      have hFGNon := famNotEmptyFam (F ⋎ G) hContra
+      rcases hFGNon with ⟨A, hA⟩
+      simp only [HasFamJoin.famJoin, Family.famJoin, famJoin, Set.mem_ofPred_eq] at hA
+      rcases hA with ⟨B, hB, C, hC, hBC⟩
+      rcases hG
+      exact hC
 
 theorem fullFamilyJoinCondition
 {α : Type*} (F G : Family α) :
-F ⋎ G = fullFam α ↔ ¬(F ⊆ G*) :=
-by sorry
-
+F ⋎ G = fullFam α ↔ ¬(F ⊆ G*) := by
+  constructor
+  · intro hFG
+    simp only [fullFam, fullCollection, Set.powerset_univ] at hFG
+    have hFGSets : (F ⋎ G).sets = Set.univ := by
+      rw [hFG]
+    have hEmp : ∅ ∈ (F ⋎ G).sets := by
+      rw [hFGSets]
+      simp
+    simp only [HasFamJoin.famJoin, Family.famJoin, famJoin, Set.mem_ofPred_eq] at hEmp
+    rcases hEmp with ⟨A, hA, B, hB, hAB⟩
+    by_contra hContra
+    have hAG : A ∈ G* := by
+      apply hContra hA
+    simp only [HasFamDual.famDual, Family.famDual, famDual] at hAG
+    specialize hAG B hB
+    rw [<- hAB] at hAG
+    rcases hAG with ⟨x, hx⟩
+    exact hx
+  · intro hFG
+    apply Set.not_subset.mp at hFG
+    rcases hFG with ⟨A, hA1, hA2⟩
+    have hGoal : ∃ B ∈ G, A ∩ B = ∅ := by
+      by_contra hContra
+      simp only [not_exists, not_and] at hContra
+      have hAinGStar : A ∈ G* := by
+        intro B hB
+        specialize hContra B hB
+        simp only [← Set.not_nonempty_iff_eq_empty, not_not] at hContra
+        exact hContra
+      exact hA2 hAinGStar
+    rcases hGoal with ⟨B, hB1, hB2⟩
+    have hEmpFG : ∅ ∈ F ⋎ G := by
+      simp only [HasFamJoin.famJoin, Family.famJoin, famJoin]
+      use A
+      constructor
+      · exact hA1
+      · use B
+        constructor
+        · exact hB1
+        · rw [hB2]
+    simp only [fullFam, fullCollection, Set.powerset_univ]
+    have hFGUniv : (F ⋎ G).sets = Set.univ := by
+      ext D
+      constructor
+      · intro hD
+        simp
+      · intro hD
+        apply (F ⋎ G).upward_closed ∅
+        · exact hEmpFG
+        · simp
+    ext C
+    constructor
+    · intro hC
+      have hCUniv : C ∈ Set.univ := by
+        simp
+      exact hCUniv
+    · intro hC
+      have hCUniv : C ∈ (F ⋎ G).sets := by
+        rw [hFGUniv]
+        simp
+      exact hCUniv
 
 end Join
 
