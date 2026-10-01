@@ -54,7 +54,9 @@ instance {α : Type*} : Union (Family α) where
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
-lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by sorry
+lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by
+  intro A hA
+  exact hA
 
 end Family_structure
 
@@ -96,7 +98,7 @@ def isFilterFamilyv2 {α : Type*} (F : Family α) : Prop :=
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
 def isPRFamilyv2 {α : Type*} (F : Family α) : Prop :=
-  (F ≠ fullFam α) ∧ (∀ {A B : Set α}, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
+  (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
 
 
 end Filters_and_PR_Families
@@ -143,7 +145,7 @@ def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
 
 -- want to define pr for beyond two sets
-def PartitionRegular {α : Type*} (F : Family α): Prop := --rewrite this to not use ℕ **
+def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
 
 def isPRFamily {α : Type*} (F : Family α) : Prop :=
