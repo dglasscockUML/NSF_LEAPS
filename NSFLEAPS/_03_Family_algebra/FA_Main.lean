@@ -468,11 +468,34 @@ G ≠ fullFam α → F ⋏ G ⊆ F := by
 
 lemma fullFamDual
 {α : Type*} : (fullFam α)* = emptyFam α := by
-  sorry
+  simp only [HasFamDual.famDual, Family.famDual, famDual]
+  ext A
+  constructor
+  · intro hA
+    have hEmpFull : ∅ ∈ (fullFam α).sets := by
+      simp [fullFam, fullCollection]
+    specialize hA ∅ hEmpFull
+    simp only [emptyFam]
+    rcases hA with ⟨x, hx1, hx2⟩
+    exact hx2
+  · intro hA
+    simp only [emptyFam] at hA
+    have hAEmp : A ∈ (∅ : Set (Set α)) := by
+      exact hA
+    simp at hAEmp
 
 lemma emptyFamDual
 {α : Type*} : (emptyFam α)* = fullFam α := by
-  sorry
+  simp only [HasFamDual.famDual, Family.famDual, famDual]
+  ext A
+  constructor
+  · intro hA
+    simp only [fullFam, fullCollection, Set.powerset_univ]
+    have hAUniv : A ∈ Set.univ := by
+      simp
+    exact hAUniv
+  · intro hA B hB
+    simp [emptyFam] at hB
 
 theorem fullFamilyMeetCondition
 {α : Type*} (F G : Family α) :
@@ -484,8 +507,66 @@ F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
     rw [familyDeMorgan2, fullFamDual] at hFGs
     have hFGstarOr : F* = emptyFam α ∨ G* = emptyFam α := by
       by_contra hContra
-      simp at hContra
-      sorry
+      simp only [not_or] at hContra
+      rcases hContra with ⟨hContra1, hContra2⟩
+      have hAFstar : ∃ A, A ∈ F* := by
+        simp only [emptyFam] at hContra1
+        have hFNonEmp : (F*).sets ≠ ∅:= by
+          by_contra hCon1
+          have hFEmp : F* = emptyFam α := by
+            simp only [emptyFam]
+            ext A
+            constructor
+            · intro hA
+              have hAF : A ∈ (F*).sets := by
+                exact hA
+              rw [hCon1] at hAF
+              exact hAF
+            · intro hA
+              have hAEmp : A ∈ (∅ : Set (Set α)) := by
+                exact hA
+              simp at hAEmp
+          exact hContra1 hFEmp
+        simp only [ne_eq, ← Set.nonempty_iff_ne_empty] at hFNonEmp
+        rcases hFNonEmp with ⟨A, hA⟩
+        use A
+        exact hA
+      have hBGstar : ∃ B, B ∈ G * := by
+        simp only [emptyFam] at hContra1
+        have hFNonEmp : (G*).sets ≠ ∅:= by
+          by_contra hCon1
+          have hFEmp : G* = emptyFam α := by
+            simp only [emptyFam]
+            ext A
+            constructor
+            · intro hA
+              have hAF : A ∈ (G*).sets := by
+                exact hA
+              rw [hCon1] at hAF
+              exact hAF
+            · intro hA
+              have hAEmp : A ∈ (∅ : Set (Set α)) := by
+                exact hA
+              simp at hAEmp
+          exact hContra2 hFEmp
+        simp only [ne_eq, ← Set.nonempty_iff_ne_empty] at hFNonEmp
+        rcases hFNonEmp with ⟨A, hA⟩
+        use A
+        exact hA
+      rcases hAFstar with ⟨A, hA⟩
+      rcases hBGstar with ⟨B, hB⟩
+      have hABFG : A ∩ B ∈ (F*) ⋎ (G*) := by
+        simp only [HasFamJoin.famJoin, Family.famJoin, famJoin]
+        use A
+        constructor
+        · exact hA
+        · use B
+          constructor
+          · exact hB
+          · rfl
+      rw [hFGs] at hABFG
+      simp only [emptyFam] at hABFG
+      exact hABFG
     rcases hFGstarOr with h1 | h2
     · have hEq : (F*)* = (emptyFam α)* := by
         rw [h1]
