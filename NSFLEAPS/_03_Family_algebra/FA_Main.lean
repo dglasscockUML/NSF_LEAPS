@@ -605,8 +605,62 @@ F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
 
 theorem emptyFamilyMeetCondition
 {α : Type*} (F G : Family α) :
-F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) :=
-by sorry
+F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) := by
+  apply not_iff_not.mp
+  constructor
+  · intro h
+    simp only [not_not]
+    have hEx : ∃ A : Set α, A ∈ F ⋏ G := by
+      simp only [emptyFam] at h
+      have hFG : (F ⋏ G).sets ≠ ∅ := by
+        by_contra hContra
+        have hFGEmp : (F ⋏ G) = emptyFam α := by
+          ext A
+          constructor
+          · intro hA
+            have hAN : A ∈ (F ⋏ G).sets := by
+              exact hA
+            rw [hContra] at hAN
+            exact hAN
+          · intro hA
+            simp only [emptyFam] at hA
+            have hAN : A ∈ (∅ : Set (Set α)) := by
+              exact hA
+            have hEmpSub : ∅ ⊆ (F ⋏ G).sets := by
+              simp
+            apply hEmpSub hAN
+        exact h hFGEmp
+      simp only [ne_eq, ← Set.nonempty_iff_ne_empty] at hFG
+      rcases hFG with ⟨A, hA⟩
+      use A
+      exact hA
+    rcases hEx with ⟨A, hA⟩
+    simp only [HasFamMeet.famMeet, Family.famMeet, famMeet] at hA
+    intro B hB
+    specialize hA B hB
+    apply G.upward_closed (A ∩ B)
+    · exact hA
+    · simp
+  · intro h
+    simp only [not_not] at h
+    simp only [emptyFam]
+    have hUnivFG : Set.univ ∈ F ⋏ G := by
+      intro B hB
+      simp only [Set.univ_inter]
+      apply h hB
+    have hFGNonEmp : (F ⋏ G).sets ≠ ∅ := by
+      simp only [ne_eq, ← Set.nonempty_iff_ne_empty]
+      exact ⟨Set.univ, hUnivFG⟩
+    by_contra hContra
+    have hFGEmp : (F ⋏ G).sets = ∅ := by
+      ext A
+      constructor
+      · intro hA
+        rw [hContra] at hA
+        exact hA
+      · intro hA
+        simp at hA
+    exact hFGNonEmp hFGEmp
 
 end Meet
 
