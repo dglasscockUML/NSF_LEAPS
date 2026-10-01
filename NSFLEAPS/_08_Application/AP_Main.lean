@@ -111,12 +111,11 @@ theorem urSetIsRxU
     simp only [indicator, true_eq_decide_iff] at hw1
     exact hw1
 
-/-- Given a syndetic set `A` and a thick set `H`, there exists a
+/-- Given a set `A` and a thick set `H`, there exists a
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
 theorem syndSetIsUROnThickSet
 {S : Type*} [Semigroup S] [Nonempty S]
-(A : Set S) {_ : isSyndetic A}
-(H : Set S) {hH : isThick H} :
+(A : Set S) (H : Set S) {hH : isThick H} :
 ∃ (B : Set S) (_ : isURSet B) (H' : Set S) (_ : isThick H') (_ : H' ⊆ H),
 A ∩ H' = B ∩ H' := by
   have hExistp := minIdempotentWitnessesShiftIntersectionLargeness H hH
@@ -472,18 +471,18 @@ theorem urContainmentSufficesForFamilyContainment
     simp only [Set.subset_inter_iff, Set.empty_subset, and_self]
   · -- Case that F ≠ fullFam S
     intro A hA
-    have h0 : isSyndetic A := by
-      have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
-        exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
-      have h03 : A ∈ syndeticFamily S := by
-        exact h01 hA
-      simpa
+    -- have h0 : isSyndetic A := by
+    --   have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
+    --     exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
+    --   have h03 : A ∈ syndeticFamily S := by
+    --     exact h01 hA
+    --   simpa
     have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
       intro H hHThick
       have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
       A ∩ H' = B ∩ H' := by
         apply syndSetIsUROnThickSet
-        · exact h0
+        --· exact h0
         · exact hHThick
       obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
       have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
