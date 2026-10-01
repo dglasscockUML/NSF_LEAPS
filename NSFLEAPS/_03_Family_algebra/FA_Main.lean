@@ -91,8 +91,6 @@ F ⊆ G → G* ⊆ F* :=
 
 end Dual
 
-
-
 section DeMorgan
 
 --∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty
@@ -148,10 +146,7 @@ theorem familyDeMorgan2
 
 end DeMorgan
 
-
-
 section Join
-
 
 theorem familyJoinIsAssociative
 {α : Type*} (F G H : Family α) :
@@ -666,9 +661,94 @@ end Meet
 
 section Filters_and_PR
 
+lemma fullFamEquiv
+{α : Type*} (F : Family α) :
+F = fullFam α ↔ ∅ ∈ F := by
+  constructor
+  · intro hF
+    rw [hF]
+    simp only [fullFam, fullCollection, Set.powerset_univ]
+    trivial
+  · intro hF
+    ext A
+    constructor
+    · intro hA
+      simp only [fullFam, fullCollection, Set.powerset_univ]
+      trivial
+    · intro hA
+      apply F.upward_closed ∅
+      · exact hF
+      · simp
+
 theorem familyIsIdempotentForMeetIffPR
 {α : Type*} (F : Family α) :
-  F ⋏ F = F ↔ (isPRFamilyv2 F ∨ F = fullFam α) := by sorry
+  F ⋏ F = F ↔ (isPRFamilyv2 F ∨ F = fullFam α) := by
+  constructor
+  · intro hF
+    by_cases hFull : F = fullFam α
+    · right
+      exact hFull
+    · left
+      simp only [isPRFamilyv2, ne_eq]
+      constructor
+      · exact hFull
+      · intro A B hAB
+        by_contra hContra
+        simp only [not_or] at hContra
+        rcases hContra with ⟨hC1, hC2⟩
+        have hAstar : Aᶜ ∈ F* := by
+          simp only [mem_dual_alt, compl_compl]
+          exact hC1
+        have hBstar : Bᶜ ∈ F* := by
+          simp only [mem_dual_alt, compl_compl]
+          exact hC2
+        rw [<- hF] at hAB
+        specialize hAB Aᶜ hAstar
+        have hBF : B ∈ F := by
+          apply F.upward_closed ((A ∪ B) ∩ Aᶜ)
+          · exact hAB
+          · apply Set.union_inter_compl_left_subset
+        exact hC2 hBF
+  · intro hF
+    rcases hF with hF1 | hF2
+    · simp only [isPRFamilyv2, ne_eq] at hF1
+      rcases hF1 with ⟨hF1a, hF1b⟩
+      ext A
+      constructor
+      · intro hA
+        have hUniFstar : Set.univ ∈ F* := by
+          intro B hB
+          simp only [Set.univ_inter]
+          by_contra hContra
+          simp only [Set.nonempty_iff_empty_ne, ne_eq, Decidable.not_not] at hContra
+          rw [<- hContra] at hB
+          have hFFull : F = fullFam α := by
+            simp only [fullFamEquiv]
+            exact hB
+          exact hF1a hFFull
+        specialize hA Set.univ hUniFstar
+        simp only [Set.inter_univ] at hA
+        exact hA
+      · intro hA B hB
+        specialize hF1b (A ∩ B) (A \ B)
+        simp only [Set.inter_union_sdiff] at hF1b
+        specialize hF1b hA
+        rcases hF1b with hFAB | hFABm
+        · exact hFAB
+        · specialize hB (A \ B) hFABm
+          simp at hB
+    · simp only [fullFam, fullCollection, Set.powerset_univ] at hF2
+      ext A
+      constructor
+      · intro hA
+        have hAUniv : A ∈ F.sets := by
+          rw [hF2]
+          simp
+        exact hAUniv
+      · intro hA B hB
+        rw [hF2]
+        simp
+
 -- H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H
 -- H* ⊆ (F ⋏ ((F* ⋎ G*)))** ↔ F ⋏ G ⊆ F ⋏ H
 -- H* ⊆ (F* ⋎ (F* ⋎ G*)\*)* ↔ F ⋏ G ⊆ F ⋏ H

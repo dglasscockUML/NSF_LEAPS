@@ -98,7 +98,7 @@ def isFilterFamilyv2 {α : Type*} (F : Family α) : Prop :=
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
 def isPRFamilyv2 {α : Type*} (F : Family α) : Prop :=
-  (F ≠ fullFam α) ∧ (∀ {A B : Set α}, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
+  (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
 
 
 end Filters_and_PR_Families
