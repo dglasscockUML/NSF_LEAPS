@@ -410,6 +410,8 @@ A ∩ H' = B ∩ H' := by
 --     specialize h1 H hH2
 --     exact h1
 
+/-- A sufficient condition for strongly-`F` sets to be strongly-`G`:
+it suffices to check a finer statement for UR sets. -/
 theorem urContainmentSufficesForFamilyContainment
 {S : Type*} [Semigroup S] [Nonempty S]
 (F G : Family S)
@@ -524,6 +526,17 @@ theorem urContainmentSufficesForFamilyContainment
     specialize h1 H hH2
     exact h1
 
+/-- A sufficient condition for the dual of the very strongly PW-`F` sets to be very
+strongly PW-`G`: it suffices to check a finer statement for UR sets. -/
+theorem urContainmentSufficesForFamilyContainmentUpgrade
+{S : Type*} [Semigroup S] [Nonempty S]
+(F G : Family S)
+(hFG : ∀ h ∈ thickFamily S,
+  (((capFamily (thickFamily S) h)* ⋏ F)).sets ∩ {C : Set S | isURSet C} ⊆
+    ((capFamily (thickFamily S) h)* ⋏ F).sets) :
+Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ F) ⊆
+Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ G) :=
+by sorry
 
 end Reduction_to_UR_sets
 

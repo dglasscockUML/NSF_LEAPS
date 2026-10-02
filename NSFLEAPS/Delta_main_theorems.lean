@@ -151,7 +151,7 @@ theorem DeltaTheoremB
     then for all thick sets `H ⊆ S`, there exists an `IP*` set `B ⊆ S` and a thick
     set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. -/
 theorem DeltaTheoremC
-{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S]:
+{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S] :
 ∀ (A : Set S), isCentralStar A →
   ∀ (H : Set S), isThick H →
     ∃ (B H' : Set S),
