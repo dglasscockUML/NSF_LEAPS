@@ -125,6 +125,12 @@ def emptyFam (α : Type*) : Family α := {
     simp at hA
 }
 
+/-- An equivalent condition to show that a family is non-empty -/
+lemma notEmptyFam
+{α : Type*} (F : Family α) :
+F ≠ emptyFam α ↔ F.sets.Nonempty :=
+by sorry
+
 end Empty_and_full_families
 
 section Filters_and_PR_Families

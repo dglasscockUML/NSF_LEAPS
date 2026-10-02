@@ -533,10 +533,33 @@ theorem urContainmentSufficesForFamilyContainmentUpgrade
 (F G : Family S)
 (hFG : ∀ h ∈ thickFamily S,
   (((capFamily (thickFamily S) h)* ⋏ F)).sets ∩ {C : Set S | isURSet C} ⊆
-    ((capFamily (thickFamily S) h)* ⋏ F).sets) :
+    ((capFamily (thickFamily S) h)* ⋏ G).sets) :
 Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ F) ⊆
 Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ G) :=
-by sorry
+by
+  intro A hA
+  -- there is a thick `H` such that `A ∩ H' ∈ F` for all thick `H' ⊆ H`
+  obtain ⟨H, hH, hAH⟩ := (Set.ext_iff.mp
+    (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S) F) A).mp hA
+  -- there is a UR set `B` and a thick `T ⊆ H` such that `A ∩ T = B ∩ T`
+  obtain ⟨B, hBUR, T, hT, hTH, hATBT⟩ := syndSetIsUROnThickSet A H (hH := hH)
+  -- so `A ∩ H' = B ∩ H'` for all `H' ⊆ T`
+  have hBA : ∀ H' ⊆ T, B ∩ H' = A ∩ H' := by
+    intro H' hH'T
+    rw [← Set.inter_eq_self_of_subset_right hH'T, ← Set.inter_assoc, ← Set.inter_assoc, hATBT]
+  -- `B ∩ H' = A ∩ H' ∈ F` for all thick `H' ⊆ T`
+  have hBF : B ∈ ((capFamily (thickFamily S) T)* ⋏ F).sets :=
+    (memberOfCapFamDualMeetH (thickFamily S) F B T).mpr fun H' hH' hH'T ↦ by
+      rw [hBA H' hH'T]
+      exact hAH H' hH' (hH'T.trans hTH)
+  -- by assumption, `B ∩ H' ∈ G` for all thick `H' ⊆ T`
+  have hBG := (memberOfCapFamDualMeetH (thickFamily S) G B T).mp (hFG T hT ⟨hBF, hBUR⟩)
+  -- hence `A ∩ H' = B ∩ H' ∈ G` for all thick `H' ⊆ T`
+  refine (Set.ext_iff.mp
+    (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S) G) A).mpr ⟨T, hT, ?_⟩
+  intro H' hH' hH'T
+  rw [← hBA H' hH'T]
+  exact hBG H' hH' hH'T
 
 end Reduction_to_UR_sets
 
@@ -1236,7 +1259,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
   have hBinBohr : B ∈ setOfBohrRecurrenceFamily S := by
     simp only [setOfBohrRecurrenceFamily]
     exact hBrec
-  have hBohrPR : isPRFamily (setOfBohrRecurrenceFamily S) := by
+  have hBohrPR : isPRFamilyv2 (setOfBohrRecurrenceFamily S) := by
     exact setOfBohrRecurrenceFamilyIsPR S
   have hUClosed : IsClosed U := by
     unfold IsClopen at hUClopen
@@ -1352,6 +1375,8 @@ theorem commURSetsOfBohrRecurrenceAreDelta
 end Dynamical_sets_of_bohr_recurrence
 
 section Application
+
+
 
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
