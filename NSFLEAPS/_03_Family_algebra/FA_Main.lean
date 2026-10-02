@@ -144,6 +144,14 @@ theorem familyDeMorgan2
   rw [← h]
   rw [dualIsInvolutionOnFamilies]
 
+theorem unionDeMorgan1
+{α β : Type*} (F : β → Family α) :
+(Family.iUnion F)* = Family.iInter (fun (b : β) ↦ (F b)*) := by sorry
+
+theorem unionDeMorgan2
+{α β : Type*} (F : β → Family α) :
+(Family.iInter F)* = Family.iUnion (fun (b : β) ↦ (F b)*) := by sorry
+
 end DeMorgan
 
 section Join
@@ -656,6 +664,29 @@ F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) := by
       · intro hA
         simp at hA
     exact hFGNonEmp hFGEmp
+
+
+theorem memberOfCapFamJoinH
+{α : Type*} (G H : Family α) (a f : Set α) :
+a ∈ (capFamily G f) ⋎ H ↔
+  (∃ g ∈ G, g ⊆ f ∧ (∃ b ∈ H, a ∩ g = b ∩ g)) :=
+    by sorry
+
+theorem memberOfCapFamDualMeetH
+{α : Type*} (G H : Family α) (a f : Set α) :
+a ∈ (capFamily G f)* ⋏ H ↔
+  (∀ g ∈ G, g ⊆ f → a ∩ g ∈ H) :=
+    by sorry
+
+theorem iInterCapFamilyDescription
+{α : Type*} (F G H : Family α) :
+Family.iInter (fun (f : F.sets) ↦ (capFamily G f) ⋎ H) =
+{a : Set α | ∀ f ∈ F, ∃ g ∈ G, g ⊆ f ∧ (∃ b ∈ H, a ∩ g = b ∩ g)} := by sorry
+
+theorem iUnionCapFamilyDualDescription
+{α : Type*} (F G H : Family α) :
+Family.iUnion (fun (f : F.sets) ↦ (capFamily G f)* ⋏ H) =
+{a : Set α | ∃ f ∈ F, ∀ g ∈ G, g ⊆ f → a ∩ g ∈ H} := by sorry
 
 end Meet
 

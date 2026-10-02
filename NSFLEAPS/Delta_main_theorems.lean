@@ -59,6 +59,20 @@ def isDeltaStar
 Prop :=
 ∀ (B : Set S), isDelta B → (A ∩ B).Nonempty
 
+/-- A set `A` of a semigroup `S` is central* if it has nonempty
+intersection with all central subsets of `S` -/
+def isCentralStar
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
+
+/-- A set `A` of a semigroup `S` is IP* if it has nonempty
+intersection with all IP subsets of `S` -/
+def isIPStar
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (B : Set S), isIP B → (A ∩ B).Nonempty
+
 /-- A collection `F` of subsets of `S` is a Furstenberg family if it is
 upward closed: for all `A, B ⊆ S`, if `A ⊆ B` and `A ∈ F`, then `B ∈ F` -/
 def isFamily
@@ -119,22 +133,42 @@ by
 
 /-- # Theorem B
     Let `S` be a commutative semigroup and `A ⊆ S`.
-    If for all thick sets `H ⊆ S`, the set `A ∩ H` is a set of Bohr recurrence,
-    then for all thick sets `H ⊆ S`, the set `A ∩ H` is a Delta set. -/
+    If there exists a thick set `H ⊆ S` such that for all thick sets
+    `H' ⊆ H`, the set `A ∩ H'` is a set of Bohr recurrence,
+    then the set `A` is a Delta set. -/
 theorem DeltaTheoremB
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 ∀ (A : Set S),
-  (∀ (H : Set S), isThick H → isSetOfBohrRec (A ∩ H)) →
-    (∀ (H : Set S), isThick H → isDelta (A ∩ H)) := by sorry
+  (∃ (H : Set S), isThick H
+  ∧ (∀ (H' : Set S), H' ⊆ H → isThick H' → isSetOfBohrRec (A ∩ H))) →
+  isDelta A := by sorry
 
+
+  -- B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
 
 /-- # Theorem C
-    Let `S` be a semigroup. Family meet and family join, when restricted to
+    Let `S` be a countable, commutative semigroup. If `A ⊆ S` is a `central*` set,
+    then for all thick sets `H ⊆ S`, there exists an `IP*` set `B ⊆ S` and a thick
+    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. -/
+theorem DeltaTheoremC
+{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S]:
+∀ (A : Set S), isCentralStar A →
+  ∀ (H : Set S), isThick H →
+    ∃ (B H' : Set S),
+      (isIPStar B) -- B is a IP*
+      ∧ (isThick H') -- H' is thick
+      ∧ (H' ⊆ H) -- H' is contained in H
+      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
+        by sorry
+
+
+/-- # Theorem D
+    Let `S` be a set. Family meet and family join, when restricted to
     the collection of families, are associative, commutative, and monotone
     operators that, together with the family dual, satisfy the DeMorgan-type
     laws `(F meet G)* = F* join G*` and `(F join G)* = F* meet G*`. -/
-theorem DeltaTheoremC
-{S : Type*} [Semigroup S] [Nonempty S] :
+theorem DeltaTheoremD
+{S : Type*} [Nonempty S] :
 ∀ (F G H I : Set (Set S)), isFamily F → isFamily G → isFamily H → isFamily I →
   -- closedness
   (isFamily (familyMeet F G)) ∧

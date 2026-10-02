@@ -54,6 +54,46 @@ instance {α : Type*} : Union (Family α) where
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
+def Family.iInter
+{α ι : Type*} (F : ι → Family α) : Family α :=
+  ⟨⋂ i, (F i).sets, by
+    intro A B hA hAB
+    rw [Set.mem_iInter] at hA ⊢
+    intro i
+    exact (F i).upward_closed A B (hA i) hAB⟩
+
+def Family.iUnion
+{α ι : Type*} (F : ι → Family α) : Family α :=
+  ⟨⋃ i, (F i).sets, by
+    intro A B hA hAB
+    rw [Set.mem_iUnion] at hA ⊢
+    obtain ⟨i, hi⟩ := hA
+    exact ⟨i, (F i).upward_closed A B hi hAB⟩⟩
+
+@[simp]
+theorem Family.mem_iInter
+{α ι : Type*} (F : ι → Family α) (A : Set α) :
+    A ∈ (Family.iInter F).sets ↔ ∀ i, A ∈ (F i).sets :=
+  Set.mem_iInter
+
+@[simp]
+theorem Family.mem_iUnion
+{α ι : Type*} (F : ι → Family α) (A : Set α) :
+    A ∈ (Family.iUnion F).sets ↔ ∃ i, A ∈ (F i).sets :=
+  Set.mem_iUnion
+
+/-- Given a family `F` and a set `A`, `capFamily F A` is the family of
+sets `B` for which `B ∩ A ∈ F` -/
+def capFamily
+{α : Type*} (F : Family α) (A : Set α) :
+Family α :=
+{
+  sets := {B : Set α | A ∩ B ∈ F}
+  upward_closed := by
+    intro C D hC CinD
+    exact F.2 (A ∩ C) (A ∩ D) hC (Set.inter_subset_inter_right A CinD)
+}
+
 lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by
   intro A hA
   exact hA
