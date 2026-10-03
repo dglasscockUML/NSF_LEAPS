@@ -1022,8 +1022,17 @@ F ⋎ F* = F ↔ F ⋏ F* = F* := by
 
 theorem ifFMeetDualFIsDualFAndNonemptyThenDualFInF
 {α : Type*} (F : Family α) :
-F ≠ emptyFam α → F ⋏ F* = F* → F* ⊆ F := by sorry
-
+F ≠ emptyFam α → F ⋏ F* = F* → F* ⊆ F := by
+  intro hF1 hF2
+  rw [<- hF2]
+  have hFstarNotFull : F* ≠ fullFam α := by
+    by_contra hContra
+    have hFstar : F** = (fullFam α)* := by
+      rw [hContra]
+    rw [dualIsInvolutionOnFamilies, fullFamDual] at hFstar
+    exact hF1 hFstar
+  apply familyMeetContainedInIntersection
+  · exact hFstarNotFull
 
 theorem meetOfFamilyAndDualIsFilter
 {α : Type*} (F : Family α) :
