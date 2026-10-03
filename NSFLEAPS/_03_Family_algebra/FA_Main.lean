@@ -770,8 +770,51 @@ theorem familyIsIdempotentForMeetIffPR
 
 theorem familyIsIdempotentForJoinIffFilter
 {α : Type*} (F : Family α) :
-  F ⋎ F = F ↔ (isFilterFamilyv2 F ∨ F = emptyFam α) := by sorry
-
+  F ⋎ F = F ↔ (isFilterFamilyv2 F ∨ F = emptyFam α) := by
+  constructor
+  · intro hF
+    by_cases hFEmp : F = emptyFam α
+    · right
+      exact hFEmp
+    · left
+      unfold isFilterFamilyv2
+      constructor
+      · exact hFEmp
+      · intro A B hA hB
+        rw [<- hF]
+        use A
+        constructor
+        · exact hA
+        · use B
+          constructor
+          · exact hB
+          · rfl
+  · intro hF
+    rcases hF with hF1 | hF2
+    · ext A
+      unfold isFilterFamilyv2 at hF1
+      rcases hF1 with ⟨hF1a, hF1b⟩
+      constructor
+      · intro hA
+        rcases hA with ⟨B, hB, C, hC, hBC⟩
+        specialize hF1b hB hC
+        rw [hBC]
+        exact hF1b
+      · intro hA
+        have hFF := familyContainedInFamilyJoin F F hF1a
+        apply hFF hA
+    · ext A
+      constructor
+      · intro hA
+        rcases hA with ⟨B, hB, C, hC, hBC⟩
+        rw [hF2] at hB
+        simp [emptyFam] at hB
+      · intro hA
+        rw [hF2] at hA
+        simp only [emptyFam] at hA
+        have hAEmp : A ∈ (∅ : Set (Set α)) := by
+          exact hA
+        simp at hAEmp
 
 -- Can we prove this as familyIsPRIffDualIsFilter below instead?
 -- theorem thm_familyIsPRIffDualIsFilter
