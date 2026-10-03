@@ -971,7 +971,39 @@ isFilterFamilyv2 F ↔ isPRFamilyv2 (F*) := by
 
 theorem dualFFilterIffFMeetDualFIsDualF
 {α : Type*} (F : Family α) :
-isFilterFamilyv2 (F*) ↔ F ⋏ F* = F* := by sorry
+isFilterFamilyv2 (F*) ↔ F ⋏ F* = F* := by
+  constructor
+  · intro hF
+    rcases hF with ⟨hF1, hF2⟩
+    ext A
+    constructor
+    · intro hA
+      rw [familyMeetIsCommutative] at hA
+      have hFNotFull : F ≠ fullFam α := by
+        by_contra hContra
+        have hFstar : F* = (fullFam α)* := by
+          rw [hContra]
+        rw [fullFamDual] at hFstar
+        exact hF1 hFstar
+      have h1 := familyMeetContainedInIntersection F* F hFNotFull
+      apply h1 hA
+    · intro hA B hB
+      specialize hF2 hA hB
+      exact hF2
+  · intro hF
+    constructor
+    · by_contra hContra
+      rw [hContra] at hF
+      simp only [emptyFamilyMeetCondition] at hF
+      rw [hContra] at hF
+      have hEmpSub : emptyFam α ⊆ emptyFam α := by
+        intro A hA
+        exact hA
+      exact hF hEmpSub
+    · intro A B hA hB
+      rw [<- hF] at hA
+      specialize hA B hB
+      exact hA
 
 theorem FJoinDualFIsFIffFMeetDualFIsDualF
 {α : Type*} (F : Family α) :

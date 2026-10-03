@@ -128,8 +128,27 @@ def emptyFam (α : Type*) : Family α := {
 /-- An equivalent condition to show that a family is non-empty -/
 lemma notEmptyFam
 {α : Type*} (F : Family α) :
-F ≠ emptyFam α ↔ F.sets.Nonempty :=
-by sorry
+F ≠ emptyFam α ↔ F.sets.Nonempty := by
+  constructor
+  · intro hF
+    by_contra hContra
+    simp only [Set.not_nonempty_iff_eq_empty] at hContra
+    have hGEq : F = emptyFam α := by
+      simp only [emptyFam]
+      ext B
+      constructor
+      · intro hB
+        have hBIn : B ∈ F.sets := by
+          exact hB
+        rw [hContra] at hBIn
+        exact hBIn
+      · intro hB
+        have hBIn : B ∈ F.sets := by
+          rw [hContra]
+          exact hB
+        exact hBIn
+    exact hF hGEq
+  · sorry
 
 end Empty_and_full_families
 
