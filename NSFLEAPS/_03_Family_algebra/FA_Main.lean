@@ -364,7 +364,6 @@ F ⋎ G = fullFam α ↔ ¬(F ⊆ G*) := by
 
 end Join
 
-
 section Meet
 
 theorem familyMeetIsAssociative
@@ -377,7 +376,6 @@ theorem familyMeetIsAssociative
   rw [familyJoinIsAssociative]
   repeat rw [familyDeMorgan1]
   repeat rw [dualIsInvolutionOnFamilies]
-
 
 theorem familyMeetIsCommutative
 {α : Type*} (F G : Family α) :
@@ -664,7 +662,6 @@ F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) := by
       · intro hA
         simp at hA
     exact hFGNonEmp hFGEmp
-
 
 theorem memberOfCapFamJoinH
 {α : Type*} (G H : Family α) (a f : Set α) :
@@ -1050,20 +1047,34 @@ isFilterFamily (F ⋏ F*) := /- DGG: can we prove "isFilterFamilyv2 (F ⋏ F*) i
 
 theorem joinOfFamilyAndDualIsPR
 {α : Type*} (F : Family α) :
-isPRTwoSets (F ⋎ F*) := /- DGG: can we prove "isPRFamilyv2 (F ⋎ F*) instead"-/
-by
-  rw [isPRTwoSets]
-  intro A hA c
-  have h_decomp : ∃ B ∈ F.sets, ∃ C ∈ (F*).sets, A = B ∩ C := by sorry
-  rcases h_decomp with ⟨B, hB, C, hC, rfl⟩
-  by_cases h0 : {x ∈ B | c x = 0} ∈ F.sets
-  · use 0
-    have h_goal : {x ∈ B ∩ C | c x = 0} ∈ (F ⋎ F*).sets := by
-      sorry
-    exact h_goal
-  · use 1
-    sorry
-
+isPRFamilyv2 (F ⋎ F*) := by
+  have h1 : (F ⋎ F*) = (F* ⋏ F)* := by
+    rw [familyDeMorgan2, dualIsInvolutionOnFamilies]
+  rw [h1]
+  apply (familyIsPRIffDualIsFilter (F*⋏F)).mp
+  constructor
+  · by_contra hContra
+    have hF3 : (F* ⋏ F)* = (emptyFam α)* := by
+      rw [hContra]
+    rw [<- h1, emptyFamDual] at hF3
+    simp only [fullFamEquiv] at hF3
+    rcases hF3 with ⟨A, hA, B, hB, hAB⟩
+    apply (mem_famDual F B).mp at hB
+    specialize hB A hA
+    rw [Set.inter_comm, <- hAB] at hB
+    rcases hB with ⟨x, hx⟩
+    exact hx
+  · intro A B hA hB C hC
+    simp only [Set.inter_assoc]
+    specialize hB C hC
+    specialize hA (B ∩ C)
+    have hBC : B ∩ C ∈ F** := by
+      rw [dualIsInvolutionOnFamilies]
+      exact hB
+    have hBC2 : B ∩ C ∈ (F*).sets* := by
+      exact hBC
+    specialize hA hBC2
+    exact hA
 
 end Filters_and_PR
 
