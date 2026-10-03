@@ -18,7 +18,8 @@ def isURSet
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
-/-- An UR set can be written as R(x, U) -/
+/-- All UR sets can be written as `R(x, U)` with `x` uniformly recurrent
+and `U` clopen -/
 theorem urSetIsRxU
 {S : Type u} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
 ∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
@@ -532,8 +533,8 @@ theorem urContainmentSufficesForFamilyContainmentUpgrade
 {S : Type*} [Semigroup S] [Nonempty S]
 (F G : Family S)
 (hFG : ∀ h ∈ thickFamily S,
-  (((capFamily (thickFamily S) h)* ⋏ F)).sets ∩ {C : Set S | isURSet C} ⊆
-    ((capFamily (thickFamily S) h)* ⋏ G).sets) :
+  (((capFamily (thickFamily S) h)*⋏F)).sets ∩ {C : Set S | isURSet C} ⊆
+    ((capFamily (thickFamily S) h)*⋏G).sets) :
 Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ F) ⊆
 Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ G) :=
 by

@@ -94,7 +94,7 @@ visitTimeSet dSystem x U ∈ F →
     · exact hContra
     · exact hSub
   have hExistOne : ∃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
-    unfold isPRFamily at hF
+    have hF := prFamilyIsMultiPR hF
     specialize hF (⋃ y : G, visitTimeSet dSystem x (g y)) hIn ⟨G.card, hGCard⟩
     classical
     have hGNonempty : Nonempty ↥G := ⟨G.equivFin.symm ⟨0, hGCard⟩⟩
@@ -102,7 +102,7 @@ visitTimeSet dSystem x U ∈ F →
     choose! w hw using fun (s : S) (hs : s ∈ ⋃ y : G, visitTimeSet dSystem x (g y)) ↦
       Set.mem_iUnion.mp hs
     obtain ⟨i, hi⟩ := hF (fun s ↦ G.equivFin (w s))
-    -- the monochromatic piece of colour `i` sits inside `R(x, g (e.symm i))`
+    -- the monochromatic piece of color `i` sits inside `R(x, g (e.symm i))`
     refine ⟨G.equivFin.symm i, F.upward_closed _ _ hi ?_⟩
     rintro s ⟨hsUnion, hsColour⟩
     have hws : w s = G.equivFin.symm i := (Equiv.eq_symm_apply _).mpr hsColour

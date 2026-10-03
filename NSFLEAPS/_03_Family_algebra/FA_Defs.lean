@@ -137,14 +137,25 @@ section Filters_and_PR_Families
 
 /-- A family is a filter if it is not the empty family and if it
 is closed under intersections -/
-def isFilterFamilyv2 {α : Type*} (F : Family α) : Prop :=
+def isFilterFamilyv2
+{α : Type*} (F : Family α) :
+Prop :=
   (F ≠ emptyFam α) ∧ (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
 
 /-- A family is partition regular (PR) if it is not the full
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
-def isPRFamilyv2 {α : Type*} (F : Family α) : Prop :=
+def isPRFamilyv2
+{α : Type*} (F : Family α) :
+Prop :=
   (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
+
+/-- A PR family `F` satisfies the ostensibly stronger property of
+one piece of any finite partition belonging to `F` -/
+theorem prFamilyIsMultiPR
+{α : Type*} {F : Family α} (hF : isPRFamilyv2 F) :
+∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
+  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by sorry
 
 
 end Filters_and_PR_Families
