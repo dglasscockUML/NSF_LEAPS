@@ -1007,7 +1007,18 @@ isFilterFamilyv2 (F*) ↔ F ⋏ F* = F* := by
 
 theorem FJoinDualFIsFIffFMeetDualFIsDualF
 {α : Type*} (F : Family α) :
-F ⋎ F* = F ↔ F ⋏ F* = F* := by sorry
+F ⋎ F* = F ↔ F ⋏ F* = F* := by
+  constructor
+  · intro hF
+    have hFdual : (F ⋎ F*)* = F* := by
+      rw [hF]
+    rw [familyDeMorgan1, dualIsInvolutionOnFamilies, familyMeetIsCommutative] at hFdual
+    exact hFdual
+  · intro hF
+    have hFdual : (F ⋏ F*)* = F** := by
+      rw [hF]
+    rw [familyDeMorgan2, dualIsInvolutionOnFamilies, familyJoinIsCommutative] at hFdual
+    exact hFdual
 
 theorem ifFMeetDualFIsDualFAndNonemptyThenDualFInF
 {α : Type*} (F : Family α) :
