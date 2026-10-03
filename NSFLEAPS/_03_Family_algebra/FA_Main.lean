@@ -917,7 +917,57 @@ FJoinDualFIsFIffFMeetDualFIsDualF, and ifFMeetDualFIsDualFAndNonemptyThenDualFIn
 
 theorem familyIsPRIffDualIsFilter
 {α : Type*} (F : Family α) :
-isFilterFamilyv2 F ↔ isPRFamilyv2 (F*) := by sorry
+isFilterFamilyv2 F ↔ isPRFamilyv2 (F*) := by
+  constructor
+  · intro hF
+    unfold isPRFamilyv2
+    unfold isFilterFamilyv2 at hF
+    rcases hF with ⟨hF1, hF2⟩
+    constructor
+    · by_contra hContra
+      have hFEmp : F = emptyFam α := by
+        rw [<- dualIsInvolutionOnFamilies F, hContra, fullFamDual]
+      exact hF1 hFEmp
+    · intro A B hAB
+      by_contra hContra
+      simp only [not_or] at hContra
+      rcases hContra with ⟨hA, hB⟩
+      have hAF : Aᶜ ∈ F := by
+        by_contra hContra2
+        apply mem_dual_alt.mpr at hContra2
+        exact hA hContra2
+      have hBF : Bᶜ ∈ F := by
+        by_contra hContra2
+        apply mem_dual_alt.mpr at hContra2
+        exact hB hContra2
+      specialize hF2 hAF hBF
+      apply mem_dual_alt.mp at hAB
+      simp only [Set.compl_union] at hAB
+      exact hAB hF2
+  · intro hF
+    unfold isFilterFamilyv2
+    unfold isPRFamilyv2 at hF
+    rcases hF with ⟨hF1, hF2⟩
+    constructor
+    · by_contra hContra
+      have hFstar : F* = (emptyFam α)* := by
+        rw [hContra]
+      rw [emptyFamDual] at hFstar
+      exact hF1 hFstar
+    · intro A B hA hB
+      by_contra hContra2
+      have hABc : A ∩ B = (Aᶜ ∪ Bᶜ)ᶜ := by
+        simp
+      rw [hABc] at hContra2
+      apply mem_dual_alt.mpr at hContra2
+      specialize hF2 Aᶜ Bᶜ hContra2
+      rcases hF2 with hF2a | hF2b
+      · apply mem_dual_alt.mp at hF2a
+        simp only [compl_compl] at hF2a
+        exact hF2a hA
+      · apply mem_dual_alt.mp at hF2b
+        simp only [compl_compl] at hF2b
+        exact hF2b hB
 
 theorem dualFFilterIffFMeetDualFIsDualF
 {α : Type*} (F : Family α) :
