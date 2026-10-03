@@ -148,7 +148,11 @@ F ≠ emptyFam α ↔ F.sets.Nonempty := by
           exact hB
         exact hBIn
     exact hF hGEq
-  · sorry
+  · intro hF
+    by_contra hContra
+    rcases hF with ⟨A, hA⟩
+    rw [hContra] at hA
+    simp [emptyFam] at hA
 
 end Empty_and_full_families
 

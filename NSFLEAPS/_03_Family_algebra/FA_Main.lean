@@ -218,28 +218,6 @@ G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) := by
   intro GinH
   exact familyJoinIsMonotonic (Family.rfl F) GinH
 
-lemma famNotEmptyFam
-{α : Type*} (F : Family α) :
-F ≠ emptyFam α → F.sets.Nonempty := by
-  intro hF
-  by_contra hContra
-  simp only [Set.not_nonempty_iff_eq_empty] at hContra
-  have hGEq : F = emptyFam α := by
-    simp only [emptyFam]
-    ext B
-    constructor
-    · intro hB
-      have hBIn : B ∈ F.sets := by
-        exact hB
-      rw [hContra] at hBIn
-      exact hBIn
-    · intro hB
-      have hBIn : B ∈ F.sets := by
-        rw [hContra]
-        exact hB
-      exact hBIn
-  exact hF hGEq
-
 theorem familyContainedInFamilyJoin
 {α : Type*} (F G : Family α) :
 G ≠ emptyFam α → F ⊆ (F ⋎ G) := by
@@ -251,7 +229,7 @@ G ≠ emptyFam α → F ⊆ (F ⋎ G) := by
   · use Set.univ
     constructor
     · have hGSets : G.sets.Nonempty := by
-        apply famNotEmptyFam
+        apply (notEmptyFam G).mp
         · exact hG
       simp only [Set.nonempty_def] at hGSets
       rcases hGSets with ⟨B, hB⟩
@@ -268,8 +246,8 @@ F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α := by
     by_contra hContra1
     simp only [not_or] at hContra1
     rcases hContra1 with ⟨hF, hG⟩
-    have hFNonEmp := famNotEmptyFam F hF
-    have hGNonEmp := famNotEmptyFam G hG
+    have hFNonEmp := (notEmptyFam F).mp hF
+    have hGNonEmp := (notEmptyFam G).mp hG
     rcases hFNonEmp with ⟨A, hA⟩
     rcases hGNonEmp with ⟨B, hB⟩
     have hAB : A ∩ B ∈ F ⋎ G := by
@@ -283,14 +261,14 @@ F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α := by
   · intro hFG
     rcases hFG with hF | hG
     · by_contra hContra
-      have hFGNon := famNotEmptyFam (F ⋎ G) hContra
+      have hFGNon := (notEmptyFam (F ⋎ G)).mp hContra
       rcases hFGNon with ⟨A, hA⟩
       simp only [HasFamJoin.famJoin, Family.famJoin, famJoin, Set.mem_ofPred_eq] at hA
       rcases hA with ⟨B, hB, C, hC, hBC⟩
       rcases hF
       exact hB
     · by_contra hContra
-      have hFGNon := famNotEmptyFam (F ⋎ G) hContra
+      have hFGNon := (notEmptyFam (F ⋎ G)).mp hContra
       rcases hFGNon with ⟨A, hA⟩
       simp only [HasFamJoin.famJoin, Family.famJoin, famJoin, Set.mem_ofPred_eq] at hA
       rcases hA with ⟨B, hB, C, hC, hBC⟩
