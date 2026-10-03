@@ -18,7 +18,8 @@ def isURSet
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
-/-- An UR set can be written as R(x, U) -/
+/-- All UR sets can be written as `R(x, U)` with `x` uniformly recurrent
+and `U` clopen -/
 theorem urSetIsRxU
 {S : Type u} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
 ∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
@@ -111,12 +112,11 @@ theorem urSetIsRxU
     simp only [indicator, true_eq_decide_iff] at hw1
     exact hw1
 
-/-- Given a syndetic set `A` and a thick set `H`, there exists a
+/-- Given a set `A` and a thick set `H`, there exists a
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
 theorem syndSetIsUROnThickSet
 {S : Type*} [Semigroup S] [Nonempty S]
-(A : Set S) {_ : isSyndetic A}
-(H : Set S) {hH : isThick H} :
+(A : Set S) (H : Set S) {hH : isThick H} :
 ∃ (B : Set S) (_ : isURSet B) (H' : Set S) (_ : isThick H') (_ : H' ⊆ H),
 A ∩ H' = B ∩ H' := by
   have hExistp := minIdempotentWitnessesShiftIntersectionLargeness H hH
@@ -411,6 +411,8 @@ A ∩ H' = B ∩ H' := by
 --     specialize h1 H hH2
 --     exact h1
 
+/-- A sufficient condition for strongly-`F` sets to be strongly-`G`:
+it suffices to check a finer statement for UR sets. -/
 theorem urContainmentSufficesForFamilyContainment
 {S : Type*} [Semigroup S] [Nonempty S]
 (F G : Family S)
@@ -472,18 +474,18 @@ theorem urContainmentSufficesForFamilyContainment
     simp only [Set.subset_inter_iff, Set.empty_subset, and_self]
   · -- Case that F ≠ fullFam S
     intro A hA
-    have h0 : isSyndetic A := by
-      have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
-        exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
-      have h03 : A ∈ syndeticFamily S := by
-        exact h01 hA
-      simpa
+    -- have h0 : isSyndetic A := by
+    --   have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
+    --     exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
+    --   have h03 : A ∈ syndeticFamily S := by
+    --     exact h01 hA
+    --   simpa
     have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
       intro H hHThick
       have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
       A ∩ H' = B ∩ H' := by
         apply syndSetIsUROnThickSet
-        · exact h0
+        --· exact h0
         · exact hHThick
       obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
       have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
@@ -525,6 +527,40 @@ theorem urContainmentSufficesForFamilyContainment
     specialize h1 H hH2
     exact h1
 
+/-- A sufficient condition for the dual of the very strongly PW-`F` sets to be very
+strongly PW-`G`: it suffices to check a finer statement for UR sets. -/
+theorem urContainmentSufficesForFamilyContainmentUpgrade
+{S : Type*} [Semigroup S] [Nonempty S]
+(F G : Family S)
+(hFG : ∀ h ∈ thickFamily S,
+  (((capFamily (thickFamily S) h)*⋏F)).sets ∩ {C : Set S | isURSet C} ⊆
+    ((capFamily (thickFamily S) h)*⋏G).sets) :
+Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ F) ⊆
+Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ G) :=
+by
+  intro A hA
+  -- there is a thick `H` such that `A ∩ H' ∈ F` for all thick `H' ⊆ H`
+  obtain ⟨H, hH, hAH⟩ := (Set.ext_iff.mp
+    (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S) F) A).mp hA
+  -- there is a UR set `B` and a thick `T ⊆ H` such that `A ∩ T = B ∩ T`
+  obtain ⟨B, hBUR, T, hT, hTH, hATBT⟩ := syndSetIsUROnThickSet A H (hH := hH)
+  -- so `A ∩ H' = B ∩ H'` for all `H' ⊆ T`
+  have hBA : ∀ H' ⊆ T, B ∩ H' = A ∩ H' := by
+    intro H' hH'T
+    rw [← Set.inter_eq_self_of_subset_right hH'T, ← Set.inter_assoc, ← Set.inter_assoc, hATBT]
+  -- `B ∩ H' = A ∩ H' ∈ F` for all thick `H' ⊆ T`
+  have hBF : B ∈ ((capFamily (thickFamily S) T)* ⋏ F).sets :=
+    (memberOfCapFamDualMeetH (thickFamily S) F B T).mpr fun H' hH' hH'T ↦ by
+      rw [hBA H' hH'T]
+      exact hAH H' hH' (hH'T.trans hTH)
+  -- by assumption, `B ∩ H' ∈ G` for all thick `H' ⊆ T`
+  have hBG := (memberOfCapFamDualMeetH (thickFamily S) G B T).mp (hFG T hT ⟨hBF, hBUR⟩)
+  -- hence `A ∩ H' = B ∩ H' ∈ G` for all thick `H' ⊆ T`
+  refine (Set.ext_iff.mp
+    (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S) G) A).mpr ⟨T, hT, ?_⟩
+  intro H' hH' hH'T
+  rw [← hBA H' hH'T]
+  exact hBG H' hH' hH'T
 
 end Reduction_to_UR_sets
 
@@ -1224,7 +1260,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
   have hBinBohr : B ∈ setOfBohrRecurrenceFamily S := by
     simp only [setOfBohrRecurrenceFamily]
     exact hBrec
-  have hBohrPR : isPRFamily (setOfBohrRecurrenceFamily S) := by
+  have hBohrPR : isPRFamilyv2 (setOfBohrRecurrenceFamily S) := by
     exact setOfBohrRecurrenceFamilyIsPR S
   have hUClosed : IsClosed U := by
     unfold IsClopen at hUClopen
@@ -1340,6 +1376,8 @@ theorem commURSetsOfBohrRecurrenceAreDelta
 end Dynamical_sets_of_bohr_recurrence
 
 section Application
+
+
 
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence

@@ -144,6 +144,14 @@ theorem familyDeMorgan2
   rw [← h]
   rw [dualIsInvolutionOnFamilies]
 
+theorem unionDeMorgan1
+{α β : Type*} (F : β → Family α) :
+(Family.iUnion F)* = Family.iInter (fun (b : β) ↦ (F b)*) := by sorry
+
+theorem unionDeMorgan2
+{α β : Type*} (F : β → Family α) :
+(Family.iInter F)* = Family.iUnion (fun (b : β) ↦ (F b)*) := by sorry
+
 end DeMorgan
 
 section Join
@@ -656,6 +664,86 @@ F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) := by
       · intro hA
         simp at hA
     exact hFGNonEmp hFGEmp
+
+
+theorem memberOfCapFamJoinH
+{α : Type*} (G H : Family α) (a f : Set α) :
+a ∈ (capFamily G f) ⋎ H ↔
+  (∃ g ∈ G, g ⊆ f ∧ (∃ b ∈ H, a ∩ g = b ∩ g)) :=
+    by
+    constructor
+    · -- if `a = c ∩ b` with `c ∩ f ∈ G` and `b ∈ H`, then `g := f ∩ c` works
+      rintro ⟨c, hc, b, hb, rfl⟩
+      refine ⟨f ∩ c, hc, Set.inter_subset_left, b, hb, ?_⟩
+      ext x
+      constructor
+      · rintro ⟨⟨-, hxb⟩, hxf, hxc⟩
+        exact ⟨hxb, hxf, hxc⟩
+      · rintro ⟨hxb, hxf, hxc⟩
+        exact ⟨⟨hxc, hxb⟩, hxf, hxc⟩
+    · -- if `a ∩ g = b ∩ g`, then `a = (g ∪ (a \ g)) ∩ (b ∪ (a \ g))`, where
+      -- `(g ∪ (a \ g)) ∩ f ⊇ g` belongs to `G` and `b ∪ (a \ g) ⊇ b` belongs to `H`
+      rintro ⟨g, hg, hgf, b, hb, hab⟩
+      refine ⟨g ∪ (a ∩ gᶜ), ?_, b ∪ (a ∩ gᶜ), H.upward_closed b _ hb Set.subset_union_left, ?_⟩
+      · exact G.upward_closed g _ hg fun x hx ↦ ⟨hgf hx, Or.inl hx⟩
+      · ext x
+        constructor
+        · intro hxa
+          by_cases hxg : x ∈ g
+          · have hxb : x ∈ b ∩ g := by
+              rw [← hab]
+              exact ⟨hxa, hxg⟩
+            exact ⟨Or.inl hxg, Or.inl hxb.1⟩
+          · exact ⟨Or.inr ⟨hxa, hxg⟩, Or.inr ⟨hxa, hxg⟩⟩
+        · rintro ⟨hxg | ⟨hxa, -⟩, hxb | ⟨hxa, -⟩⟩
+          · have hxa : x ∈ a ∩ g := by
+              rw [hab]
+              exact ⟨hxb, hxg⟩
+            exact hxa.1
+          all_goals exact hxa
+
+theorem memberOfCapFamDualMeetH
+{α : Type*} (G H : Family α) (a f : Set α) :
+a ∈ (capFamily G f)* ⋏ H ↔
+  (∀ g ∈ G, g ⊆ f → a ∩ g ∈ H) :=
+    by
+    -- `a ∈ (G∩f)* ⋏ H` if and only if `a ∩ c ∈ H` for all `c ∈ (G∩f)** = G∩f`
+    have hmem : a ∈ (capFamily G f)* ⋏ H ↔ ∀ c ∈ capFamily G f, a ∩ c ∈ H := by
+      change (∀ c ∈ (capFamily G f)**, a ∩ c ∈ H) ↔ _
+      rw [dualIsInvolutionOnFamilies]
+    rw [hmem]
+    constructor
+    · -- if `g ∈ G` and `g ⊆ f`, then `f ∩ g = g ∈ G`, so `g ∈ G∩f`
+      intro h g hg hgf
+      exact h g (show f ∩ g ∈ G by rwa [Set.inter_eq_right.mpr hgf])
+    · -- if `f ∩ c ∈ G`, then `a ∩ c ⊇ a ∩ (f ∩ c) ∈ H`
+      intro h c hc
+      exact H.upward_closed _ _ (h (f ∩ c) hc Set.inter_subset_left)
+        (Set.inter_subset_inter_right a Set.inter_subset_right)
+
+theorem iInterCapFamilyDescription
+{α : Type*} (F G H : Family α) :
+Family.iInter (fun (f : F.sets) ↦ (capFamily G f) ⋎ H) =
+{a : Set α | ∀ f ∈ F, ∃ g ∈ G, g ⊆ f ∧ (∃ b ∈ H, a ∩ g = b ∩ g)} := by
+  ext a
+  refine (Family.mem_iInter _ a).trans ?_
+  constructor
+  · intro h f hf
+    exact (memberOfCapFamJoinH G H a f).mp (h ⟨f, hf⟩)
+  · rintro h ⟨f, hf⟩
+    exact (memberOfCapFamJoinH G H a f).mpr (h f hf)
+
+theorem iUnionCapFamilyDualDescription
+{α : Type*} (F G H : Family α) :
+Family.iUnion (fun (f : F.sets) ↦ (capFamily G f)* ⋏ H) =
+{a : Set α | ∃ f ∈ F, ∀ g ∈ G, g ⊆ f → a ∩ g ∈ H} := by
+  ext a
+  refine (Family.mem_iUnion _ a).trans ?_
+  constructor
+  · rintro ⟨⟨f, hf⟩, h⟩
+    exact ⟨f, hf, (memberOfCapFamDualMeetH G H a f).mp h⟩
+  · rintro ⟨f, hf, h⟩
+    exact ⟨⟨f, hf⟩, (memberOfCapFamDualMeetH G H a f).mpr h⟩
 
 end Meet
 

@@ -54,6 +54,46 @@ instance {α : Type*} : Union (Family α) where
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
+def Family.iInter
+{α ι : Type*} (F : ι → Family α) : Family α :=
+  ⟨⋂ i, (F i).sets, by
+    intro A B hA hAB
+    rw [Set.mem_iInter] at hA ⊢
+    intro i
+    exact (F i).upward_closed A B (hA i) hAB⟩
+
+def Family.iUnion
+{α ι : Type*} (F : ι → Family α) : Family α :=
+  ⟨⋃ i, (F i).sets, by
+    intro A B hA hAB
+    rw [Set.mem_iUnion] at hA ⊢
+    obtain ⟨i, hi⟩ := hA
+    exact ⟨i, (F i).upward_closed A B hi hAB⟩⟩
+
+@[simp]
+theorem Family.mem_iInter
+{α ι : Type*} (F : ι → Family α) (A : Set α) :
+    A ∈ (Family.iInter F).sets ↔ ∀ i, A ∈ (F i).sets :=
+  Set.mem_iInter
+
+@[simp]
+theorem Family.mem_iUnion
+{α ι : Type*} (F : ι → Family α) (A : Set α) :
+    A ∈ (Family.iUnion F).sets ↔ ∃ i, A ∈ (F i).sets :=
+  Set.mem_iUnion
+
+/-- Given a family `F` and a set `A`, `capFamily F A` is the family of
+sets `B` for which `B ∩ A ∈ F` -/
+def capFamily
+{α : Type*} (F : Family α) (A : Set α) :
+Family α :=
+{
+  sets := {B : Set α | A ∩ B ∈ F}
+  upward_closed := by
+    intro C D hC CinD
+    exact F.2 (A ∩ C) (A ∩ D) hC (Set.inter_subset_inter_right A CinD)
+}
+
 lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by
   intro A hA
   exact hA
@@ -85,20 +125,37 @@ def emptyFam (α : Type*) : Family α := {
     simp at hA
 }
 
+/-- An equivalent condition to show that a family is non-empty -/
+lemma notEmptyFam
+{α : Type*} (F : Family α) :
+F ≠ emptyFam α ↔ F.sets.Nonempty :=
+by sorry
+
 end Empty_and_full_families
 
 section Filters_and_PR_Families
 
 /-- A family is a filter if it is not the empty family and if it
 is closed under intersections -/
-def isFilterFamilyv2 {α : Type*} (F : Family α) : Prop :=
+def isFilterFamilyv2
+{α : Type*} (F : Family α) :
+Prop :=
   (F ≠ emptyFam α) ∧ (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
 
 /-- A family is partition regular (PR) if it is not the full
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
-def isPRFamilyv2 {α : Type*} (F : Family α) : Prop :=
+def isPRFamilyv2
+{α : Type*} (F : Family α) :
+Prop :=
   (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
+
+/-- A PR family `F` satisfies the ostensibly stronger property of
+one piece of any finite partition belonging to `F` -/
+theorem prFamilyIsMultiPR
+{α : Type*} {F : Family α} (hF : isPRFamilyv2 F) :
+∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
+  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by sorry
 
 
 end Filters_and_PR_Families

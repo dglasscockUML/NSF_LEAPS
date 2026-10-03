@@ -59,6 +59,20 @@ def isDeltaStar
 Prop :=
 ∀ (B : Set S), isDelta B → (A ∩ B).Nonempty
 
+/-- A set `A` of a semigroup `S` is central* if it has nonempty
+intersection with all central subsets of `S` -/
+def isCentralStar
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
+
+/-- A set `A` of a semigroup `S` is IP* if it has nonempty
+intersection with all IP subsets of `S` -/
+def isIPStar
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (B : Set S), isIP B → (A ∩ B).Nonempty
+
 /-- A collection `F` of subsets of `S` is a Furstenberg family if it is
 upward closed: for all `A, B ⊆ S`, if `A ⊆ B` and `A ∈ F`, then `B ∈ F` -/
 def isFamily
@@ -106,35 +120,74 @@ theorem DeltaTheoremA
       ∧ (isThick H') -- H' is thick
       ∧ (H' ⊆ H) -- H' is contained in H
       ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
-by
-  intro A hA H hH
-  have AinDeltaStarFam : A ∈ (deltaFamily S)* := by sorry
-  have HinSyndeticStarFam : H ∈ (syndeticFamily S)* := by sorry
-  obtain ⟨Hpre,hHpre,B,hB,capCondition⟩ := commDeltaStarImpliesLocallyBohrZero AinDeltaStarFam H HinSyndeticStarFam
-  let H' := Hpre ∩ H
-  have hH' : isThick H' := by sorry
-  have H'inH : H' ⊆ H := by sorry
-  have AcapH'isBcapH' : A ∩ H' = B ∩ H' := by sorry
-  use B, H', hB, hH', H'inH, AcapH'isBcapH'
+by sorry
 
 /-- # Theorem B
     Let `S` be a commutative semigroup and `A ⊆ S`.
-    If for all thick sets `H ⊆ S`, the set `A ∩ H` is a set of Bohr recurrence,
-    then for all thick sets `H ⊆ S`, the set `A ∩ H` is a Delta set. -/
+    If there exists a thick set `H ⊆ S` such that for all thick sets
+    `H' ⊆ H`, the set `A ∩ H'` is a set of Bohr recurrence,
+    then the set `A` is a Delta set. -/
 theorem DeltaTheoremB
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 ∀ (A : Set S),
-  (∀ (H : Set S), isThick H → isSetOfBohrRec (A ∩ H)) →
-    (∀ (H : Set S), isThick H → isDelta (A ∩ H)) := by sorry
+  (∃ (H : Set S), isThick H
+  ∧ (∀ (H' : Set S), H' ⊆ H → isThick H' → isSetOfBohrRec (A ∩ H'))) →
+  isDelta A := by
+  rintro A ⟨H, hH, hAH⟩
+  -- by Lemma 3.8, `A ∈ ⋃_{H ∈ T} ((T∩H)* ⋏ dcT_Bohr0)`
+  have hA : A ∈ Family.iUnion (fun (t : (thickFamily S).sets) ↦
+      (capFamily (thickFamily S) t)* ⋏ setOfBohrRecurrenceFamily S) :=
+    (Set.ext_iff.mp (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S)
+      (setOfBohrRecurrenceFamily S)) A).mpr ⟨H, hH, fun H' hH' hH'H ↦ hAH H' hH'H hH'⟩
+  -- the condition of Theorem 5.4 for `F := dcT_Bohr0` and `G := Δ`
+  have hFG : ∀ h ∈ thickFamily S,
+      ((capFamily (thickFamily S) h)* ⋏ setOfBohrRecurrenceFamily S).sets ∩
+        {C : Set S | isURSet C} ⊆ ((capFamily (thickFamily S) h)* ⋏ deltaFamily S).sets := by
+    rintro h hh B ⟨hB, hBUR⟩
+    -- 1. `(T∩h)* ⋏ dcT_Bohr0 ⊆ dcT_Bohr0`
+    have hB1 : B ∈ setOfBohrRecurrenceFamily S := capThickDualMeetContained hh _ hB
+    -- 2. Theorem 5.6: `dcT_Bohr0 ∩ {C ⊆ S : C is a UR set} ⊆ S ⋏ Δ`
+    have hB2 : B ∈ syndeticFamily S ⋏ deltaFamily S := by
+      refine (mem_famMeet (syndeticFamily S) (deltaFamily S) B).mpr fun T hT ↦ ?_
+      rw [dualSyndeticThick] at hT
+      exact commURSetsOfBohrRecurrenceAreDelta B (hBur := hBUR) (hBrec := hB1) T hT
+    -- 3. `S = T* ⊆ (T∩h)*`, so `S ⋏ Δ ⊆ (T∩h)* ⋏ Δ`
+    have hsub : syndeticFamily S ⊆ (capFamily (thickFamily S) h)* := by
+      rw [← dualThickSyndetic]
+      exact dualIsAntitone fun C hC ↦ thickIsMonotone hC Set.inter_subset_right
+    exact familyMeetIsMonotonicSlot1 (deltaFamily S) hsub hB2
+  -- by Theorem 5.4, `A ∈ ⋃_{H ∈ T} ((T∩H)* ⋏ Δ)`
+  obtain ⟨⟨t, ht⟩, hAt⟩ := (Family.mem_iUnion _ A).mp
+    (urContainmentSufficesForFamilyContainmentUpgrade _ _ hFG hA)
+  -- and `(T∩t)* ⋏ Δ ⊆ Δ`
+  exact capThickDualMeetContained ht (deltaFamily S) hAt
 
+
+  -- B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
 
 /-- # Theorem C
-    Let `S` be a semigroup. Family meet and family join, when restricted to
+    Let `S` be a countable, commutative semigroup. If `A ⊆ S` is a `central*` set,
+    then for all thick sets `H ⊆ S`, there exists an `IP*` set `B ⊆ S` and a thick
+    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. -/
+theorem DeltaTheoremC
+{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S] :
+∀ (A : Set S), isCentralStar A →
+  ∀ (H : Set S), isThick H →
+    ∃ (B H' : Set S),
+      (isIPStar B) -- B is a IP*
+      ∧ (isThick H') -- H' is thick
+      ∧ (H' ⊆ H) -- H' is contained in H
+      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
+        by sorry
+
+
+/-- # Theorem D
+    Let `S` be a set. Family meet and family join, when restricted to
     the collection of families, are associative, commutative, and monotone
     operators that, together with the family dual, satisfy the DeMorgan-type
     laws `(F meet G)* = F* join G*` and `(F join G)* = F* meet G*`. -/
-theorem DeltaTheoremC
-{S : Type*} [Semigroup S] [Nonempty S] :
+theorem DeltaTheoremD
+{S : Type*} [Nonempty S] :
 ∀ (F G H I : Set (Set S)), isFamily F → isFamily G → isFamily H → isFamily I →
   -- closedness
   (isFamily (familyMeet F G)) ∧

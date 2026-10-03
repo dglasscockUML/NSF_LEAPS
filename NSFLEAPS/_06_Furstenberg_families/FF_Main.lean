@@ -19,7 +19,7 @@ theorem visitTimeConcentrationForPRFamily
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 (x : X) (U : Set X) (hU : IsClosed U) (hU' : U.Nonempty)
-(F : Family S) (hF : isPRFamily F) :
+(F : Family S) (hF : isPRFamilyv2 F) :
 visitTimeSet dSystem x U ∈ F →
 ∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
   contrapose
@@ -94,7 +94,7 @@ visitTimeSet dSystem x U ∈ F →
     · exact hContra
     · exact hSub
   have hExistOne : ∃ y : G, visitTimeSet dSystem x (g y) ∈ F := by
-    unfold isPRFamily at hF
+    have hF := prFamilyIsMultiPR hF
     specialize hF (⋃ y : G, visitTimeSet dSystem x (g y)) hIn ⟨G.card, hGCard⟩
     classical
     have hGNonempty : Nonempty ↥G := ⟨G.equivFin.symm ⟨0, hGCard⟩⟩
@@ -102,7 +102,7 @@ visitTimeSet dSystem x U ∈ F →
     choose! w hw using fun (s : S) (hs : s ∈ ⋃ y : G, visitTimeSet dSystem x (g y)) ↦
       Set.mem_iUnion.mp hs
     obtain ⟨i, hi⟩ := hF (fun s ↦ G.equivFin (w s))
-    -- the monochromatic piece of colour `i` sits inside `R(x, g (e.symm i))`
+    -- the monochromatic piece of color `i` sits inside `R(x, g (e.symm i))`
     refine ⟨G.equivFin.symm i, F.upward_closed _ _ hi ?_⟩
     rintro s ⟨hsUnion, hsColour⟩
     have hws : w s = G.equivFin.symm i := (Equiv.eq_symm_apply _).mpr hsColour
@@ -368,6 +368,39 @@ isMinimalUltrafilter p ∧ p * p = p ∧ ∀ (F : Set S), F.Finite → (⋂ f �
   refine (Filter.biInter_mem hF).mpr fun f _ ↦ ?_
   have hfpL : (pure f : Ultrafilter S) * p ∈ L := hLmin.1.2 (pure f) ⟨p, hpL, rfl⟩
   exact (membershipInLeftMultByPrincipal f H p).mp ((memClosurePureIff H _).mp (hLH hfpL))
+
+/-- Given a family `F`, a set `A` is strongly piecewise-`F` if
+for all thick sets `H ⊆ S`, there exists a thick set `H' ⊆ S` and a
+set `B ∈ F` such that `A ∩ H = B ∩ H'` -/
+noncomputable
+def stronglyPW
+{S : Type*} [Semigroup S] [Nonempty S] (F : Family S) :
+Family S :=
+syndeticFamily S ⋏ (thickFamily S ⋎ F)
+
+/-- Given a family `F`, a set `A` is very strongly piecewise-`F` if
+for all thick sets `H ⊆ S`, there exists a thick set `H' ⊆ H` and a
+set `B ∈ F` such that `A ∩ H' = B ∩ H'` -/
+noncomputable
+def veryStronglyPW
+{S : Type*} [Semigroup S] [Nonempty S] (F : Family S) :
+Family S :=
+Family.iInter (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t) ⋎ F)
+
+/-- If `H ⊆ S` is thick, then `(T∩H)* ⋏ F ⊆ F` for every family `F`, where `T∩H` is
+the family of sets `A ⊆ S` for which `A ∩ H` is thick -/
+lemma capThickDualMeetContained
+{S : Type*} [Semigroup S] [Nonempty S] {H : Set S} (hH : isThick H) (F : Family S) :
+(capFamily (thickFamily S) H)* ⋏ F ⊆ F := by
+  -- `H ∈ T∩H`, so `T∩H ≠ ∅`, whereby `(T∩H)* ≠ P(S)`
+  have hfull : (capFamily (thickFamily S) H)* ≠ fullFam S := by
+    intro hfull
+    obtain ⟨x, hx, -⟩ := (fullFamEquiv _).mp hfull H
+      (show H ∩ H ∈ thickFamily S by rwa [Set.inter_self])
+    simp at hx
+  -- so Theorem 3.3 applies
+  rw [familyMeetIsCommutative]
+  exact familyMeetContainedInIntersection F _ hfull
 
 end Syndetic_and_thick_sets
 
@@ -1231,86 +1264,83 @@ by
       exact hx f hf
 
 
-/- In countable, commutative semigroups,
-(syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S)
-for UR sets -/
--- theorem preStrongIPIffStrongCentralInCountCommSemi
--- (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S]
--- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem)
--- (x : X) {U : Set X} (UClopen : IsClopen U) :
--- visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (IPFamily S) →
---   visitTimeSet dSystem x U ∈ (syndeticFamily S) ⋏ (centralFamily S) :=
---     by
---   intro hR B hB
---   -- `B` meets every syndetic set, so `B` is thick
---   have hBthick : isThick B := by
---     by_contra hnot
---     unfold isThick at hnot
---     push Not at hnot
---     obtain ⟨F, hFfin, hF⟩ := hnot
---     have hsyn : isSyndetic Bᶜ := by
---       refine ⟨F, hFfin, fun s ↦ ?_⟩
---       obtain ⟨w, hw, hwB⟩ := Set.not_subset.mp (hF s)
---       obtain ⟨f, hfF, rfl⟩ := hw
---       exact ⟨f, hfF, hwB⟩
---     obtain ⟨z, hzB, hzBc⟩ := hB Bᶜ hsyn
---     exact hzBc hzB
---   -- Lemma 4.4 produces a thick set `G` with the stipulated property
---   obtain ⟨G, -, hGthick, hGprop⟩ := thickIndicatorLemmaInCountCommSemi (H := B) hBthick
---   have hGdual : G ∈ (syndeticFamily S)* := by
---     intro C hC
---     obtain ⟨z, hzC, hzG⟩ := syndeticThickIntersect C G hC hGthick
---     exact ⟨z, hzG, hzC⟩
---   -- `R(x,U) ∩ G` is an IP set, so it lies in an idempotent ultrafilter `p`
---   obtain ⟨p, hpidem, hpRG⟩ := hR G hGdual
---   have hRp : visitTimeSet dSystem x U ∈ p := Filter.mem_of_superset hpRG Set.inter_subset_left
---   have hGp : G ∈ p := Filter.mem_of_superset hpRG Set.inter_subset_right
---   -- `p x ∈ U` is uniformly recurrent (the system is minimal) and proximal to `x`
---   set y := (ultraAction dSystem).map p x with hy
---   have hyU : y ∈ U := by
---     have hcl := visitTimeSetInUltraImpliesUltraActInClosure dSystem x U p hRp
---     rwa [UClopen.1.closure_eq] at hcl
---   have hyUR : isUniformlyRecurrent dSystem y :=
---     minimalImpliesUniformlyRecurrent dSystem (hMin := hMin) y
---   have hpy : (ultraAction dSystem).map p y = y := by
---     rw [hy, ← (ultraAction dSystem).mapMult p p x, hpidem]
---   -- Lemma 2.1: `R((x,y),α) ∩ R(y,V) ⊆ R(x,U)`
---   obtain ⟨V, hVopen, hyV, α, hαopen, hαdiag, hVα⟩ :=
---     nbhdOfDiagForcesOtherSetContainment UClopen.2 hyU
---   -- `L = {p} ∪ βS p` is a left ideal meeting `closure G` and contained in `closure R((x,y),α)`
---   set L : Set (Ultrafilter S) := {r | r = p ∨ ∃ q : Ultrafilter S, q * p = r} with hLdef
---   have hLideal : isLeftIdeal L := by
---     refine ⟨⟨p, Or.inl rfl⟩, ?_⟩
---     rintro s w ⟨r, hr, rfl⟩
---     rcases hr with rfl | ⟨q, rfl⟩
---     · exact Or.inr ⟨s, rfl⟩
---     · exact Or.inr ⟨s * q, mul_assoc s q p⟩
---   have hLdiag : ∀ r ∈ L, visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∈ r := by
---     intro r hr
---     refine visitTimeSetBelongsToUltrafilter (diagDynamicalSystem dSystem dSystem) (x, y) α
---       (hU := hαopen) r ?_
---     rw [ultraDiagAction]
---     refine hαdiag ?_
---     change (ultraAction dSystem).map r x = (ultraAction dSystem).map r y
---     rcases hr with rfl | ⟨q, rfl⟩
---     · rw [hpy]
---     · rw [(ultraAction dSystem).mapMult q p x, (ultraAction dSystem).mapMult q p y, hpy, ← hy]
---   have hLsub : L ⊆ closure ((pure : S → Ultrafilter S) ''
---       (visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α)) :=
---     fun r hr ↦ (memClosurePureIff _ r).mpr (hLdiag r hr)
---   have hLmeet : (L ∩ closure ((pure : S → Ultrafilter S) '' G)).Nonempty :=
---     ⟨p, Or.inl rfl, (memClosurePureIff G p).mpr hGp⟩
---   have hthick : isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ B) :=
---     hGprop _ L hLideal hLsub hLmeet
---   -- `R(y,V)` is a dcS set, so Theorem 4.1 applies
---   have hdcS : isdcSSet (visitTimeSet dSystem y V) :=
---     returnTimesImpliesdcS _ ⟨X, inferInstance, inferInstance, inferInstance, inferInstance,
---       dSystem, y, hyUR, V, hyV, hVopen, subset_rfl⟩
---   refine dcSCapThickIsCentral _ ⟨visitTimeSet dSystem y V, hdcS,
---     visitTimeSet (diagDynamicalSystem dSystem dSystem) (x, y) α ∩ B, hthick, ?_⟩
---   rintro s ⟨hsV, hsα, hsB⟩
---   exact ⟨hVα (dSystem.map s x) (dSystem.map s y) hsα hsV, hsB⟩
+/-- A set `A` is strongly piecewise-`F` if and only if for all thick sets `H ⊆ S`,
+there exists a set `B ∈ F` and a thick set `T ⊆ S` such that `A ∩ H = B ∩ T` -/
+theorem memStronglyPWIff
+{S : Type*} [Semigroup S] [Nonempty S] (F : Family S) (A : Set S) :
+A ∈ stronglyPW F ↔ ∀ (H : Set S), isThick H →
+  ∃ (B : Set S), B ∈ F ∧ ∃ (T : Set S), isThick T ∧ A ∩ H = B ∩ T := by
+  have hdual : ∀ H : Set S, H ∈ (syndeticFamily S)* ↔ isThick H := fun H ↦ by
+    rw [dualSyndeticThick]
+    rfl
+  constructor
+  · intro h H hH
+    have h' : ∀ H ∈ (syndeticFamily S)*, A ∩ H ∈ thickFamily S ⋎ F := h
+    obtain ⟨T, hT, B, hB, hEq⟩ := h' H ((hdual H).mpr hH)
+    exact ⟨B, hB, T, hT, hEq.trans (Set.inter_comm T B)⟩
+  · intro h
+    show ∀ H ∈ (syndeticFamily S)*, A ∩ H ∈ thickFamily S ⋎ F
+    intro H hH
+    obtain ⟨B, hB, T, hT, hEq⟩ := h H ((hdual H).mp hH)
+    exact ⟨T, hT, B, hB, hEq.trans (Set.inter_comm B T)⟩
+
+/-- In countable, commutative semigroups `S`, if `F` is a family of
+syndetic subsets of `S`, then the families of strongly piecewise-`F` and
+very strongly piecewise-`F` sets coincide -/
+theorem inCommCountSemiStrongPWandVeryStrongPWCoincide
+{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S]
+(F : Family S) (hFSyndetic : ∀ A ∈ F, isSyndetic A) :
+stronglyPW F = veryStronglyPW F := by
+  ext A
+  constructor
+  · -- strongly piecewise-`F` sets are very strongly piecewise-`F`
+    intro hA
+    show A ∈ (veryStronglyPW F : Set (Set S))
+    rw [veryStronglyPW, iInterCapFamilyDescription]
+    intro H hH
+    -- Lemma `thickIndicatorLemmaInCountCommSemi` produces a thick set `G ⊆ H`
+    obtain ⟨G, -, hGthick, hGprop⟩ := thickIndicatorLemmaInCountCommSemi hH
+    -- `A ∩ G = B ∩ T` with `B ∈ F` and `T` thick
+    obtain ⟨B, hBF, T, hTthick, hAGBT⟩ := (memStronglyPWIff F A).mp hA G hGthick
+    -- `B' = B ∪ (A ∩ T) ∈ F` since `F` is upward closed
+    set B' := B ∪ (A ∩ T) with hB'def
+    have hB'F : B' ∈ F := F.upward_closed B B' hBF Set.subset_union_left
+    -- `T` is thick, so there is a left ideal `L ⊆ closure T`
+    obtain ⟨L, hLmin, hLT⟩ := thickIffClosureContainsMinLeftIdeal.mp hTthick
+    -- `L` meets `closure B` since `B` is syndetic, and `closure T ∩ closure B ⊆ closure G`
+    have hLG : (L ∩ closure ((pure : S → Ultrafilter S) '' G)).Nonempty := by
+      obtain ⟨p, hpL, hpB⟩ := syndeticClosureMeetsEveryIdeal (hFSyndetic B hBF) L hLmin.1
+      have hBT : B ∩ T ∈ p :=
+        Filter.inter_mem ((memClosurePureIff B p).mp hpB) ((memClosurePureIff T p).mp (hLT hpL))
+      rw [← hAGBT] at hBT
+      exact ⟨p, hpL, (memClosurePureIff G p).mpr
+        (Filter.mem_of_superset hBT Set.inter_subset_right)⟩
+    -- so `H' = T ∩ H` is thick
+    have hH'thick : isThick (T ∩ H) := hGprop T L hLmin.1 hLT hLG
+    refine ⟨T ∩ H, hH'thick, Set.inter_subset_right, B', hB'F, ?_⟩
+    -- `A ∩ H' = B' ∩ H'`, since `B ∩ T ∩ H = A ∩ G ∩ T ∩ H ⊆ A ∩ T ∩ H`
+    ext x
+    constructor
+    · rintro ⟨hxA, hxT, hxH⟩
+      exact ⟨Or.inr ⟨hxA, hxT⟩, hxT, hxH⟩
+    · rintro ⟨hxB | ⟨hxA, -⟩, hxT, hxH⟩
+      · have hxAG : x ∈ A ∩ G := by
+          rw [hAGBT]
+          exact ⟨hxB, hxT⟩
+        exact ⟨hxAG.1, hxT, hxH⟩
+      · exact ⟨hxA, hxT, hxH⟩
+  · -- very strongly piecewise-`F` sets are strongly piecewise-`F`
+    intro hA
+    refine (memStronglyPWIff F A).mpr fun H hH ↦ ?_
+    obtain ⟨C, hC, D, hD, rfl⟩ := (Family.mem_iInter _ A).mp hA ⟨H, hH⟩
+    refine ⟨D, hD, H ∩ C, hC, ?_⟩
+    ext x
+    constructor
+    · rintro ⟨⟨hxC, hxD⟩, hxH⟩
+      exact ⟨hxD, hxH, hxC⟩
+    · rintro ⟨hxD, hxH, hxC⟩
+      exact ⟨⟨hxC, hxD⟩, hxH⟩
+
 
 /-- Precursor to result in AP_Defs: In countable, commutative semigroups,
 (syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) -/
@@ -2446,18 +2476,57 @@ isBohrZero A := by
 --     exact setOfBohrRecurrenceIsMonotone hA hAB
 -- }
 
-/-- The family of Bohr_0 sets is a filter -/
+/- The family of Bohr_0 sets is a filter -/
 -- Here I've spelled out the requirement for a filter.
 -- Later update with isFilterFamily (bohrZeroFamily S)
-theorem bohrZeroFamilyIsFilter
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-(bohrZeroFamily S).sets.Nonempty ∧ (∀ (A B : Set S), A ∈ (bohrZeroFamily S) →
-  B ∈ (bohrZeroFamily S) → A ∩ B ∈ (bohrZeroFamily S)) :=
+-- theorem bohrZeroFamilyIsFilter
+-- {S : Type*} [CommSemigroup S] [Nonempty S] :
+-- (bohrZeroFamily S).sets.Nonempty ∧ (∀ (A B : Set S), A ∈ (bohrZeroFamily S) →
+--   B ∈ (bohrZeroFamily S) → A ∩ B ∈ (bohrZeroFamily S)) :=
+-- by
+--   constructor
+--   · -- `S` is Bohr_0 in itself, via the trivial homomorphism into the `0`-dimensional torus
+--     exact ⟨Set.univ, 0, fun _ ↦ 1, fun _ _ ↦ (one_mul 1).symm, Set.univ, isOpen_univ,
+--       Set.mem_univ 1, Set.subset_univ _⟩
+--   · rintro A B ⟨k, φ, hφ, U, hUopen, h1U, hUA⟩ ⟨l, ψ, hψ, V, hVopen, h1V, hVB⟩
+--     -- `s ↦ (φ s, ψ s) : S → 𝕋^(k+l)` is a homomorphism and `U × V` is an open
+--     -- neighbourhood of the identity of `𝕋^(k+l)`
+--     refine ⟨k + l, fun s ↦ Fin.append (φ s) (ψ s), fun s t ↦ ?_,
+--       (fun x : (Fin (k + l) → Circle) ↦ (fun i ↦ x (Fin.castAdd l i))) ⁻¹' U ∩
+--         (fun x : (Fin (k + l) → Circle) ↦ (fun i ↦ x (Fin.natAdd k i))) ⁻¹' V, ?_, ?_, ?_⟩
+--     · -- appending pointwise products is the pointwise product of the appended families
+--       funext i
+--       induction i using Fin.addCases with
+--       | left i => simp only [Pi.mul_apply, Fin.append_left, hφ]
+--       | right i => simp only [Pi.mul_apply, Fin.append_right, hψ]
+--     · exact (hUopen.preimage (continuous_pi fun i ↦ continuous_apply (Fin.castAdd l i))).inter
+--         (hVopen.preimage (continuous_pi fun i ↦ continuous_apply (Fin.natAdd k i)))
+--     · exact ⟨h1U, h1V⟩
+--     · -- `(φ ⊗ ψ)⁻¹ (U × V) = φ⁻¹ U ∩ ψ⁻¹ V ⊆ A ∩ B`
+--       rintro s ⟨hsU, hsV⟩
+--       have hφs : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.castAdd l i)) = φ s := by
+--         funext i
+--         exact Fin.append_left _ _ i
+--       have hψs : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.natAdd k i)) = ψ s := by
+--         funext i
+--         exact Fin.append_right _ _ i
+--       have hsU' : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.castAdd l i)) ∈ U := hsU
+--       have hsV' : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.natAdd k i)) ∈ V := hsV
+--       rw [hφs] at hsU'
+--       rw [hψs] at hsV'
+--       exact ⟨hUA hsU', hVB hsV'⟩
+
+/-- The family of Bohr_0 sets is a filter -/
+theorem bohrZeroFamilyIsFilterv2
+{S : Type*} [Semigroup S] [Nonempty S] :
+isFilterFamilyv2 (bohrZeroFamily S) :=
 by
   constructor
   · -- `S` is Bohr_0 in itself, via the trivial homomorphism into the `0`-dimensional torus
-    exact ⟨Set.univ, 0, fun _ ↦ 1, fun _ _ ↦ (one_mul 1).symm, Set.univ, isOpen_univ,
-      Set.mem_univ 1, Set.subset_univ _⟩
+    have : (bohrZeroFamily S).sets.Nonempty :=
+      ⟨Set.univ, 0, fun _ ↦ 1, fun _ _ ↦ (one_mul 1).symm, Set.univ, isOpen_univ,
+        Set.mem_univ 1, Set.subset_univ _⟩
+    exact (notEmptyFam (bohrZeroFamily S)).mpr this
   · rintro A B ⟨k, φ, hφ, U, hUopen, h1U, hUA⟩ ⟨l, ψ, hψ, V, hVopen, h1V, hVB⟩
     -- `s ↦ (φ s, ψ s) : S → 𝕋^(k+l)` is a homomorphism and `U × V` is an open
     -- neighbourhood of the identity of `𝕋^(k+l)`
@@ -2545,7 +2614,7 @@ isSetOfBohrRecurrence B :=
 --   by sorry
   -- This should be easy logical consequence of the definitions
 
-/-- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
+/- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
 -- Something happens upstream regarding "dualEquivForm" that the proof no longer work
 -- Need to fix
 -- theorem dualBohrZeroSetsOfBohrRecurrence
@@ -2562,15 +2631,11 @@ isSetOfBohrRecurrence B :=
   -- simp only [Set.mem_ofPred_eq]
   -- exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
-/- The family of sets of Bohr
-recurrence is partition regular -/
--- Here I've spelled out the requirement for PR family.
--- Later update with isPRFamily (bohrZeroFamily S)
+/-- The family of sets of Bohr recurrence is partition regular -/
 theorem setOfBohrRecurrenceFamilyIsPR
 (S : Type*) [Semigroup S] [Nonempty S] :
-isPRFamily (setOfBohrRecurrenceFamily S) :=
-by sorry
--- This will be immediate using FA_theorems result (duality of filter and PR)
+isPRFamilyv2 (setOfBohrRecurrenceFamily S) :=
+(familyIsPRIffDualIsFilter (bohrZeroFamily S)).mp bohrZeroFamilyIsFilterv2
 
 /-- In a commutative semigroup, if set is a set of Bohr recurrence,
 then it contains the time of return of a point to a neighborhood of itself
