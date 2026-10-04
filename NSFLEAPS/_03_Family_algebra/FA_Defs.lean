@@ -178,8 +178,36 @@ one piece of any finite partition belonging to `F` -/
 theorem prFamilyIsMultiPR
 {α : Type*} {F : Family α} (hF : isPRFamilyv2 F) :
 ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
-  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by sorry
-
+  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
+  sorry
+  -- unfold isPRFamilyv2 at hF
+  -- rcases hF with ⟨hF1, hF2⟩
+  -- intro A hA n c
+  -- induction n with
+  -- | one =>
+  --   use 0
+  --   have hAAll : {x | x ∈ A ∧ c x = 0} = A := by
+  --     ext x
+  --     constructor
+  --     · intro hx
+  --       simp at hx
+  --       simp [hx]
+  --     · intro hx
+  --       simp only [PNat.val_ofNat, Fin.isValue, Set.mem_ofPred_eq]
+  --       constructor
+  --       · exact hx
+  --       · apply Fin.eq_zero
+  --   rw [hAAll]
+  --   exact hA
+  -- | succ n ih =>
+  --   classical
+  --     -- Separate the last color class from all remaining colors.
+  --   let C : Set α := {x ∈ A | c x = Fin.last (n : ℕ)}
+  --   let B : Set α := {x ∈ A | c x ≠ Fin.last (n : ℕ)}
+  --   have hUnion : C ∪ B = A := by
+  --     ext x
+  --     by_cases hx : c x = Fin.last (n : ℕ)
+  --       ·
 
 end Filters_and_PR_Families
 
