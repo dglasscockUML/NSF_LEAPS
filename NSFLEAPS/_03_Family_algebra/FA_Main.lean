@@ -146,11 +146,70 @@ theorem familyDeMorgan2
 
 theorem unionDeMorgan1
 {α β : Type*} (F : β → Family α) :
-(Family.iUnion F)* = Family.iInter (fun (b : β) ↦ (F b)*) := by sorry
+(Family.iUnion F)* = Family.iInter (fun (b : β) ↦ (F b)*) := by
+  ext A
+  constructor
+  · intro hA G hG
+    simp only [Set.mem_range] at hG
+    rcases hG with ⟨y, hy⟩
+    simp only [HasFamDual.famDual, Family.famDual, famDual, Family.iUnion, Set.mem_iUnion,
+      forall_exists_index] at hA
+    rw [<- hy]
+    intro B hB
+    specialize hA B y hB
+    exact hA
+  · intro hA B hB
+    simp only [Family.mem_iUnion] at hB
+    rcases hB with ⟨i, hi⟩
+    have hFi : ((F i)*).sets ∈ Set.range fun i ↦ ((fun b ↦ (F b)*) i).sets := by
+      simp
+    specialize hA (F i)* hFi
+    simp only [HasFamDual.famDual, famDual, SetLike.mem_coe, Set.mem_ofPred_eq] at hA
+    specialize hA B hi
+    exact hA
 
 theorem unionDeMorgan2
 {α β : Type*} (F : β → Family α) :
-(Family.iInter F)* = Family.iUnion (fun (b : β) ↦ (F b)*) := by sorry
+(Family.iInter F)* = Family.iUnion (fun (b : β) ↦ (F b)*) := by
+  ext A
+  constructor
+  · intro hA
+    simp only [Family.iUnion]
+    have hAIn : A ∈ ⋃ i : β, ((F i)*).sets := by
+      simp only [Set.mem_iUnion]
+      simp only [Family.iInter] at hA
+      by_contra hContra
+      simp only [not_exists] at hContra
+      simp only [HasFamDual.famDual, Family.famDual, famDual, Set.mem_ofPred_eq, not_forall]
+        at hContra
+      choose f hf1 hf2 using hContra
+      let B := ⋃ i : β, f i
+      have hBin : B ∈ ⋂ i : β, (F i).sets := by
+        simp only [Set.mem_iInter]
+        intro i
+        specialize hf1 i
+        simp only [B]
+        apply (F i).upward_closed (f i)
+        · exact hf1
+        · intro a ha
+          simp only [Set.mem_iUnion]
+          use i
+      specialize hA B hBin
+      have hABEmp : ¬ (A ∩ B).Nonempty := by
+        simp only [Set.inter_iUnion, Set.nonempty_iUnion, not_exists, B]
+        exact hf2
+      exact hABEmp hA
+    exact hAIn
+  · intro hA B hB
+    simp only [Family.mem_iInter] at hB
+    simp only [Family.iUnion] at hA
+    have hAIn : A ∈ ⋃ i : β, ((F i)*).sets := by
+      exact hA
+    simp only [Set.mem_iUnion] at hAIn
+    rcases hAIn with ⟨i, hi⟩
+    specialize hB i
+    specialize hi B hB
+    exact hi
 
 end DeMorgan
 
@@ -1056,74 +1115,74 @@ isPRFamilyv2 (F ⋎ F*) := by
 
 end Filters_and_PR
 
-section PartialModAndConsequences
+-- section PartialModAndConsequences
 
-theorem familyPartialModularity
-{α : Type*} (F G H : Family α) :
-(F ⋎ (G ⋏ H)) ⊆ (F ⋎ G) ⋏ H := by sorry
+-- theorem familyPartialModularity
+-- {α : Type*} (F G H : Family α) :
+-- (F ⋎ (G ⋏ H)) ⊆ (F ⋎ G) ⋏ H := by sorry
 
 
-theorem familyPartialDistributivity
-{α : Type*} (F G H : Family α) :
-(F ⋏ G) ⋎ (F ⋏ H) ⊆ F ⋏ (G ⋎ H) := by sorry
+-- theorem familyPartialDistributivity
+-- {α : Type*} (F G H : Family α) :
+-- (F ⋏ G) ⋎ (F ⋏ H) ⊆ F ⋏ (G ⋎ H) := by sorry
 
-theorem familyAbsorptionAdjacent
-{α : Type*} (F G : Family α) :
-F ⊆ (F ⋎ G) ⋏ G* := by sorry
-  -- intro A hA
-  -- change A ∈ (F ⋎ G) ⋏ G* at ⊢
-  -- change A ∈ F at hA
-  -- have hAinFG : A ∈ F ⋎ G := by
-  --   change A ∈ famJoin F G
-  --   unfold _root_.famJoin
-  --   simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
-  --   sorry
-  -- have hAinGstar : A ∈ G* := by
-  --   intro B hBinG
-  --   sorry
-  -- exact ⟨hAinFG, hAinGstar⟩
+-- theorem familyAbsorptionAdjacent
+-- {α : Type*} (F G : Family α) :
+-- F ⊆ (F ⋎ G) ⋏ G* := by sorry
+--   -- intro A hA
+--   -- change A ∈ (F ⋎ G) ⋏ G* at ⊢
+--   -- change A ∈ F at hA
+--   -- have hAinFG : A ∈ F ⋎ G := by
+--   --   change A ∈ famJoin F G
+--   --   unfold _root_.famJoin
+--   --   simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
+--   --   sorry
+--   -- have hAinGstar : A ∈ G* := by
+--   --   intro B hBinG
+--   --   sorry
+--   -- exact ⟨hAinFG, hAinGstar⟩
 
---familyUsefulIdentity
-theorem familyUsefulIdentity
-{α : Type*} (F G H : Family α) :
-F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
+-- --familyUsefulIdentity
+-- theorem familyUsefulIdentity
+-- {α : Type*} (F G H : Family α) :
+-- F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
 
-theorem familyLocalImplicationEquivalence
-{α : Type*} (F G H : Family α) :
-H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
-by
-  nth_rw 1 [← dualIsInvolutionOnFamilies (F ⋏ (F* ⋎ G*))]
-  rw [familyDeMorgan2]
-  rw [familyDeMorgan1]
-  repeat rw [dualIsInvolutionOnFamilies]
-  rw [← familyDeMorgan2]
-  have step : H* ⊆ F⋏(F⋏G)* ↔ ((H* ⊆ F) ∧ (H* ⊆ (F ⋏ G)*)) := by sorry
-  rw [step]
-  constructor
-  · intro h
-    have h2 : H* ⊆ (F ⋏ G)* := h.2
-    have h_anti := dualIsAntitone h2
-    rw [dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies] at h_anti
-    intro A hA
-    have hmono : (F ⋏ G) ⋏ F ⊆ H ⋏ F :=
-      familyMeetIsMonotonicSlot1 F h_anti
-    have h2 : (F ⋏ G) ⋏ F = F ⋏ G := by
-      rw [←familyMeetIsAssociative]
-      rw [familyMeetIsCommutative G F]
-      rw [familyMeetIsAssociative]
-      sorry
-    have h3 : H ⋏ F = F ⋏ H := by
-      rw [familyMeetIsCommutative]
-    have h4 : F ⋏ G ⊆ F ⋏ H := by
-      rw [← h2]
-      rw [←h3]
-      exact hmono
-    exact h4 hA
-  · intro h
-    rw [←step] at ⊢
-    rw [familyDeMorgan2]
+-- theorem familyLocalImplicationEquivalence
+-- {α : Type*} (F G H : Family α) :
+-- H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
+-- by
+--   nth_rw 1 [← dualIsInvolutionOnFamilies (F ⋏ (F* ⋎ G*))]
+--   rw [familyDeMorgan2]
+--   rw [familyDeMorgan1]
+--   repeat rw [dualIsInvolutionOnFamilies]
+--   rw [← familyDeMorgan2]
+--   have step : H* ⊆ F⋏(F⋏G)* ↔ ((H* ⊆ F) ∧ (H* ⊆ (F ⋏ G)*)) := by sorry
+--   rw [step]
+--   constructor
+--   · intro h
+--     have h2 : H* ⊆ (F ⋏ G)* := h.2
+--     have h_anti := dualIsAntitone h2
+--     rw [dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies] at h_anti
+--     intro A hA
+--     have hmono : (F ⋏ G) ⋏ F ⊆ H ⋏ F :=
+--       familyMeetIsMonotonicSlot1 F h_anti
+--     have h2 : (F ⋏ G) ⋏ F = F ⋏ G := by
+--       rw [←familyMeetIsAssociative]
+--       rw [familyMeetIsCommutative G F]
+--       rw [familyMeetIsAssociative]
+--       sorry
+--     have h3 : H ⋏ F = F ⋏ H := by
+--       rw [familyMeetIsCommutative]
+--     have h4 : F ⋏ G ⊆ F ⋏ H := by
+--       rw [← h2]
+--       rw [←h3]
+--       exact hmono
+--     exact h4 hA
+--   · intro h
+--     rw [←step] at ⊢
+--     rw [familyDeMorgan2]
 
-    sorry
+--     sorry
   /- classical
   constructor
   · intro h A hAinFG
@@ -1154,7 +1213,7 @@ by
 
 
 
-end PartialModAndConsequences
+--end PartialModAndConsequences
 
 section Unused_Or_still_to_sort
 
