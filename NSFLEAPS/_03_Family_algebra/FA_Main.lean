@@ -9,6 +9,7 @@ of Furstenberg families.
 
 section Dual
 
+/-- F* consists of all set A such that Aᶜ is not in F -/
 theorem famDualAlt
 {α : Type*} (F : Family α) :
 F* = {A : Set α | Aᶜ ∉ F} := by
@@ -43,11 +44,13 @@ F* = {A : Set α | Aᶜ ∉ F} := by
     exact AcninF this
  --complement of A in S not in F
 
+/-- A belongs to F* if and only if Aᶜ is not in F -/
 lemma mem_dual_alt
 {α : Type*} {F : Family α} {A : Set α} :
 A ∈ F* ↔ Aᶜ ∉ F :=
   Set.ext_iff.mp (famDualAlt F) A
 
+/-- Dual of dual of F is equal to F -/
 theorem dualIsInvolutionOnFamilies
 {α : Type*} (F : Family α) :
 F** = F := by
@@ -58,6 +61,7 @@ F** = F := by
   push Not
   rfl
 
+/-- If F ⊆ G, then G* ⊆ F* -/
 theorem dualIsAntitone
 {α : Type*} {F G : Family α} :
 F ⊆ G → G* ⊆ F* :=
@@ -74,6 +78,7 @@ end Dual
 
 section DeMorgan
 
+/-- First DeMorgan for family algebra -/
 theorem familyDeMorgan1
 {α : Type*} (F G : Family α) :
 (F ⋎ G)* = (F* ⋏ G*) :=
@@ -114,6 +119,7 @@ by
   simp_rw [Set.nonempty_iff_ne_empty]
   exact final_equiv
 
+/-- Second DeMorgan's law for family algebra -/
 theorem familyDeMorgan2
 {α : Type*} (F G : Family α) :
 (F ⋏ G)* = (F* ⋎ G*) :=
@@ -124,6 +130,7 @@ theorem familyDeMorgan2
   rw [← h]
   rw [dualIsInvolutionOnFamilies]
 
+/-- Dual of union of families is intersection of dual of families -/
 theorem unionDeMorgan1
 {α β : Type*} (F : β → Family α) :
 (Family.iUnion F)* = Family.iInter (fun (b : β) ↦ (F b)*) := by
@@ -148,6 +155,7 @@ theorem unionDeMorgan1
     specialize hA B hi
     exact hA
 
+/-- Dual of intersection of families is union of dual of families -/
 theorem unionDeMorgan2
 {α β : Type*} (F : β → Family α) :
 (Family.iInter F)* = Family.iUnion (fun (b : β) ↦ (F b)*) := by
@@ -195,6 +203,7 @@ end DeMorgan
 
 section Join
 
+/-- Family join is associative -/
 theorem familyJoinIsAssociative
 {α : Type*} (F G H : Family α) :
 (F ⋎ (G ⋎ H)) = ((F ⋎ G) ⋎ H) :=
@@ -210,6 +219,7 @@ theorem familyJoinIsAssociative
       refine ⟨X, hX, W ∩ Z, ⟨W, hW, Z, hZ, rfl⟩, ?_⟩
       exact (Set.inter_assoc X W Z)
 
+/-- Family join is commutative -/
 theorem familyJoinIsCommutative
 {α : Type*} (F G : Family α) :
 F ⋎ G = G ⋎ F :=
@@ -224,6 +234,7 @@ F ⋎ G = G ⋎ F :=
       rcases h with ⟨D, hD, C, hC, rfl⟩
       exact ⟨C, hC, D, hD, Set.inter_comm D C⟩
 
+/-- Family join is monotonic -/
 theorem familyJoinIsMonotonic
 {α : Type*} {F1 G1 F2 G2 : Family α} :
 F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋎ F2) ⊆ (G1 ⋎ G2) := by
