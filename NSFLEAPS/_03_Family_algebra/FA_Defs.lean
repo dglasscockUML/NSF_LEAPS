@@ -32,12 +32,6 @@ instance {α} : SetLike (Family α) (Set α) where
 lemma Family.ext {α : Type*} {F G : Family α} (h : ∀ (A : Set α), A ∈ F ↔ A ∈ G) : F = G :=
   SetLike.ext h
 
--- instance {α} : SetLike (Family α) (Set α) where
---   coe F := F.sets
---   coe_injective' := by
---     intro F G h
---     cases F; cases G; cases h; rfl
-
 instance {α : Type*} : HasSubset (Family α) where
   Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
 
@@ -175,39 +169,34 @@ Prop :=
 
 /-- A PR family `F` satisfies the ostensibly stronger property of
 one piece of any finite partition belonging to `F` -/
+-- Proof of this theorem was written by ChatGPT
 theorem prFamilyIsMultiPR
 {α : Type*} {F : Family α} (hF : isPRFamilyv2 F) :
 ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
   ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
-  sorry
-  -- unfold isPRFamilyv2 at hF
-  -- rcases hF with ⟨hF1, hF2⟩
-  -- intro A hA n c
-  -- induction n with
-  -- | one =>
-  --   use 0
-  --   have hAAll : {x | x ∈ A ∧ c x = 0} = A := by
-  --     ext x
-  --     constructor
-  --     · intro hx
-  --       simp at hx
-  --       simp [hx]
-  --     · intro hx
-  --       simp only [PNat.val_ofNat, Fin.isValue, Set.mem_ofPred_eq]
-  --       constructor
-  --       · exact hx
-  --       · apply Fin.eq_zero
-  --   rw [hAAll]
-  --   exact hA
-  -- | succ n ih =>
-  --   classical
-  --     -- Separate the last color class from all remaining colors.
-  --   let C : Set α := {x ∈ A | c x = Fin.last (n : ℕ)}
-  --   let B : Set α := {x ∈ A | c x ≠ Fin.last (n : ℕ)}
-  --   have hUnion : C ∪ B = A := by
-  --     ext x
-  --     by_cases hx : c x = Fin.last (n : ℕ)
-  --       ·
+  classical
+  intro A hA n c
+  have haux (s : Finset (Fin n)) (hs : s.Nonempty) :
+      {x ∈ A | c x ∈ s} ∈ F →
+        ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
+    induction hs using Finset.Nonempty.cons_induction with
+    | singleton i =>
+        intro h
+        exact ⟨i, by simpa only [Finset.mem_singleton] using h⟩
+    | cons i s hi hs ih =>
+        intro h
+        have heq :
+            {x ∈ A | c x ∈ Finset.cons i s hi} =
+              {x ∈ A | c x = i} ∪ {x ∈ A | c x ∈ s} := by
+          ext x
+          simp [Set.mem_union, and_or_left]
+        rw [heq] at h
+        rcases hF.2 _ _ h with hiF | hsF
+        · exact ⟨i, hiF⟩
+        · exact ih hsF
+  apply haux Finset.univ
+    ⟨⟨0, n.property⟩, Finset.mem_univ _⟩
+  simpa using hA
 
 end Filters_and_PR_Families
 
