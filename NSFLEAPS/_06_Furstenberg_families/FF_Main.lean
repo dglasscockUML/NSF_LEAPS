@@ -1279,7 +1279,7 @@ A ∈ stronglyPW F ↔ ∀ (H : Set S), isThick H →
     obtain ⟨T, hT, B, hB, hEq⟩ := h' H ((hdual H).mpr hH)
     exact ⟨B, hB, T, hT, hEq.trans (Set.inter_comm T B)⟩
   · intro h
-    show ∀ H ∈ (syndeticFamily S)*, A ∩ H ∈ thickFamily S ⋎ F
+    change ∀ H ∈ (syndeticFamily S)*, A ∩ H ∈ thickFamily S ⋎ F
     intro H hH
     obtain ⟨B, hB, T, hT, hEq⟩ := h H ((hdual H).mp hH)
     exact ⟨T, hT, B, hB, hEq.trans (Set.inter_comm B T)⟩
@@ -1295,7 +1295,7 @@ stronglyPW F = veryStronglyPW F := by
   constructor
   · -- strongly piecewise-`F` sets are very strongly piecewise-`F`
     intro hA
-    show A ∈ (veryStronglyPW F : Set (Set S))
+    change A ∈ (veryStronglyPW F : Set (Set S))
     rw [veryStronglyPW, iInterCapFamilyDescription]
     intro H hH
     -- Lemma `thickIndicatorLemmaInCountCommSemi` produces a thick set `G ⊆ H`

@@ -106,21 +106,7 @@ These are the theorems from the introduction.  Their short proofs
 are possible by importing the full development and putting together
 or calling the more detailed theorems from the body of the paper. -/
 
-/-- # Theorem A
-    Let `S` be a commutative semigroup and `A ⊆ S`.
-    If `A` is a Delta* set, then for all thick sets `H ⊆ S`,
-    there exists a Bohr_0 set `B ⊆ S` and a thick set `H' ⊆ S`,
-    such that `A ∩ H' = B ∩ H'`. -/
-theorem DeltaTheoremA
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-∀ (A : Set S), isDeltaStar A →
-  ∀ (H : Set S), isThick H →
-    ∃ (B H' : Set S),
-      (isBohrZero B) -- B is a Bohr_0 set
-      ∧ (isThick H') -- H' is thick
-      ∧ (H' ⊆ H) -- H' is contained in H
-      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
-by sorry
+/- # Theorem A : Proved after Theorem B -/
 
 /-- # Theorem B
     Let `S` be a commutative semigroup and `A ⊆ S`.
@@ -162,8 +148,38 @@ theorem DeltaTheoremB
   -- and `(T∩t)* ⋏ Δ ⊆ Δ`
   exact capThickDualMeetContained ht (deltaFamily S) hAt
 
+/-- # Theorem A
+    Let `S` be a commutative semigroup and `A ⊆ S`.
+    If `A` is a Delta* set, then for all thick sets `H ⊆ S`,
+    there exists a Bohr_0 set `B ⊆ S` and a thick set `H' ⊆ S`,
+    such that `A ∩ H' = B ∩ H'`. -/
+theorem DeltaTheoremA
+{S : Type*} [CommSemigroup S] [Nonempty S] :
+∀ (A : Set S), isDeltaStar A →
+  ∀ (H : Set S), isThick H →
+    ∃ (B H' : Set S),
+      (isBohrZero B) -- B is a Bohr_0 set
+      ∧ (isThick H') -- H' is thick
+      ∧ (H' ⊆ H) -- H' is contained in H
+      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
+by
+  intro A hA H hH
+  have hAD : A ∈ (deltaFamily S)* := (mem_dual_star _ A).mpr fun C hC ↦ hA C hC
+  -- by Theorem B and Lemma 3.8, `(T∩H)* ⋏ Bohr_0* ⊆ Δ`
+  have hsub : (capFamily (thickFamily S) H)* ⋏ (bohrZeroFamily S)* ⊆ deltaFamily S :=
+    fun B hB ↦ DeltaTheoremB B ⟨H, hH, fun H' hH'H hH' ↦ fun C hC ↦
+      (mem_dual_star _ _).mp
+        ((memberOfCapFamDualMeetH (thickFamily S) (bohrZeroFamily S)* B H).mp hB H' hH' hH'H)
+        C hC⟩
+  -- taking duals, `Δ* ⊆ ((T∩H)* ⋏ Bohr_0*)* = (T∩H) ⋎ Bohr_0`
+  have hAJ : A ∈ capFamily (thickFamily S) H ⋎ bohrZeroFamily S := by
+    have hA' := dualIsAntitone hsub hAD
+    rwa [familyDeMorgan2, dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies] at hA'
+  -- by Lemma 3.8, there is a thick `H' ⊆ H` and a Bohr_0 set `B` with `A ∩ H' = B ∩ H'`
+  obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
+    (memberOfCapFamJoinH (thickFamily S) (bohrZeroFamily S) A H).mp hAJ
+  exact ⟨B, H', hB, hH', hH'H, hAB⟩
 
-  -- B \subseteq S$ and a thick set $H' \subseteq H$ such that $A \cap H' = B \cap H'$.
 
 /-- # Theorem C
     Let `S` be a countable, commutative semigroup. If `A ⊆ S` is a `central*` set,
@@ -178,7 +194,41 @@ theorem DeltaTheoremC
       ∧ (isThick H') -- H' is thick
       ∧ (H' ⊆ H) -- H' is contained in H
       ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
-        by sorry
+        by
+  intro A hA H hH
+  have hAC : A ∈ (centralFamily S)* := (mem_dual_star _ A).mpr fun C hC ↦ hA C hC
+  -- (5.3): `⋃_{H ∈ T} ((T∩H)* ⋏ IP) ⊆ C`
+  have h53 : Family.iUnion (fun (t : (thickFamily S).sets) ↦
+      (capFamily (thickFamily S) t)* ⋏ IPFamily S) ⊆ centralFamily S := by
+    -- the condition of Theorem 5.4 for `F := IP` and `G := C`
+    have hFG : ∀ h ∈ thickFamily S,
+        ((capFamily (thickFamily S) h)* ⋏ IPFamily S).sets ∩ {C : Set S | isURSet C} ⊆
+          ((capFamily (thickFamily S) h)* ⋏ centralFamily S).sets := by
+      rintro h hh B ⟨hB, hBUR⟩
+      -- by Lemma 5.2, `B = R(x, U)` for a point `x` in a minimal system and a clopen `U`
+      obtain ⟨X, _, _, _, _, dSystem, hMin, x, U, hU, rfl⟩ := urSetIsRxU hBUR
+      -- `R(x, U) ∩ H' ∈ IP` for all thick `H' ⊆ h`, so `R(x, U) ∩ H' ∈ C` for all thick `H' ⊆ h`
+      refine (memberOfCapFamDualMeetH (thickFamily S) (centralFamily S) _ h).mpr
+        fun H' hH' hH'h ↦ ?_
+      exact preStrongIPIffStrongCentralInCountCommSemi hMin x hU h hh
+        (fun G hGh hG ↦ (memberOfCapFamDualMeetH (thickFamily S) (IPFamily S) _ h).mp hB G hG hGh)
+        H' hH'h hH'
+    -- by Theorem 5.4, `D ∈ ⋃_{H ∈ T} ((T∩H)* ⋏ C)`, and `(T∩t)* ⋏ C ⊆ C`
+    intro D hD
+    obtain ⟨⟨t, ht⟩, hDt⟩ := (Family.mem_iUnion _ D).mp
+      (urContainmentSufficesForFamilyContainmentUpgrade _ _ hFG hD)
+    exact capThickDualMeetContained ht (centralFamily S) hDt
+  -- in particular, `(T∩H)* ⋏ IP ⊆ C`
+  have hsub : (capFamily (thickFamily S) H)* ⋏ IPFamily S ⊆ centralFamily S := fun B hB ↦
+    h53 ((Family.mem_iUnion _ B).mpr ⟨⟨H, hH⟩, hB⟩)
+  -- taking duals, `C* ⊆ ((T∩H)* ⋏ IP)* = (T∩H) ⋎ IP*`
+  have hAJ : A ∈ capFamily (thickFamily S) H ⋎ (IPFamily S)* := by
+    have hA' := dualIsAntitone hsub hAC
+    rwa [familyDeMorgan2, dualIsInvolutionOnFamilies] at hA'
+  -- by Lemma 3.8, there is a thick `H' ⊆ H` and an IP* set `B` with `A ∩ H' = B ∩ H'`
+  obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
+    (memberOfCapFamJoinH (thickFamily S) (IPFamily S)* A H).mp hAJ
+  exact ⟨B, H', fun C hC ↦ (mem_dual_star _ B).mp hB C hC, hH', hH'H, hAB⟩
 
 
 /-- # Theorem D
@@ -193,8 +243,8 @@ theorem DeltaTheoremD
   (isFamily (familyMeet F G)) ∧
   (isFamily (familyJoin F G)) ∧
   -- associativity
-  familyMeet (familyMeet F G) H = familyMeet F (familyMeet F G) ∧
-  familyJoin (familyJoin F G) H = familyJoin F (familyJoin F G) ∧
+  familyMeet (familyMeet F G) H = familyMeet F (familyMeet G H) ∧
+  familyJoin (familyJoin F G) H = familyJoin F (familyJoin G H) ∧
   -- commutativity
   familyMeet F G = familyMeet G F ∧
   familyJoin F G = familyJoin G F ∧
@@ -203,4 +253,40 @@ theorem DeltaTheoremD
   (F ⊆ H → G ⊆ I → familyJoin F G ⊆ familyJoin H I) ∧
   -- DeMorgan-type laws
   familyDual (familyMeet F G) = familyJoin (familyDual F) (familyDual G) ∧
-  familyDual (familyJoin F G) = familyMeet (familyDual F) (familyDual G) := by sorry
+  familyDual (familyJoin F G) = familyMeet (familyDual F) (familyDual G) := by
+  intro F G H I hF hG hH hI
+  -- `F`, `G`, `H`, `I` as terms of type `Family S` (FA_Defs)
+  let 𝓕 : Family S := ⟨F, fun A B hA hAB ↦ hF A B hAB hA⟩
+  let 𝓖 : Family S := ⟨G, fun A B hA hAB ↦ hG A B hAB hA⟩
+  let 𝓗 : Family S := ⟨H, fun A B hA hAB ↦ hH A B hAB hA⟩
+  let 𝓘 : Family S := ⟨I, fun A B hA hAB ↦ hI A B hAB hA⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  -- closedness
+  · -- `isFamily (familyMeet F G)`: `Family.famMeet` (FA_Defs)
+    exact fun A B hAB hA ↦ (Family.famMeet 𝓕 𝓖).upward_closed A B hA hAB
+  · -- `isFamily (familyJoin F G)`: `Family.famJoin` (FA_Defs)
+    exact fun A B hAB hA ↦ (Family.famJoin 𝓕 𝓖).upward_closed A B hA hAB
+  -- associativity
+  · -- `familyMeet (familyMeet F G) H = familyMeet F (familyMeet G H)`:
+      --`familyMeetIsAssociative` (FA_Main)
+    exact congrArg Family.sets (familyMeetIsAssociative 𝓕 𝓖 𝓗).symm
+  · -- `familyJoin (familyJoin F G) H = familyJoin F (familyJoin G H)`:
+      --`familyJoinIsAssociative` (FA_Main)
+    exact congrArg Family.sets (familyJoinIsAssociative 𝓕 𝓖 𝓗).symm
+  -- commutativity
+  · -- `familyMeet F G = familyMeet G F`: `familyMeetIsCommutative` (FA_Main)
+    exact congrArg Family.sets (familyMeetIsCommutative 𝓕 𝓖)
+  · -- `familyJoin F G = familyJoin G F`: `familyJoinIsCommutative` (FA_Main)
+    exact congrArg Family.sets (familyJoinIsCommutative 𝓕 𝓖)
+  -- monotonicity
+  · -- `F ⊆ H → G ⊆ I → familyMeet F G ⊆ familyMeet H I`: `familyMeetIsMonotonic` (FA_Main)
+    exact familyMeetIsMonotonic (F1 := 𝓕) (G1 := 𝓗) (F2 := 𝓖) (G2 := 𝓘)
+  · -- `F ⊆ H → G ⊆ I → familyJoin F G ⊆ familyJoin H I`: `familyJoinIsMonotonic` (FA_Main)
+    exact familyJoinIsMonotonic (F1 := 𝓕) (G1 := 𝓗) (F2 := 𝓖) (G2 := 𝓘)
+  -- DeMorgan-type laws
+  · -- `familyDual (familyMeet F G) = familyJoin (familyDual F) (familyDual G)`:
+      --`familyDeMorgan2` (FA_Main)
+    exact congrArg Family.sets (familyDeMorgan2 𝓕 𝓖)
+  · -- `familyDual (familyJoin F G) = familyMeet (familyDual F) (familyDual G)`:
+      --`familyDeMorgan1` (FA_Main)
+    exact congrArg Family.sets (familyDeMorgan1 𝓕 𝓖)
