@@ -154,7 +154,7 @@ section Filters_and_PR_Families
 
 /-- A family is a filter if it is not the empty family and if it
 is closed under intersections -/
-def isFilterFamilyv2
+def isFilterFamily
 {α : Type*} (F : Family α) :
 Prop :=
   (F ≠ emptyFam α) ∧ (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
@@ -162,7 +162,7 @@ Prop :=
 /-- A family is partition regular (PR) if it is not the full
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
-def isPRFamilyv2
+def isPRFamily
 {α : Type*} (F : Family α) :
 Prop :=
   (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
@@ -171,7 +171,7 @@ Prop :=
 one piece of any finite partition belonging to `F` -/
 -- Proof of this theorem was written by ChatGPT
 theorem prFamilyIsMultiPR
-{α : Type*} {F : Family α} (hF : isPRFamilyv2 F) :
+{α : Type*} {F : Family α} (hF : isPRFamily F) :
 ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
   ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
   classical
@@ -200,65 +200,34 @@ theorem prFamilyIsMultiPR
 
 end Filters_and_PR_Families
 
-section Old_filter_and_pr
+-- section Old_filter_and_pr
 
-def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
-  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
+-- def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
+--   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
 
-def isFilterFamily {α : Type*} (F : Family α) : Prop :=
-  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+-- def isFilterFamily {α : Type*} (F : Family α) : Prop :=
+--   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
 
-def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
-  ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
-/- def PRFamily.famDual (fam : PRFamily α) : PRFamily α :=
-{
-  sets := _root_.famDual fam.sets,
-  upward_closed := by
-    intro A B hA hAB C hCF
-    -- prove B ∈ dual S fam.
-    have hAint : (A ∩ C).Nonempty :=
-      hA C hCF
-    rcases hAint with ⟨x, hxA, hxC⟩
-    exact ⟨x, hAB hxA, hxC⟩
-  partition_regular := by sorry -- need to get rid of this sorry
-    -- prove ∃ i : Fin 2, {x ∈ A| c x = i} ∈ dual S fam.
-} -/
+-- def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
+--   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
 
+-- def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
+--   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
 
--- def infiniteSets (α : Type*) : Family α where
---   sets := {s | s.Infinite}
---   upward_closed := by
---     intro A B hA hAB
---     exact hA.mono hAB
+-- -- want to define pr for beyond two sets
+-- def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
+--   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
 
--- theorem infinite_is_PR (α : Type*) [Infinite α] :
---   isPRFamily (infiniteSets α) := by
---   intro A hA n c
---   -- at least one color must appear infinitely often
---   simp [infiniteSets]
---   exact Finite.exists_infinite_fiber A c hA
+-- def isPRFamily {α : Type*} (F : Family α) : Prop :=
+--   ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
 
-def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
-  ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
+-- structure PRFamily (α : Type) extends Family α where
+--   partition_regular : partitionRegularTwoSets sets
 
--- want to define pr for beyond two sets
-def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
-  sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+-- structure FilterFamily (α : Type) extends Family α where
+--   filter : isIntersectionClosed sets
 
-def isPRFamily {α : Type*} (F : Family α) : Prop :=
-  ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
-
-
-
-structure PRFamily (α : Type) extends Family α where
-  partition_regular : partitionRegularTwoSets sets
-
-structure FilterFamily (α : Type) extends Family α where
-  filter : isIntersectionClosed sets
-
-
-
-end Old_filter_and_pr
+-- end Old_filter_and_pr
 
 section Dual_Join_Meet_Classes_and_Operators
 
