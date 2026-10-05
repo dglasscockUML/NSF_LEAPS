@@ -37,15 +37,15 @@ DynamicalSystem T X :=
   mapCont := fun (t : T) ↦ dSystem.mapCont (φ t)
 }
 
-lemma compactT2ByClosedIsCompactT2 --see quotientByCERIsCompactHausdorff
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{R : X → X → Prop} (hEquiv : Equivalence R)
-(hClosed : IsClosed {p : X × X | R p.1 p.2}) :
-Nonempty (Quotient ⟨R, hEquiv⟩)
-∧
-CompactSpace (Quotient ⟨R, hEquiv⟩)
-∧
-T2Space (Quotient ⟨R, hEquiv⟩) := by sorry
+-- lemma compactT2ByClosedIsCompactT2 --see quotientByCERIsCompactHausdorff
+-- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- {R : X → X → Prop} (hEquiv : Equivalence R)
+-- (hClosed : IsClosed {p : X × X | R p.1 p.2}) :
+-- Nonempty (Quotient ⟨R, hEquiv⟩)
+-- ∧
+-- CompactSpace (Quotient ⟨R, hEquiv⟩)
+-- ∧
+-- T2Space (Quotient ⟨R, hEquiv⟩) := by sorry
 
 lemma compactT2ByClosedIsCompactT2Set --see quotientByCERIsCompactHausdorff
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -67,33 +67,23 @@ def quotientDynamicalSystemIntro
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 (dSystem : DynamicalSystem S X)
 {I : Set (X × X)}
-(IEquiv : Equivalence (fun (x : X) ↦ (⟨x,·⟩ ∈ I)))
+(IEquiv : Equivalence (fun (x : X) ↦ (⟨x, ·⟩ ∈ I)))
 (IClosed : IsClosed I)
 (IInvariant : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s)) I I) :
-let Y := Quotient ⟨setToRelation I, hI.2.2⟩
-have : Nonempty Y := nonemptyQuotient X hI.2.2
-have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
-DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) := by
-  let Y := Quotient ⟨setToRelation I, hI.2.2⟩
-  have : Nonempty Y :=
-    nonemptyQuotient X hI.2.2
-  have : T2Space Y :=
-    quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
-  unfold isICER at hI
-  rcases hI with ⟨hIInvariant, hIClosed, hIEquiv⟩
-  let π := Quotient.mk ⟨setToRelation I, hIEquiv⟩
+let Y := Quotient ⟨fun (x : X) ↦ (⟨x,·⟩ ∈ I), IEquiv⟩
+have : Nonempty Y := (compactT2ByClosedIsCompactT2Set IEquiv IClosed).1
+have : T2Space Y := (compactT2ByClosedIsCompactT2Set IEquiv IClosed).2.2
+DynamicalSystem S Y := by
+  let IasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ I)
+  let Y := Quotient ⟨IasRel, IEquiv⟩
+  have : Nonempty Y := (compactT2ByClosedIsCompactT2Set IEquiv IClosed).1
+  have : T2Space Y := (compactT2ByClosedIsCompactT2Set IEquiv IClosed).2.2
+  let π := Quotient.mk ⟨IasRel, IEquiv⟩
   let f : S → X → Y := fun s ↦ π ∘ (dSystem.map s)
-  have hRespect : ∀ s : S, ∀ x y : X, (setToRelation I) x y → (f s) x = (f s) y := by
+  have hRespect : ∀ s : S, ∀ x y : X, IasRel x y → f s x = f s y := by
     intro s x y hxy
-    simp only [Function.comp_apply, f]
-    apply (Equivalence.quot_mk_eq_iff hIEquiv (dSystem.map s x) (dSystem.map s y)).mpr
-    unfold setToRelation
-    unfold setToRelation at hxy
-    unfold isInvariantSet at hIInvariant
-    specialize hIInvariant s
-    unfold Set.MapsTo at hIInvariant
-    specialize hIInvariant hxy
-    exact hIInvariant
+    exact (Equivalence.quot_mk_eq_iff IEquiv (dSystem.map s x) (dSystem.map s y)).mpr
+      (IInvariant s hxy)
   exact
   {
     map := fun s ↦ Quotient.lift (f s) (hRespect s)
@@ -102,22 +92,32 @@ DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) := by
       simp only [f]
       refine Quotient.inductionOn y ?_
       intro x
-      simp only [Quotient.lift]
       have hs12 : dSystem.map (s1 * s2) = (dSystem.map s1) ∘ (dSystem.map s2) := by
         ext t
         exact (dSystem.mapMult s1 s2 t)
-      simp [hs12]
+      simp only [hs12]
       rfl
     mapCont := by
       intro s
       apply Continuous.quotient_lift
-      simp only [f]
-      have hπCont : Continuous π := by
-        exact continuous_quot_mk
-      have hsCont : Continuous (dSystem.map s) := by
-        exact (dSystem.mapCont s)
-      exact Continuous.comp hπCont hsCont
+      exact Continuous.comp continuous_quot_mk (dSystem.mapCont s)
   }
+
+/- A dynamical system satisfies `homeoSystem` if all
+elements of the acting semigroup act by homeomorphisms -/
+-- _def isHomeoSystem_ APPEARS ALREADY UPSTREAM
+-- {S} [Semigroup S] [Nonempty S]
+-- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) :=
+-- ∀ s : S, IsHomeomorph (dSystem.map s)
+
+/-- An action of `S` on `X` is minimal if every point has a dense `S`-orbit -/
+def isMinimalSystemIntro
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Prop :=
+∀ (x : X), Dense (Set.range (fun (s : S) ↦ dSystem.map s x))
 
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
@@ -161,19 +161,72 @@ def equiStructureRelationIntro
 Set (X × X) :=
 ⋂₀ {I : Set (X × X) |
   ∃ (IClosed : IsClosed I)
-  (IEqui : Equivalence (fun x y => (x, y) ∈ I))
-  (IInvariant : (∀ (s : S) (x y : X), ⟨x,y⟩ ∈ I →
-    ⟨dSystem.map s x, dSystem.map s y⟩ ∈ I)),
-  isEquicontinuousSystemIntro (quotientSystem dSystem RPEquiv RPClosed RPInv)
+  (IEquiv : Equivalence (fun x y => (x, y) ∈ I))
+  (IInvariant : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s)) I I),
+    let Y := Quotient ⟨fun (x : X) ↦ (⟨x,·⟩ ∈ I), IEquiv⟩
+    have : Nonempty Y := (compactT2ByClosedIsCompactT2Set IEquiv IClosed).1
+    have : T2Space Y := (compactT2ByClosedIsCompactT2Set IEquiv IClosed).2.2
+    isEquicontinuousSystemIntro (quotientDynamicalSystemIntro dSystem IEquiv IClosed IInvariant)
   }
 
-/-
+/-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is a factor map
+if it is a continuous, equivariant surjection -/
+def isFactorMapIntro
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
+Prop :=
+Continuous π
+∧
+Function.Surjective π
+∧
+∀ (s : S), (dSystemY.map s) ∘ π = π ∘ (dSystemX.map s)
 
-isFactorMap
-isHomeoSystem
-isIsomorphism
-isIsomorphic (exists isomorphism)
-isLargestEquiFactor
+/-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
+if it is a equivariant homeomorphism -/
+def isIsomorphismIntro
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
+Prop :=
+IsHomeomorph π
+∧
+∀ (s : S), (dSystemY.map s) ∘ π = π ∘ (dSystemX.map s)
+
+/-- Dynamical systems `X` and `Y` are isomorphic if there exists a map `π : X → Y`\
+that is an isomorphism -/
+def isIsomorphic
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y) :
+Prop :=
+∃ (ξ : X → Y), isIsomorphismIntro dSystemX dSystemY ξ
+
+/-- A map `π : X → Y` is the largest equicontinuous factor of `X` if for all
+equicontinuous factors `ρ : X → Z`, there exists a factor map `ξ : Y → Z`
+such that `ρ = ξ ∘ π`. -/
+def isLargestEquiFactor
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
+Prop :=
+(∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
+  ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
+  ∀ (ρ : X → Z) (_ : isFactorMap dSystemX dSystemZ ρ) ,
+  ∃ (ξ : Y → Z) (_ : isFactorMap dSystemY dSystemZ ξ), ρ = ξ ∘ π)
+
+/-
 
 groGroup
 instance: groGroup is an abelian group
@@ -207,12 +260,13 @@ groGroupHomIsSemigroupHom
 theorem RPTheoremA
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem)
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystemIntro dSystem)
 {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
-{π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
-RP dSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔ isEquicontinuousSystem dSystemY :=
-  (minimalFactorEquicontinuousIffRPInFactorRelation dSystem hMin dSystemY hFactorMap).2
+{π : X → Y} (hFactorMap : isFactorMapIntro dSystem dSystemY π) :
+RPIntro dSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔ isEquicontinuousSystemIntro dSystemY :=
+  (minimalFactorEquicontinuousIffRPInFactorRelation
+    dSystem ((minimalIffDenseOrbits dSystem).mpr hMin) dSystemY hFactorMap).2
 
 
 /-- # Theorem B Part I
