@@ -121,7 +121,7 @@ DynamicalSystem S (∀ i, X i) :=
 (dSystems : ∀ i, DynamicalSystem S (X i)) (s : S) (φ : ∀ i, X i) (i : I) :
 (arbProdDynamicalSystem dSystems).map s φ i = (dSystems i).map s (φ i) := rfl
 
-/- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
+/-- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
 we get an action of `T` on `X` by setting `tx = (φ t)x` -/
 def homDynamicalSystem
 {S} [Semigroup S] [Nonempty S]
