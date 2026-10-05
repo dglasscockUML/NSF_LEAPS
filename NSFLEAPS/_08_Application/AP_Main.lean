@@ -1260,7 +1260,7 @@ theorem commURSetsOfBohrRecurrenceAreDelta
   have hBinBohr : B ∈ setOfBohrRecurrenceFamily S := by
     simp only [setOfBohrRecurrenceFamily]
     exact hBrec
-  have hBohrPR : isPRFamilyv2 (setOfBohrRecurrenceFamily S) := by
+  have hBohrPR : isPRFamily (setOfBohrRecurrenceFamily S) := by
     exact setOfBohrRecurrenceFamilyIsPR S
   have hUClosed : IsClosed U := by
     unfold IsClopen at hUClopen

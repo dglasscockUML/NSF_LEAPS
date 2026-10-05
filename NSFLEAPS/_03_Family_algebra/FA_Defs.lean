@@ -32,12 +32,6 @@ instance {α} : SetLike (Family α) (Set α) where
 lemma Family.ext {α : Type*} {F G : Family α} (h : ∀ (A : Set α), A ∈ F ↔ A ∈ G) : F = G :=
   SetLike.ext h
 
--- instance {α} : SetLike (Family α) (Set α) where
---   coe F := F.sets
---   coe_injective' := by
---     intro F G h
---     cases F; cases G; cases h; rfl
-
 instance {α : Type*} : HasSubset (Family α) where
   Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
 
@@ -160,7 +154,7 @@ section Filters_and_PR_Families
 
 /-- A family is a filter if it is not the empty family and if it
 is closed under intersections -/
-def isFilterFamilyv2
+def isFilterFamily
 {α : Type*} (F : Family α) :
 Prop :=
   (F ≠ emptyFam α) ∧ (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
@@ -168,80 +162,72 @@ Prop :=
 /-- A family is partition regular (PR) if it is not the full
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
-def isPRFamilyv2
+def isPRFamily
 {α : Type*} (F : Family α) :
 Prop :=
   (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
 
 /-- A PR family `F` satisfies the ostensibly stronger property of
 one piece of any finite partition belonging to `F` -/
+-- Proof of this theorem was written by ChatGPT
 theorem prFamilyIsMultiPR
-{α : Type*} {F : Family α} (hF : isPRFamilyv2 F) :
+{α : Type*} {F : Family α} (hF : isPRFamily F) :
 ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
-  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by sorry
-
+  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
+  classical
+  intro A hA n c
+  have haux (s : Finset (Fin n)) (hs : s.Nonempty) :
+      {x ∈ A | c x ∈ s} ∈ F →
+        ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
+    induction hs using Finset.Nonempty.cons_induction with
+    | singleton i =>
+        intro h
+        exact ⟨i, by simpa only [Finset.mem_singleton] using h⟩
+    | cons i s hi hs ih =>
+        intro h
+        have heq :
+            {x ∈ A | c x ∈ Finset.cons i s hi} =
+              {x ∈ A | c x = i} ∪ {x ∈ A | c x ∈ s} := by
+          ext x
+          simp [Set.mem_union, and_or_left]
+        rw [heq] at h
+        rcases hF.2 _ _ h with hiF | hsF
+        · exact ⟨i, hiF⟩
+        · exact ih hsF
+  apply haux Finset.univ
+    ⟨⟨0, n.property⟩, Finset.mem_univ _⟩
+  simpa using hA
 
 end Filters_and_PR_Families
 
-section Old_filter_and_pr
+-- section Old_filter_and_pr
 
-def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
-  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
+-- def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
+--   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
 
-def isFilterFamily {α : Type*} (F : Family α) : Prop :=
-  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+-- def isFilterFamily {α : Type*} (F : Family α) : Prop :=
+--   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
 
-def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
-  ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
-/- def PRFamily.famDual (fam : PRFamily α) : PRFamily α :=
-{
-  sets := _root_.famDual fam.sets,
-  upward_closed := by
-    intro A B hA hAB C hCF
-    -- prove B ∈ dual S fam.
-    have hAint : (A ∩ C).Nonempty :=
-      hA C hCF
-    rcases hAint with ⟨x, hxA, hxC⟩
-    exact ⟨x, hAB hxA, hxC⟩
-  partition_regular := by sorry -- need to get rid of this sorry
-    -- prove ∃ i : Fin 2, {x ∈ A| c x = i} ∈ dual S fam.
-} -/
+-- def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
+--   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
 
+-- def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
+--   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
 
--- def infiniteSets (α : Type*) : Family α where
---   sets := {s | s.Infinite}
---   upward_closed := by
---     intro A B hA hAB
---     exact hA.mono hAB
+-- -- want to define pr for beyond two sets
+-- def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
+--   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
 
--- theorem infinite_is_PR (α : Type*) [Infinite α] :
---   isPRFamily (infiniteSets α) := by
---   intro A hA n c
---   -- at least one color must appear infinitely often
---   simp [infiniteSets]
---   exact Finite.exists_infinite_fiber A c hA
+-- def isPRFamily {α : Type*} (F : Family α) : Prop :=
+--   ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
 
-def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
-  ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
+-- structure PRFamily (α : Type) extends Family α where
+--   partition_regular : partitionRegularTwoSets sets
 
--- want to define pr for beyond two sets
-def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
-  sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+-- structure FilterFamily (α : Type) extends Family α where
+--   filter : isIntersectionClosed sets
 
-def isPRFamily {α : Type*} (F : Family α) : Prop :=
-  ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
-
-
-
-structure PRFamily (α : Type) extends Family α where
-  partition_regular : partitionRegularTwoSets sets
-
-structure FilterFamily (α : Type) extends Family α where
-  filter : isIntersectionClosed sets
-
-
-
-end Old_filter_and_pr
+-- end Old_filter_and_pr
 
 section Dual_Join_Meet_Classes_and_Operators
 

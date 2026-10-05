@@ -19,7 +19,7 @@ theorem visitTimeConcentrationForPRFamily
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
 (x : X) (U : Set X) (hU : IsClosed U) (hU' : U.Nonempty)
-(F : Family S) (hF : isPRFamilyv2 F) :
+(F : Family S) (hF : isPRFamily F) :
 visitTimeSet dSystem x U ∈ F →
 ∃ (y : X), y ∈ U ∧ (∀ (V : Set X), V ∈ nhds y → visitTimeSet dSystem x V ∈ F) := by
   contrapose
@@ -2517,9 +2517,9 @@ isBohrZero A := by
 --       exact ⟨hUA hsU', hVB hsV'⟩
 
 /-- The family of Bohr_0 sets is a filter -/
-theorem bohrZeroFamilyIsFilterv2
+theorem bohrZeroFamilyIsFilter
 {S : Type*} [Semigroup S] [Nonempty S] :
-isFilterFamilyv2 (bohrZeroFamily S) :=
+isFilterFamily (bohrZeroFamily S) :=
 by
   constructor
   · -- `S` is Bohr_0 in itself, via the trivial homomorphism into the `0`-dimensional torus
@@ -2634,8 +2634,8 @@ isSetOfBohrRecurrence B :=
 /-- The family of sets of Bohr recurrence is partition regular -/
 theorem setOfBohrRecurrenceFamilyIsPR
 (S : Type*) [Semigroup S] [Nonempty S] :
-isPRFamilyv2 (setOfBohrRecurrenceFamily S) :=
-(familyIsPRIffDualIsFilter (bohrZeroFamily S)).mp bohrZeroFamilyIsFilterv2
+isPRFamily (setOfBohrRecurrenceFamily S) :=
+(familyIsPRIffDualIsFilter (bohrZeroFamily S)).mp bohrZeroFamilyIsFilter
 
 /-- In a commutative semigroup, if set is a set of Bohr recurrence,
 then it contains the time of return of a point to a neighborhood of itself
