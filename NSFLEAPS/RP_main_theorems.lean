@@ -269,47 +269,6 @@ RPIntro dSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔ isEquicontinuousSys
     dSystem ((minimalIffDenseOrbits dSystem).mpr hMin) dSystemY hFactorMap).2
 
 
-/-- # Theorem B Part I
-  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
-  The regionally proximal relation coincides with the equicontinuous
-  structure relation: `RP = S_eq`. In particular, `RP` is a closed,
-  `S`-invariant equivalence relation. -/
-theorem RPTheoremBPartI
-{S : Type*} [CommSemigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
-RP dSystem = equiStructureRelation dSystem -- RP = S_eq
-∧ Equivalence (fun x y => (x, y) ∈ RP dSystem) -- RP is an equivalence relation
-∧ IsClosed (RP dSystem) -- RP is closed
-∧ (∀ (s : S) (x y : X), ⟨x,y⟩ ∈ RP dSystem →
-  ⟨dSystem.map s x, dSystem.map s y⟩ ∈ RP dSystem) -- RP is `S`-invariant
-:= by sorry
-
-/-
-Further essential defs
-
-quotientSystem (may not need to define in generality, only need for quotient by RP)
-RPQuotient (eats proof of minimality of a commutative system, gives quotient set, like RPSetoid)
-RPQuotientSystem (the dSystem resulting from it)
-
- -/
-
--- use quotientSystem with the fact that RP is an ICE from Part I.
-/- # Theorem B Part II
-Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
-The quotient `X → X/RP` is the largest equicontinuous factor of `X`,
-in the sense that if `ξ : X → Y` is an equicontinuous factor of `X`, then
-there exists a factor map `ρ : X/RP → Y` of `S`-systems -/
--- theorem RPTheoremBPartII
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
--- (∀ (Y : Type*) [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y],
---   ∀ (dSystemY : DynamicalSystem S Y) (_ : isEquicontinuousSystem dSystemY),
---   ∀ (ρ : X → Y) (_ : isFactorMap dSystemX dSystemY ρ) ,
---   ∃ (ξ : R → Y) (_ : isFactorMap dSystemR dSystemY ξ), ρ = ξ ∘ π) := by sorry
-
-
 /-- # Theorem B
   Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
   The regionally proximal relation coincides with the equicontinuous
@@ -321,23 +280,31 @@ there exists a factor map `ρ : X/RP → Y` of `S`-systems -/
 theorem RPTheoremB
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
-RP dSystem = equiStructureRelation dSystem -- RP = S_eq
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystemIntro dSystem) :
+let RPX := RPIntro dSystem
+-- RP = S_eq
+RPX = equiStructureRelationIntro dSystem
 ∧
 -- RP is an equivalence relation
-(∃ (RPEquiv : Equivalence (fun x y => (x, y) ∈ RP dSystem)),
+(∃ (RPEquiv : Equivalence (fun x y => (x, y) ∈ RPX)),
 -- RP is closed
-∃ (RPClosed : IsClosed (RP dSystem)),
+∃ (RPClosed : IsClosed RPX),
 -- RP is `S`-invariant
-∃ (RPInv : (∀ (s : S) (x y : X), ⟨x,y⟩ ∈ RP dSystem →
-  ⟨dSystem.map s x, dSystem.map s y⟩ ∈ RP dSystem)),
-let XmodRP := quotientSet dSystem RPEquiv RPClosed RPInv
-let dSystemXmodRP := quotientSystem dSystem RPEquiv RPClosed RPInv
-(∀ (Y : Type*) [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y],
-  ∀ (dSystemY : DynamicalSystem S Y) (_ : isEquicontinuousSystem dSystemY),
-  ∀ (ρ : X → Y) (_ : isFactorMap dSystemX dSystemY ρ) ,
-  ∃ (ξ : XmodRP → Y) (_ : isFactorMap dSystemXmodRP dSystemY ξ), ρ = ξ ∘ π))
+∃ (RPInv : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s)) RPX RPX),
+-- X → XmodRP is largest equicontinuous factor
+let RPasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ RPX)
+let XmodRP := Quotient ⟨RPasRel, RPEquiv⟩
+have : Nonempty XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).1
+have : T2Space XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).2.2
+let π := Quotient.mk ⟨RPasRel, RPEquiv⟩
+let dSystemXmodRP := quotientDynamicalSystemIntro dSystem RPEquiv RPClosed RPInv
+isLargestEquiFactor dSystem dSystemXmodRP π)
 := by sorry
+
+-- (∀ (Y : Type*) [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y],
+--   ∀ (dSystemY : DynamicalSystem S Y) (_ : isEquicontinuousSystem dSystemY),
+--   ∀ (ρ : X → Y) (_ : isFactorMap dSystemX dSystemY ρ) ,
+--   ∃ (ξ : XmodRP → Y) (_ : isFactorMap dSystemXmodRP dSystemY ξ), ρ = ξ ∘ π))
 
 
 /-- # Theorem C
@@ -348,9 +315,30 @@ theorem RPTheoremC
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
-RP dSystem = RPM dSystem :=
-  forwardEqualsBackwardRPInMinCommSystem dSystem hMin
-
+RPIntro dSystem = RPMIntro dSystem := by
+  have := forwardEqualsBackwardRPInMinCommSystem dSystem hMin
+  have RPSame : RP dSystem = RPIntro dSystem := by rfl
+  have RPMSame : RPM dSystem = RPMIntro dSystem := by
+    unfold RPM RPMIntro setOrbitClosure setOrbit diagDynamicalSystem Prod.map
+    simp only
+    apply Set.iInter_congr; intro α
+    apply Set.iInter_congr; intro hα
+    apply congrArg closure; ext x
+    constructor
+    · intro hx
+      obtain ⟨⟨s,a⟩,hsa⟩ := hx
+      simp only at hsa
+      rw [Set.mem_iUnion]
+      use s
+      --rw [←hsa]
+      use ⟨a.1.1,a.1.2⟩
+      exact ⟨a.2,hsa⟩
+    · intro hx
+      rw [Set.mem_iUnion] at hx
+      obtain ⟨s,a,ha,hax⟩ := hx
+      --use ⟨s,a⟩
+      sorry
+  sorry
 
 /-- # Theorem D
   Let `S` and `T` be commutative semigroups.  Let `X` be both a minimal
@@ -489,3 +477,45 @@ are the same up to isomorphism. -/
 --     isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin))
 --       (homDynamicalSystem groGroupHom (maxEquiFactor (natExtGroSystemIsMinimal hMin))) ζ) :=
 -- ⟨maxEquiFactorOfNatExtIsoMaxEquiFactor hMin, maxEquiFactorOfNatExtIsoGroMaxEquiFactor hMin⟩
+
+
+
+/- # Theorem B Part I
+  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
+  The regionally proximal relation coincides with the equicontinuous
+  structure relation: `RP = S_eq`. In particular, `RP` is a closed,
+  `S`-invariant equivalence relation. -/
+-- theorem RPTheoremBPartI
+-- {S : Type*} [CommSemigroup S] [Nonempty S]
+-- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
+-- RP dSystem = equiStructureRelation dSystem -- RP = S_eq
+-- ∧ Equivalence (fun x y => (x, y) ∈ RP dSystem) -- RP is an equivalence relation
+-- ∧ IsClosed (RP dSystem) -- RP is closed
+-- ∧ (∀ (s : S) (x y : X), ⟨x,y⟩ ∈ RP dSystem →
+--   ⟨dSystem.map s x, dSystem.map s y⟩ ∈ RP dSystem) -- RP is `S`-invariant
+-- := by sorry
+
+/-
+Further essential defs
+
+quotientSystem (may not need to define in generality, only need for quotient by RP)
+RPQuotient (eats proof of minimality of a commutative system, gives quotient set, like RPSetoid)
+RPQuotientSystem (the dSystem resulting from it)
+
+ -/
+
+-- use quotientSystem with the fact that RP is an ICE from Part I.
+/- # Theorem B Part II
+Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
+The quotient `X → X/RP` is the largest equicontinuous factor of `X`,
+in the sense that if `ξ : X → Y` is an equicontinuous factor of `X`, then
+there exists a factor map `ρ : X/RP → Y` of `S`-systems -/
+-- theorem RPTheoremBPartII
+-- {S : Type*} [CommSemigroup S] [Nonempty S]
+-- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+-- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
+-- (∀ (Y : Type*) [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y],
+--   ∀ (dSystemY : DynamicalSystem S Y) (_ : isEquicontinuousSystem dSystemY),
+--   ∀ (ρ : X → Y) (_ : isFactorMap dSystemX dSystemY ρ) ,
+--   ∃ (ξ : R → Y) (_ : isFactorMap dSystemR dSystemY ξ), ρ = ξ ∘ π) := by sorry
