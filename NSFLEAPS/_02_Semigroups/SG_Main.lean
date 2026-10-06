@@ -93,30 +93,6 @@ by
     · exact finF
     · exact hAB fsinA
 
-/- Still not sure we want to pursue this route,
-but it would make sense to define class Syndetic as follows. -/
-class Syndetic
-{S : Type*} [Semigroup S] (A : Set S) where
-  syndetic_prop : ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
-
-/-- If `A ⊆ S` is syndetic and `A ⊆ B`, then `B` is syndetic. -/
-theorem syndeticIsMonotonev2
-{S : Type*} [Semigroup S]
-{A B : Set S} [hSA : Syndetic A] (hAB : A ⊆ B) :
-Syndetic B :=
-by
-  rcases hSA.syndetic_prop with ⟨F, Ffinite, hF⟩
-  use F
-  constructor
-  · exact Ffinite
-  · intro s
-    rcases (hF s) with ⟨f, finF, fsinA⟩
-    use f
-    constructor
-    · exact finF
-    · exact hAB fsinA
-
-
 class SemigroupHom
 {S T} [Semigroup S] [Semigroup T] (φ : S → T) where
   hom_prop : ∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
@@ -459,10 +435,11 @@ isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
 
 /-- `Fintype`-indexed version of `unionOfRightQuotientSetsIsSyndetic` -/
 lemma unionOfRightQuotientSetsIsSyndeticOfFintype
-{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Fintype ι] (C : ι → Set T)
+{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Finite ι] (C : ι → Set T)
 (hcover : ∀ t : T, ∃ i, t ∈ C i) :
 isSyndetic (⋃ i, rightQuotientSet (C i) (C i)) := by
   classical
+  let := Fintype.ofFinite ι
   refine syndeticIsMonotone (unionOfRightQuotientSetsIsSyndetic
     (fun j ↦ C ((Fintype.equivFin ι).symm j)) (fun t ↦ ?_)) ?_
   · obtain ⟨i, hi⟩ := hcover t
@@ -472,10 +449,11 @@ isSyndetic (⋃ i, rightQuotientSet (C i) (C i)) := by
 
 /-- `Fintype`-indexed version of `unionOfLeftQuotientSetsIsSyndetic` -/
 lemma unionOfLeftQuotientSetsIsSyndeticOfFintype
-{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Fintype ι] (C : ι → Set T)
+{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Finite ι] (C : ι → Set T)
 (hcover : ∀ t : T, ∃ i, t ∈ C i) :
 isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
   classical
+  let := Fintype.ofFinite ι
   refine syndeticIsMonotone (unionOfLeftQuotientSetsIsSyndetic
     (fun j ↦ C ((Fintype.equivFin ι).symm j)) (fun t ↦ ?_)) ?_
   · obtain ⟨i, hi⟩ := hcover t
