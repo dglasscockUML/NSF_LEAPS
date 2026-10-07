@@ -7,14 +7,6 @@ This file develops the basic properties of semigroups that are not
 available (or not convenient) from Mathlib.
 -/
 
--- We may want to assume [Nonempty S] throughout, but I've not implemented that yet.
-
-structure SemigroupLeftIdeal
-(S : Type*) [Semigroup S] where
-  carrier : Set S
-  nonempty' : carrier.Nonempty
-  mul_closed' (s : S) {x : S} : x ∈ carrier → s * x ∈ carrier
-
 /-- isLeftIdeal is the predicate that `L` is a left ideal of a semigroup `S` -/
 def isLeftIdeal
 {S : Type*} [Semigroup S] (L : Set S) :
@@ -93,16 +85,10 @@ by
     · exact finF
     · exact hAB fsinA
 
+/-- The class of semigroup homomorphisms.  Could have used MulHom from Mathlib. -/
 class SemigroupHom
 {S T} [Semigroup S] [Semigroup T] (φ : S → T) where
   hom_prop : ∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
-
-/- A semigroup action is an action by a semigroup `S` on a set `X` -/
-/-structure SemigroupAction
-(S : Type*) [Semigroup S] [Nonempty S]
-(X : Type*) [Nonempty X] where
-  toFun : S → X → X
-  map_mult' : ∀ s₁ s₂ x, toFun (s₁ * s₂) x = toFun s₁ (toFun s₂ x)-/
 
 /-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
 theorem surjImgOfSyndeticIsSyndetic
@@ -226,7 +212,6 @@ isSyndetic A ↔ ∀ H : Set S, isThick H → (A ∩ H).Nonempty := by
     obtain ⟨x, hxA, hxAc⟩ := h Aᶜ hthick
     exact hxAc hxA
 
--- DGG: Some things around this are aready present at end of SG file
 /-- A set is thick iff its complement is not syndetic -/
 theorem thickIffComplementNotSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :

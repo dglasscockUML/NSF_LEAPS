@@ -8,7 +8,6 @@ This file develops definitions, structures, and properies of actions of discrete
 semigroups on compact Hausdorff spaces by continuous maps.
 -/
 
-/- Sections are used for organizational purposes only.  See the `Outline` pane under `Explorer`. -/
 section Structures
 
 /-- A (topological) dynamical system is a compact Hausdorff space `X` together
@@ -20,14 +19,6 @@ where
   map : S → X → X
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
   mapCont : ∀ s, Continuous (map s)
-
-/- DGG: SEVERAL OF THE FOLLOWING CAN BE UNIFIED AS FOLLOWS
-Arbitrary products of dynamical systems as a dynamical system (eg: for an index set I,
-I → S_i Dynamical system yields a prod S_i dynamical system)
-Specialize to all S_i the same
-Then specialize that to get diagonal version
-Probably still want special cases for the two-system products since those are used most frequently
--/
 
 /-- Given dynamical systems of `S` on `X` and `T` on `Y`, the product system
 of `S × T` on `X × Y` is given by `(s,t) (x,y) = (sx,ty)` -/
@@ -71,23 +62,6 @@ DynamicalSystem S (X × Y) :=
     intro s
     exact Continuous.prodMap (dSystemX.mapCont s) (dSystemY.mapCont s)
 }
-
--- DGG: May not need this
-/- Given dynamical systems of `S` on `X` and `Y`, the diagonal system
-of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
--- def multiProdDynamicalSystem
--- {S} [Semigroup S] [Nonempty S]
--- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) (d : ℕ) :
--- DynamicalSystem S (Fin d → X) :=
--- {
---   map := fun s ↦ (Pi.map (fun _ : Fin d => dSystem.map s))
---   mapMult := by sorry
---   mapCont := by sorry -- use Continuous.piMap
--- }
-
--- DGG: We do need support for arbitrary products of systems so that we can show that
--- arbitrary products of distal / equicontinuous / backward equicontinuous systems are such
 
 /-- Given an index type `I` and, for each `i : I`, an `S`-system on `X i`, the arbitrary
 product system of `S` on `∀ i, X i` is given by the diagonal action `s φ = fun i ↦ s (φ i)`.
@@ -298,6 +272,7 @@ section Orbits
 variable {S : Type*} [Semigroup S] [Nonempty S]
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
+/-- Iterated powers of action of a single element of `S` -/
 lemma mapSemigroupIteratePow
 (dSystem : DynamicalSystem S X) (s : S) (n : ℕ) (x : X) :
 dSystem.map (semigroupIteratePow s n) x = (dSystem.map s)^[n + 1] x := by
@@ -342,19 +317,19 @@ def inverseSetOrbit
 Set X :=
 ⋃ (s : S), (dSystem.map s) ⁻¹' Z
 
-/-- The orbit along a set A ⊆ S -/
+/-- The orbit along a set `A ⊆ S` -/
 def setOrbitAlongASet
 (dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
 Set X :=
 ⋃ (s : A), (dSystem.map s) '' Z
 
-/-- The inverse orbit along a set A ⊆ S -/
+/-- The inverse orbit along a set `A ⊆ S` -/
 def inverseSetOrbitAlongASet
 (dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
 Set X :=
 ⋃ (s : A), (dSystem.map s) ⁻¹' Z
 
-/-- If A ⊆ B, then the orbit closure of A is subset of the orbit closure of B -/
+/-- If `A ⊆ B`, then the orbit closure of `A` is subset of the orbit closure of `B` -/
 lemma monotoneSetOrbitClosure
 (dSystem : DynamicalSystem S X) (A : Set X) (B : Set X) (hAB : A ⊆ B) :
 setOrbitClosure dSystem A ⊆ setOrbitClosure dSystem B := by
@@ -375,7 +350,7 @@ setOrbitClosure dSystem A ⊆ setOrbitClosure dSystem B := by
   apply closure_mono
   exact h1
 
-/-- If A ⊆ B, then S⁻¹ A ⊆ S⁻¹ B -/
+/-- If `A ⊆ B`, then `S⁻¹ A ⊆ S⁻¹ B` -/
 lemma inverseSetOrbitMono
 (dSystem : DynamicalSystem S X) (A : Set X) (B : Set X) (hAB : A ⊆ B) :
 inverseSetOrbit dSystem A ⊆ inverseSetOrbit dSystem B := by
@@ -495,53 +470,6 @@ end Orbits
 
 section Subsystems
 
-/- Implemenetation note: SubDynamicalSystem is a class since given the parameters
-(a dynamical system and a non-empty, compact, invariant set), it is canonically determined -/
-
-/- A sub (topological) dynamical system of a topological dynmical system given by
-a semigroup `S` acting on `X` is a nonempty, compact, invariant subset of `X`
-together with the action by `S`.
-def isSubDynamicalSystem
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (Z : Set X) :
-Prop :=
-Z.Nonempty ∧ IsCompact Z ∧ T2Space Z ∧ isInvariantSet dSystem.toSemigroupAction Z-/
-
--- UNHAPPY
-/-- A sub (topological) dynamical system of a topological dynmical system given by
-a semigroup `S` acting on `X` is a nonempty, compact, invariant subset of `X`
-together with the action by `S`. -/
-class SubDynamicalSystem
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (Z : Set X) where
-  carrier_inv : isInvariantSet dSystem Z
-  carrier_nonempty := Z.Nonempty
-  carrier_compact := IsCompact Z
-
-/- Given a system of `S` acting on `X` and a subset `Z` satisfying
- `isNonemptyCompactT2InvariantSubset dSystem Z`, create a term of type `DynamicalSystem S Z` -/
-/-def fromSubsystemToSystem
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X)
-{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
-(isSubsys : isNonemptyCompactT2InvariantSubset dSystem Z) :
-DynamicalSystem S ↑Z :=
-{
-  toFun := by
-    intro s ⟨z,hz⟩
-    unfold isNonemptyCompactT2InvariantSubset at isSubsys
-    unfold isInvariantSet at isSubsys
-    rcases isSubsys with ⟨hNon,hCmct,hT2,hInv⟩
-    exact ⟨(dSystem.toFun s z : X), hInv s z hz⟩
-  map_mult' := by
-    intro s t ⟨z,hz⟩
-    sorry
-  cont' := by sorry
-}-/
-
 /-- Given a system of `S` acting on `X` and a nonempty, compact, T2, invariant `Z ⊆ X`,
 create a term of type `DynamicalSystem S ↑Z`, where note that `↑Z` is the type
 corresponding to membership in `Z` (tuples of term of type `X` and proof of
@@ -569,25 +497,6 @@ by
       exact Continuous.restrict (isInv.2.2.2 s) (dSystem.mapCont s)
   }
 
--- Still working on this definition.  Not sure how to make lean see that
--- the compactness of Z will come from the assumption isNonemptyCompactT2InvariantSubset dSystem Z
-/-def makeDynamicalSystemFromSub {S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (Z : Set X)
-{hZ : isNonemptyCompactT2InvariantSubset dSystem Z} : DynamicalSystem S Z := sorry
-
-instance
-    {S : Type*} [Semigroup S] [Nonempty S]
-    {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-    {dSystem : DynamicalSystem S X} {Z : Set X}
-    [sub : SubDynamicalSystem dSystem Z] : CompactSpace Z := sorry
-
-instance
-    {S : Type*} [Semigroup S] [Nonempty S]
-    {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-    {dSystem : DynamicalSystem S X} {Z : Set X}
-    [SubDynamicalSystem dSystem Z] : DynamicalSystem S Z :=-/
-
 end Subsystems
 
 section Relations_as_sets
@@ -598,9 +507,6 @@ def setToRelation
 X → X → Prop :=
 fun x y => (x, y) ∈ s
 
--- We use Std.Refl, Std.Symm, and IsTrans before,
--- but these classes have been deprecated since March 2026
--- So I changed to Reflexive, Symmetric, and Transitive
 /-- A set `s : Set (X × X)` is reflexive if for all `x : X`, `(x,x) ∈ s` -/
 def isReflexive
 {X : Type*} (s : Set (X × X)) :
@@ -680,22 +586,6 @@ end Relations_as_sets
 
 
 section Factor_maps_and_ICERS
-
-/- DGG: I am playing around with different definition structures in this section
-until we land on one that works nicely. -/
-
--- Depracated in favor of isEquivariant
-/- A map between the phase spaces of two dynamical systems is
-interwining if `π ∘ s = s ∘ π`. (See MulActionHom for precedent) -/
-/- def isIntertwining
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-(dSystemY : DynamicalSystem S Y)
-(π : X → Y) :
-Prop :=
-∀ x : X, ∀ s : S, π (dSystemX.map s x) = dSystemY.map s (π x) -/
 
 /-- Given actions `S → X → X` and `S → Y → Y`, a map `π : X → Y` is
 `S`-equivariant if it intertwines the actions -/
@@ -777,8 +667,6 @@ def isFactor
 Prop :=
 ∃ (π : X → Y), isFactorMap dSystemX dSystemY π
 
-set_option linter.unusedVariables false
-
 /- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
 a continuous, intertwining map `π: X → Y` as a dynamical system -/
 def imageDynamicalSystem
@@ -828,24 +716,6 @@ have hMapsto : ∀ s : S, Set.MapsTo (dSystemY.map s) (π '' Z) (π '' Z) := by
     apply Continuous.restrict
     exact hYCont
 }
-
-set_option linter.unusedVariables true
-
-/- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
-a continuous, intertwining map `π: X → Y` is a nonempty, compact, T2,
-`S`-invariant subset of `Y` -/
-/- Depracated in favor of imageSystem -/
-/- theorem contIntertwiningImageOfNonemptyComT2InvIsNonemptyComT2Inv
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-(dSystemY : DynamicalSystem S Y)
-(π : X → Y) {hπCont : Continuous π} {hπInt : isIntertwining dSystemX dSystemY π}
-{Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
-(hZisInv : isInvariantSet dSystemX Z) :
-isNonemptyCompactT2InvariantSubset dSystemY (π '' Z)
-:= by sorry -/
 
 /-- The restriction of a continuous, intertwining map to a nonempty, compact,
 T2, invariant subset `Z ⊆ X` is a factor map from `Z` as an `S`-system to its
@@ -906,16 +776,6 @@ def isICER
 Prop :=
 isInvariantSet (diagDynamicalSystem dSystem dSystem) I ∧ IsClosed I ∧
 isEquivalenceRelation I
-
-/- Testing this out -/
-/- class ICER
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) (I : Set (X × X)) where
-  ICER_prop :=
-    isInvariantSet (diagDynamicalSystem dSystem dSystem) I ∧
-    IsClosed I ∧
-    isEquivalenceRelation I -/
 
 /-- An arbitrary intersection of ICERs (for a given system) is an ICER
 (for that system) -/
@@ -998,204 +858,6 @@ theorem quotientOfCompactT2ByClosedIsT2
 (hIEquiv : Equivalence (setToRelation I)) :
 T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
   (quotientByCERIsCompactHausdorff hIEquiv hIClosed).2
--- by
---   let f := Quotient.mk ⟨setToRelation I, hIEquiv⟩
---   have hfSurjective : Function.Surjective f := by
---       exact Quot.mk_surjective
---   have hfCont : Continuous f := by
---     exact continuous_quot_mk
---   have hfClosed : IsClosedMap f := by
---     unfold IsClosedMap
---     intro K hK
---     have hPreImageRe : f ⁻¹' (f '' K) = Prod.fst '' ((Set.univ ×ˢ K) ∩ I) := by
---       ext x
---       constructor
---       · intro hx
---         simp only [Set.mem_preimage, Set.mem_image] at hx
---         rcases hx with ⟨k, hk1, hk2⟩
---         have hkx : (setToRelation I) k x := by
---           apply (Equivalence.quot_mk_eq_iff hIEquiv k x).mp
---           exact hk2
---         have hxk : (setToRelation I) x k := hIEquiv.symm hkx
---         have hxkRe : (x, k) ∈ I := by
---           unfold setToRelation at hxk
---           exact hxk
---         simp only [Set.mem_image, Set.mem_inter_iff, Set.mem_prod, Set.mem_univ, true_and,
---           Prod.exists, exists_and_right, exists_eq_right]
---         use k
---       · intro hx
---         simp only [Set.mem_image, Set.mem_inter_iff, Set.mem_prod, Set.mem_univ, true_and,
---           Prod.exists, exists_and_right, exists_eq_right] at hx
---         rcases hx with ⟨k, hk1, hk2⟩
---         simp only [Set.mem_preimage, Set.mem_image]
---         use k
---         constructor
---         · exact hk1
---         · simp only [f]
---           apply (Equivalence.quot_mk_eq_iff hIEquiv k x).mpr
---           exact hIEquiv.symm hk2
---     have hXKClosed : IsClosed ((Set.univ : Set X) ×ˢ K) := by
---       exact IsClosed.prod isClosed_univ hK
---     have hXKIClosed : IsClosed ((Set.univ ×ˢ K) ∩ I) := by
---       apply IsClosed.inter
---       · exact hXKClosed
---       · exact hIClosed
---     have hXKICompact : IsCompact ((Set.univ ×ˢ K) ∩ I) := by
---       apply IsClosed.isCompact
---       exact hXKIClosed
---     have ffKCompact : IsCompact (f ⁻¹' (f '' K)) := by
---       rw [hPreImageRe]
---       apply IsCompact.image
---       · exact hXKICompact
---       · continuity
---     have hPreImageClosed : IsClosed (f ⁻¹' (f '' K)) := by
---       apply IsCompact.isClosed
---       exact ffKCompact
---     have hfQuotientMap : Topology.IsQuotientMap f := by
---       simp only [f]
---       exact isQuotientMap_quot_mk
---     exact ((Topology.isQuotientMap_iff_isClosed.mp hfQuotientMap).2 (f '' K)).mpr hPreImageClosed
---   apply (t2Space_iff (Quotient ⟨setToRelation I, hIEquiv⟩)).mpr
---   intro z w hzw
---   let Ez := f ⁻¹' {z}
---   let Ew := f ⁻¹' {w}
---   have hEzClosed : IsClosed Ez := by
---     specialize hfSurjective z
---     rcases hfSurjective with ⟨a, ha⟩
---     have hEzReDef : Ez = {x : X | (x, a) ∈ I} := by
---       simp only [Ez]
---       rw [<- ha]
---       simp only [f]
---       ext x
---       simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_ofPred_eq]
---       apply Equivalence.quot_mk_eq_iff hIEquiv
---     let g : X → X × X := fun x ↦ (x, a)
---     have hEzReDef2 : Ez = g ⁻¹' I := by
---       simp only [g]
---       rw [hEzReDef]
---       rfl
---     have hgCont : Continuous g := by
---       continuity
---     rw [hEzReDef2]
---     apply IsClosed.preimage
---     · exact hgCont
---     · exact hIClosed
---   have hEwClosed : IsClosed Ew := by
---     specialize hfSurjective w
---     rcases hfSurjective with ⟨a, ha⟩
---     have hEwReDef : Ew = {x : X | (x, a) ∈ I} := by
---       simp only [Ew]
---       rw [<- ha]
---       simp only [f]
---       ext x
---       simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_ofPred_eq]
---       apply Equivalence.quot_mk_eq_iff hIEquiv
---     let g : X → X × X := fun x ↦ (x, a)
---     have hgCont : Continuous g := by
---       continuity
---     have hEwReDef2 : Ew = g ⁻¹' I := by
---       simp only [g]
---       rw [hEwReDef]
---       rfl
---     rw [hEwReDef2]
---     apply IsClosed.preimage
---     · exact hgCont
---     · exact hIClosed
---   have hEzwDisjoint : Disjoint Ez Ew := by
---     simp only [Ez, Ew]
---     apply Set.disjoint_left.mpr
---     intro a ha
---     simp only [Set.mem_preimage, Set.mem_singleton_iff] at ha
---     simp only [Set.mem_preimage, Set.mem_singleton_iff]
---     rw [ha]
---     exact hzw
---   let hXNormal : NormalSpace X := by infer_instance
---   have hEzwSeparated : SeparatedNhds Ez Ew := by
---     exact normal_separation hEzClosed hEwClosed hEzwDisjoint
---   rcases hEzwSeparated with ⟨U, V, hU1, hV1, hU2, hV2, hUV⟩
---   let u := (f '' Uᶜ)ᶜ
---   let v := (f '' Vᶜ)ᶜ
---   use u
---   use v
---   constructor
---   · simp only [isOpen_compl_iff, u]
---     unfold IsClosedMap at hfClosed
---     specialize hfClosed Uᶜ
---     have hUcClosed : IsClosed Uᶜ := by
---       simp only [isClosed_compl_iff]
---       exact hU1
---     apply hfClosed hUcClosed
---   constructor
---   · simp only [isOpen_compl_iff, v]
---     unfold IsClosedMap at hfClosed
---     specialize hfClosed Vᶜ
---     have hVcClosed : IsClosed Vᶜ := by
---       simp only [isClosed_compl_iff]
---       exact hV1
---     apply hfClosed hVcClosed
---   constructor
---   · simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and, u]
---     intro x hx
---     have hxEz : x ∉ Ez := by
---       by_contra
---       have hxU : x ∈ U := by
---         apply hU2
---         exact this
---       exact hx hxU
---     unfold Ez at hxEz
---     simp only [Set.mem_preimage, Set.mem_singleton_iff] at hxEz
---     exact hxEz
---   constructor
---   · simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and, v]
---     intro x hx
---     have hxEw : x ∉ Ew := by
---       by_contra
---       have hxV : x ∈ V := by
---         apply hV2
---         exact this
---       exact hx hxV
---     unfold Ew at hxEw
---     simp only [Set.mem_preimage, Set.mem_singleton_iff] at hxEw
---     · exact hxEw
---   · simp only [u, v]
---     by_contra
---     have hNotDisjoint : ∃ y, y ∈ (f '' Uᶜ)ᶜ ∧ y ∈ (f '' Vᶜ)ᶜ := by
---       apply Set.not_disjoint_iff.mp
---       exact this
---     rcases hNotDisjoint with ⟨y, hy1, hy2⟩
---     simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and] at hy1
---     simp only [Set.mem_compl_iff, Set.mem_image, not_exists, not_and] at hy2
---     specialize hfSurjective y
---     rcases hfSurjective with ⟨a, ha⟩
---     have haU : a ∈ U := by
---       by_contra
---       specialize hy1 a this
---       exact hy1 ha
---     have haV : a ∈ V := by
---       by_contra
---       specialize hy2 a this
---       exact hy2 ha
---     have hUVNotDisjoint : ¬ Disjoint U V := by
---       apply Set.not_disjoint_iff.mpr
---       use a
---     exact hUVNotDisjoint hUV
-
-/- instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{I : Set (X × X)} {hIClosed : IsClosed I}
-{hIEquiv : Equivalence (setToRelation I)} :
-T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
-by sorry
-
-instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{I : Set (X × X)} {hIClosed : IsClosed I}
-{hIEquiv : Equivalence (setToRelation I)} :
-CompactSpace (Quotient ⟨setToRelation I, hIEquiv⟩) :=
-by infer_instance
-
-instance {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{I : Set (X × X)} {hIClosed : IsClosed I}
-{hIEquiv : Equivalence (setToRelation I)} :
-Nonempty (Quotient ⟨setToRelation I, hIEquiv⟩) := nonemptyQuotient X hIEquiv -/
 
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient dynamical system has phase space `X/I` with an `S` action
@@ -1255,34 +917,6 @@ DynamicalSystem S (Quotient ⟨setToRelation I, hI.2.2⟩) := by
         exact (dSystem.mapCont s)
       exact Continuous.comp hπCont hsCont
   }
-
--- (hT2 := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2)
--- (hNonempty := nonemptyQuotient X hI.2.2)
-
--- The follow code is part of the debugging effort around quotientMapIsEquivariant
-/- variable {S : Type*} [Semigroup S] [Nonempty S]
-variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X]
-[hNonempty : Nonempty X]
-variable (dSystem : DynamicalSystem S X)
-variable {I : Set (X × X)} (hI : isICER dSystem I)
-
-set_option pp.explicit true
-#print quotientDynamicalSystem
-#check quotientDynamicalSystem dSystem hI
-#check (quotientDynamicalSystem dSystem hI).map -/
-
-/- Given a dynamical system of `S` acting on `X` and an ICER `I`,
-the quotient map `X → X/I` is S-equivariant -/
-/- theorem quotientMapIsEquivariant
-{S : Type*} [Semigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X)
-{I : Set (X × X)} (hI : isICER dSystem I) :
-isEquivariant dSystem.map
-(quotientDynamicalSystem dSystem hI).map
-  (Quotient.mk ⟨setToRelation I, hI.2.2⟩) :=
-by sorry -/
-
 
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient map `X → X/I` is a factor map of S-systems -/
@@ -1661,15 +1295,6 @@ theorem existsMinimalSubset
     have hYZ : Y ⊆ Z := by
       apply hY2b hZ1
     exact subset_antisymm hYZ hZ1
-
-/- Depracated in favor of minimalSubsetIffMinimalSubsystem
-/-- A minimal set, when made into a system, is a minimal system -/
-theorem minimalSubsetIsMinimalSystem
-(dSystem : DynamicalSystem S X)
-{Y : Set X} [CompactSpace Y] [Nonempty Y]
-(hMinSubset : isMinimalSubset dSystem Y) :
-isMinimalSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem (hMinSubset.1)) :=
-by sorry -- UNHAPPY, WAIT TO TOUCH -/
 
 /-- If Z is a subsystem of Y and Y is a subsystem of X, then Z is a subsystem of X -/
 lemma subSystemOfSubsystem

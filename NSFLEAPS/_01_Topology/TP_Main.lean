@@ -109,17 +109,6 @@ theorem openClosureProductInEntourage
   · exact hUopen
   exact h4
 
--- The following is an alternative to openClosureProductInEntourage using nbhds of diagonal
---/-- Given an entourage `α` of `X` and a point `x ∈ X`
---there exists an open neighborhood `U` of `x` such that
---the closure of `U × U` is a subset of `α` -/
--- Since we already proved openClosureProductInEntourage, this theorem is no longer needed
--- theorem openClosureProductInNhdDiag
--- {X} [TopologicalSpace X]
--- (x : X) (α : Set (X × X)) {ha : α ∈ nhdsSet (Set.diagonal X)} :
--- ∃ U ∈ nhds x, IsOpen U ∧ ((closure U) ×ˢ (closure U) ⊆ α) :=
--- sorry
-
 /-- If every neighborhood of a set A intersects B, then A intersects closure of B -/
 theorem closureIntersect
 {X} [TopologicalSpace X]
@@ -380,7 +369,6 @@ theorem nbhdOfDiagForcesOtherSetContainment
     by_contra hxU
     exact hxz hxU (subset_closure hzV)
 
--- DGG: this may be the same as nbhdOfDiagForcesOtherSetContainment
 /-- The open neighbourhood of the diagonal that detects membership in `W` from `x`:
 `α = (X × X) \ ({x} × Wᶜ)` -/
 lemma existsDiagonalNbhdForcingMembership
