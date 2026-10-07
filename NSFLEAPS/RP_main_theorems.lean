@@ -319,7 +319,6 @@ RPIntro dSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔ isEquicontinuousSys
   (minimalFactorEquicontinuousIffRPInFactorRelation
     dSystem ((minimalIffDenseOrbits dSystem).mpr hMin) dSystemY hFactorMap).2
 
-
 /-- # Theorem B
   Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
   The regionally proximal relation coincides with the equicontinuous
@@ -332,14 +331,81 @@ theorem RPTheoremB
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystemIntro dSystem) :
-let RPX := RPIntro dSystem
 -- RP = S_eq
-RPX = equiStructureRelationIntro dSystem
+RPIntro dSystem = equiStructureRelationIntro dSystem
 ∧
--- RPX is an ICER and X / RPX is the largest equicontinuous factor
-(∃ (I : ICER dSystem), RPX = ICERToSet I ∧
-  isLargestEquiFactor dSystem (quotientDynamicalSystemIntro I) (ICERQuotientMap I))
-:= by sorry
+-- RPX is an ICER and X / RP is the largest equicontinuous factor
+(∃ (I : ICER dSystem), RPIntro dSystem = ICERToSet I ∧
+  isLargestEquiFactor dSystem (quotientDynamicalSystemIntro I) (ICERQuotientMap I)) :=
+by
+  have equiSame : equiStructureRelation dSystem = equiStructureRelationIntro dSystem := by sorry
+  constructor
+  · rw [RPSame dSystem]
+    rw [←equiSame]
+    exact RPisEquiStructureRelation ((minimalIffDenseOrbits dSystem).mpr hMin)
+  · have equiIsRPIntro : equiStructureRelation dSystem = RPIntro dSystem := by
+      rw [RPSame dSystem]
+      exact (RPisEquiStructureRelation ((minimalIffDenseOrbits dSystem).mpr hMin)).symm
+    let E := equiStructureRelation dSystem
+    let hE := equiStructureRelationIsICER dSystem
+    let F := RPIntro dSystem
+    have hF : isICER dSystem (RPIntro dSystem) := by
+      rw [equiIsRPIntro] at hE
+      exact hE
+    let I : ICER dSystem :=
+      {
+        r := setToRelation (RPIntro dSystem)
+        iseqv := hF.2.2
+        isClosed := hF.2.1
+        isInvariant := hF.1
+      }
+    have RPisIICER : RPIntro dSystem = ICERToSet I := rfl
+    use I, RPisIICER
+    let Y := Quotient ⟨setToRelation E, hE.2.2⟩
+    let Y2 := ICERQuotient I
+    let π : X → Y := Quotient.mk ⟨setToRelation E, hE.2.2⟩
+    let π2 : X → Y2 := ICERQuotientMap I
+    have YisY2 : Y = Y2 := by
+      apply congrArg Quotient
+      exact
+        Setoid.mk.congr_simp (setToRelation E) (setToRelation F)
+          (congrArg setToRelation equiIsRPIntro) hE.right.right
+    have πisπ2 : YisY2 ▸ π = π2 := by
+      sorry
+    have : Nonempty Y := nonemptyQuotient X hE.2.2
+    have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hE.2.1 hE.2.2
+    intro V _ _ _ _ dSystemV VEqui ρ ρFactor
+    obtain ⟨ξpre, ξpreFactor, ρIsξpreCircQuotmk⟩ := equiStructFactorIsLargestEquiFactor dSystem V dSystemV ρ ρFactor VEqui
+    change Y → V at ξpre
+    change ρ = ξpre ∘ π at ρIsξpreCircQuotmk
+    let ξ := YisY2 ▸ ξpre
+    use ξ
+    have : isFactorMap (quotientDynamicalSystemIntro I) dSystemV ξ := by sorry
+    use this
+    rw [ρIsξpreCircQuotmk]
+    change ξpre ∘ π = (YisY2 ▸ ξpre) ∘ π2
+    rw [←πisπ2]
+    have eq_rec_comp {A B C D} (h : A = B) (f : A → C) (g : D → A) :
+      f ∘ g =
+        Eq.rec (motive := fun T _ => T → C) f h ∘
+          Eq.rec (motive := fun T _ => D → T) g h := by
+          cases h
+          rfl
+    exact eq_rec_comp YisY2 ξpre π
+
+
+    -- change isFactorMap (quotientDynamicalSystem dSystem (equiStructureRelationIsICER dSystem)) dSystemV ξpre at ξpreFactor
+
+    -- rw [YisY2] at ξpre
+    -- --rw [rpIntroIsEquiIntro] at ξpre
+    -- -- re
+    -- have : -- want same thing with RP instead.
+    --   ∃ (ξ : (ICERQuotient I) → V) (_ : isFactorMap (quotientDynamicalSystem dSystem (equiStructureRelationIsICER dSystem)) dSystemV ξ),
+    --   ρ = ξ ∘ (ICERQuotientMap I) := by sorry
+    -- -- goal is to massage previous have into what remains of the
+    -- -- proof of isLargestEquiFactor dSystem (quotientDynamicalSystemIntro I) (ICERQuotientMap I)
+    -- sorry
+
 
 
 def RPICER
