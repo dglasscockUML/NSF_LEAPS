@@ -717,6 +717,26 @@ def isFactorMap
 Prop :=
 Continuous π ∧ Function.Surjective π ∧ isEquivariant dSystemX.map dSystemY.map π
 
+/-- The composition of two factor maps is a factor map -/
+theorem compositionOfFactorMapsIsFactorMap
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystemX : DynamicalSystem S X}
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{dSystemY : DynamicalSystem S Y}
+{Z} [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z]
+{dSystemZ : DynamicalSystem S Z}
+{π1 : X → Y} {π2 : Y → Z}
+(factorπ1 : isFactorMap dSystemX dSystemY π1)
+(factorπ2 : isFactorMap dSystemY dSystemZ π2) :
+isFactorMap dSystemX dSystemZ (π2 ∘ π1) :=
+by
+  obtain ⟨π1Cont, π1Surj, π1Equi⟩ := factorπ1
+  obtain ⟨π2Cont, π2Surj, π2Equi⟩ := factorπ2
+  refine ⟨π2Cont.comp π1Cont, π2Surj.comp π1Surj, ?_⟩
+  intro s
+  rw [← Function.comp_assoc, π2Equi s, Function.comp_assoc, π1Equi s, Function.comp_assoc]
+
 /-- The square of a system is the `Bool`-indexed product of two copies of it -/
 private lemma pairToBoolFamilyIsFactorMap
 {S} [Semigroup S] [Nonempty S]

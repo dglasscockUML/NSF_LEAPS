@@ -6,7 +6,7 @@ import NSFLEAPS._08_Application.AP_Main
 Explain
 -/
 
-/- # Essential Definitions and Lemmas
+/- # Essential Definitions
 For those definitions that are repeated, decide what to do ... -/
 
 /- A (topological) dynamical system is a compact Hausdorff space `X` together
@@ -157,6 +157,8 @@ Prop :=
     ∀ (s : S), (fun (x : X × X) ↦
       ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' β ⊆ α
 
+
+
 /-- The regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RPIntro -- See RP upstream
 {S : Type*} [Semigroup S] [Nonempty S]
@@ -166,13 +168,6 @@ Set (X × X) :=
 ⋂ α ∈ nhdsSet (Set.diagonal X),
   closure (⋃ (s : S), (fun (x : X × X) ↦
     ⟨dSystem.map s x.1, dSystem.map s x.2⟩) ⁻¹' α)
-
-/-- RPIntro is the same as RP, defined upstream -/
-lemma RPSame
-{S : Type*} [Semigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) :
-RPIntro dSystem = RP dSystem := rfl
 
 /-- The backward regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
 def RPMIntro -- See RPM upstream
@@ -184,28 +179,7 @@ Set (X × X) :=
   closure (⋃ (s : S), (fun (x : X × X) ↦
     ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' α)
 
-/-- RPMIntro is the same as RP, defined upstream -/
-lemma RPMSame
-{S : Type*} [Semigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystem : DynamicalSystem S X) :
-RPMIntro dSystem = RPM dSystem :=
-  by
-    unfold RPM RPMIntro setOrbitClosure setOrbit diagDynamicalSystem Prod.map
-    apply Set.iInter_congr; intro α
-    apply Set.iInter_congr; intro hα
-    apply congrArg closure; ext x
-    constructor
-    · intro hx
-      rw [Set.mem_iUnion] at hx
-      obtain ⟨s,a,ha,hax⟩ := hx
-      use ⟨s,⟨a,ha⟩⟩
-    · intro hx
-      obtain ⟨⟨s,a⟩,hsa⟩ := hx
-      simp only at hsa
-      rw [Set.mem_iUnion]
-      use s, ⟨a.1.1,a.1.2⟩
-      exact ⟨a.2,hsa⟩
+
 
 /-- The equicontinuous structure relation of a dynamical system is the
 intersection of all equicontinuous ICERS of the system -/
@@ -280,7 +254,7 @@ Prop :=
 
 /-- The Grothendieck group of a non-empty, commutative semigroup `S` is
 the Grothendieck group of the Monoid extension of `S` -/
-def groGroupIntro
+@[reducible] def groGroupIntro
 (S : Type*) [CommSemigroup S] [Nonempty S] :=
   Algebra.GrothendieckGroup (WithOne S)
 
@@ -300,6 +274,109 @@ MulHom S (groGroupIntro S) :=
       (s : WithOne S)) * (Algebra.GrothendieckGroup.of (t : WithOne S))
     rfl
 }
+
+
+/- # Translation lemmas -/
+
+/-- RPIntro is the same as RP, defined upstream -/
+lemma RPSame
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+RPIntro dSystem = RP dSystem := rfl
+
+/-- RPMIntro is the same as RP, defined upstream -/
+lemma RPMSame
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+RPMIntro dSystem = RPM dSystem :=
+  by
+    unfold RPM RPMIntro setOrbitClosure setOrbit diagDynamicalSystem Prod.map
+    apply Set.iInter_congr; intro α
+    apply Set.iInter_congr; intro hα
+    apply congrArg closure; ext x
+    constructor
+    · intro hx
+      rw [Set.mem_iUnion] at hx
+      obtain ⟨s,a,ha,hax⟩ := hx
+      use ⟨s,⟨a,ha⟩⟩
+    · intro hx
+      obtain ⟨⟨s,a⟩,hsa⟩ := hx
+      simp only at hsa
+      rw [Set.mem_iUnion]
+      use s, ⟨a.1.1,a.1.2⟩
+      exact ⟨a.2,hsa⟩
+
+lemma EquiSystemSame
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+isEquicontinuousSystemIntro dSystem ↔ isEquicontinuousSystem dSystem :=
+by rfl
+
+lemma EquiStructureSame
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+equiStructureRelationIntro dSystem = equiStructureRelation dSystem := by
+  apply congrArg Set.sInter
+  ext x
+  constructor
+  · intro hx
+    obtain ⟨IC, xIsIC, ICisEqui⟩ := hx
+    rw [xIsIC]
+    use ⟨IC.isInvariant, IC.isClosed, IC.iseqv⟩
+    unfold isEquicontinuousICER
+    exact (EquiSystemSame (quotientDynamicalSystemIntro IC)).mp ICisEqui
+  · intro hx
+    obtain ⟨⟨xIsInv, xIsClosed, xIsEquiv⟩, xICERisEqui⟩ := hx
+    let IC : ICER dSystem :=
+      {
+        r := setToRelation x
+        iseqv := xIsEquiv
+        isClosed := xIsClosed
+        isInvariant := xIsInv
+      }
+    use IC, by rfl
+    unfold isEquicontinuousICER at xICERisEqui
+    exact (EquiSystemSame (quotientDynamicalSystemIntro IC)).mpr xICERisEqui
+
+
+lemma IsomSame
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
+isIsomorphism dSystemX dSystemY π ↔
+isIsomorphismIntro dSystemX dSystemY π := by rfl
+
+lemma QuotSameViaIsom
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X}
+{I : Set (X × X)} (hI : isICER dSystem I)
+(J : ICER dSystem) (IisJ : ICERToSet J = I) :
+let Y := Quotient ⟨setToRelation I, hI.2.2⟩
+let dSystemY := quotientDynamicalSystem dSystem hI
+let π := Quotient.mk ⟨setToRelation I, hI.2.2⟩
+let Z := ICERQuotient J
+let dSystemZ := quotientDynamicalSystemIntro J
+have : Nonempty Y := nonemptyQuotient X hI.2.2
+have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
+∃ (ψ : Z → Y),
+isIsomorphismIntro dSystemZ dSystemY ψ
+∧
+π = ψ ∘ (ICERQuotientMap J) := by
+  subst IisJ
+  obtain ⟨JIsInv, JIsClosed, JIsEquiv⟩ := hI
+  intro Y dSystemY π Z dSystemZ _ _
+  use id
+  refine ⟨⟨IsHomeomorph.id, ?_⟩, rfl⟩
+  intro s
+  rfl
 
 
 /- # Theorems -/
@@ -338,10 +415,9 @@ RPIntro dSystem = equiStructureRelationIntro dSystem
 (∃ (I : ICER dSystem), RPIntro dSystem = ICERToSet I ∧
   isLargestEquiFactor dSystem (quotientDynamicalSystemIntro I) (ICERQuotientMap I)) :=
 by
-  have equiSame : equiStructureRelation dSystem = equiStructureRelationIntro dSystem := by sorry
   constructor
   · rw [RPSame dSystem]
-    rw [←equiSame]
+    rw [EquiStructureSame dSystem]
     exact RPisEquiStructureRelation ((minimalIffDenseOrbits dSystem).mpr hMin)
   · have equiIsRPIntro : equiStructureRelation dSystem = RPIntro dSystem := by
       rw [RPSame dSystem]
@@ -349,62 +425,43 @@ by
     let E := equiStructureRelation dSystem
     let hE := equiStructureRelationIsICER dSystem
     let F := RPIntro dSystem
-    have hF : isICER dSystem (RPIntro dSystem) := by
+    have hF : isICER dSystem F := by
       rw [equiIsRPIntro] at hE
       exact hE
     let I : ICER dSystem :=
       {
-        r := setToRelation (RPIntro dSystem)
+        r := setToRelation F
         iseqv := hF.2.2
         isClosed := hF.2.1
         isInvariant := hF.1
       }
-    have RPisIICER : RPIntro dSystem = ICERToSet I := rfl
-    use I, RPisIICER
+    have hFishE : ICERToSet I = E := by
+      have : ICERToSet I = F := by rfl
+      unfold F at this
+      rw [←equiIsRPIntro] at this
+      exact this
+    use I, by rfl
+    intro V _ _ _ _ dSystemV VEqui ρ ρFactor
+    obtain ⟨ξpre, ξpreFactor, ρIsξpreCircQuotmk⟩ :=
+      equiStructFactorIsLargestEquiFactor dSystem V dSystemV ρ ρFactor VEqui
+    obtain ⟨ψ, hψ1, hψ2⟩ := QuotSameViaIsom hE I hFishE
+    use ξpre ∘ ψ
     let Y := Quotient ⟨setToRelation E, hE.2.2⟩
-    let Y2 := ICERQuotient I
-    let π : X → Y := Quotient.mk ⟨setToRelation E, hE.2.2⟩
-    let π2 : X → Y2 := ICERQuotientMap I
-    have YisY2 : Y = Y2 := by
-      apply congrArg Quotient
-      exact
-        Setoid.mk.congr_simp (setToRelation E) (setToRelation F)
-          (congrArg setToRelation equiIsRPIntro) hE.right.right
-    have πisπ2 : YisY2 ▸ π = π2 := by
-      sorry
     have : Nonempty Y := nonemptyQuotient X hE.2.2
     have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hE.2.1 hE.2.2
-    intro V _ _ _ _ dSystemV VEqui ρ ρFactor
-    obtain ⟨ξpre, ξpreFactor, ρIsξpreCircQuotmk⟩ := equiStructFactorIsLargestEquiFactor dSystem V dSystemV ρ ρFactor VEqui
-    change Y → V at ξpre
-    change ρ = ξpre ∘ π at ρIsξpreCircQuotmk
-    let ξ := YisY2 ▸ ξpre
-    use ξ
-    have : isFactorMap (quotientDynamicalSystemIntro I) dSystemV ξ := by sorry
-    use this
-    rw [ρIsξpreCircQuotmk]
-    change ξpre ∘ π = (YisY2 ▸ ξpre) ∘ π2
-    rw [←πisπ2]
-    have eq_rec_comp {A B C D} (h : A = B) (f : A → C) (g : D → A) :
-      f ∘ g =
-        Eq.rec (motive := fun T _ => T → C) f h ∘
-          Eq.rec (motive := fun T _ => D → T) g h := by
-          cases h
-          rfl
-    exact eq_rec_comp YisY2 ξpre π
-
-
-    -- change isFactorMap (quotientDynamicalSystem dSystem (equiStructureRelationIsICER dSystem)) dSystemV ξpre at ξpreFactor
-
-    -- rw [YisY2] at ξpre
-    -- --rw [rpIntroIsEquiIntro] at ξpre
-    -- -- re
-    -- have : -- want same thing with RP instead.
-    --   ∃ (ξ : (ICERQuotient I) → V) (_ : isFactorMap (quotientDynamicalSystem dSystem (equiStructureRelationIsICER dSystem)) dSystemV ξ),
-    --   ρ = ξ ∘ (ICERQuotientMap I) := by sorry
-    -- -- goal is to massage previous have into what remains of the
-    -- -- proof of isLargestEquiFactor dSystem (quotientDynamicalSystemIntro I) (ICERQuotientMap I)
-    -- sorry
+    have hψ1Factor : isFactorMap (quotientDynamicalSystemIntro I)
+      (quotientDynamicalSystem dSystem hE) ψ := by
+        unfold isFactorMap
+        refine ⟨?_,?_,?_⟩
+        · exact hψ1.1.continuous
+        · exact hψ1.1.bijective.2
+        · exact hψ1.right
+    have factorComp : isFactorMap (quotientDynamicalSystemIntro I) dSystemV (ξpre ∘ ψ) := by
+      exact compositionOfFactorMapsIsFactorMap hψ1Factor ξpreFactor
+    use factorComp
+    rw [Function.comp_assoc ξpre ψ (ICERQuotientMap I)]
+    rw [←hψ2]
+    exact ρIsξpreCircQuotmk
 
 
 
@@ -481,10 +538,11 @@ RPIntro dSystemS = RPIntro dSystemT := by
       natural extension `W` of `X` as a `Gr(S)`-system, made
       into an `S`-system via the homomorphism `i_Gr(S) : S \to Gr(S)`. -/
 theorem RPTheoremsEandF
-{S : Type*} [CommSemigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Type u} [CommSemigroup S] [Nonempty S]
+{X : Type v} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystemX : DynamicalSystem S X} (hMinX : isMinimalSystemIntro dSystemX) :
-∃ (W : Type*) (_ : TopologicalSpace W) (_ : CompactSpace W) (_ : T2Space W) (_ : Nonempty W),
+∃ (W : Type (max u v)) (_ : TopologicalSpace W)
+  (_ : CompactSpace W) (_ : T2Space W) (_ : Nonempty W),
 ∃ (dSystemGW : DynamicalSystem (groGroupIntro S) W) (minGroSys : isMinimalSystemIntro dSystemGW),
 -- dSystemSW is the S-system whose existence is stipulated in the theorem
 -- statement.  It is the homomorphism system of dSystemWG via groGroupHom
@@ -502,302 +560,69 @@ isHomeoSystem dSystemSW
   ∃ (ξ : V → W) (_ : isFactorMapIntro dSystemV dSystemSW ξ), ρ = π ∘ ξ)
 ∧
 let XmodRPSystem := quotientDynamicalSystemIntro (RPICER hMinX)
-let GWmodRPSystem := homDynamicalSystemIntro groGroupHomIntro (quotientDynamicalSystemIntro (RPICER minGroSys))
+let GWmodRPSystem := homDynamicalSystemIntro groGroupHomIntro
+  (quotientDynamicalSystemIntro (RPICER minGroSys))
 let SWmodRPSystem := quotientDynamicalSystemIntro (RPICER minHomSys)
 -- 4. W / RP_{W,S} and X / RP_{X,S} are isomorphic
 isIsomorphic SWmodRPSystem XmodRPSystem
 ∧
 -- 5. W / RP_{W,S} and W / RP_{W,G} are isomorphic
 isIsomorphic SWmodRPSystem GWmodRPSystem
-  := by sorry
-
-
-
-
-
-
-
-
-
-
--- _GRAVEYARD_
-
-
-
-
--- theorem RPTheoremsEandF
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- {dSystemX : DynamicalSystem S X} (hMinX : isMinimalSystem dSystemX) :
--- ∃ (W : Type*) (_ : TopologicalSpace W) (_ : CompactSpace W) (_ : T2Space W) (_ : Nonempty W),
--- ∃ (dSystemW : DynamicalSystem S W) (_ : isMinimalSystem dSystemW) (_ : isHomeoSystem dSystemW),
--- ∃ (π : W → X) (_ : isFactorMap dSystemW dSystemX π),
--- ∃ (G : Type*) (_ : CommGroup G) (_ : Nonempty G),
--- ∃ (dSystemWG : DynamicalSystem G W),
--- ∃ (φ : S → G) (_ : SemigroupHom φ), --Change SemigroupHom to Mathlib version
--- (dSystemW)
--- -- exists abelian group G, an action of G on W making W a G-system, an a
--- -- homomorphism i: S → G st.
--- -- 1. dSystemW is the hom system
--- ∧
--- -- 2. universal property of W as the smallest homeo system extension
--- (∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
---   ∀ (dSystemV : DynamicalSystem S V) (_ : isHomeoSystem dSystemV),
---   ∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystemX ρ),
---   ∃ (ξ : V → W) (_ : isFactorMap dSystemV dSystemW ξ), ρ = π ∘ ξ)
--- ∧
--- -- 3. there is a map W / RP_{W,S} → X / RP_{X,S} that is an isomorphism
--- (∃ ξ : Quotient (RPSetoid (natExtSystemIsMinimal hMin)) → Quotient (RPSetoid hMin),
---     isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin)) (maxEquiFactor hMin) ξ)
--- ∧
--- -- 4. there is a map W / RP_{W,S} → W / RP_{W,G} that is an isomorphism
--- (∃ ζ : Quotient (RPSetoid (natExtSystemIsMinimal hMin))
---      → Quotient (RPSetoid (natExtGroSystemIsMinimal hMin)),
---     isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin))
---       (homDynamicalSystem groGroupHom (maxEquiFactor (natExtGroSystemIsMinimal hMin))) ζ)
---  := by sorry
-
-
--- challenge in theorem F
-/- # Theorem F
-  Let `S` be a commutative semigroup, `X` be a minimal `S`-system,
-  and `π : W → X` be the natural extension (as constructed in the proof of
-  RPTheoremE). The following `S`-systems are the same up to isomorphism:
-  · `X / RP_{X,S}`, the largest equicontinuous factor of the `S`-system `X`;
-  · `W / RP_{W,S}`, the largest equicontinuous factor of the natural
-      extension `W` of `X` as an `S`-system; and
-  · `W / RP_{W,Gr(S)}`, the largest equicontinuous factor of the
-      natural extension `W` of `X` as a `Gr(S)`-system, made
-      into an `S`-system via the homomorphism `i_Gr(S) : S \to Gr(S)`. -/
--- theorem RPTheoremF
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
--- 1+1=2 := by sorry
-
-
-/- **Theorem E.**  For a minimal system `X` with natural extension `π : W → X`, the three
-`S`-systems
-
-1. `X / RP_X`, the largest equicontinuous factor of `X`;
-2. `W / RP_{W,S}`, the largest equicontinuous factor of `W` as an `S`-system;
-3. `W / RP_{W,Gr(S)}`, the largest equicontinuous factor of `W` as a `Gr(S)`-system, made
-   into an `S`-system via `groGroupHom`,
-
-are the same up to isomorphism. -/
--- theorem theoremE
--- {S} [CommSemigroup S] [Nonempty S]
--- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- {dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
--- letI : Nonempty ↑(natExtSet dSystem) :=
---   natExtSetIsNonemptyInstance (hSurject := minimalCommActionIsSurjective hMin)
--- (∃ ξ : Quotient (RPSetoid (natExtSystemIsMinimal hMin)) → Quotient (RPSetoid hMin),
---     isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin)) (maxEquiFactor hMin) ξ)
--- ∧
--- (∃ ζ : Quotient (RPSetoid (natExtSystemIsMinimal hMin))
---      → Quotient (RPSetoid (natExtGroSystemIsMinimal hMin)),
---     isIsomorphism (maxEquiFactor (natExtSystemIsMinimal hMin))
---       (homDynamicalSystem groGroupHom (maxEquiFactor (natExtGroSystemIsMinimal hMin))) ζ) :=
--- ⟨maxEquiFactorOfNatExtIsoMaxEquiFactor hMin, maxEquiFactorOfNatExtIsoGroMaxEquiFactor hMin⟩
-
-
-
-/- # Theorem B Part I
-  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
-  The regionally proximal relation coincides with the equicontinuous
-  structure relation: `RP = S_eq`. In particular, `RP` is a closed,
-  `S`-invariant equivalence relation. -/
--- theorem RPTheoremBPartI
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
--- RP dSystem = equiStructureRelation dSystem -- RP = S_eq
--- ∧ Equivalence (fun x y => (x, y) ∈ RP dSystem) -- RP is an equivalence relation
--- ∧ IsClosed (RP dSystem) -- RP is closed
--- ∧ (∀ (s : S) (x y : X), ⟨x,y⟩ ∈ RP dSystem →
---   ⟨dSystem.map s x, dSystem.map s y⟩ ∈ RP dSystem) -- RP is `S`-invariant
--- := by sorry
-
-/-
-Further essential defs
-
-quotientSystem (may not need to define in generality, only need for quotient by RP)
-RPQuotient (eats proof of minimality of a commutative system, gives quotient set, like RPSetoid)
-RPQuotientSystem (the dSystem resulting from it)
-
- -/
-
--- use quotientSystem with the fact that RP is an ICE from Part I.
-/- # Theorem B Part II
-Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
-The quotient `X → X/RP` is the largest equicontinuous factor of `X`,
-in the sense that if `ξ : X → Y` is an equicontinuous factor of `X`, then
-there exists a factor map `ρ : X/RP → Y` of `S`-systems -/
--- theorem RPTheoremBPartII
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
--- (∀ (Y : Type*) [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y],
---   ∀ (dSystemY : DynamicalSystem S Y) (_ : isEquicontinuousSystem dSystemY),
---   ∀ (ρ : X → Y) (_ : isFactorMap dSystemX dSystemY ρ) ,
---   ∃ (ξ : R → Y) (_ : isFactorMap dSystemR dSystemY ξ), ρ = ξ ∘ π) := by sorry
-
-
-
-/- Given a dynamical system, return the quotient system by the RP relation. -/
--- def RPQuotientSystem
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- {dSystem : DynamicalSystem S X} (hMin : isMinimalSystemIntro dSystem) :
--- let RPX := RPIntro dSystem
--- let RPasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ RPX)
--- let RPEquiv : Equivalence RPasRel := (RPTheoremB hMin).2.1
--- let RPClosed : IsClosed RPX := (RPTheoremB hMin).2.2.1
--- let XmodRP := Quotient ⟨RPasRel, RPEquiv⟩
--- --have : Nonempty XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).1
--- have : T2Space XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).2
--- DynamicalSystem S XmodRP := by
---   let RPX := RPIntro dSystem
---   let RPasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ RPX)
---   let RPEquiv : Equivalence RPasRel := (RPTheoremB hMin).2.1
---   let RPClosed : IsClosed RPX := (RPTheoremB hMin).2.2.1
---   let RPInv : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s)
---     (dSystem.map s)) RPX RPX := (RPTheoremB hMin).2.2.2.1
---   let XmodRP := Quotient ⟨RPasRel, RPEquiv⟩
---   --have : Nonempty XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).1
---   have : T2Space XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).2
---   exact quotientDynamicalSystemIntro dSystem RPEquiv RPClosed RPInv
-
-
-/- Given a dynamical system, return the quotient system by the RP relation. -/
--- def RPQuotientGroSystemAsSSystem
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- {dSystem : DynamicalSystem (groGroup S) X} (hMin : isMinimalSystemIntro dSystem) :
--- let RPX := RPIntro dSystem
--- let RPasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ RPX)
--- let RPEquiv : Equivalence RPasRel := (RPTheoremB hMin).2.1
--- let RPClosed : IsClosed RPX := (RPTheoremB hMin).2.2.1
--- let XmodRP := Quotient ⟨RPasRel, RPEquiv⟩
--- --have : Nonempty XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).1
--- have : T2Space XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).2
--- DynamicalSystem S XmodRP := by
---   let RPX := RPIntro dSystem
---   let RPasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ RPX)
---   let RPEquiv : Equivalence RPasRel := (RPTheoremB hMin).2.1
---   let RPClosed : IsClosed RPX := (RPTheoremB hMin).2.2.1
---   let RPInv : ∀ (s : groGroup S), Set.MapsTo (Prod.map (dSystem.map s)
---     (dSystem.map s)) RPX RPX := (RPTheoremB hMin).2.2.2.1
---   let XmodRP := Quotient ⟨RPasRel, RPEquiv⟩
---   --have : Nonempty XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).1
---   have : T2Space XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).2
---   exact homDynamicalSystemIntro groGroupHomIntro (quotientDynamicalSystemIntro dSystem RPEquiv RPClosed RPInv)
-
--- (∀ (Y : Type*) [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y],
---   ∀ (dSystemY : DynamicalSystem S Y) (_ : isEquicontinuousSystem dSystemY),
---   ∀ (ρ : X → Y) (_ : isFactorMap dSystemX dSystemY ρ) ,
---   ∃ (ξ : XmodRP → Y) (_ : isFactorMap dSystemXmodRP dSystemY ξ), ρ = ξ ∘ π))
-
-
--- RP is an equivalence relation
--- (∃ (RPEquiv : Equivalence (fun x y => (x, y) ∈ RPX)),
--- -- RP is closed
--- ∃ (RPClosed : IsClosed RPX),
--- -- RP is `S`-invariant
--- ∃ (RPInv : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s)) RPX RPX),
--- -- X → XmodRP is largest equicontinuous factor
--- let RPasRel := fun (x : X) ↦ (⟨x,·⟩ ∈ RPX)
--- let XmodRP := Quotient ⟨RPasRel, RPEquiv⟩
--- --have : Nonempty XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).1
--- have : T2Space XmodRP := (compactT2ByClosedIsCompactT2Set RPEquiv RPClosed).2
--- let π := Quotient.mk ⟨RPasRel, RPEquiv⟩
--- let dSystemXmodRP := quotientDynamicalSystemIntro dSystem RPEquiv RPClosed RPInv
--- isLargestEquiFactor dSystem dSystemXmodRP π)
-
-
-/- The image of the semigroup `S` in its Grothendieck group -/
--- def imageOfSemiInGG
--- {S : Type*} [CommSemigroup S] [Nonempty S] :
--- Set (groGroup S) :=
--- groGroupHom '' Set.univ
-
-/- `Algebra.GrothendieckGroup.of`, viewed as a map from `WithOne S` into `groGroupIntro S` -/
--- def groGroupOfIntro
--- {S : Type*} [CommSemigroup S] [Nonempty S] :
--- WithOne S → groGroupIntro S :=
--- Algebra.GrothendieckGroup.of
-
--- /- `groGroupOfIntro` is a monoid homomorphism -/
--- lemma groGroupOfMulIntro
--- {S : Type*} [CommSemigroup S] [Nonempty S] (a b : WithOne S) :
--- groGroupOfIntro (a * b) = (groGroupOfIntro a) * (groGroupOfIntro b) :=
--- map_mul Algebra.GrothendieckGroup.of a b
-
--- /- `groGroupHomIntro` is the restriction of `groGroupOfIntro` to `S` -/
--- lemma groGroupHomEqOfIntro
--- {S : Type*} [CommSemigroup S] [Nonempty S] (s : S) :
--- groGroupHomIntro s = groGroupOfIntro (s : WithOne S) := rfl
-
-/- `groGroupOf` written using `Localization.mk` -/
--- lemma groGroupOfEqMk
--- {S : Type*} [CommSemigroup S] [Nonempty S] (a : WithOne S) :
--- groGroupOf a = Localization.mk a 1 :=
--- (Localization.mk_one_eq_monoidOf_mk a).symm
-
-/- Case analysis on `WithOne S` -/
--- lemma withOneCases
--- {α : Type*} (u : WithOne α) :
--- u = 1 ∨ ∃ a : α, u = (a : WithOne α) :=
--- WithOne.cases_on u (Or.inl rfl) (fun a => Or.inr ⟨a, rfl⟩)
-
-
-/- Instance for `groGroupHom` being a semigroup homomorphism -/
--- instance
--- (S : Type*) [CommSemigroup S] [nonEmpty : Nonempty S] :
--- SemigroupHom (groGroupHom (nonEmpty := nonEmpty)) :=
--- {
---   hom_prop := groGroupHomIsSemigroupHom S
--- }
-
---  def isSmallestHomeoExtension
---  {S : Type*} [CommSemigroup S] [Nonempty S]
--- {W : Type*} [TopologicalSpace W] [CompactSpace W] [T2Space W] [Nonempty W]
--- (dSystemW : DynamicalSystem S W)
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystemX : DynamicalSystem S X)
--- (π : W → X) :
--- Prop :=
---   isHomeoSystem dSystemW ∧
---   isFactorMap dSystemW dSystemX π ∧
---   ∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
---   ∀ (dSystemV : DynamicalSystem S V),
---   ∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystemX ρ) (_ : isHomeoSystem dSystemV),
---   ∃ (ξ : V → W) (_ : isFactorMap dSystemV dSystemW ξ), ρ = π ∘ ξ
-
-
-/- `groGroup` is made reducible so that `groGroup S` and `Algebra.GrothendieckGroup (WithOne S)`
-are interchangeable during type class synthesis.  This only adds an attribute; the definition
-above is unchanged. -/
--- attribute [reducible] groGroup
-
-/- WithOne S is a CommMonoid (Lean already knows this) -/
--- instance
--- (S : Type*) [CommSemigroup S] [Nonempty S] :
--- CommMonoid (WithOne S) := by infer_instance
-
-/- The map from a non-empty, commutative semigroup `S` into its
-Grothendieck group `groGroup S` -/
--- def groGroupHomIntro
--- {S : Type*} [CommSemigroup S] [Nonempty S] :
--- S → groGroupIntro S :=
---   Algebra.GrothendieckGroup.of ∘ WithOne.coe
-
-
-
-
-/- The map `groGroupHom` is a semigroup homomorphism -/
--- theorem groGroupHomIsSemigroupHomIntro
--- (S : Type*) [CommSemigroup S] [Nonempty S] :
--- ∀ (s t : S), groGroupHom (s * t) = (groGroupHom s) * (groGroupHom t) := by
---   intro s t
---   rw [groGroupHomEqOf, groGroupHomEqOf, groGroupHomEqOf, WithOne.coe_mul, groGroupOfMul]
+  := by
+  have hMin : isMinimalSystem dSystemX := (minimalIffDenseOrbits dSystemX).mpr hMinX
+  have hSurject := minimalCommActionIsSurjective hMin
+  have : Nonempty ↑(natExtSet dSystemX) := natExtSetIsNonemptyInstance (hSurject := hSurject)
+  have hWMin := natExtSystemIsMinimal hMin
+  have hWGrMin := natExtGroSystemIsMinimal hMin
+  refine ⟨natExtSet dSystemX, inferInstance, inferInstance, inferInstance, this,
+    natExtGroSystem hSurject, (minimalIffDenseOrbits _).mp hWGrMin, ?_⟩
+  intro dSystemSW
+  refine ⟨natExtFactorMap dSystemX, natExtFactorMapIsFactorMap hSurject,
+    (minimalIffDenseOrbits _).mp hWMin, ?_, ?_, ?_⟩
+  -- 2. `S` acts by homeomorphisms, since `s` acts as `groGroupHom s`, which is invertible
+  · intro s
+    let G := natExtGroSystem hSurject
+    let g := groGroupHom s
+    refine (Homeomorph.mk ⟨G.map g, G.map g⁻¹, ?_, ?_⟩ (G.mapCont g)
+      (G.mapCont g⁻¹)).isHomeomorph
+    · intro φ
+      apply Subtype.ext
+      funext h
+      exact congrArg φ.1 (inv_mul_cancel_right h g)
+    · intro φ
+      apply Subtype.ext
+      funext h
+      exact congrArg φ.1 (mul_inv_cancel_right h g)
+  -- 3. universal property of the natural extension
+  · intro V _ _ _ _ dSystemV hHomeoV ρ ρFactor
+    exact natExtUniversalProperty hSurject V dSystemV ρ ρFactor hHomeoV
+  -- 4. and 5.
+  · intro XmodRPSystem GWmodRPSystem SWmodRPSystem
+    have hX : ∀ s, XmodRPSystem.map s = (maxEquiFactor hMin).map s := by
+      intro s
+      funext q
+      refine Quotient.inductionOn (s := RPSetoid hMin) q ?_
+      intro x
+      exact (maxEquiFactorMap hMin s x).symm
+    have hSW : ∀ s, SWmodRPSystem.map s = (maxEquiFactor hWMin).map s := by
+      intro s
+      funext q
+      refine Quotient.inductionOn (s := RPSetoid hWMin) q ?_
+      intro w
+      exact (maxEquiFactorMap hWMin s w).symm
+    have hGW : ∀ s, GWmodRPSystem.map s =
+        (homDynamicalSystem groGroupHom (maxEquiFactor hWGrMin)).map s := by
+      intro s
+      funext q
+      refine Quotient.inductionOn (s := RPSetoid hWGrMin) q ?_
+      intro w
+      exact (maxEquiFactorMap hWGrMin (groGroupHom s) w).symm
+    obtain ⟨ξ, ξHomeo, ξEquiv⟩ := maxEquiFactorOfNatExtIsoMaxEquiFactor hMin
+    obtain ⟨ζ, ζHomeo, ζEquiv⟩ := maxEquiFactorOfNatExtIsoGroMaxEquiFactor hMin
+    refine ⟨⟨ξ, ξHomeo, ?_⟩, ⟨ζ, ζHomeo, ?_⟩⟩
+    · intro s
+      rw [hX s, hSW s]
+      exact ξEquiv s
+    · intro s
+      rw [hGW s, hSW s]
+      exact ζEquiv s

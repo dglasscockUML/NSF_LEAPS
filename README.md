@@ -2,7 +2,7 @@
 
 A Lean 4 formalization of all of the results and underlying machinery of the two papers below. Both papers jointly authored by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le with support from the US National Science Foundation under a LEAPS Grant, Award Number 2418589. See below for affiliation and contact information.
 
-There are two associated Palomar submissions, one for each of the papers: LINKS TO PALOMAR.
+There are two associated Palomar submissions, one for each of the papers: (to be updated).
 
 ## Papers and abstracts
 
@@ -30,7 +30,7 @@ Beyond the results in the papers, the formalization in this repository includes 
 
 ## Organization
 
-The code in this repository is organized as follows. The main results from the introductions are stated and proved in the files: file name, file name. The accompanying machinery is split into 9 folders with the following logical dependency:
+The code in this repository is organized as follows. The main results from the introductions are stated and proved in the files: Delta_main_theorems.lean and RP_main_theorems.lean. The accompanying machinery is split into 9 folders with the following logical dependency:
 
 ![Diagram of dependencies between the folders](images/folder_diagram.png)
 
@@ -60,7 +60,7 @@ Parts of this formalization were written with the help of AI-based coding agents
 - definitions, theorems, and proofs in the files `TP_Cylinders.lean` and `FF_Pontryagin.lean` were written by Claude Opus 5;
 - definitions, theorems, and proofs in the file `FF_CXX.lean` were written by ChatGPT 5.6 Sol;
 - some definitions and most proofs in the file `RP_Nat_ext.lean` were written by Claude Opus 5;
-- approximately 15 proofs of theorems scattered throughout the project were written by Claude Opus 5.
+- approximately 20 proofs of theorems scattered throughout the project were written by Claude Opus 5.
 
 ChatGPT 5.6 Sol and Luna were used to help with tactics at particular places in proofs, diagnose compilation errors, and search Mathlib. Beyond these specific callouts, all code was written by hand.  In particular, all definition and theorem statements outside of the specific files mentioned above were written by hand.
 
