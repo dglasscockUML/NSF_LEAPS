@@ -417,21 +417,6 @@ F ⋏ G = G ⋏ F :=
   simp_rw [dualIsInvolutionOnFamilies] at h_dual_meet
   exact h_dual_meet
 
-lemma mem_famMeetv2 {α : Type*} (F G : Family α) (A : Set α) :
-  A ∈ F ⋏ G ↔ (∀ B ∈ G*, A ∩ B ∈ F) := by
-  rw [familyMeetIsCommutative]
-  constructor
-  · intro hA
-    simp only [HasFamMeet.famMeet, Family.famMeet, famMeet] at hA
-    intro B hB
-    specialize hA B hB
-    exact hA
-  · intro hA
-    simp only [HasFamMeet.famMeet, Family.famMeet, famMeet]
-    intro B hB
-    specialize hA B hB
-    exact hA
-
 theorem familyMeetIsMonotonic
 {α : Type*} {F1 G1 F2 G2 : Family α} :
 F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) := by
@@ -1089,37 +1074,35 @@ isPRFamily (F ⋎ F*) := by
 
 end Filters_and_PR
 
--- section PartialModAndConsequences
-
--- theorem familyPartialModularity
--- {α : Type*} (F G H : Family α) :
--- (F ⋎ (G ⋏ H)) ⊆ (F ⋎ G) ⋏ H := by sorry
-
-
--- theorem familyPartialDistributivity
--- {α : Type*} (F G H : Family α) :
--- (F ⋏ G) ⋎ (F ⋏ H) ⊆ F ⋏ (G ⋎ H) := by sorry
-
--- theorem familyAbsorptionAdjacent
--- {α : Type*} (F G : Family α) :
--- F ⊆ (F ⋎ G) ⋏ G* := by sorry
---   -- intro A hA
---   -- change A ∈ (F ⋎ G) ⋏ G* at ⊢
---   -- change A ∈ F at hA
---   -- have hAinFG : A ∈ F ⋎ G := by
---   --   change A ∈ famJoin F G
---   --   unfold _root_.famJoin
---   --   simp_all only [SetLike.mem_coe, Set.mem_setOf_eq]
---   --   sorry
---   -- have hAinGstar : A ∈ G* := by
---   --   intro B hBinG
---   --   sorry
---   -- exact ⟨hAinFG, hAinGstar⟩
-
 --familyUsefulIdentity
 theorem familyUsefulIdentity
 {α : Type*} (F G H : Family α) :
-F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by sorry
+F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by
+  constructor
+  · intro hF A hA B hB C hC
+    rw [Set.inter_right_comm]
+    have hAC : A ∩ C ∈ F ⋎ G := by
+      use A
+      constructor
+      · exact hA
+      · use C
+    specialize hF hAC
+    rw [Set.inter_comm]
+    apply (mem_famDual H B).mp hB
+    exact hF
+  · intro hF A hA
+    rcases hA with ⟨B, hB, C, hC, hBC⟩
+    have hHH : H = (H*)* := by
+      rw [dualIsInvolutionOnFamilies]
+    rw [hHH]
+    intro D hD
+    rw [hBC, Set.inter_assoc]
+    nth_rw 2 [Set.inter_comm]
+    rw [<- Set.inter_assoc]
+    specialize hF hB D hD
+    apply (mem_famDual G (B ∩ D)).mp
+    · exact hF
+    · exact hC
 
 theorem familyLocalImplicationEquivalence
 {α : Type*} (F G H : Family α) :

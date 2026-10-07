@@ -270,7 +270,6 @@ def Family.famDual {α : Type*} (fam : Family α) : Family α :=
 lemma mem_famDual {α : Type*} (F : Set (Set α)) (A : Set α) :
   A ∈ famDual F ↔ ∀ B ∈ F, (A ∩ B).Nonempty := by rfl
 
-
 instance {α : Type*} : HasFamDual (Family α) where
   famDual := @Family.famDual α
 
@@ -308,6 +307,7 @@ def Family.famJoin {α : Type*} (famA famB : Family α) : Family α :=
       _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
     exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
+
 lemma mem_famJoin {α : Type*} (F G : Set (Set α)) (A : Set α) :
   A ∈ famJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
   rfl

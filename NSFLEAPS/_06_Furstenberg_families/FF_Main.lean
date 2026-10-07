@@ -1145,9 +1145,12 @@ theorem cStarIffSetOfRecAlongAllThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 A ∈ (centralFamily S)* ↔ ∀ (H : Set S), isThick H → A ∩ H ∈ dcTFamily S := by
   rw [cStarIsSyndeticMeetdcThick S]
-  have := mem_famMeetv2 (dcTFamily S) (syndeticFamily S) A
-  rw [dualSyndeticThick] at this
-  exact this
+  have hEqu : A ∈ dcTFamily S⋏syndeticFamily S ↔ ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ dcTFamily S :=
+    by
+    rw [familyMeetIsCommutative]
+    exact mem_famMeet (syndeticFamily S) (dcTFamily S) A
+  rw [dualSyndeticThick] at hEqu
+  exact hEqu
 
 /-- A set `A ⊆ S` is Central* if and only if `R(x,U) ∩ A` is syndetic for all
 `x ∈ U` in any minimal system -/
