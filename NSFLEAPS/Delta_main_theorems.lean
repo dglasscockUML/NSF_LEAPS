@@ -3,21 +3,35 @@ import NSFLEAPS._08_Application.AP_Main
 /-!
 # Main results in the Delta paper
 
-Explain
+This file contains the statements and proofs of the main results from the introduction
+section of the paper
+
+`The local dynamical structure of \Delta^* sets via a new Furstenberg family algebra`
+by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le.
+
+This file imports the entire project development, which rests on Mathlib only via
+the imports in the IM_Main.lean file.
+
+There are three sections below:
+  · Essential definitions
+  · Theorems
+
+The _essential definitions_ section contains commented copies or simplifications of
+the definitions required to audit the statements of the main theorems.  A definition
+with `Intro` appended is one that has been simplified in this file; its original
+form can be found in the development upstream.
+
+The _theorems_ section contains statements and proofs of the theorems that appear
+in the introduction of the paper.
+
 -/
 
-/- # Essential Definitions
-This is the minimal set of definitions necessary to state the
-main theorems as they appear in the introduction.  Those definitions
-that are commented out already appear upstream. Those definitions
-that are new are simplified versions of those that appear upstream
-and are quick to check in order to verify the statement of the main
-theorems. -/
+/- # Essential Definitions -/
 
 /- A set `A` of a semigroup `S` is thick if for all finite
 subsets `F ⊆ S`, there exists `s ∈ S` such that `Fs ⊆ A` -/
 /-
-_def isThick_ APPEARS ALREADY UPSTREAM
+_def isThick_ : this definition appears in this form upstream
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (F : Set S), F.Finite → ∃ s : S, (· * s) '' F ⊆ A
@@ -28,7 +42,7 @@ A subset `A` of a semigroup `S` is Bohr_0 if there exists a
 semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
 containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
 /-
-_def isBohrZero_ APPEARS ALREADY UPSTREAM
+_def isBohrZero_ : this definition appears in this form upstream
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
   (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
@@ -46,7 +60,7 @@ Prop :=
 /- A set `A` of a semigroup `S` is a Delta set if there exist
 `s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
 /-
-_def isDelta_ APPEARS ALREADY UPSTREAM
+_def isDelta_ : this definition appears in this form upstream
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
@@ -101,10 +115,7 @@ def familyJoin
 Set (Set S) :=
 {A : Set S | ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C}
 
-/- # Theorems
-These are the theorems from the introduction.  Their short proofs
-are possible by importing the full development and putting together
-or calling the more detailed theorems from the body of the paper. -/
+/- # Theorems -/
 
 /- # Theorem A : Proved after Theorem B -/
 
