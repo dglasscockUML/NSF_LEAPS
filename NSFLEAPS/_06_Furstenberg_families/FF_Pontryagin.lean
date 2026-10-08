@@ -1,18 +1,6 @@
-import Mathlib.MeasureTheory.Measure.Haar.Basic
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Function.ContinuousMapDense
-import Mathlib.Analysis.InnerProductSpace.Spectrum
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
-import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-import Mathlib.Topology.Algebra.PontryaginDual
-import Mathlib.Topology.ContinuousMap.Compact
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.Topology.UrysohnsLemma
+import NSFLEAPS._00_Imports.IM_Main
 
 /-!
-Written entirely by Claude Opus 5
-
 # Characters separate points on a compact abelian group
 
 The main result of this file is `PontryaginDual.exists_apply_ne_one`: on a compact Hausdorff
@@ -51,6 +39,22 @@ Write `μ` for the normalised Haar measure on `X` and `H = L²(X, μ)`.
   minimal nonzero invariant subspace `M` of it carries a common eigenvector for the commuting
   unitaries `transl μ a`, whose eigenvalues form the desired character.  Continuity of the
   character is read off from the continuous function `Lop φ v₀`.
+
+(This file was written by Claude Opus 5.)
+-/
+
+/- A list of imports just for this file:
+import Mathlib.MeasureTheory.Measure.Haar.Basic
+import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.MeasureTheory.Function.ContinuousMapDense
+import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.Topology.Algebra.PontryaginDual
+import Mathlib.Topology.ContinuousMap.Compact
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.Topology.UrysohnsLemma
 -/
 
 open MeasureTheory Filter Topology Metric

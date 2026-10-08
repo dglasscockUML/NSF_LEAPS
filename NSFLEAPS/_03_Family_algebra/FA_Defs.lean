@@ -1,39 +1,20 @@
-import NSFLEAPS._00_Imports.IM_Base
+import NSFLEAPS._00_Imports.IM_Main
 
-/-! This is a module docstring-/
+/-!
+# Furstenberg family structure objects
 
-/- These imports have been moved to _00_Imports.IM_Base
-import Mathlib.Data.Set.Basic
-import Mathlib.Data.Set.Lattice
-import Mathlib.Data.Fin.Basic
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Set.Operations
-import Init.PropLemmas
-import Mathlib.Data.Finset.Empty
-When ready, delete me.
+This file defines the objects that capture Furstenberg families
+and their basic properties.  It also establishes notation for the family
+dual, meet, and join operators.
 -/
 
---class defs
-class HasFamDual (T : Type _) where
-  famDual : T → T
-class HasFamJoin (T : Type _) where
-  famJoin : T → T → T
-class HasFamMeet (T : Type _) where
-  famMeet : T → T → T
+section Family_structure
 
---operators
-postfix:max "*" => HasFamDual.famDual
-infixr:80 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
-infixr:80 "⋏" => HasFamMeet.famMeet
---infixr:80 "~" => HasFamJoinnew.newFamJoin -- dont like 2 with max precedence
---infixr:80 "!" => HasFamMeetnew.newFamMeet
-def upwardClosed (F : Set (Set α)) : Prop :=
+def upwardClosed {α : Type*} (F : Set (Set α)) : Prop :=
   ∀ (A B : Set α), A ∈ F → A ⊆ B → B ∈ F
 
-def partitionRegularTwoSets (F : Set (Set α)) : Prop :=
-  ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
-
---family structures
+/-- A term of type `Family α` is an upward closed
+collection of subsets of `α` -/
 structure Family (α : Type*) where
   sets : Set (Set α)
   upward_closed : upwardClosed sets
@@ -48,86 +29,234 @@ instance {α} : SetLike (Family α) (Set α) where
     congr
 
 @[ext]
-lemma Family.ext {α} {F G : Family α} (h : ∀ (A : Set α), A ∈ F ↔ A ∈ G) : F = G :=
+lemma Family.ext {α : Type*} {F G : Family α} (h : ∀ (A : Set α), A ∈ F ↔ A ∈ G) : F = G :=
   SetLike.ext h
 
--- instance {α} : SetLike (Family α) (Set α) where
---   coe F := F.sets
---   coe_injective' := by
---     intro F G h
---     cases F; cases G; cases h; rfl
-
-instance {α} : HasSubset (Family α) where
+instance {α : Type*} : HasSubset (Family α) where
   Subset F G := (F : Set (Set α)) ⊆ (G : Set (Set α))
 
-instance {α} : Inter (Family α) where
+instance {α : Type*} : Inter (Family α) where
   inter F G := ⟨(F : Set (Set α)) ∩ (G : Set (Set α)), by
     intro A B hA hAB
     obtain ⟨hAF, hAG⟩ := hA
     exact ⟨F.upward_closed A B hAF hAB, G.upward_closed A B hAG hAB⟩⟩
 
-instance {α} : Union (Family α) where
+instance {α : Type*} : Union (Family α) where
   union F G := ⟨(F : Set (Set α)) ∪ (G : Set (Set α)), by
     intro A B hA hAB
     obtain hAF | hAG := hA
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
-def isIntersectionClosed (F : Set (Set α)) : Prop :=
-  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
+def Family.iInter
+{α ι : Type*} (F : ι → Family α) : Family α :=
+  ⟨⋂ i, (F i).sets, by
+    intro A B hA hAB
+    rw [Set.mem_iInter] at hA ⊢
+    intro i
+    exact (F i).upward_closed A B (hA i) hAB⟩
 
-def isFilterFamily (F : Family α) : Prop :=
-  (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+def Family.iUnion
+{α ι : Type*} (F : ι → Family α) : Family α :=
+  ⟨⋃ i, (F i).sets, by
+    intro A B hA hAB
+    rw [Set.mem_iUnion] at hA ⊢
+    obtain ⟨i, hi⟩ := hA
+    exact ⟨i, (F i).upward_closed A B hi hAB⟩⟩
 
--- want to define pr for beyond two sets
-def PartitionRegular (F : Family α): Prop := --rewrite this to not use ℕ **
-  sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+@[simp]
+theorem Family.mem_iInter
+{α ι : Type*} (F : ι → Family α) (A : Set α) :
+    A ∈ (Family.iInter F).sets ↔ ∀ i, A ∈ (F i).sets :=
+  Set.mem_iInter
 
-def isPRFamily (F : Family α) : Prop :=
-  ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
+@[simp]
+theorem Family.mem_iUnion
+{α ι : Type*} (F : ι → Family α) (A : Set α) :
+    A ∈ (Family.iUnion F).sets ↔ ∃ i, A ∈ (F i).sets :=
+  Set.mem_iUnion
 
--- def infiniteSets (α : Type*) : Family α where
---   sets := {s | s.Infinite}
---   upward_closed := by
---     intro A B hA hAB
---     exact hA.mono hAB
+/-- Given a family `F` and a set `A`, `capFamily F A` is the family of
+sets `B` for which `B ∩ A ∈ F` -/
+def capFamily
+{α : Type*} (F : Family α) (A : Set α) :
+Family α :=
+{
+  sets := {B : Set α | A ∩ B ∈ F}
+  upward_closed := by
+    intro C D hC CinD
+    exact F.2 (A ∩ C) (A ∩ D) hC (Set.inter_subset_inter_right A CinD)
+}
 
--- theorem infinite_is_PR (α : Type*) [Infinite α] :
---   isPRFamily (infiniteSets α) := by
---   intro A hA n c
---   -- at least one color must appear infinitely often
---   simp [infiniteSets]
---   exact Finite.exists_infinite_fiber A c hA
+lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by
+  intro A hA
+  exact hA
 
-structure PRFamily (α : Type) extends Family α where
-  partition_regular : partitionRegularTwoSets sets
+end Family_structure
 
-structure FilterFamily (α : Type) extends Family α where
-  filter : isIntersectionClosed sets
+section Empty_and_full_families
 
-def fullCollection (α : Type _) : Set (Set α) :=
+/-- The full collection is the set of all subsets of `α` -/
+def fullCollection (α : Type*) : Set (Set α) :=
   Set.powerset (Set.univ : Set α)
 
-def fullFam (α : Type _) : Family α := {
+/-- The full family is the family whose underlying set is
+the full collection -/
+def fullFam (α : Type*) : Family α := {
   sets := fullCollection α,
   upward_closed := by
     intro A B hA hAB
     unfold fullCollection
     simp [Set.powerset] at hA ⊢
 }
-def emptyFam (α : Type _) : Family α := {
+
+/-- The empty family is the family whose underlying set is
+the empty set -/
+def emptyFam (α : Type*) : Family α := {
   sets := ∅,
   upward_closed := by
     intro A B hA hAB
     simp at hA
 }
 
+/-- An equivalent condition to show that a family is non-empty -/
+lemma notEmptyFam
+{α : Type*} (F : Family α) :
+F ≠ emptyFam α ↔ F.sets.Nonempty := by
+  constructor
+  · intro hF
+    by_contra hContra
+    simp only [Set.not_nonempty_iff_eq_empty] at hContra
+    have hGEq : F = emptyFam α := by
+      simp only [emptyFam]
+      ext B
+      constructor
+      · intro hB
+        have hBIn : B ∈ F.sets := by
+          exact hB
+        rw [hContra] at hBIn
+        exact hBIn
+      · intro hB
+        have hBIn : B ∈ F.sets := by
+          rw [hContra]
+          exact hB
+        exact hBIn
+    exact hF hGEq
+  · intro hF
+    by_contra hContra
+    rcases hF with ⟨A, hA⟩
+    rw [hContra] at hA
+    simp [emptyFam] at hA
 
---dual definitions
-def famDual (F : Set (Set α)) : Set (Set α) :=
+end Empty_and_full_families
+
+section Filters_and_PR_Families
+
+/-- A family is a filter if it is not the empty family and if it
+is closed under intersections -/
+def isFilterFamily
+{α : Type*} (F : Family α) :
+Prop :=
+  (F ≠ emptyFam α) ∧ (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+
+/-- A family is partition regular (PR) if it is not the full
+family and if the union of two sets belonging to the family
+implies that at least one of the sets belongs to the family -/
+def isPRFamily
+{α : Type*} (F : Family α) :
+Prop :=
+  (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
+
+/-- A PR family `F` satisfies the ostensibly stronger property of
+one piece of any finite partition belonging to `F` -/
+-- Proof of this theorem was written by ChatGPT
+theorem prFamilyIsMultiPR
+{α : Type*} {F : Family α} (hF : isPRFamily F) :
+∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n),
+  ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
+  classical
+  intro A hA n c
+  have haux (s : Finset (Fin n)) (hs : s.Nonempty) :
+      {x ∈ A | c x ∈ s} ∈ F →
+        ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F := by
+    induction hs using Finset.Nonempty.cons_induction with
+    | singleton i =>
+        intro h
+        exact ⟨i, by simpa only [Finset.mem_singleton] using h⟩
+    | cons i s hi hs ih =>
+        intro h
+        have heq :
+            {x ∈ A | c x ∈ Finset.cons i s hi} =
+              {x ∈ A | c x = i} ∪ {x ∈ A | c x ∈ s} := by
+          ext x
+          simp [Set.mem_union, and_or_left]
+        rw [heq] at h
+        rcases hF.2 _ _ h with hiF | hsF
+        · exact ⟨i, hiF⟩
+        · exact ih hsF
+  apply haux Finset.univ
+    ⟨⟨0, n.property⟩, Finset.mem_univ _⟩
+  simpa using hA
+
+end Filters_and_PR_Families
+
+-- section Old_filter_and_pr
+
+-- def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
+--   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
+
+-- def isFilterFamily {α : Type*} (F : Family α) : Prop :=
+--   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
+
+-- def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
+--   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
+
+-- def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
+--   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
+
+-- -- want to define pr for beyond two sets
+-- def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
+--   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
+
+-- def isPRFamily {α : Type*} (F : Family α) : Prop :=
+--   ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
+
+-- structure PRFamily (α : Type) extends Family α where
+--   partition_regular : partitionRegularTwoSets sets
+
+-- structure FilterFamily (α : Type) extends Family α where
+--   filter : isIntersectionClosed sets
+
+-- end Old_filter_and_pr
+
+section Dual_Join_Meet_Classes_and_Operators
+
+/- Classes associated with the family dual, join, and meet operators -/
+class HasFamDual (T : Type _) where
+  famDual : T → T
+class HasFamJoin (T : Type _) where
+  famJoin : T → T → T
+class HasFamMeet (T : Type _) where
+  famMeet : T → T → T
+
+/- The family dual, join, and meet operator symbols -/
+postfix:max "*" => HasFamDual.famDual
+infixr:80 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
+infixr:80 "⋏" => HasFamMeet.famMeet
+--infixr:80 "~" => HasFamJoinnew.newFamJoin -- dont like 2 with max precedence
+--infixr:80 "!" => HasFamMeetnew.newFamMeet
+
+end Dual_Join_Meet_Classes_and_Operators
+
+section Dual
+
+/-- The family dual defined at the level of collections:
+famDual F = { A | ∀ B ∈ F, A ∩ B ≠ ∅ } -/
+def famDual {α : Type*} (F : Set (Set α)) : Set (Set α) :=
   { A : Set α | ∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty}
 
-def Family.famDual (fam : Family α) : Family α :=
+/-- The family dual of a family as a term of type Family α -/
+def Family.famDual {α : Type*} (fam : Family α) : Family α :=
 { sets := _root_.famDual fam.sets,
   upward_closed := by
     intro A B hA hAB C hCF
@@ -137,45 +266,33 @@ def Family.famDual (fam : Family α) : Family α :=
     rcases hAint with ⟨x, hxA, hxC⟩
     exact ⟨x, hAB hxA, hxC⟩
 }
-lemma mem_famDual (F : Set (Set α)) (A : Set α) :
+
+lemma mem_famDual {α : Type*} (F : Set (Set α)) (A : Set α) :
   A ∈ famDual F ↔ ∀ B ∈ F, (A ∩ B).Nonempty := by rfl
 
-def isPRTwoSets (F : Family α) : Prop :=
-  ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
-/- def PRFamily.famDual (fam : PRFamily α) : PRFamily α :=
-{
-  sets := _root_.famDual fam.sets,
-  upward_closed := by
-    intro A B hA hAB C hCF
-    -- prove B ∈ dual S fam.
-    have hAint : (A ∩ C).Nonempty :=
-      hA C hCF
-    rcases hAint with ⟨x, hxA, hxC⟩
-    exact ⟨x, hAB hxA, hxC⟩
-  partition_regular := by sorry -- need to get rid of this sorry
-    -- prove ∃ i : Fin 2, {x ∈ A| c x = i} ∈ dual S fam.
-} -/
-
-instance : HasFamDual (Family α) where
+instance {α : Type*} : HasFamDual (Family α) where
   famDual := @Family.famDual α
-instance : HasFamDual (Set (Set α)) where
+
+instance {α : Type*} : HasFamDual (Set (Set α)) where
   famDual := _root_.famDual
 --instance : HasFamDual (PRFamily α) where
  -- famDual := @PRFamily.famDual α
 -- ⋎ definitions
+
 lemma mem_dual_star {α : Type*} (F : Family α) (A : Set α) :
     A ∈ F* ↔ ∀ B ∈ F, (A ∩ B).Nonempty := Iff.rfl
-/- open Classical in
-noncomputable def famJoin (F G : Set (Set α)) : Set (Set α) :=
-  if F = ∅ then G
-  else if G = ∅ then F
-  else { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B } -/
---F ⋏ G = {A ⊆ S: ∀ B ∈ F*, A ∩ B ∈ G} if both not P(S),
---if F = P(S), then G, if G = P(S) then F
-def famJoin (F G : Set (Set α)) : Set (Set α) :=
-  { h | ∃ A ∈ F, ∃ B ∈ G, h = A ∩ B }
 
-def Family.famJoin (famA famB : Family α) : Family α :=
+end Dual
+
+section Join
+
+/-- The family join defined at the level of collections:
+famJoin F G = {C | ∃ A ∈ F, ∃ B ∈ G, C = A ∩ B} -/
+def famJoin {α : Type*} (F G : Set (Set α)) : Set (Set α) :=
+  { C | ∃ A ∈ F, ∃ B ∈ G, C = A ∩ B }
+
+/-- The family join of families as a term of type Family α -/
+def Family.famJoin {α : Type*} (famA famB : Family α) : Family α :=
 {
   sets := _root_.famJoin famA.sets famB.sets,
   upward_closed := by
@@ -190,49 +307,27 @@ def Family.famJoin (famA famB : Family α) : Family α :=
       _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
     exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
-lemma mem_famJoin (F G : Set (Set α)) (A : Set α) :
+
+lemma mem_famJoin {α : Type*} (F G : Set (Set α)) (A : Set α) :
   A ∈ famJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
   rfl
-instance : HasFamJoin (Set (Set α))  where
+instance {α : Type*} : HasFamJoin (Set (Set α))  where
   famJoin := _root_.famJoin
-noncomputable instance : HasFamJoin (Family α) where
+
+noncomputable instance {α : Type*} : HasFamJoin (Family α) where
   famJoin := @Family.famJoin α
-/- open Classical in
-noncomputable def Family.famJoin (famA famB : Family α) : Family α :=
-{
-  sets := _root_.famJoin famA.sets famB.sets,
-  upward_closed := by
-    intro A B hA hAB
-    -- prove B ∈ famMeet famA famB
-    unfold _root_.famJoin at hA ⊢
-    split_ifs at hA ⊢ with hF hG
-    · exact famB.upward_closed A B hA hAB
-    · exact famA.upward_closed A B hA hAB
-    · rcases hA with ⟨C, hCF, D, hDG, hAeq⟩
-      -- C ∩ D = A ⊆ B, so B ⊆ (C ∪ B) and B ⊆ (D ∪ B).
-      have hC' : (B ∪ C) ∈ famA.sets := famA.upward_closed C (B ∪ C) hCF Set.subset_union_right
-      have hD' : (B ∪ D) ∈ famB.sets := famB.upward_closed D (B ∪ D) hDG Set.subset_union_right
-      -- Now, (B ∪ C) ∩ (B ∪ D) = B ∪ (C ∩ D) = B ∪ A = B, so B ∈ famMeet famA famB.
-      have hsub : C ∩ D ⊆ B := by simpa [hAeq] using hAB
-      have hB : B = (B ∪ C) ∩ (B ∪ D) := by
-        calc B = B ∪ (C ∩ D) := by exact (Set.union_eq_left.mpr hsub).symm
-        _ = (B ∪ C) ∩ (B ∪ D) := by simp [Set.union_inter_distrib_left]
-      exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
-}
 
-lemma mem_famJoin (F G : Set (Set α)) (A : Set α) :
-  A ∈ famJoin F G ↔ (F = ∅ → A ∈ G) ∧ (G = ∅ → A ∈ F) ∧
-    (F ≠ ∅ → G ≠ ∅ → ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) :=
-by sorry
-noncomputable instance : HasFamJoin (Set (Set α))  where
-  famJoin := _root_.famJoin
-noncomputable instance : HasFamJoin (Family α) where
-  famJoin := @Family.famJoin α -/
+end Join
 
--- ⋏ definitions
-def famMeet (F G : Set (Set α)) : Set (Set α) :=
-  { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
-def Family.famMeet (famA famB : Family α) : Family α := {
+section Meet
+
+/-- The family meet defined at the level of collections:
+famMeet F G = { A | ∀ B ∈ F*, A ∩ B ∈ G } -/
+def famMeet {α : Type*} (F G : Set (Set α)) : Set (Set α) :=
+  { A : Set α | ∀ B ∈ F*, A ∩ B ∈ G }
+
+/-- The family meet of families as a term of type Family α -/
+def Family.famMeet {α : Type*} (famA famB : Family α) : Family α := {
   sets := _root_.famMeet famA.sets famB.sets,
   upward_closed := by
     intro A B hA hAB
@@ -243,42 +338,15 @@ def Family.famMeet (famA famB : Family α) : Family α := {
       (Set.inter_subset_inter hAB (Set.Subset.refl C))
     exact hBCmem
 }
-lemma mem_famMeet (F G : Set (Set α)) (A : Set α) :
+
+lemma mem_famMeet {α : Type*} (F G : Family α) (A : Set α) :
   A ∈ famMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
   rfl
-instance : HasFamMeet (Set (Set α))  where
+
+instance {α : Type*} : HasFamMeet (Set (Set α))  where
   famMeet := _root_.famMeet
-instance : HasFamMeet (Family α) where
+
+instance {α : Type*} : HasFamMeet (Family α) where
   famMeet := @Family.famMeet α
 
-
-/- open Classical in
-noncomputable def famMeet (F G : Set (Set α)) : Set (Set α) :=
-  if F = fullCollection α then G
-  else if G = fullCollection α then F
-  else { (A : Set α)| ∀ B ∈ F*, A ∩ B ∈ G }
-
-open Classical in
-noncomputable def Family.famMeet (famA famB : Family α) : Family α := {
-  sets := _root_.famMeet famA.sets famB.sets,
-  upward_closed := by
-    intro A B hA hAB
-    -- prove B ∈ famMeet famA famB
-    unfold _root_.famMeet at hA ⊢
-    split_ifs at hA ⊢ with hF hG
-    · exact famB.upward_closed A B hA hAB
-    · exact famA.upward_closed A B hA hAB
-    · intro C hCF
-      have hBCmem : B ∩ C ∈ famB.sets :=
-        famB.upward_closed (A ∩ C) (B ∩ C) (hA C hCF)
-        (Set.inter_subset_inter hAB (Set.Subset.refl C))
-      exact hBCmem
-}
-lemma mem_famMeet (F G : Set (Set α)) (A : Set α) :
-  A ∈ famMeet F G ↔ (F = fullCollection α → A ∈ G) ∧
-    (F ≠ fullCollection α → ∀ B ∈ F*, A ∩ B ∈ G) :=
-by sorry
-instance : HasFamMeet (Set (Set α))  where
-  famMeet := _root_.famMeet
-noncomputable instance : HasFamMeet (Family α) where
-  famMeet := @Family.famMeet α -/
+end Meet

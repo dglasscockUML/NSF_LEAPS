@@ -1,6 +1,12 @@
-import NSFLEAPS._05_Ultrafilters.UF_Defs
+import NSFLEAPS._05_Ultrafilters.UF_Main
 
-/-! This is a module docstring -/
+/-!
+# The regionally proximal relation is an equivalence relation
+
+This file contains the proofs of the main results concerning the regionally
+proximal relation from the paper "The regionally proximal relation for
+commutative semigroup actions"
+-/
 
 variable {S} [CommSemigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -367,7 +373,7 @@ section Corner_System_1
 
 omit [CommSemigroup S] [Nonempty S] [CompactSpace X] [T2Space X] [Nonempty X] in
 /-- Given an action of `S` on `X`, `leftMap1: X → X` is defined by `s z = z` -/
-def leftMap1 (s : S) : X → X := id
+def leftMap1 (_s : S) : X → X := id
 
 omit [CommSemigroup S] [Nonempty S] [CompactSpace X] [T2Space X] [Nonempty X] in
 /-- `leftMap1 : X → X` is continuous -/
@@ -1045,7 +1051,7 @@ section Corollaries
 /-- In a minimal system, for `(x,y) ∈ RP` and `U, V ⊆ X` open with `y ∈ V`,
 the intersection `R(x,U) ∩ R(V,U)` is a syndetic subset of `S` -/
 theorem xyInRPImpliesSyndeticVisitTimeIntersection
-(hMin : isMinimalSystem dSystem) {x y : X} :
+(hMin : isMinimalSystem dSystem) (x y : X) :
 ((x, y) ∈ RP dSystem → ∀ (U V : Set X), IsOpen U → IsOpen V → U.Nonempty → y ∈ V →
 isSyndetic ((visitTimeSet dSystem x U) ∩ (setVisitTimeSet dSystem V U)))
 ∧

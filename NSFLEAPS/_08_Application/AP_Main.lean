@@ -1,62 +1,13 @@
-import NSFLEAPS._06_Furstenberg_families.FF_Defs
-import NSFLEAPS._07_RP.RP_Defs
+import NSFLEAPS._06_Furstenberg_families.FF_Main
+import NSFLEAPS._07_RP.RP_Nat_ext
 import NSFLEAPS._08_Application.AP_Symbolic_system
 
-/-! This is a module docstring -/
+/-!
+# Applications
 
-
-section Theorems_needed_from_FA_Theorems
--- This section contains theorems from FA_Theorems which are not stated yet
--- I state them here to use for theorems in this file
--- After we state corresponding theorems in FA_Theorems, the statements in this
--- section will be removed
-
-/-- For families F and G, we have F ⋏ G ⊆ F ∩ G -/
--- This theorem will be moved to FA_Theorems later
-theorem familyMeetContainedInIntersection
-{S : Type*} (F G : Family S) : F ⋏ G ⊆ F ∩ G := by
-  sorry
-
-/-- Familymeet is monotone -/
--- We will move this theorem to FA_Theorems file later
--- Here's an easier-to-apply version of the arguments:  (F) {G H} : G ⊆ H → F ⋏ G ⊆ F ⋏ H
-theorem familyMeetIsMonotonic
-{S : Type*} (F G H : Family S) (hGH : G ⊆ H) : F ⋏ G ⊆ F ⋏ H := by
-  sorry
-
-/-- This lemma helps us unfold the definition of FamilyMeet -/
--- This may be redundant eventually.
--- But for now, I am struggling to unfold the definition of FamilyMeet, so I use this lemma
-lemma unfoldFamMeet
-{S : Type*} (F G : Family S) (A : Set S) : A ∈ F ⋏ G ↔ ∀ B ∈ F*, A ∩ B ∈ G := by
-  sorry
-
-/-- For families F, G, H, we have H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H -/
--- This theorem should be also in FA_Theorems. I state it here since it's needed for this section
--- and the corresponding theorem in FA_Theorems is not there yet
-theorem familyLocalImplicationEquivalence
-{S : Type*} (F G H : Family S) : H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
-  sorry
-
-theorem familyJoinCommutative
-{S : Type*} (F G : Family S) : F ⋎ G = G ⋎ F := by sorry
-
-theorem familyJoinMonotoneSlot1
-{S : Type*} {F G : Family S} (H : Family S) : F ⊆ G → F ⋎ H ⊆ G ⋎ H := by sorry
-
-theorem familyJoinMonotoneSlot2
-{S : Type*} (F : Family S) {G H : Family S} : G ⊆ H → F ⋎ G ⊆ F ⋎ H := by sorry
-
-theorem dualIsAntitone
-{S : Type*} {F G : Family S} : F ⊆ G → G* ⊆ F* := by sorry
-
-theorem deMorganOverJoin
-{S : Type*} {F G : Family S} : (F ⋎ G)* = F* ⋏ G* := by sorry
-
-theorem deMorganOverMeet
-{S : Type*} {F G : Family S} : (F ⋏ G)* = F* ⋎ G* := by sorry
-
-end Theorems_needed_from_FA_Theorems
+This file contains the main results from the paper "The local dynamical
+structure of delta* sets via a new Furstenberg family algebra".
+-/
 
 section Reduction_to_UR_sets
 
@@ -67,8 +18,9 @@ def isURSet
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
 
-/-- An UR set can be written as R(x, U) -/
-theorem urSetIsRxU.{u}
+/-- All UR sets can be written as `R(x, U)` with `x` uniformly recurrent
+and `U` clopen -/
+theorem urSetIsRxU
 {S : Type u} [Semigroup S] [Nonempty S] {A : Set S} (hA : isURSet A) :
 ∃ (X : Type u) (_ : TopologicalSpace X) (_ : CompactSpace X) (_ : T2Space X) (_ : Nonempty X),
 ∃ (dSystem : DynamicalSystem S X) (_ : isMinimalSystem dSystem),
@@ -160,12 +112,11 @@ theorem urSetIsRxU.{u}
     simp only [indicator, true_eq_decide_iff] at hw1
     exact hw1
 
-/-- Given a syndetic set `A` and a thick set `H`, there exists a
+/-- Given a set `A` and a thick set `H`, there exists a
 UR set `B` and a thick set `G` such that `A ∩ G = B ∩ G` -/
 theorem syndSetIsUROnThickSet
 {S : Type*} [Semigroup S] [Nonempty S]
-(A : Set S) {_ : isSyndetic A}
-(H : Set S) {hH : isThick H} :
+(A : Set S) (H : Set S) {hH : isThick H} :
 ∃ (B : Set S) (_ : isURSet B) (H' : Set S) (_ : isThick H') (_ : H' ⊆ H),
 A ∩ H' = B ∩ H' := by
   have hExistp := minIdempotentWitnessesShiftIntersectionLargeness H hH
@@ -410,7 +361,7 @@ A ∩ H' = B ∩ H' := by
 --     intro A hA
 --     have h0 : isSyndetic A := by
 --       have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
---         apply familyMeetContainedInIntersection
+--         apply familyMeetContainedInIntersectionv2
 --       have h02 : A ∈ syndeticFamily S ∩ F := by
 --         exact h01 hA
 --       have h03 : A ∈ syndeticFamily S := by
@@ -425,7 +376,7 @@ A ∩ H' = B ∩ H' := by
 --         exact hH
 --       obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
 --       have h12 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
---         exact (unfoldFamMeet (syndeticFamily S) F A).mp hA
+--         exact (mem_famMeet (syndeticFamily S) F A).mp hA
 --       have h13 : A ∩ H' ∈ F := by
 --         specialize h12 H'
 --         rw [dualSyndeticThick] at h12
@@ -454,12 +405,14 @@ A ∩ H' = B ∩ H' := by
 --       exact dualSyndeticThick
 --     have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
 --       rw [<- dualSyndeticThick]
---       exact (unfoldFamMeet (syndeticFamily S) G A).mpr
+--       exact (mem_famMeet (syndeticFamily S) G A).mpr
 --     apply h3
 --     intro H hH2
 --     specialize h1 H hH2
 --     exact h1
 
+/-- A sufficient condition for strongly-`F` sets to be strongly-`G`:
+it suffices to check a finer statement for UR sets. -/
 theorem urContainmentSufficesForFamilyContainment
 {S : Type*} [Semigroup S] [Nonempty S]
 (F G : Family S)
@@ -467,68 +420,158 @@ theorem urContainmentSufficesForFamilyContainment
   (∀ (H' : Set S) (_ : H' ⊆ H) (_ : isThick H'), (B ∩ H' ∈ F))
     → (∀ (H' : Set S) (_ : H' ⊆ H) (_ : isThick H'), (B ∩ H' ∈ G))} :
 (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
-  intro A hA
-  have h0 : isSyndetic A := by
-    have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
-      apply familyMeetContainedInIntersection
-    have h02 : A ∈ syndeticFamily S ∩ F := by
-      exact h01 hA
-    have h03 : A ∈ syndeticFamily S := by
-      exact h02.1
-    simpa
-  have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
-    intro H hHThick
-    have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
-    A ∩ H' = B ∩ H' := by
-      apply syndSetIsUROnThickSet
-      · exact h0
-      · exact hHThick
-    obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
-    have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
-      intro H'' hH'' hH''Thick
-      have hABH'' : B ∩ H'' = A ∩ H'' := by
-        have hAB0 : H' ∩ H'' = H'' := by
-          exact Set.inter_eq_self_of_subset_right hH''
-        have hAB1 : B ∩ H'' = B ∩ H' ∩ H'' := by
-          nth_rw 1 [<- hAB0]
-          rw [Set.inter_assoc]
-        have hAB2 : A ∩ H'' = A ∩ H' ∩ H'' := by
-          nth_rw 1 [<- hAB0]
-          rw [Set.inter_assoc]
-        rw [hAB1, hAB2, h2]
-      rw [hABH'']
-      apply (unfoldFamMeet (syndeticFamily S) F A).mp hA
-      rw [dualSyndeticThick]
-      exact hH''Thick
-    have hH'Triv : H' ⊆ H' := by
-      simp
-    specialize hFG B H' hB hH' h12 H' hH'Triv hH'
-    rw [<- h2] at hFG
-    have hSub : A ∩ H' ⊆ A ∩ H := by
-      intro a ha
-      simp only [Set.mem_inter_iff] at ha
-      rcases ha with ⟨ha1, ha2⟩
-      simp only [Set.mem_inter_iff]
+  by_cases FisFull : F = fullFam S
+  · -- Case that F = fullFam S
+    intro A hA
+    let B := ({} : Set S)
+    let H := (Set.univ : Set S)
+    have hBUnif : isURSet B := by
+      simp only [isURSet, isUniformlyRecurrent]
+      intro U hU
+      have hVis : (visitTimeSet (selfSymbolicSystem S) (indicator B) U) = Set.univ := by
+        apply Set.Subset.antisymm
+        · simp
+        · intro t ht
+          simp only [visitTimeSet, Set.mem_preimage]
+          have hEq : (selfSymbolicSystem S).map t (indicator B) = indicator B := by
+            apply funext
+            intro s
+            have hB0 : indicator B s = false := by
+              simp [indicator, B]
+            rw [hB0]
+            simp [selfSymbolicSystem, basicRightAction, symbolicSystem, indicator, B]
+          rw [hEq]
+          simp only [mem_nhds_iff] at hU
+          rcases hU with ⟨V, hV1, hV2, hV3⟩
+          apply hV1 hV3
+      rw [hVis]
+      simp only [isSyndetic, Set.mem_univ, and_true, forall_const]
+      have hSNonempty : (Set.univ : Set S).Nonempty := by
+        simp
+      rcases hSNonempty with ⟨t, ht⟩
+      use {t}
       constructor
-      · exact ha1
-      · apply hHH' ha2
-    apply G.upward_closed (A ∩ H') (A ∩ H) hFG hSub
-  have h2 : (syndeticFamily S)* = (thickFamily S) := by
-    exact dualSyndeticThick
-  have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
-    rw [<- dualSyndeticThick]
-    exact (unfoldFamMeet (syndeticFamily S) G A).mpr
-  apply h3
-  intro H hH2
-  specialize h1 H hH2
-  exact h1
+      · simp
+      · use t
+        simp
+    have hUnivThick : isThick (Set.univ : Set S) := by
+      simp [isThick]
+    have hHThick : isThick H := by
+      exact hUnivThick
+    specialize hFG B H hBUnif hHThick
+    have hStart : (∀ H' ⊆ H, isThick H' → B ∩ H' ∈ F) := by
+      intro H' hH'H hH'Thick
+      apply F.upward_closed ∅
+      · simp [FisFull, fullFam, fullCollection]
+      · simp
+    have hSub : Set.univ ⊆ H := by
+      simp
+      rfl
+    specialize hFG hStart (Set.univ : Set S) hSub hUnivThick
+    simp only [Set.inter_univ, B] at hFG
+    intro C hC
+    apply G.upward_closed ∅ (A ∩ C) hFG
+    simp only [Set.subset_inter_iff, Set.empty_subset, and_self]
+  · -- Case that F ≠ fullFam S
+    intro A hA
+    -- have h0 : isSyndetic A := by
+    --   have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
+    --     exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
+    --   have h03 : A ∈ syndeticFamily S := by
+    --     exact h01 hA
+    --   simpa
+    have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
+      intro H hHThick
+      have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
+      A ∩ H' = B ∩ H' := by
+        apply syndSetIsUROnThickSet
+        --· exact h0
+        · exact hHThick
+      obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
+      have h12 : ∀ H'' ⊆ H', isThick H'' → B ∩ H'' ∈ F := by
+        intro H'' hH'' hH''Thick
+        have hABH'' : B ∩ H'' = A ∩ H'' := by
+          have hAB0 : H' ∩ H'' = H'' := by
+            exact Set.inter_eq_self_of_subset_right hH''
+          have hAB1 : B ∩ H'' = B ∩ H' ∩ H'' := by
+            nth_rw 1 [<- hAB0]
+            rw [Set.inter_assoc]
+          have hAB2 : A ∩ H'' = A ∩ H' ∩ H'' := by
+            nth_rw 1 [<- hAB0]
+            rw [Set.inter_assoc]
+          rw [hAB1, hAB2, h2]
+        rw [hABH'']
+        apply (mem_famMeet (syndeticFamily S) F A).mp hA
+        rw [dualSyndeticThick]
+        exact hH''Thick
+      have hH'Triv : H' ⊆ H' := by
+        simp
+      specialize hFG B H' hB hH' h12 H' hH'Triv hH'
+      rw [<- h2] at hFG
+      have hSub : A ∩ H' ⊆ A ∩ H := by
+        intro a ha
+        simp only [Set.mem_inter_iff] at ha
+        rcases ha with ⟨ha1, ha2⟩
+        simp only [Set.mem_inter_iff]
+        constructor
+        · exact ha1
+        · apply hHH' ha2
+      apply G.upward_closed (A ∩ H') (A ∩ H) hFG hSub
+    have h2 : (syndeticFamily S)* = (thickFamily S) := by
+      exact dualSyndeticThick
+    have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
+      rw [<- dualSyndeticThick]
+      exact (mem_famMeet (syndeticFamily S) G A).mpr
+    apply h3
+    intro H hH2
+    specialize h1 H hH2
+    exact h1
+
+/-- A sufficient condition for the dual of the very strongly PW-`F` sets to be very
+strongly PW-`G`: it suffices to check a finer statement for UR sets. -/
+theorem urContainmentSufficesForFamilyContainmentUpgrade
+{S : Type*} [Semigroup S] [Nonempty S]
+(F G : Family S)
+(hFG : ∀ h ∈ thickFamily S,
+  (((capFamily (thickFamily S) h)*⋏F)).sets ∩ {C : Set S | isURSet C} ⊆
+    ((capFamily (thickFamily S) h)*⋏G).sets) :
+Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ F) ⊆
+Family.iUnion (fun (t : (thickFamily S).sets) ↦ (capFamily (thickFamily S) t)* ⋏ G) :=
+by
+  intro A hA
+  -- there is a thick `H` such that `A ∩ H' ∈ F` for all thick `H' ⊆ H`
+  obtain ⟨H, hH, hAH⟩ := (Set.ext_iff.mp
+    (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S) F) A).mp hA
+  -- there is a UR set `B` and a thick `T ⊆ H` such that `A ∩ T = B ∩ T`
+  obtain ⟨B, hBUR, T, hT, hTH, hATBT⟩ := syndSetIsUROnThickSet A H (hH := hH)
+  -- so `A ∩ H' = B ∩ H'` for all `H' ⊆ T`
+  have hBA : ∀ H' ⊆ T, B ∩ H' = A ∩ H' := by
+    intro H' hH'T
+    rw [← Set.inter_eq_self_of_subset_right hH'T, ← Set.inter_assoc, ← Set.inter_assoc, hATBT]
+  -- `B ∩ H' = A ∩ H' ∈ F` for all thick `H' ⊆ T`
+  have hBF : B ∈ ((capFamily (thickFamily S) T)* ⋏ F).sets :=
+    (memberOfCapFamDualMeetH (thickFamily S) F B T).mpr fun H' hH' hH'T ↦ by
+      rw [hBA H' hH'T]
+      exact hAH H' hH' (hH'T.trans hTH)
+  -- by assumption, `B ∩ H' ∈ G` for all thick `H' ⊆ T`
+  have hBG := (memberOfCapFamDualMeetH (thickFamily S) G B T).mp (hFG T hT ⟨hBF, hBUR⟩)
+  -- hence `A ∩ H' = B ∩ H' ∈ G` for all thick `H' ⊆ T`
+  refine (Set.ext_iff.mp
+    (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S) G) A).mpr ⟨T, hT, ?_⟩
+  intro H' hH' hH'T
+  rw [← hBA H' hH'T]
+  exact hBG H' hH' hH'T
 
 end Reduction_to_UR_sets
 
 section Delta_builder
 
--- Next three definitions were written by ChatGPT. The definitions help with product
--- on commutative semigroups
+/-
+Next three definitions and the three lemmas below were written by ChatGPT
+These definitions help with product on commutative semigroups and the lemmas
+provide simple equalities regarding these definitions
+These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
+-/
 
 -- Product of f over a nonempty finset.
 noncomputable def prodNonempty
@@ -557,6 +600,306 @@ prodNonempty ((Finset.univ : Finset (Fin N)).erase i) (by
     simp only [Finset.card_univ, Fintype.card_fin]
     omega) s
 
+lemma mul_prodNonempty_erase
+    {I S : Type*} [DecidableEq I] [CommSemigroup S] [Nonempty S]
+    (t : Finset I) (ht : t.Nonempty) (f : I → S)
+    (i : I) (hi : i ∈ t) (he : (t.erase i).Nonempty) :
+    (f i) * prodNonempty (t.erase i) he f =
+      prodNonempty t ht f := by
+  classical
+  let : Std.Commutative (fun x y : S ↦ x * y) :=
+    ⟨fun x y ↦ mul_comm x y⟩
+  let : Std.Associative (fun x y : S ↦ x * y) :=
+    ⟨fun x y z ↦ mul_assoc x y z⟩
+  -- Swap an outside factor with the starting value of a fold.
+  have hswap (u : Finset I) (x y : S) :
+      x * u.fold (· * ·) y f =
+        y * u.fold (· * ·) x f := by
+    induction u using Finset.induction_on with
+    | empty =>
+        simpa only [Finset.fold_empty] using mul_comm x y
+    | @insert k u hk ih =>
+        simp only [Finset.fold_insert hk]
+        rw [
+          mul_left_comm x (f k),
+          ih,
+          mul_left_comm (f k) y
+        ]
+  -- Separate one indexed factor from a fold.
+  have hsplit (u : Finset I) (a : I)
+      (ha : a ∈ u) (b : S) :
+      u.fold (· * ·) b f =
+        (f a) * (u.erase a).fold (· * ·) b f := by
+    simpa only [Finset.insert_erase ha] using
+      (Finset.fold_insert
+        (op := (· * ·)) (b := b) (f := f)
+        (by simp : a ∉ u.erase a))
+  -- Any member can be used as the starting factor.
+  have hanchor (u : Finset I) (hu : u.Nonempty)
+      (a : I) (ha : a ∈ u) :
+      prodNonempty u hu f =
+        (u.erase a).fold (· * ·) (f a) f := by
+    let c : I := Classical.choose hu
+    have hc : c ∈ u := Classical.choose_spec hu
+    have hdef :
+        prodNonempty u hu f =
+          (u.erase c).fold (fun x y : S => x * y) (f c) f := by
+      unfold prodNonempty
+      apply congrArg
+        (fun t : Finset I =>
+          t.fold (fun x y : S => x * y) (f c) f)
+      ext k
+      simp only [Finset.mem_erase, c]
+    rw [hdef]
+    by_cases hca : c = a
+    · rw [hca]
+    · rw [
+        hsplit (u.erase c) a
+          (Finset.mem_erase.mpr ⟨Ne.symm hca, ha⟩) (f c),
+        hsplit (u.erase a) c
+          (Finset.mem_erase.mpr ⟨hca, hc⟩) (f a),
+        Finset.erase_right_comm
+      ]
+      exact hswap _ _ _
+  -- Choose a common starting index from the remaining indices.
+  let a : I := Classical.choose he
+  have ha : a ∈ t.erase i := Classical.choose_spec he
+  have hi' : i ∈ t.erase a :=
+    Finset.mem_erase.mpr
+      ⟨Ne.symm (Finset.mem_erase.mp ha).1, hi⟩
+  -- Rewrite both products with starting factor f a,
+  -- then separate the factor f i.
+  rw [
+    hanchor (t.erase i) he a ha,
+    hanchor t ht a (Finset.mem_of_mem_erase ha),
+    hsplit (t.erase a) i hi' (f a),
+    Finset.erase_right_comm
+  ]
+
+lemma prodExcept_last_eq_prodAll
+    {S : Type*} [CommSemigroup S] [Nonempty S]
+    {N : ℕ}
+    (hN : 2 ≤ N)
+    (hNSucc : 2 ≤ N.succ)
+    (s : Fin N.succ → S) :
+    prodExcept hNSucc s (Fin.last N) =
+      prodAll hN (fun k : Fin N ↦ s k.castSucc) := by
+  classical
+  -- A product over a singleton is its only factor.
+  have hsingleton {I : Type}
+      (a : I) (f : I → S)
+      (h : ({a} : Finset I).Nonempty) :
+      prodNonempty {a} h f = f a := by
+    have hc : Classical.choose h = a :=
+      Finset.mem_singleton.mp (Classical.choose_spec h)
+    simp only [
+      prodNonempty, hc,
+      Finset.erase_singleton, Finset.fold_empty
+    ]
+  -- This is the step that uses mul_prodNonempty_erase.
+  have hinsert {I : Type}
+      (t : Finset I) (ht : t.Nonempty)
+      (a : I) (ha : a ∉ t) (f : I → S)
+      (h : (insert a t).Nonempty) :
+      prodNonempty (insert a t) h f =
+        (f a) * prodNonempty t ht f := by
+    have he : ((insert a t).erase a).Nonempty := by
+      simpa [ha] using ht
+    simpa [ha] using
+      (mul_prodNonempty_erase
+        (insert a t) h f a
+        (Finset.mem_insert_self a t) he).symm
+  -- Reindex a nonempty product along an embedding.
+  --
+  -- We allow an explicit equality t.map e = u, so that
+  -- the nonemptiness proofs are handled inside this helper.
+  have hreindex {I J : Type}
+      (e : I ↪ J)
+      (t : Finset I) (u : Finset J)
+      (he : t.map e = u)
+      (ht : t.Nonempty) (hu : u.Nonempty)
+      (f : J → S) :
+      prodNonempty u hu f =
+        prodNonempty t ht (fun k ↦ f (e k)) := by
+    subst u
+    revert ht hu
+    induction t using Finset.induction_on with
+    | empty =>
+        intro ht
+        simp at ht
+    | @insert a t ha ih =>
+        intro ht hu
+        obtain rfl | ht' := t.eq_empty_or_nonempty
+        · -- Singleton case.
+          simp only [
+            Finset.insert_empty,
+            Finset.map_singleton,
+            hsingleton
+          ]
+        · -- Insert into a nonempty finset.
+          have hmt : (t.map e).Nonempty :=
+            Finset.map_nonempty.mpr ht'
+          have hea : e a ∉ t.map e := by
+            simpa using ha
+          -- Split off f (e a) on both sides, then use ih.
+          simpa only [
+            Finset.map_insert,
+            hinsert t ht' a ha (fun k ↦ f (e k)),
+            hinsert (t.map e) hmt (e a) hea f
+          ] using
+            congrArg
+              (fun z : S ↦ (f (e a)) * z)
+              (ih ht' hmt)
+  -- castSucc maps the old univ onto the new univ
+  -- with the last index erased.
+  have hindex :
+      (Finset.univ : Finset (Fin N)).map Fin.castSuccEmb =
+        (Finset.univ : Finset (Fin N.succ)).erase
+          (Fin.last N) := by
+    rw [Finset.map_eq_image]
+    change
+      (Finset.univ : Finset (Fin N)).image
+          (fun k : Fin N ↦ k.castSucc) =
+        (Finset.univ : Finset (Fin N.succ)).erase
+          (Fin.last N)
+    rw [Fin.image_castSucc N]
+    ext k
+    simp
+  have hU : (Finset.univ : Finset (Fin N)).Nonempty :=
+    ⟨⟨0, by omega⟩, Finset.mem_univ _⟩
+  have hE :
+      ((Finset.univ : Finset (Fin N.succ)).erase
+        (Fin.last N)).Nonempty := by
+    rw [← hindex]
+    exact Finset.map_nonempty.mpr hU
+  unfold prodExcept prodAll
+  exact hreindex Fin.castSuccEmb
+    Finset.univ _ hindex hU hE s
+
+lemma prodExcept_castSucc_eq
+    {S : Type*} [CommSemigroup S] [Nonempty S]
+    {N : ℕ}
+    (hN : 2 ≤ N) (hNSucc : 2 ≤ N.succ)
+    (s : ℕ → S) (i : Fin N) :
+    prodExcept hNSucc
+        (fun k : Fin N.succ => s k.val) i.castSucc =
+      (prodExcept hN
+        (fun k : Fin N => s k.val) i) * s N := by
+  classical
+  -- A nonempty product over a singleton is its only factor.
+  have hsingleton {I : Type}
+      (a : I) (f : I → S)
+      (h : ({a} : Finset I).Nonempty) :
+      prodNonempty {a} h f = f a := by
+    have hc : Classical.choose h = a :=
+      Finset.mem_singleton.mp (Classical.choose_spec h)
+    simp only [
+      prodNonempty, hc,
+      Finset.erase_singleton, Finset.fold_empty
+    ]
+  -- Derive an insertion rule from your existing lemma.
+  have hinsert {I : Type}
+      (t : Finset I) (ht : t.Nonempty)
+      (a : I) (ha : a ∉ t) (f : I → S)
+      (h : (insert a t).Nonempty) :
+      prodNonempty (insert a t) h f =
+        (f a) * prodNonempty t ht f := by
+    have he : ((insert a t).erase a).Nonempty := by
+      simpa [ha] using ht
+    simpa [ha] using
+      (mul_prodNonempty_erase
+        (insert a t) h f a
+        (Finset.mem_insert_self a t) he).symm
+  -- Reindexing along an embedding preserves prodNonempty.
+  -- All supporting work is local to this proof.
+  have hreindex {I J : Type}
+      (e : I ↪ J)
+      (t : Finset I) (u : Finset J)
+      (htu : t.map e = u)
+      (ht : t.Nonempty) (hu : u.Nonempty)
+      (f : J → S) :
+      prodNonempty u hu f =
+        prodNonempty t ht (fun k => f (e k)) := by
+    subst u
+    revert ht hu
+    induction t using Finset.induction_on with
+    | empty =>
+        intro ht
+        simp at ht
+    | @insert a t ha ih =>
+        intro ht hu
+        obtain rfl | ht' := t.eq_empty_or_nonempty
+        · -- Singleton case.
+          simp only [
+            Finset.insert_empty,
+            Finset.map_singleton,
+            hsingleton
+          ]
+        · -- Split off corresponding factors and use induction.
+          have hmt : (t.map e).Nonempty :=
+            Finset.map_nonempty.mpr ht'
+          have hea : e a ∉ t.map e := by
+            simpa using ha
+          simpa only [
+            Finset.map_insert,
+            hinsert t ht' a ha (fun k => f (e k)),
+            hinsert (t.map e) hmt (e a) hea f
+          ] using
+            congrArg
+              (fun z : S => (f (e a)) * z)
+              (ih ht' hmt)
+  -- The old and enlarged index sets, each omitting i.
+  let t : Finset (Fin N) :=
+    Finset.univ.erase i
+  let u : Finset (Fin N.succ) :=
+    Finset.univ.erase i.castSucc
+  have ht : t.Nonempty := by
+    dsimp [t]
+    apply Finset.card_pos.mp
+    rw [Finset.card_erase_of_mem (Finset.mem_univ i)]
+    simp only [Finset.card_univ, Fintype.card_fin]
+    omega
+  -- The new index belongs to u.
+  have hlast : Fin.last N ∈ u := by
+    exact Finset.mem_erase.mpr
+      ⟨ne_of_gt (Fin.castSucc_lt_last i), Finset.mem_univ _⟩
+  have hu : u.Nonempty :=
+    ⟨Fin.last N, hlast⟩
+  -- After removing the new index, u is exactly the image of t.
+  have hindex :
+      t.map Fin.castSuccEmb = u.erase (Fin.last N) := by
+    dsimp [t, u]
+    rw [
+      Finset.map_erase,
+      Finset.erase_right_comm,
+      Fin.univ_castSuccEmb N,
+      Finset.erase_cons
+    ]
+    rfl
+  have he : (u.erase (Fin.last N)).Nonempty := by
+    rw [← hindex]
+    exact Finset.map_nonempty.mpr ht
+  -- Identify the product over the remaining indices.
+  have hrest :
+      prodNonempty (u.erase (Fin.last N)) he
+          (fun k : Fin N.succ => s k.val) =
+        prodNonempty t ht
+          (fun k : Fin N => s k.val) := by
+    exact hreindex Fin.castSuccEmb
+      t (u.erase (Fin.last N)) hindex ht he
+      (fun k : Fin N.succ => s k.val)
+  -- Unfold prodExcept, split off s N, and use hrest.
+  change
+    prodNonempty u hu (fun k : Fin N.succ => s k.val) =
+      (prodNonempty t ht (fun k : Fin N => s k.val)) * s N
+  rw [
+    ← mul_prodNonempty_erase
+      u hu (fun k : Fin N.succ => s k.val)
+      (Fin.last N) hlast he,
+    hrest
+  ]
+  exact mul_comm _ _
+
 /-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
 then for all thick set H, R(x, V) ∩ H is a Delta set -/
 theorem commVisitTimeSetForRPPairIsDelta
@@ -566,30 +909,172 @@ theorem commVisitTimeSetForRPPairIsDelta
 (x y : X) (hxyRP : (x, y) ∈ RP dSystem)
 {V : Set X} (hV : V ∈ nhds y) :
 ∀ (H : Set S), isThick H → isDelta ((visitTimeSet dSystem x V) ∩ H) := by
+  simp only [mem_nhds_iff] at hV
+  rcases hV with ⟨V0, hV0a, hV0b, hV0c⟩
   intro H hHThick
   unfold isDelta
-  let C := (visitTimeSet dSystem x V) ∩ H
+  -- instead of V, we work with an open set V0 ⊆ V such that y ∈ V0
+  let C := (visitTimeSet dSystem x V0) ∩ H
   have hSNonempty : (Set.univ : Set S).Nonempty := by
     simp
   rcases (Set.nonempty_def.mp hSNonempty) with ⟨s0, hs0⟩
   -- build s1 by hand
-  -- this is to avoid issue of empty product that appears for N = 1 in the general case
-  -- (shown below)
+  -- this is to avoid issue of empty product that appears for N = 1 in the general case below
   have hs1Exist : ∃ s1 : S, (s1 ∈ (fun x ↦ s0 * x) '' C) ∧
-    ((dSystem.map s1) ⁻¹' V ∩ (dSystem.map s0) ⁻¹' V).Nonempty := by
-    let U := V
+    ((dSystem.map s1) ⁻¹' V0 ∩ (dSystem.map s0) ⁻¹' V0).Nonempty := by
+    let U := V0
     let G := H
-    sorry
+    have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1 hxyRP U V0
+    have hUOpen : IsOpen U := by
+      simp only [U]
+      exact hV0b
+    have hUNonempty : U.Nonempty := by
+      simp only [U]
+      exact ⟨y, hV0c⟩
+    specialize hInterSynd hUOpen hV0b hUNonempty hV0c
+    have hInterN : (visitTimeSet dSystem x U ∩ setVisitTimeSet dSystem V0 U ∩ G).Nonempty := by
+      apply syndeticThickIntersect
+      · exact hInterSynd
+      · simp only [G]
+        exact hHThick
+    rcases (Set.inter_nonempty_iff_exists_right.mp hInterN) with ⟨t, ht1, ht2, ht3⟩
+    let s1 := s0 * t
+    use s1
+    constructor
+    · simp only [Set.mem_image, Set.mem_inter_iff, C]
+      use t
+    · have hExz : ∃ z ∈ V0, (dSystem.map t) z ∈ V0 := by
+        simp only [setVisitTimeSet, Set.inter_nonempty_iff_exists_right, Set.mem_image,
+          ↓existsAndEq, and_true, Set.mem_ofPred_eq] at ht3
+        rcases ht3 with ⟨z, hz1, hz2⟩
+        use z
+      rcases hExz with ⟨z, hz1, hz2⟩
+      have hSurj := minimalCommActionIsSurjective hMin
+      unfold isSurjectiveSystem at hSurj
+      specialize hSurj s0
+      simp only [Function.Surjective] at hSurj
+      specialize hSurj z
+      rcases hSurj with ⟨a, ha⟩
+      use a
+      simp only [Set.mem_inter_iff, Set.mem_preimage]
+      constructor
+      · simp only [s1]
+        rw [CommSemigroup.mul_comm s0 t]
+        rw [dSystem.mapMult t s0]
+        rw [ha]
+        exact hz2
+      · rw [ha]
+        exact hz1
   rcases hs1Exist with ⟨s1, hs1a, hs1b⟩
   -- build sN from the previous sn given N ≥ 2
   have hClaim : ∀ (N : ℕ) (hN : N ≥ 2), ∀ s : Fin N → S,
     ((∀ i j : Fin N, (i < j) →  s j ∈ (fun x ↦ (s i) * x) '' C) ∧
-    (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V).Nonempty)
+    (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V0).Nonempty)
     →
     (∃ r : S, (∀ i : Fin N, r ∈ (fun x ↦ (s i) * x) '' C) ∧
-    (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V))
-    ∩ (dSystem.map (prodAll hN s)) ⁻¹' V).Nonempty) := by
-    sorry
+    (((⋂ i : Fin N, (dSystem.map ((prodExcept hN s i) * r)) ⁻¹' V0))
+    ∩ (dSystem.map (prodAll hN s)) ⁻¹' V0).Nonempty) := by
+    intro N hN s hs
+    rcases hs with ⟨hs1, hs2⟩
+    let U := (⋂ i : Fin N, (dSystem.map (prodExcept hN s i)) ⁻¹' V0)
+    let G := ⋂ i : Fin N, ((prodExcept hN s i) * ·) ⁻¹' H
+    have hUNonempty : U.Nonempty := by
+      simp only [U]
+      exact hs2
+    have hUOpen : IsOpen U := by
+      unfold U
+      apply isOpen_iInter_of_finite
+      intro i
+      apply IsOpen.preimage
+      · apply dSystem.mapCont
+      · exact hV0b
+    have hGThick : isThick G := by
+      simp only [G, isThick]
+      intro F hF
+      let E := (⋃ i : Fin N, ((prodExcept hN s i) * ·) '' F)
+      have hFinite: ∀ i : Fin N, (((prodExcept hN s i) * ·) '' F).Finite := by
+        intro i
+        apply hF.image ((prodExcept hN s i) * ·)
+      have hEFinite: E.Finite := by
+        exact Set.finite_iUnion hFinite
+      unfold isThick at hHThick
+      specialize hHThick E hEFinite
+      rcases hHThick with ⟨t, ht⟩
+      use t
+      simp only [E] at ht
+      simp only [Set.subset_iInter_iff, Set.image_subset_iff]
+      simp only [Set.image_subset_iff, Set.iUnion_subset_iff] at ht
+      intro i
+      specialize ht i
+      intro f hf
+      specialize ht hf
+      simp only [Set.mem_preimage] at ht
+      simp only [Set.mem_preimage]
+      rw [<- Semigroup.mul_assoc]
+      exact ht
+    have hInterSynd := (xyInRPImpliesSyndeticVisitTimeIntersection hMin x y).1
+      hxyRP U V0 hUOpen hV0b hUNonempty hV0c
+    have hInterN : (visitTimeSet dSystem x U ∩ setVisitTimeSet dSystem V0 U ∩ G).Nonempty := by
+      apply syndeticThickIntersect
+      · exact hInterSynd
+      · exact hGThick
+    rcases (Set.inter_nonempty_iff_exists_right.mp hInterN) with ⟨t, ht1, ht2, ht3⟩
+    simp only [visitTimeSet, Set.mem_preimage] at ht2 ht3
+    simp only [setVisitTimeSet, Set.image_inter_nonempty_iff, Set.mem_ofPred_eq] at ht3
+    let r := (prodAll hN s) * t
+    use r
+    constructor
+    · intro i
+      simp only [Set.mem_iInter, Set.mem_preimage, U] at ht2
+      specialize ht2 i
+      simp only [← dSystem.mapMult] at ht2
+      simp only [Set.mem_image, Set.mem_inter_iff, C, r]
+      use (prodExcept hN s i) * t
+      constructor
+      · constructor
+        · simp only [visitTimeSet, Set.mem_preimage]
+          exact ht2
+        · simp only [Set.mem_iInter, Set.mem_preimage, G] at ht1
+          specialize ht1 i
+          exact ht1
+      · simp only [← Semigroup.mul_assoc]
+        have hEq : (s i) * prodExcept hN s i = prodAll hN s := by
+          simp only [prodExcept, prodAll]
+          have hUnivNon : (Finset.univ : Finset (Fin N)).Nonempty := by
+            exact ⟨⟨0, by omega⟩, Finset.mem_univ _⟩
+          apply mul_prodNonempty_erase
+          simp
+        rw [hEq]
+    · have hExz : ∃ z ∈ V0, (dSystem.map t) z ∈ U := by
+        simp only [Set.inter_nonempty_iff_exists_right] at ht3
+        rcases ht3 with ⟨z, hz1, hz2⟩
+        use z
+        constructor
+        · exact hz2
+        · simp only [Set.mem_preimage] at hz1
+          exact hz1
+      rcases hExz with ⟨z, hz1, hz2⟩
+      have hSurj := minimalCommActionIsSurjective hMin
+      unfold isSurjectiveSystem at hSurj
+      specialize hSurj (prodAll hN s)
+      simp only [Function.Surjective] at hSurj
+      specialize hSurj z
+      rcases hSurj with ⟨a, ha⟩
+      use a
+      simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage]
+      constructor
+      · intro i
+        simp only [Set.mem_iInter, Set.mem_preimage, U] at hz2
+        specialize hz2 i
+        simp only [← dSystem.mapMult] at hz2
+        simp only [r]
+        rw [<- ha] at hz2
+        simp only [← dSystem.mapMult] at hz2
+        simp only [CommSemigroup.mul_comm]
+        simp only [← Semigroup.mul_assoc]
+        exact hz2
+      · rw [ha]
+        exact hz1
   choose! pick hpick using hClaim
   let step : (N : ℕ) → ((k : ℕ) → k < N → S) → S := fun N prev ↦
     if N = 0 then s0
@@ -616,7 +1101,7 @@ theorem commVisitTimeSetForRPPairIsDelta
   have h01 : s 1 ∈ (fun x ↦ (s 0) * x) '' C := by
     rw [hs0, hs1]
     exact hs1a
-  have hstart : ((dSystem.map (s 0) ⁻¹' V) ∩ (dSystem.map (s 1) ⁻¹' V)).Nonempty := by
+  have hstart : ((dSystem.map (s 0) ⁻¹' V0) ∩ (dSystem.map (s 1) ⁻¹' V0)).Nonempty := by
     rw [hs0, hs1]
     simp only [Set.inter_nonempty_iff_exists_right, Set.mem_preimage]
     simp only [Set.inter_nonempty_iff_exists_right, Set.mem_preimage] at hs1b
@@ -644,7 +1129,7 @@ theorem commVisitTimeSetForRPPairIsDelta
   -- Prove BOTH prefix properties simultaneously.
   have hprefix_all : ∀ (N : ℕ) (hN : 2 ≤ N), (∀ a b : Fin N, a < b → s b.val
     ∈ (fun y ↦ (s a.val) * y) '' C) ∧
-    (⋂ a : Fin N, dSystem.map (prodExcept hN (fun k : Fin N ↦ s k.val) a) ⁻¹' V).Nonempty := by
+    (⋂ a : Fin N, dSystem.map (prodExcept hN (fun k : Fin N ↦ s k.val) a) ⁻¹' V0).Nonempty := by
     intro N hN
     induction N, hN using Nat.le_induction with
     | base =>
@@ -694,39 +1179,68 @@ theorem commVisitTimeSetForRPPairIsDelta
           intro a
           refine Fin.lastCases ?_ (fun i ↦ ?_) a
           · -- when the omitted index is the new index.
-            unfold prodExcept
-            unfold prodExcept at hzold
-            unfold prodAll at hzall
-            sorry
+            have hNSucc : 2 ≤ N.succ := by
+              omega
+            have hEq : prodExcept hNSucc (fun k ↦ s k) (Fin.last N) = prodAll hN fun k ↦ s k := by
+              apply prodExcept_last_eq_prodAll
+            rw [hEq]
+            exact hzall
           · -- when the omitted index is an old index.
-            sorry
+            have hNSucc : 2 ≤ N.succ := by
+              omega
+            simp only [Set.mem_iInter] at hzold
+            specialize hzold i
+            have hEq : prodExcept hNSucc (fun k ↦ s k) i.castSucc
+              = (prodExcept hN (fun k ↦ s ↑k) i) * s N := by
+              apply prodExcept_castSucc_eq
+            rw [hEq]
+            exact hzold
   -- prove the sequence s satisfies the conclusion
+  have hGoalV0 : ∃ s : ℕ → S, ∀ (i j : ℕ), i < j → s j
+    ∈ (fun x ↦ (s i) * x) '' (visitTimeSet dSystem x V0 ∩ H) := by
+    use s
+    intro i j hij
+    by_cases hj2 : j ≥ 2
+    · specialize hs_step j hj2
+      change s j ∈ (fun x ↦ (s i) * x) '' C
+      rw [hs_step]
+      refine (hpick j hj2 (fun k : Fin j ↦ s k.val) ?_).1 ⟨i, hij⟩
+      constructor
+      · exact (hprefix_all j hj2).1
+      · exact (hprefix_all j hj2).2
+    · have hjlesseq1 : j ≤ 1 := by
+        omega
+      have hjequal1 : j = 1 := by
+        by_contra hContra
+        have hjequal0 : j = 0 := by
+          omega
+        have hiatleast0 : i ≥ 0 := by
+          omega
+        have hjatleast1 : j ≥ 1 := by
+          omega
+        rw [hjequal0] at hjatleast1
+        omega
+      have hiequal0 : i = 0 := by
+        omega
+      rw [hjequal1, hiequal0, hs0, hs1]
+      exact hs1a
+  -- finish the proof by using the sequence s
+  rcases hGoalV0 with ⟨s, hs⟩
   use s
   intro i j hij
-  by_cases hj2 : j ≥ 2
-  · specialize hs_step j hj2
-    change s j ∈ (fun x ↦ (s i) * x) '' C
-    rw [hs_step]
-    refine (hpick j hj2 (fun k : Fin j ↦ s k.val) ?_).1 ⟨i, hij⟩
-    constructor
-    · exact (hprefix_all j hj2).1
-    · exact (hprefix_all j hj2).2
-  · have hjlesseq1 : j ≤ 1 := by
-      omega
-    have hjequal1 : j = 1 := by
-      by_contra hContra
-      have hjequal0 : j = 0 := by
-        omega
-      have hiatleast0 : i ≥ 0 := by
-        omega
-      have hjatleast1 : j ≥ 1 := by
-        omega
-      rw [hjequal0] at hjatleast1
-      omega
-    have hiequal0 : i = 0 := by
-      omega
-    rw [hjequal1, hiequal0, hs0, hs1]
-    exact hs1a
+  specialize hs i j hij
+  simp only [Set.mem_image, Set.mem_inter_iff] at hs
+  rcases hs with ⟨r, hr1, hr2⟩
+  rcases hr1 with ⟨hr1a, hr1b⟩
+  simp only [Set.mem_image, Set.mem_inter_iff]
+  use r
+  constructor
+  · constructor
+    · simp only [visitTimeSet, Set.mem_preimage]
+      simp only [visitTimeSet, Set.mem_preimage] at hr1a
+      apply hV0a hr1a
+    · exact hr1b
+  · exact hr2
 
 end Delta_builder
 
@@ -863,13 +1377,15 @@ end Dynamical_sets_of_bohr_recurrence
 
 section Application
 
+
+
 /-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:= by
     have h1 : syndeticFamily S ⋏ deltaFamily S
       ⊆ syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
-      apply familyMeetIsMonotonic
+      apply familyMeetIsMonotonicSlot2
       have h11 : deltaFamily S ⊆ deltaZeroFamily S := by
         exact deltaFamilyContainedInDeltaZeroFamily
       have h12 : deltaZeroFamily S ⊆ setOfBohrRecurrenceFamily S := by
@@ -901,11 +1417,11 @@ theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := by
   have h1 : syndeticFamily S ⋏ deltaFamily S ⊆ syndeticFamily S ⋏ deltaZeroFamily S := by
-    apply familyMeetIsMonotonic
+    apply familyMeetIsMonotonicSlot2
     exact deltaFamilyContainedInDeltaZeroFamily
   have h2 : syndeticFamily S ⋏ deltaZeroFamily S ⊆
   syndeticFamily S ⋏ setOfBohrRecurrenceFamily S := by
-    apply familyMeetIsMonotonic
+    apply familyMeetIsMonotonicSlot2
     exact deltaZeroImpliesSetOfBohrRecurrence
   have h3 : syndeticFamily S ⋏ setOfBohrRecurrenceFamily S = syndeticFamily S ⋏ deltaFamily S := by
     rw [commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence]
@@ -924,7 +1440,7 @@ theorem commDeltaStarImpliesLocallyBohrZero
     intro x hx
     exact hx
   have h2 : (bohrZeroFamily S)** = bohrZeroFamily S := by
-    apply thm_dual_is_involution
+    apply dualIsInvolutionOnFamilies
   rw [<- h2]
   exact (familyLocalImplicationEquivalence (syndeticFamily S)
   (bohrZeroFamily S)* (deltaFamily S)).mpr h1
@@ -941,8 +1457,8 @@ theorem strongIPIffStrongCentralInCountCommSemi
     rw [Bvisits] at hypoth
     rw [Bvisits]
     exact applyPre hypoth H' H'inH H'thick
-  have contain2 := familyMeetIsMonotonic (syndeticFamily S) (centralFamily S)
-    (IPFamily S) (centralFamilyContainedInIPFamily S)
+  have contain2 := familyMeetIsMonotonicSlot2
+    (syndeticFamily S) (centralFamilyContainedInIPFamily S)
   ext A
   constructor
   · intro hA
@@ -960,28 +1476,27 @@ by
   have contain0 : (syndeticFamily S) ⋏ (IPFamily S) ⊆ (syndeticFamily S) ⋏ (centralFamily S) := by
     rw [strongIPIffStrongCentralInCountCommSemi S]
     exact
-      familyMeetIsMonotonic (syndeticFamily S) (centralFamily S) (centralFamily S) fun ⦃a⦄ a_1 ↦ a_1
+      familyMeetIsMonotonicSlot2 (syndeticFamily S) (fun ⦃a⦄ a_1 ↦ a_1)
   have contain1 : (centralFamily S)* ⊆
     (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) := by
       have := (familyLocalImplicationEquivalence (syndeticFamily S)
         (IPFamily S) (centralFamily S)).mpr contain0
-      rw [familyJoinCommutative] at this
+      rw [familyJoinIsCommutative] at this
       rw [dualSyndeticThick] at this
       exact this
   have contain2 : (syndeticFamily S) ⋏ ((IPFamily S)* ⋎ (thickFamily S)) ⊆
     (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) := by
       have := dualIsAntitone (centralFamilyContainedInIPFamily S)
-      have := familyJoinMonotoneSlot1 (thickFamily S) this
-      exact familyMeetIsMonotonic (syndeticFamily S) ((IPFamily S)* ⋎ thickFamily S)
-        ((centralFamily S)* ⋎ thickFamily S) this
+      have := familyJoinIsMonotonicSlot1 (thickFamily S) this
+      exact familyMeetIsMonotonicSlot2 (syndeticFamily S) this
   have contain3 : (syndeticFamily S) ⋏ ((centralFamily S)* ⋎ (thickFamily S)) ⊆
     (centralFamily S)* := by
-      have := familyJoinMonotoneSlot2 (thickFamily S) (dcsIsSyndeticMeetCentral S)
-      rw [familyJoinCommutative] at this
+      have := familyJoinIsMonotonicSlot2 (thickFamily S) (dcsIsSyndeticMeetCentral S)
+      rw [familyJoinIsCommutative] at this
       rw [←centralIsdcSCapThick S] at this
       have := dualIsAntitone this
-      rw [deMorganOverJoin] at this
-      rw [deMorganOverMeet] at this
+      rw [familyDeMorgan1] at this
+      rw [familyDeMorgan2] at this
       rw [dualThickSyndetic] at this
       rw [dualSyndeticThick] at this
       exact this

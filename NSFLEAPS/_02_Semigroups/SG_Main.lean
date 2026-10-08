@@ -1,14 +1,11 @@
-import NSFLEAPS._00_Imports.IM_Base
+import NSFLEAPS._00_Imports.IM_Main
 
-/-! This is a module docstring. -/
+/-!
+# Semigroup properties
 
--- We may want to assume [Nonempty S] throughout, but I've not implemented that yet.
-
-structure SemigroupLeftIdeal
-(S : Type*) [Semigroup S] where
-  carrier : Set S
-  nonempty' : carrier.Nonempty
-  mul_closed' (s : S) {x : S} : x ∈ carrier → s * x ∈ carrier
+This file develops the basic properties of semigroups that are not
+available (or not convenient) from Mathlib.
+-/
 
 /-- isLeftIdeal is the predicate that `L` is a left ideal of a semigroup `S` -/
 def isLeftIdeal
@@ -88,40 +85,10 @@ by
     · exact finF
     · exact hAB fsinA
 
-/- Still not sure we want to pursue this route,
-but it would make sense to define class Syndetic as follows. -/
-class Syndetic
-{S : Type*} [Semigroup S] (A : Set S) where
-  syndetic_prop : ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
-
-/-- If `A ⊆ S` is syndetic and `A ⊆ B`, then `B` is syndetic. -/
-theorem syndeticIsMonotonev2
-{S : Type*} [Semigroup S]
-{A B : Set S} [hSA : Syndetic A] (hAB : A ⊆ B) :
-Syndetic B :=
-by
-  rcases hSA.syndetic_prop with ⟨F, Ffinite, hF⟩
-  use F
-  constructor
-  · exact Ffinite
-  · intro s
-    rcases (hF s) with ⟨f, finF, fsinA⟩
-    use f
-    constructor
-    · exact finF
-    · exact hAB fsinA
-
-
+/-- The class of semigroup homomorphisms.  Could have used MulHom from Mathlib. -/
 class SemigroupHom
 {S T} [Semigroup S] [Semigroup T] (φ : S → T) where
   hom_prop : ∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
-
-/- A semigroup action is an action by a semigroup `S` on a set `X` -/
-/-structure SemigroupAction
-(S : Type*) [Semigroup S] [Nonempty S]
-(X : Type*) [Nonempty X] where
-  toFun : S → X → X
-  map_mult' : ∀ s₁ s₂ x, toFun (s₁ * s₂) x = toFun s₁ (toFun s₂ x)-/
 
 /-- Image of a syndetic set under a surjective semigroup homomorphism is syndetic -/
 theorem surjImgOfSyndeticIsSyndetic
@@ -245,7 +212,6 @@ isSyndetic A ↔ ∀ H : Set S, isThick H → (A ∩ H).Nonempty := by
     obtain ⟨x, hxA, hxAc⟩ := h Aᶜ hthick
     exact hxAc hxA
 
--- DGG: Some things around this are aready present at end of SG file
 /-- A set is thick iff its complement is not syndetic -/
 theorem thickIffComplementNotSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
@@ -454,10 +420,11 @@ isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
 
 /-- `Fintype`-indexed version of `unionOfRightQuotientSetsIsSyndetic` -/
 lemma unionOfRightQuotientSetsIsSyndeticOfFintype
-{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Fintype ι] (C : ι → Set T)
+{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Finite ι] (C : ι → Set T)
 (hcover : ∀ t : T, ∃ i, t ∈ C i) :
 isSyndetic (⋃ i, rightQuotientSet (C i) (C i)) := by
   classical
+  let := Fintype.ofFinite ι
   refine syndeticIsMonotone (unionOfRightQuotientSetsIsSyndetic
     (fun j ↦ C ((Fintype.equivFin ι).symm j)) (fun t ↦ ?_)) ?_
   · obtain ⟨i, hi⟩ := hcover t
@@ -467,10 +434,11 @@ isSyndetic (⋃ i, rightQuotientSet (C i) (C i)) := by
 
 /-- `Fintype`-indexed version of `unionOfLeftQuotientSetsIsSyndetic` -/
 lemma unionOfLeftQuotientSetsIsSyndeticOfFintype
-{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Fintype ι] (C : ι → Set T)
+{T : Type*} [Semigroup T] [Nonempty T] {ι : Type*} [Finite ι] (C : ι → Set T)
 (hcover : ∀ t : T, ∃ i, t ∈ C i) :
 isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
   classical
+  let := Fintype.ofFinite ι
   refine syndeticIsMonotone (unionOfLeftQuotientSetsIsSyndetic
     (fun j ↦ C ((Fintype.equivFin ι).symm j)) (fun t ↦ ?_)) ?_
   · obtain ⟨i, hi⟩ := hcover t

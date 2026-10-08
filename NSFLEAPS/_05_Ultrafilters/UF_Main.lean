@@ -1,6 +1,10 @@
-import NSFLEAPS._04_Dynamical_systems.DS_Defs
+import NSFLEAPS._04_Dynamical_systems.DS_Main
 
-/-! This is a module docstring -/
+/-!
+# Ultrafilters as tools in topological dynamics
+
+This file develops the machinery of ultrafilters as tools in topological dynamics.
+-/
 
 section Right_topological_semigroups
 
@@ -263,8 +267,6 @@ end Right_topological_semigroups
 
 section Semigroup_stuff
 
--- There is some basic semigroup stuff here that might be better in SG_Defs
-
 /-- `OurSemigroupAction S X` is, for each `s : S`, a map `s: X → X` such that
 `st: X → X` is the composition of `s: X → X` and `t: X → X` -/
 structure OurSemigroupAction
@@ -343,7 +345,6 @@ end Generic_ultrafilter_lemmas
 
 section Ultrafilters_as_a_semigroup
 
--- Was S_left_mult
 /-- `leftMult s : S → S` is left multiplication by `s` -/
 def leftMult
 {S : Type*} [Semigroup S] (s : S) :
@@ -412,7 +413,7 @@ B ∈ leftMultUltra (pure s) p ↔ (leftMult s) ⁻¹' B ∈ p := by
     rw [h2]
     exact hB
 
-/-- If ultrafilter p ∈ closure of B, then B ∈ p -/
+/-- If ultrafilter `p ∈ closure of B`, then `B ∈ p` -/
 lemma memClosurePureIff
 {S : Type*} [Semigroup S]
 (B : Set S) (p : Ultrafilter S) :
@@ -566,7 +567,6 @@ end Ultrafilters_as_a_semigroup
 section Ultrafilters_as_topological_semigroups
 
 -- The following proof is copied from the mathlib documentation
--- Was: ultra_right_mult_continuous
 /-- For all `q ∈ βS`, `ultraRightMult q: βS → βS` is continuous -/
 theorem rightMultUltraContinuous
 {S : Type*} [Semigroup S] (q : Ultrafilter S) :
@@ -574,7 +574,7 @@ Continuous (rightMultUltra q) :=
 ultrafilterBasis_is_basis.continuous_iff.2 <| Set.forall_mem_range.mpr fun A ↦
     ultrafilter_isOpen_basic { m : S | ∀ᶠ m' in q, m * m' ∈ A }
 
-/- This instance makes the RightTopological structure on βS "canonical" by
+/-- This instance makes the RightTopological structure on βS "canonical" by
 making it available to typeclass inference. -/
 instance
 {S : Type*} [Semigroup S] : RightTopological (Ultrafilter S) :=
@@ -582,7 +582,6 @@ instance
     rightCont := fun (q : Ultrafilter S) ↦ rightMultUltraContinuous q
   }
 
--- Was: ultra_left_mult_by_principal_continuous
 /-- For all `s ∈ S`, `ultraLeftMult (pure s): βS → βS` is continuous -/
 theorem leftMultPrincipalUltraContinuous
 {S : Type*} [Semigroup S] (s : S) :
@@ -1424,7 +1423,7 @@ isSemisimpleSystem dSys := by
   have hur := minUltraImageIsUniformlyRecurrent dSys x hpmin
   rwa [← hdistal x _ hprox] at hur
 
-/-- A system X is distal iff the system X^2 is semisimple -/
+/-- A system `X` is distal iff the system `X^2` is semisimple -/
 theorem distalIffDiagSemisimple
 (dSystem : DynamicalSystem S X) :
 isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) ↔ isDistalSystem dSystem := by
@@ -1454,7 +1453,7 @@ isSemisimpleSystem (diagDynamicalSystem dSystem dSystem) ↔ isDistalSystem dSys
   · intro hdistal
     exact distalImpliesSemisimple (diagOfDistalIsDistal hdistal)
 
-/-- If S acts on an S-system surjectively and that system is equicontinuous,
+/-- If `S` acts on an `S`-system surjectively and that system is equicontinuous,
 then it is semisimple -/
 theorem equiSurjectiveSystemsAreSemisimple
 (dSystem : DynamicalSystem S X) (hSurject : isSurjectiveSystem dSystem) :
@@ -1686,14 +1685,5 @@ RP dSystem ⊆ Set.diagonal X ↔
         (backEquiSystemIffRPInDiag dSystem).symm
       _ ↔ isSurjectiveSystem dSystem ∧ isEquicontinuousSystem dSystem :=
         (equiSurjectiveIffBackEqui dSystem).symm
-
-/- If a system is distal for some d >= 1, then it is distal and semisimple for all d.
-Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
--- theorem distalImpliesDistalAndSemisimple
--- (dSystem : DynamicalSystem S X) :
--- ∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) →
---   ∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
---     (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
---       by sorry
 
 end Semisimplicity_and_equicontinuity

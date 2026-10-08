@@ -1,10 +1,3 @@
-/-
-IMPORTS FILE
-
-This file is intended to keep all the mathlib imports we need for the project.
-For esoteric imports, comment: why do we need this import?
--/
-
 import Init.PropLemmas
 
 import Mathlib.Data.Set.Defs
@@ -45,9 +38,12 @@ import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.AddCircle.Real
 import Mathlib.Topology.Sets.VietorisTopology
 import Mathlib.Topology.Separation.Regular
-
-
-import Mathlib.Analysis.Complex.Circle
+import Mathlib.Topology.UniformSpace.Equicontinuity
+import Mathlib.Topology.UniformSpace.OfCompactT2
+import Mathlib.Topology.Category.TopCat.OpenNhds
+import Mathlib.Topology.UrysohnsLemma
+import Mathlib.Topology.Algebra.PontryaginDual
+import Mathlib.Topology.ContinuousMap.Compact
 
 import Mathlib.Combinatorics.Hindman
 
@@ -56,4 +52,25 @@ import Mathlib.Algebra.Group.WithOne.Defs
 import Mathlib.Algebra.Group.MinimalAxioms
 import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.Group.WithOne.Basic
+
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+
+import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.MonoidLocalization.GrothendieckGroup
+
+import Mathlib.Analysis.Complex.Circle
+import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
+import Mathlib.Analysis.Complex.Polynomial.Basic
+
+import Mathlib.MeasureTheory.Measure.Haar.Basic
+import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.MeasureTheory.Function.ContinuousMapDense
+
+/-!
+# Imports
+
+This file contains imports from Mathlib that the project requires.
+-/
