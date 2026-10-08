@@ -159,8 +159,8 @@ theorem dualThickSyndetic
     have that := mem_dual_alt (F := thickFamily S) (A := A)
     exact Iff.trans that this
 
-/-- If A is a thick set and K is a finite set of a semigroup S,
-then ⋂ k ∈ K, (k * ·) ⁻¹' A is thick -/
+/-- If `A` is a thick set and `K` is a finite set of a semigroup `S`,
+then `⋂ k ∈ K, (k * ·) ⁻¹' A` is thick -/
 theorem inverseDilateCapOfThickIsThick
 {S} [Semigroup S] [Nonempty S]
 (A : Set S) {hA : isThick A}
@@ -194,57 +194,7 @@ isThick (⋂ k ∈ K, (k * ·) ⁻¹' A) := by
   simp only [hb1, true_and]
   apply Semigroup.mul_assoc
 
--- I changed the hypothesis of this theorem from Semigroup S to Monoid S.
--- The purpose is to have access to Finset.prod function ∏ which is only available for Monoid
--- We may weaken the hypothesis to Semigroup later by using WithOne function
-theorem commDilateCapOfThickIsThick
-{S} [CommMonoid S] [Nonempty S]
-(A : Set S) {hA : isThick A}
-(K : Set S) {KIsFinite : K.Finite} :
-isThick (⋂ k ∈ K, (k * ·) '' A) := by
-  intro F hF
-  let p : S := ∏ x ∈ KIsFinite.toFinset, x
-  classical
-  let f : S → S := fun k ↦ ∏ x ∈ KIsFinite.toFinset.erase k, x
-  let Q := ⋂ x ∈ f '' K, (x * ·) ⁻¹' A
-  have hqThick : isThick (Q) := by
-    apply inverseDilateCapOfThickIsThick
-    · exact hA
-    exact KIsFinite.image f
-  specialize hqThick F hF
-  obtain ⟨s, hs⟩ := hqThick
-  use p * s
-  intro b hb
-  obtain ⟨a, ha1, ha2⟩ := hb
-  have hb2 : b = a * (p * s) := by
-    rw [<- ha2]
-  -- redefine the goal
-  have goal_redefined: ∀ k ∈ K, b ∈ (fun x ↦ k * x) '' A := by
-    intro k hk
-    have ha_in_Q : a * s ∈ Q := by
-      exact hs ⟨a, ha1, rfl⟩
-    have hQ : ∀ q ∈ Q, ∀ x ∈ f '' K, x * q ∈ A := by
-      unfold Q
-      simp
-    specialize hQ (a * s) ha_in_Q
-    specialize hQ (f k) ⟨k, hk, rfl⟩
-    have hk1 : k ∈ KIsFinite.toFinset := by
-      simpa using hk
-    have hp : k * f (k) = p := by
-      classical
-      simpa using (Finset.mul_prod_erase (s := KIsFinite.toFinset) (f := fun x => x) hk1)
-    rw [<- hp] at hb2
-    have hb_rewrite: b = k * ((f k) * (a * s)) := by
-      simp [hb2, mul_comm, mul_left_comm, mul_assoc]
-    simp only [Set.mem_image]
-    use ((f k) * (a * s))
-    constructor
-    · exact hQ
-    rw [hb_rewrite]
-  -- finishing the proof
-  simpa [Set.mem_iInter] using goal_redefined
-
-/-- This instance makes the semigroup structure on βS "canonical" by
+/-- This instance makes the semigroup structure on `βS` "canonical" by
 making it available to typeclass inference -/
 instance
 {S : Type*} [Semigroup S] : Semigroup (Ultrafilter S) :=
@@ -696,14 +646,6 @@ end dcS_sets
 
 section IP_sets
 
-/- A subset `A` of a semigroup `S` is an IP set if there exists a sequence
-x_1, x_2, ... of elements of S such that all finite, increasing products are
-in A -/
--- def isIP
--- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
--- Prop :=
--- ∃ (x : Stream' S), ∀ (s : S), Hindman.FP x s → s ∈ A
-
 /-- A subset `A` of a semigroup `S` is an IP set if it belongs to an
 idempotent ultrafilter on `S` -/
 def isIP
@@ -765,6 +707,7 @@ Family S :=
     exact centralIsMonotone hA hAB
 }
 
+/-- A `central` set is an `IP` set -/
 theorem centralIsIP
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 isCentral A → isIP A := by
@@ -772,6 +715,7 @@ isCentral A → isIP A := by
   obtain ⟨p,-,pIdemp,Ainp⟩ := hA
   use p
 
+/-- The family of `central` sets is contained in the family of `IP` sets -/
 theorem centralFamilyContainedInIPFamily
 (S : Type*) [Semigroup S] [Nonempty S] :
 centralFamily S ⊆ IPFamily S := by

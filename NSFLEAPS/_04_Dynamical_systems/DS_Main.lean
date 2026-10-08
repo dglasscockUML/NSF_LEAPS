@@ -4306,33 +4306,6 @@ isReflexive (RPM dSystem) :=
     exact hGoal1
 }
 
---DGG we may not use this lemma any more!
-/- A minimal system satisfies the non-degeneracy condition required to conclude
-that `RPM` is reflexive -/
-/-
-lemma minimalImpliesNondegen
-{S : Type*} [Semigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
-setOrbitClosure dSystem Set.univ = Set.univ := by
-unfold setOrbitClosure
-rcases (inferInstance : Nonempty X) with ⟨x⟩
-have xDenseOrbit : Dense (orbit dSystem x) := (minimalIffDenseOrbits dSystem).mp hMin x
-have xOrbitAll : closure (orbit dSystem x) = Set.univ := xDenseOrbit.closure_eq
-have xOrbitInSetOrbit : orbit dSystem x ⊆ setOrbit dSystem Set.univ := by
-  apply Set.subset_def.mpr
-  intro y hy
-  rcases hy with ⟨z, hz1⟩
-  rw [<- hz1]
-  unfold setOrbit
-  simp
-apply Set.Subset.antisymm
-· simp
-nth_rw 1 [<- xOrbitAll]
-apply closure_mono
-exact xOrbitInSetOrbit
--/
-
 /-- A pair `(x,y) ∈ RPM` if and only if inverse orbit closures open
 neighborhoods of `(x,y)` intersect the diagonal -/
 theorem inRPMiffBackwardUOrbitClosHitsDiag
@@ -4448,6 +4421,9 @@ z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.dia
       · exact hab1
       · rfl
 
+/-- A characterization of points belonging to the backward regionally proximal
+equivalence relation as those whose inverse set orbits of neighborhoods have
+non-empty intersection with neighborhoods of the diagonal  -/
 lemma inRPMiffBackwardUOrbitClosInterNeighDiag
 {S : Type*} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -5020,19 +4996,11 @@ theorem imageOfRPMIsInRPM
     exact hy
   exact ((h2.trans h4).trans h5).trans h6
 
--- lemma commMinOrbContainDiagonalForward
--- {S : Type*} [CommSemigroup S] [Nonempty S]
--- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystemX : DynamicalSystem S X) {hMin : isMinimalSystem dSystemX}
--- (z : X × X) (hzRP : z ∈ RP dSystemX)
--- (U : Set (X × X)) (hUz : U ∈ nhds z) :
--- Set.diagonal X ⊆ setOrbitClosure (diagDynamicalSystem dSystemX dSystemX) U := by
--- sorry
-
 end Regional_proximality_basics
 
 section Regional_proximality_in_min_comm_systems
 
+/-- inverseSetOrbit described equivalently as inverseSetOrbitAlongASet -/
 lemma inverseSetOrbitRedefined
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -5937,15 +5905,6 @@ variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
 instance : UniformSpace X := uniformSpaceOfCompactR1
 
--- We might consider defining Equicontinuous system ``by hand'' using
--- open sets containing the diagonal.  This will allow us to avoid talking
--- about the uniform structure on X at all.
-
--- def isEquicontinuousSystem
--- (dSystem : DynamicalSystem S X) :
--- Prop :=
--- UniformEquicontinuous dSystem.map
-
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
 def isEquicontinuousSystem
@@ -5986,83 +5945,6 @@ isEquicontinuousSystem (diagDynamicalSystem dSystem dSystem) := by
     diagonalSubsetPreimagePairToBoolFamily hβdiag, ?_⟩
   rintro s w ⟨p, hp, rfl⟩
   exact hβprop s ⟨(pairToBoolFamily p.1, pairToBoolFamily p.2), hp, rfl⟩
-
--- We create the next definitions because Lean has trouble understanding
--- that the uniformity structure
--- from product space coming from uniformSpaceOfCompactR1 is the same
--- as the one coming from instUniformSpaceProd
--- def isEquicontinuousProductSystem
--- (dSystemX : DynamicalSystem S X)
--- {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
--- (dSystemY : DynamicalSystem S Y) :
--- Prop :=
--- UniformEquicontinuous (diagDynamicalSystem dSystemX dSystemY).map
-
--- DEPRACATED: Plan to upgrade in favor of diagOfEquiIsEqui above
-/- If `dSystem` and `dSystemY` are equicontinuous dynamical systems, then the
-diagonal action of `S` on `X × Y` is an equicontinuous dynamical system -/
--- theorem diagSystemOfEquiSystemsIsEquiSystem
--- {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
--- {dSystemX : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystemX)
--- {dSystemY : DynamicalSystem S Y} (hYEqui : isEquicontinuousSystem dSystemY) :
--- isEquicontinuousProductSystem dSystemX dSystemY := by
---   intro β hβ
---   simp only [Filter.Eventually]
---   have h1 : ∃ βX ∈ uniformity X, ∃ βY ∈ uniformity Y, entourageProd βX βY ⊆ β := by
---     apply entourageProd_subset
---     exact hβ
---   rcases h1 with ⟨βX, hβX, βY, hβY, hβXY⟩
---   specialize hXEqui βX hβX
---   simp only [Filter.Eventually] at hXEqui
---   specialize hYEqui βY hβY
---   simp only [Filter.Eventually] at hYEqui
---   let αX := {x : X × X | ∀ (i : S), (dSystemX.map i x.1, dSystemX.map i x.2) ∈ βX}
---   let αY := {y : Y × Y | ∀ (i : S), (dSystemY.map i y.1, dSystemY.map i y.2) ∈ βY}
---   let αXY :=  {z : (X × Y) × (X × Y) | ∀ (i : S),
---     ((diagDynamicalSystem dSystemX dSystemY).map i z.1,
---       (diagDynamicalSystem dSystemX dSystemY).map
---       i z.2) ∈ β}
---   have αXYDef : αXY =  {z : (X × Y) × (X × Y) | ∀ (i : S),
---     ((diagDynamicalSystem dSystemX dSystemY).map i z.1,
---     (diagDynamicalSystem dSystemX dSystemY).map i z.2) ∈ β} := by
---       rfl
---   have hαX : αX ∈ uniformity X := by
---     simpa
---   have hαY : αY ∈ uniformity Y := by
---     simpa
---   have hαXY : entourageProd αX αY ⊆ αXY := by
---     intro z hz s
---     rcases hz with ⟨p1, p2⟩
---     have hα3 : ((diagDynamicalSystem dSystemX dSystemY).map s z.1,
---       (diagDynamicalSystem dSystemX dSystemY).map s z.2) ∈ entourageProd βX βY := by
---       simp only [mem_entourageProd]
---       constructor
---       · have hα4 :
---          ((diagDynamicalSystem dSystemX dSystemY).map s z.1).1 = dSystemX.map s z.1.1 :=
---           by rfl
---         have hα5 :
---            ((diagDynamicalSystem dSystemX dSystemY).map s z.2).1 = dSystemX.map s z.2.1 :=
---           rfl
---         simp only [hα4, hα5]
---         specialize p1 s
---         exact p1
---       have hα6 :
---        ((diagDynamicalSystem dSystemX dSystemY).map s z.1).2 = dSystemY.map s z.1.2 := by
---         rfl
---       have hα7 :
---        ((diagDynamicalSystem dSystemX dSystemY).map s z.2).2 = dSystemY.map s z.2.2 := by
---         rfl
---       simp only [hα6, hα7]
---       specialize p2 s
---       exact p2
---     apply hβXY
---     exact hα3
---   rw [<- αXYDef]
---   have hαXY2 : entourageProd αX αY ∈ uniformity (X × Y) := by
---     apply entourageProd_mem_uniformity
---     · exact hαX
---     exact hαY
---   exact Filter.mem_of_superset hαXY2 hαXY
 
 /-- A system is equicontinuous iff RPM is contained in the diagonal -/
 theorem equiSystemIffRPMInDiag
@@ -6260,7 +6142,7 @@ isBackwardEquicontinuousSystem dSystem → isSurjectiveSystem dSystem := by
 
 /-- If `dSystem` is an equicontinuous dynamical system and `Z ⊆ X` is a
 nonempty, closed, `S`-invariant set, then `Z` is an equicontinuous
-dynamical system. (DGG: v2 is the form I need it in later.) -/
+dynamical system. -/
 theorem subsysOfEquiIsEqui
 {dSystem : DynamicalSystem S X} (hXEqui : isEquicontinuousSystem dSystem)
 {Z : Set X} [CompactSpace Z] [Nonempty Z]
@@ -6281,13 +6163,6 @@ isEquicontinuousSystem (fromNonemptyCompactT2InvariantSubsetToSystem dSystem hZ)
   · rintro s v ⟨p, hp, rfl⟩
     exact hUα _ _ (hβprop s ⟨((p.1 : X), (p.2 : X)), hp, rfl⟩)
 
-/- This instance makes lean recognize a compact, Hausdorff space as a uniform space -/
--- This seems unnecessary.  Typeclass is finding it properly.
-/- def quotientIsUniformSpace
-(dSystem : DynamicalSystem S X)
-{I : Set (X × X)} (hI : isICER dSystem I) :
-UniformSpace (Quotient ⟨setToRelation I, hI.2.2⟩) :=
-by sorry -/
 
 theorem homSystemOfEquicontinuousSystemIsEquicontinuous
 {T} [Semigroup T] [Nonempty T]
