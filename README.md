@@ -8,13 +8,13 @@ There are two associated Palomar submissions, one for each of the papers: (to be
 
 ### The regionally proximal relation for commutative semigroup actions
 
-- [The regionally proximal relation for commutative semigroup actions](link)
+- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397)
 
 Abstract: The regionally proximal and equicontinuous structure relations are fundamental relations in topological dynamics that capture the equicontinuous behavior in a topological dynamical system and its factors. For minimal actions of abelian groups, these relations are known to be equivalence relations and are known to coincide. In this paper, we generalize these facts to semigroup actions: for minimal actions of commutative semigroups, the regionally proximal and equicontinuous structure relations are equivalence relations and the two coincide. We also develop the machinery of natural extensions for commutative semigroup actions that act by surjections, concluding that the maximal equicontinuous factor of a minimal action of a commutative semigroup is the same as the maximal equicontinuous factor of the group action into which it embeds.
 
 ### The local dynamical structure of delta* sets via a new Furstenberg family algebra
 
-- [The local dynamical structure of difference sets via a new Furstenberg family algebra](link)
+- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416)
 
 Abstract: In this paper, we strengthen the connection between the combinatorics of difference sets and the dynamics of group rotations. Our main result shows that sets which have non-empty intersection with all difference subsets of a commutative semigroup possess local Bohr structure. This generalizes results of Bergelson, Furstenberg, and Weiss and Host and Kra from the integers to arbitrary commutative semigroups. We accomplish this by utilizing a recent result showing that the regionally proximal relation is an equivalence relation for minimal actions of commutative semigroups and by describing a new, DeMorgan-type algebra on Furstenberg families that allows for efficient manipulation and computation.
 
@@ -75,8 +75,8 @@ The `lean-toolchain` and `lakefile.toml` files contain the authoritative version
 
 ## References
 
-- [The regionally proximal relation for commutative semigroup actions](link)
-- [The local dynamical structure of difference sets via a new Furstenberg family algebra](link)
+- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397)
+- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416)
 - [Palomar 1](link)
 - [Palomar 2](link)
 
