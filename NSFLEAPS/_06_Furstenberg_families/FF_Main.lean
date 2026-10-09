@@ -2026,8 +2026,10 @@ end Bohr_prelims
 
 section Bohr_sets
 
-/-- A subset `A ⊆ S` is Bohr_0 if there exists a semigroup homomorphism
-`ϕ : S → T^d` and an open set `U ⊆ T^d` containing `0` such that `A ⊇ ϕ ⁻¹ U`. -/
+/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
+A subset `A` of a semigroup `S` is Bohr_0 if there exists a
+semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
+containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
 def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))

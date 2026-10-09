@@ -12,59 +12,46 @@ by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le.
 This file imports the entire project development, which rests on Mathlib only via
 the imports in the IM_Main.lean file.
 
-There are three sections below:
+There are two sections below, each in a new namespace called DeltaIntro:
   · Essential definitions
   · Theorems
 
-The _essential definitions_ section contains commented copies or simplifications of
-the definitions required to audit the statements of the main theorems.  A definition
-with `Intro` appended is one that has been simplified in this file; its original
-form can be found in the development upstream.
+The _essential definitions_ section contains the definitions required to audit the
+statements of the main theorems.  Some definitions (like isSyndetic) is exist both in
+the development upstream and here in the namespace DeltaIntro.  Note that Lean searches
+the namespace first, then the root, so that below ``isSyndetic'' refers to DeltaIntro.isSyndetic.
 
 The _theorems_ section contains statements and proofs of the theorems that appear
 in the introduction of the paper.
 
 -/
 
+namespace DeltaIntro
+
 /- # Essential Definitions -/
 
-/- A set `A` of a semigroup `S` is thick if for all finite
+/-- A set `A` of a semigroup `S` is syndetic if there exists a finite set `F ⊆ S`
+such that for all `s ∈ S`, there exists `f ∈ F` such that `f * s ∈ A`. -/
+def isSyndetic
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (F : Set S), F.Finite ∧ (∀ (s : S), ∃ f ∈ F, f * s ∈ A)
+
+/-- A set `A` of a semigroup `S` is thick if for all finite
 subsets `F ⊆ S`, there exists `s ∈ S` such that `Fs ⊆ A` -/
-/-
-_def isThick_ : this definition appears in this form upstream
+-- *
+def isThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-∀ (F : Set S), F.Finite → ∃ s : S, (· * s) '' F ⊆ A
--/
+∀ (B : Set S), isSyndetic B → (A ∩ B).Nonempty
 
-/- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
-A subset `A` of a semigroup `S` is Bohr_0 if there exists a
-semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
-containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
-/-
-_def isBohrZero_ : this definition appears in this form upstream
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
-  (_ : IsOpen U) (_ : 1 ∈ U),
-  Set.preimage φ U ⊆ A
--/
-
-/-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if
-it has non-empty intersection with all Bohr_0 subsets of `S` -/
-def isSetOfBohrRec
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
-
-/- A set `A` of a semigroup `S` is a Delta set if there exist
+/-- A set `A` of a semigroup `S` is a Delta set if there exist
 `s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
-/-
-_def isDelta_ : this definition appears in this form upstream
+-- *
+def isDelta
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
--/
 
 /-- A set `A` of a semigroup `S` is Delta* if it has nonempty
 intersection with all Delta subsets of `S` -/
@@ -73,12 +60,31 @@ def isDeltaStar
 Prop :=
 ∀ (B : Set S), isDelta B → (A ∩ B).Nonempty
 
-/-- A set `A` of a semigroup `S` is central* if it has nonempty
-intersection with all central subsets of `S` -/
-def isCentralStar
+/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
+A subset `A` of a semigroup `S` is Bohr_0 if there exists a
+semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
+containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
+-- *
+def isBohrZero
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
+  (_ : IsOpen U) (_ : 1 ∈ U),
+  Set.preimage φ U ⊆ A
+
+/-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if
+it has non-empty intersection with all Bohr_0 subsets of `S` -/
+def isSetOfBohrRec
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
+∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
+
+/-- A subset `A` of a semigroup `S` is an IP set if it is contained
+in an idempotent ultrafilter. (See Hindman-Strauss Thm. 16.4.) -/
+def isIP
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (p : Ultrafilter S) (_ : p * p = p), A ∈ p
 
 /-- A set `A` of a semigroup `S` is IP* if it has nonempty
 intersection with all IP subsets of `S` -/
@@ -86,6 +92,23 @@ def isIPStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isIP B → (A ∩ B).Nonempty
+
+/-- A set `A` of a semigroup `S` is central if it is contained
+in a minimal idempotent ultrafilter. (See Hindman-Strauss Def.
+4.42 and Thm. 4.39.) -/
+def isCentral
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (p : Ultrafilter S),
+(p * p = p) ∧ (A ∈ p) ∧
+(∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p})
+
+/-- A set `A` of a semigroup `S` is central* if it has nonempty
+intersection with all central subsets of `S` -/
+def isCentralStar
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
 
 /-- A collection `F` of subsets of `S` is a Furstenberg family if it is
 upward closed: for all `A, B ⊆ S`, if `A ⊆ B` and `A ∈ F`, then `B ∈ F` -/
@@ -115,9 +138,44 @@ def familyJoin
 Set (Set S) :=
 {A : Set S | ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C}
 
+/- # Translation lemmas -/
+
+/-- A subset of a semigroup `S` is thick according to `isThick` defined above
+if and only if it is `isThick` as defined according to the development -/
+lemma thickIsSame
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isThick A ↔ _root_.isThick A := by
+  have : isThick A ↔ A ∈ (syndeticFamily S)* := by rfl
+  rw [dualSyndeticThick] at this
+  rw [this]
+  rfl
+
+/-- A subset of a semigroup `S` is central according to `isCentral` defined above
+if and only if it is `isCentral` as defined according to the development -/
+lemma centralIsSame
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isCentral A ↔ _root_.isCentral A := by sorry
+
+
+/- def isCentral
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∃ (p : Ultrafilter S) (_ : isMinimalUltrafilter p) (_ : p * p = p), A ∈ p -/
+
+/- theorem ultrafilterMinimalIffUnifRec
+{S : Type*} [Semigroup S] [Nonempty S] (p : Ultrafilter S) :
+isMinimalUltrafilter p ↔ isUniformlyRecurrent (ultrafilterSystem S) p -/
+
+/- def isUniformlyRecurrent
+(dSystem : DynamicalSystem S X) (x : X) :
+Prop :=
+∀ U ∈ nhds x, isSyndetic (visitTimeSet dSystem x U) -/
+
+-- Need to know that neighborhoods are formed by sets
+
 /- # Theorems -/
 
-/- # Theorem A : Proved after Theorem B -/
+/- # Theorem A : Proved after Theorem B.  See below. -/
 
 /-- # Theorem B
     Let `S` be a commutative semigroup and `A ⊆ S`.
@@ -131,11 +189,13 @@ theorem DeltaTheoremB
   ∧ (∀ (H' : Set S), H' ⊆ H → isThick H' → isSetOfBohrRec (A ∩ H'))) →
   isDelta A := by
   rintro A ⟨H, hH, hAH⟩
+  apply (thickIsSame H).mp at hH
   -- by Lemma 3.8, `A ∈ ⋃_{H ∈ T} ((T∩H)* ⋏ dcT_Bohr0)`
   have hA : A ∈ Family.iUnion (fun (t : (thickFamily S).sets) ↦
       (capFamily (thickFamily S) t)* ⋏ setOfBohrRecurrenceFamily S) :=
     (Set.ext_iff.mp (iUnionCapFamilyDualDescription (thickFamily S) (thickFamily S)
-      (setOfBohrRecurrenceFamily S)) A).mpr ⟨H, hH, fun H' hH' hH'H ↦ hAH H' hH'H hH'⟩
+      (setOfBohrRecurrenceFamily S)) A).mpr
+      ⟨H, hH, fun H' hH' hH'H ↦ hAH H' hH'H ((thickIsSame H').mpr hH')⟩
   -- the condition of Theorem 5.4 for `F := dcT_Bohr0` and `G := Δ`
   have hFG : ∀ h ∈ thickFamily S,
       ((capFamily (thickFamily S) h)* ⋏ setOfBohrRecurrenceFamily S).sets ∩
@@ -180,8 +240,8 @@ by
   have hsub : (capFamily (thickFamily S) H)* ⋏ (bohrZeroFamily S)* ⊆ deltaFamily S :=
     fun B hB ↦ DeltaTheoremB B ⟨H, hH, fun H' hH'H hH' ↦ fun C hC ↦
       (mem_dual_star _ _).mp
-        ((memberOfCapFamDualMeetH (thickFamily S) (bohrZeroFamily S)* B H).mp hB H' hH' hH'H)
-        C hC⟩
+        ((memberOfCapFamDualMeetH (thickFamily S) (bohrZeroFamily S)* B H).mp hB H'
+        ((thickIsSame H').mp hH') hH'H) C hC⟩
   -- taking duals, `Δ* ⊆ ((T∩H)* ⋏ Bohr_0*)* = (T∩H) ⋎ Bohr_0`
   have hAJ : A ∈ capFamily (thickFamily S) H ⋎ bohrZeroFamily S := by
     have hA' := dualIsAntitone hsub hAD
@@ -189,7 +249,7 @@ by
   -- by Lemma 3.8, there is a thick `H' ⊆ H` and a Bohr_0 set `B` with `A ∩ H' = B ∩ H'`
   obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
     (memberOfCapFamJoinH (thickFamily S) (bohrZeroFamily S) A H).mp hAJ
-  exact ⟨B, H', hB, hH', hH'H, hAB⟩
+  exact ⟨B, H', hB, ((thickIsSame H').mpr hH'), hH'H, hAB⟩
 
 
 /-- # Theorem C
@@ -207,7 +267,8 @@ theorem DeltaTheoremC
       ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
         by
   intro A hA H hH
-  have hAC : A ∈ (centralFamily S)* := (mem_dual_star _ A).mpr fun C hC ↦ hA C hC
+  have hAC : A ∈ (centralFamily S)* := (mem_dual_star _ A).mpr
+    fun C hC ↦ hA C ((centralIsSame C).mpr hC)
   -- (5.3): `⋃_{H ∈ T} ((T∩H)* ⋏ IP) ⊆ C`
   have h53 : Family.iUnion (fun (t : (thickFamily S).sets) ↦
       (capFamily (thickFamily S) t)* ⋏ IPFamily S) ⊆ centralFamily S := by
@@ -231,7 +292,7 @@ theorem DeltaTheoremC
     exact capThickDualMeetContained ht (centralFamily S) hDt
   -- in particular, `(T∩H)* ⋏ IP ⊆ C`
   have hsub : (capFamily (thickFamily S) H)* ⋏ IPFamily S ⊆ centralFamily S := fun B hB ↦
-    h53 ((Family.mem_iUnion _ B).mpr ⟨⟨H, hH⟩, hB⟩)
+    h53 ((Family.mem_iUnion _ B).mpr ⟨⟨H, ((thickIsSame H).mp hH)⟩, hB⟩)
   -- taking duals, `C* ⊆ ((T∩H)* ⋏ IP)* = (T∩H) ⋎ IP*`
   have hAJ : A ∈ capFamily (thickFamily S) H ⋎ (IPFamily S)* := by
     have hA' := dualIsAntitone hsub hAC
@@ -239,7 +300,8 @@ theorem DeltaTheoremC
   -- by Lemma 3.8, there is a thick `H' ⊆ H` and an IP* set `B` with `A ∩ H' = B ∩ H'`
   obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
     (memberOfCapFamJoinH (thickFamily S) (IPFamily S)* A H).mp hAJ
-  exact ⟨B, H', fun C hC ↦ (mem_dual_star _ B).mp hB C hC, hH', hH'H, hAB⟩
+  exact ⟨B, H', fun C hC ↦ (mem_dual_star _ B).mp hB C
+    hC, ((thickIsSame H').mpr hH'), hH'H, hAB⟩
 
 
 /-- # Theorem D
@@ -301,3 +363,5 @@ theorem DeltaTheoremD
   · -- `familyDual (familyJoin F G) = familyMeet (familyDual F) (familyDual G)`:
       --`familyDeMorgan1` (FA_Main)
     exact congrArg Family.sets (familyDeMorgan1 𝓕 𝓖)
+
+end DeltaIntro
