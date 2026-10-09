@@ -59,7 +59,7 @@ Prop :=
 ∃ (F : Set S), F.Finite ∧ (∀ (s : S), ∃ f ∈ F, f * s ∈ A)
 
 /-- A set `A` of a semigroup `S` is thick if it has nonempty intersection
-with all syndetic subsets of `S`. -/
+with all syndetic subsets of `S` -/
 def isThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
@@ -79,7 +79,24 @@ def isDeltaStar
 Prop :=
 ∀ (B : Set S), isDelta B → (A ∩ B).Nonempty
 
-/- The following line allows us to write `p * q` for `Ultrafilter.mul.mul p q` -/
+/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
+A subset `A` of a semigroup `S` is Bohr_0 if there exists a
+semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
+containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
+def isBohrZero
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
+  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
+  (_ : IsOpen U) (_ : 1 ∈ U),
+  Set.preimage φ U ⊆ A
+
+/-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if
+it has non-empty intersection with all Bohr_0 subsets of `S` -/
+def isSetOfBohrRec
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+Prop :=
+∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
+
 attribute [local instance] Ultrafilter.mul
 
 /-- A subset `A` of a semigroup `S` is an IP set if it is contained
@@ -89,8 +106,8 @@ def isIP
 Prop :=
 ∃ (p : Ultrafilter S), (p * p = p) ∧ (A ∈ p)
 
-/-- A set `A` of a semigroup `S` is IP* if for all IP
-subsets `B` of `S`, `A ∩ B ≠ ∅`. -/
+/-- A set `A` of a semigroup `S` is IP* if it has nonempty
+intersection with all IP subsets of `S` -/
 def isIPStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
@@ -103,33 +120,14 @@ def isCentral
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (p : Ultrafilter S),
-(p * p = p) ∧ (A ∈ p) ∧
-(∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p})
+  (p * p = p) ∧ (∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p}) ∧ (A ∈ p)
 
-/-- A set `A` of a semigroup `S` is `central*` if for all central
-subsets `B` of `S`, `A ∩ B ≠ ∅`. -/
+/-- A set `A` of a semigroup `S` is central* if it has nonempty
+intersection with all central subsets of `S` -/
 def isCentralStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
-
-/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
-A subset `A` of a semigroup `S`is Bohr_0 if there exists a
-semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
-containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
-def isBohrZero
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
-  (_ : IsOpen U) (_ : 1 ∈ U),
-  Set.preimage φ U ⊆ A
-
-/-- A set `A` of a semigroup `S` is a `set of Bohr recurrence` if it has
-nonempty intersection with all `Bohr_0` subsets of `S`. -/
-def isSetOfBohrRec
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
 
 /-- A collection `F` of subsets of `S` is a Furstenberg family if it is
 upward closed: for all `A, B ⊆ S`, if `A ⊆ B` and `A ∈ F`, then `B ∈ F` -/
