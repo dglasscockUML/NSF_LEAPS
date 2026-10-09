@@ -69,16 +69,6 @@ import Mathlib.MeasureTheory.Measure.Haar.Basic
 import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.MeasureTheory.Function.ContinuousMapDense
 
-
-
-
-
-
-
-
-
-
-
 /-!
 # Imports
 

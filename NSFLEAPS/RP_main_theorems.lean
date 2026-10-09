@@ -3,25 +3,50 @@ import NSFLEAPS._08_Application.AP_Main
 /-!
 # Main results in the RP paper
 
-Explain
+This file contains the statements and proofs of the main results from the introduction
+section of the paper
+
+`The regionally proximal relation for commutative semigroup actions`
+by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le.
+
+This file imports the entire project development, which rests on Mathlib only via
+the imports in the IM_Main.lean file.
+
+There are three sections below:
+  · Essential definitions
+  · Translation lemmas
+  · Theorems
+
+The _essential definitions_ section contains commented copies or simplifications of
+the definitions required to audit the statements of the main theorems.  A definition
+with `Intro` appended is one that has been simplified in this file; its original
+form can be found in the development upstream.
+
+The _translation lemmas_ section contains lemmas that connect the simplified
+definitions in this file with their analogues in the full development. The statements
+and proofs of these lemmas do not need to be audited in order to audit the
+statements of the main theorems.
+
+The _theorems_ section contains statements and proofs of the theorems that appear
+in the introduction of the paper.
+
 -/
 
-/- # Essential Definitions
-For those definitions that are repeated, decide what to do ... -/
+/- # Essential Definitions -/
 
 /- A (topological) dynamical system is a compact Hausdorff space `X` together
 with an action by a (discrete) semigroup `S`. -/
--- _structure DynamicalSystem_ APPEARS ALREADY UPSTREAM
--- (S : Type*) [Semigroup S] [Nonempty S]
--- (X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- where
---   map : S → X → X
---   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
---   mapCont : ∀ s, Continuous (map s)
+/- _structure DynamicalSystem_ : this definition appears in this form upstream
+(S : Type*) [Semigroup S] [Nonempty S]
+(X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+where
+  map : S → X → X
+  mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
+  mapCont : ∀ s, Continuous (map s) -/
 
 /-- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
 we get an action of `T` on `X` by setting `tx = (φ t)x` -/
-def homDynamicalSystemIntro -- See homDynamicalSystem upstream
+def homDynamicalSystemIntro
 {S} [Semigroup S] [Nonempty S]
 {T} [Semigroup T] [Nonempty T]
 (φ : MulHom T S)
@@ -37,6 +62,8 @@ DynamicalSystem T X :=
   mapCont := fun (t : T) ↦ dSystem.mapCont (φ t)
 }
 
+/-- Given a dynamical system, an ICER is a closed equivalence relation on X that
+is invariant under the diagonal action of `S` -/
 structure ICER
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -45,6 +72,7 @@ structure ICER
   isInvariant : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s))
     {p : X × X | p.1 ≈ p.2} {p : X × X | p.1 ≈ p.2}
 
+/-- The set form of the relation underlying an ICER -/
 def ICERToSet
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -52,18 +80,21 @@ def ICERToSet
 Set (X × X) :=
 {x : X × X | I.r x.1 x.2}
 
+/-- The quotient of `X` by an ICER on `X` -/
 def ICERQuotient
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :=
 Quotient I.toSetoid
 
+/-- The quotient map `X → X/I` for an ICER `I` on `X` -/
 def ICERQuotientMap
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :=
 Quotient.mk I.toSetoid
 
+/-- Instance giving that `ICERQuotient` is nonempty -/
 instance
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -73,6 +104,7 @@ Nonempty (ICERQuotient I) := by
   obtain ⟨x⟩ := ‹Nonempty X›
   exact ⟨Quotient.mk' (s := I.toSetoid) x⟩
 
+/-- Instance giving the topology on `ICERQuotient` -/
 instance
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -81,6 +113,7 @@ TopologicalSpace (ICERQuotient I) := by
   change TopologicalSpace (Quotient I.toSetoid)
   exact @instTopologicalSpaceQuotient X I.toSetoid inferInstance
 
+/-- Instance giving that `ICERQuotient` is compact -/
 instance
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -89,6 +122,7 @@ CompactSpace (ICERQuotient I) := by
   change CompactSpace (Quotient I.toSetoid)
   exact Quotient.compactSpace
 
+/-- Instance giving that `ICERQuotient` is T2 -/
 instance
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -131,11 +165,11 @@ DynamicalSystem S (ICERQuotient I) :=
 
 /- A dynamical system satisfies `homeoSystem` if all
 elements of the acting semigroup act by homeomorphisms -/
--- _def isHomeoSystem_ APPEARS ALREADY UPSTREAM
--- {S} [Semigroup S] [Nonempty S]
--- {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystem : DynamicalSystem S X) :=
--- ∀ s : S, IsHomeomorph (dSystem.map s)
+/- _def isHomeoSystem_ : this definition appears in this form upstream
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :=
+∀ s : S, IsHomeomorph (dSystem.map s) -/
 
 /-- An action of `S` on `X` is minimal if every point has a dense `S`-orbit -/
 def isMinimalSystemIntro
@@ -147,7 +181,7 @@ Prop :=
 
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
-def isEquicontinuousSystemIntro -- see isEquicontinuousSystem upstream
+def isEquicontinuousSystemIntro
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -157,10 +191,8 @@ Prop :=
     ∀ (s : S), (fun (x : X × X) ↦
       ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' β ⊆ α
 
-
-
-/-- The regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
-def RPIntro -- See RP upstream
+/-- The regionally proximal relation, as a subset of `X × X` -/
+def RPIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -169,8 +201,8 @@ Set (X × X) :=
   closure (⋃ (s : S), (fun (x : X × X) ↦
     ⟨dSystem.map s x.1, dSystem.map s x.2⟩) ⁻¹' α)
 
-/-- The backward regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
-def RPMIntro -- See RPM upstream
+/-- The backward regionally proximal relation, as a subset of `X × X` -/
+def RPMIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -178,8 +210,6 @@ Set (X × X) :=
 ⋂ α ∈ nhdsSet (Set.diagonal X),
   closure (⋃ (s : S), (fun (x : X × X) ↦
     ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' α)
-
-
 
 /-- The equicontinuous structure relation of a dynamical system is the
 intersection of all equicontinuous ICERS of the system -/
@@ -195,7 +225,7 @@ Set (X × X) :=
   }
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is a factor map
-if it is a continuous, equivariant surjection -/
+if it is a continuous, `S`-equivariant surjection -/
 def isFactorMapIntro
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -211,7 +241,7 @@ Function.Surjective π
 ∀ (s : S), (dSystemY.map s) ∘ π = π ∘ (dSystemX.map s)
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
-if it is a equivariant homeomorphism -/
+if it is an `S`-equivariant homeomorphism -/
 def isIsomorphismIntro
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -224,7 +254,7 @@ IsHomeomorph π
 ∧
 ∀ (s : S), (dSystemY.map s) ∘ π = π ∘ (dSystemX.map s)
 
-/-- Dynamical systems `X` and `Y` are isomorphic if there exists a map `π : X → Y`\
+/-- Dynamical systems `X` and `Y` are isomorphic if there exists a map `π : X → Y`
 that is an isomorphism -/
 def isIsomorphic
 {S} [Semigroup S] [Nonempty S]
@@ -251,21 +281,16 @@ Prop :=
   ∀ (ρ : X → Z) (_ : isFactorMap dSystemX dSystemZ ρ) ,
   ∃ (ξ : Y → Z) (_ : isFactorMap dSystemY dSystemZ ξ), ρ = ξ ∘ π)
 
-
-/-- The Grothendieck group of a non-empty, commutative semigroup `S` is
+/- The Grothendieck group of a non-empty, commutative semigroup `S` is
 the Grothendieck group of the Monoid extension of `S` -/
-@[reducible] def groGroupIntro
-(S : Type*) [CommSemigroup S] [Nonempty S] :=
-  Algebra.GrothendieckGroup (WithOne S)
+-- def _groGroup_ : this definition appears in this form upstream
+-- (S : Type*) [CommSemigroup S] [Nonempty S] :=
+--   Algebra.GrothendieckGroup (WithOne S)
 
-/-- `groGroupIntro S` is a commutative group -/
-instance
-(S : Type*) [CommSemigroup S] [Nonempty S] :
-CommGroup (groGroupIntro S) := Algebra.GrothendieckGroup.instCommGroup
-
+/-- The homomorphism from `S` into groGroup `S`, as a `MulHom` structure -/
 def groGroupHomIntro
 {S : Type*} [CommSemigroup S] [nonEmpty : Nonempty S] :
-MulHom S (groGroupIntro S) :=
+MulHom S (groGroup S) :=
 {
   toFun := Algebra.GrothendieckGroup.of ∘ WithOne.coe
   map_mul' := by
@@ -285,7 +310,7 @@ lemma RPSame
 (dSystem : DynamicalSystem S X) :
 RPIntro dSystem = RP dSystem := rfl
 
-/-- RPMIntro is the same as RP, defined upstream -/
+/-- RPMIntro is the same as RPM, defined upstream -/
 lemma RPMSame
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -308,6 +333,7 @@ RPMIntro dSystem = RPM dSystem :=
       use s, ⟨a.1.1,a.1.2⟩
       exact ⟨a.2,hsa⟩
 
+/-- isEquicontinuousSystemIntro is the same as isEquicontinuousSystem, defined upstream -/
 lemma EquiSystemSame
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -315,6 +341,7 @@ lemma EquiSystemSame
 isEquicontinuousSystemIntro dSystem ↔ isEquicontinuousSystem dSystem :=
 by rfl
 
+/-- equiStructureRelationIntro is the same as equiStructureRelation, defined upstream -/
 lemma EquiStructureSame
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -342,17 +369,7 @@ equiStructureRelationIntro dSystem = equiStructureRelation dSystem := by
     unfold isEquicontinuousICER at xICERisEqui
     exact (EquiSystemSame (quotientDynamicalSystemIntro IC)).mpr xICERisEqui
 
-
-lemma IsomSame
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-(dSystemY : DynamicalSystem S Y)
-(π : X → Y) :
-isIsomorphism dSystemX dSystemY π ↔
-isIsomorphismIntro dSystemX dSystemY π := by rfl
-
+/-- quotientDynamicalSystemIntro is isomorphic to quotientDynamicalSystem, defined upstream -/
 lemma QuotSameViaIsom
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -369,7 +386,8 @@ have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hI.2.1 hI.2.2
 ∃ (ψ : Z → Y),
 isIsomorphismIntro dSystemZ dSystemY ψ
 ∧
-π = ψ ∘ (ICERQuotientMap J) := by
+π = ψ ∘ (ICERQuotientMap J) :=
+by
   subst IisJ
   obtain ⟨JIsInv, JIsClosed, JIsEquiv⟩ := hI
   intro Y dSystemY π Z dSystemZ _ _
@@ -464,7 +482,8 @@ by
     exact ρIsξpreCircQuotmk
 
 
-
+/-- Using Theorem B, provided `S` is commutative and `dSystem` is minimal,
+`RPICER` is the regionally proximal relation as an `ICER` structure -/
 def RPICER
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -543,17 +562,17 @@ theorem RPTheoremsEandF
 {dSystemX : DynamicalSystem S X} (hMinX : isMinimalSystemIntro dSystemX) :
 ∃ (W : Type (max u v)) (_ : TopologicalSpace W)
   (_ : CompactSpace W) (_ : T2Space W) (_ : Nonempty W),
-∃ (dSystemGW : DynamicalSystem (groGroupIntro S) W) (minGroSys : isMinimalSystemIntro dSystemGW),
--- dSystemSW is the S-system whose existence is stipulated in the theorem
--- statement.  It is the homomorphism system of dSystemWG via groGroupHom
+∃ (dSystemGW : DynamicalSystem (groGroup S) W) (minGroSys : isMinimalSystemIntro dSystemGW),
+/- The system `dSystemSW` is the `S`-system whose existence is stipulated in the statement
+of the theorem.  It is the homomorphism system of `dSystemWG` via `groGroupHom`. -/
 let dSystemSW := homDynamicalSystemIntro groGroupHomIntro dSystemGW
 ∃ (π : W → X) (_ : isFactorMap dSystemSW dSystemX π),
--- 1. hom system is minimal
+-- 1. The system `dSystemSW` is minimal
 ∃ (minHomSys : isMinimalSystemIntro dSystemSW),
--- 2. hom system is homeo
+-- 2. The semigroup `S` acts by homeomorphisms on the system `dSystemSW`
 isHomeoSystem dSystemSW
 ∧
--- 3. hom system is smallest homeo extension
+-- 3. `W → X` is smallest extension on which `S` acts by homeomorphisms
 (∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
   ∀ (dSystemV : DynamicalSystem S V) (_ : isHomeoSystem dSystemV),
   ∀ (ρ : V → X) (_ : isFactorMapIntro dSystemV dSystemX ρ),
@@ -563,10 +582,10 @@ let XmodRPSystem := quotientDynamicalSystemIntro (RPICER hMinX)
 let GWmodRPSystem := homDynamicalSystemIntro groGroupHomIntro
   (quotientDynamicalSystemIntro (RPICER minGroSys))
 let SWmodRPSystem := quotientDynamicalSystemIntro (RPICER minHomSys)
--- 4. W / RP_{W,S} and X / RP_{X,S} are isomorphic
+-- 4. The systems `W / RP_{W,S}` and `X / RP_{X,S}` are isomorphic
 isIsomorphic SWmodRPSystem XmodRPSystem
 ∧
--- 5. W / RP_{W,S} and W / RP_{W,G} are isomorphic
+-- 5. The systems `W / RP_{W,S}` and `W / RP_{W,G}` are isomorphic
 isIsomorphic SWmodRPSystem GWmodRPSystem
   := by
   have hMin : isMinimalSystem dSystemX := (minimalIffDenseOrbits dSystemX).mpr hMinX
@@ -577,6 +596,7 @@ isIsomorphic SWmodRPSystem GWmodRPSystem
   refine ⟨natExtSet dSystemX, inferInstance, inferInstance, inferInstance, this,
     natExtGroSystem hSurject, (minimalIffDenseOrbits _).mp hWGrMin, ?_⟩
   intro dSystemSW
+  -- 1. The system `dSystemSW` is minimal: proved by providing (minimalIffDenseOrbits _).mp hWMin
   refine ⟨natExtFactorMap dSystemX, natExtFactorMapIsFactorMap hSurject,
     (minimalIffDenseOrbits _).mp hWMin, ?_, ?_, ?_⟩
   -- 2. `S` acts by homeomorphisms, since `s` acts as `groGroupHom s`, which is invertible
