@@ -90,7 +90,7 @@ in an idempotent ultrafilter. (See Hindman-Strauss Thm. 16.4.) -/
 def isIP
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-∃ (p : Ultrafilter S) (_ : p * p = p), A ∈ p
+∃ (p : Ultrafilter S), (p * p = p) ∧ (A ∈ p)
 
 /-- A set `A` of a semigroup `S` is IP* if it has nonempty
 intersection with all IP subsets of `S` -/
@@ -105,9 +105,8 @@ in a minimal idempotent ultrafilter. (See Hindman-Strauss Def.
 def isCentral
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-∃ (p : Ultrafilter S) (_ : p * p = p)
-  (_ : ∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p}),
-    A ∈ p
+∃ (p : Ultrafilter S),
+  (p * p = p) ∧ (∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p}) ∧ (A ∈ p)
 
 /-- A set `A` of a semigroup `S` is central* if it has nonempty
 intersection with all central subsets of `S` -/
@@ -155,6 +154,19 @@ isThick A ↔ _root_.isThick A := by
   rw [dualSyndeticThick] at this
   rw [this]
   rfl
+
+/-- A subset of a semigroup `S` is IP according to `isIP` defined above
+if and only if it is `isIP` as defined according to the development -/
+lemma IPIsSame
+{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+isIP A ↔ _root_.isIP A := by
+  constructor
+  · intro hA
+    obtain ⟨p,hp⟩ := hA
+    use p, hp.1, hp.2
+  · intro hA
+    obtain ⟨p,hp1,hp2⟩ := hA
+    use p, hp1
 
 /-- A subset of a semigroup `S` is central according to `isCentral` defined above
 if and only if it is `isCentral` as defined according to the development -/
@@ -210,7 +222,7 @@ isCentral A ↔ _root_.isCentral A := by
 
 /- # Theorems -/
 
-/- # Theorem A : Proved after Theorem B.  See below. -/
+/- # Theorem A : Derived from, and hence proven after, Theorem B.  See below. -/
 
 /-- # Theorem B
     Let `S` be a commutative semigroup and `A ⊆ S`.
@@ -336,7 +348,7 @@ theorem DeltaTheoremC
   obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
     (memberOfCapFamJoinH (thickFamily S) (IPFamily S)* A H).mp hAJ
   exact ⟨B, H', fun C hC ↦ (mem_dual_star _ B).mp hB C
-    hC, ((thickIsSame H').mpr hH'), hH'H, hAB⟩
+    ((IPIsSame C).mp hC), ((thickIsSame H').mpr hH'), hH'H, hAB⟩
 
 
 /-- # Theorem D
