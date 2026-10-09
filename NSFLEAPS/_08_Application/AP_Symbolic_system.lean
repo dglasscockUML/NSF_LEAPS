@@ -7,13 +7,7 @@ This file contains the code describing the dynamical system {0,1}^S
 together with the shift.
 -/
 
-/- A general note: Bool is a type with terms `true` and `false`.
-Apparently, Lean automatically gives it the discrete topology?
-Then `S → Bool` has the product topology by association with `Bool^S`.
-Since this is a product of compact, Hausdorff spaces, it is compact, Hausdorff.
-Apparently Lean knows all of this automatically. -/
-
-/-- `RightSemigroupAction S X` is ... -/
+/-- `RightSemigroupAction S X` is the structure capturing a right action by a semigroup -/
 structure RightSemigroupAction
 (S : Type*) [Semigroup S] (X : Type*) where
   map : X → S → X
@@ -38,6 +32,7 @@ DynamicalSystem S (X → Bool) := {
         apply continuous_apply
 }
 
+/-- The canonical right action of a semigroup on itself -/
 def basicRightAction
 (S : Type*) [Semigroup S] [Nonempty S] :
 RightSemigroupAction S S := {
@@ -53,6 +48,7 @@ def selfSymbolicSystem
 DynamicalSystem S (S → Bool) :=
 symbolicSystem S S (basicRightAction S)
 
+/-- The right action of `S` on its monoid extension -/
 def rightActionOfSOnMonoidExt
 (S : Type*) [Semigroup S] [Nonempty S] :
 RightSemigroupAction S (WithOne S) := {
@@ -62,7 +58,7 @@ RightSemigroupAction S (WithOne S) := {
         exact Eq.symm (mul_assoc x s1 s2)
 }
 
-/-- The symbolic S-system on {0, 1}^(WithOne S) -/
+/-- The symbolic `S`-system on `{0, 1}^(WithOne S)` -/
 def monoidExtSymbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S ((WithOne S) → Bool) :=
@@ -82,8 +78,3 @@ def cylinderSet
 (S : Type*) (val : Bool) (s : S) :
 Set (S → Bool) :=
 {f : S → Bool | f s = val}
-
-
-/- def monoidExtension
-(S : Type*) [Semigroup S] [Nonempty S] :
-Monoid (WithOne S) := WithOne.instMonoid (α := S) -/

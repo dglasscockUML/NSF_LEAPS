@@ -3447,27 +3447,6 @@ by
   use φ t
   exact ht
 
-/- If a system is distal for some d >= 1, then it is distal and semisimple for all d.
-Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem
-This is shown in distalImpliesDistalAndSemisimple in the UF_Defs file. -/
-
-/- If a system X^d is semisimple for some d >= 2, then it is distal for some d >= 1.
-Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
--- theorem semisimpleImpliesDistal
--- (dSystem : DynamicalSystem S X) :
--- ∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
---   ∃ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) :=
---    by sorry
-
-/- If a system is distal and semisimple for all d, then it is semisimple for some d >= 2.
-Note the shift: in Lean, ℕ starts at 0, and (multiProdDynamicalSystem dSystem 0) is just dSystem -/
--- theorem distalAndSemisimpleImpliesSemisimple
--- (dSystem : DynamicalSystem S X) :
--- ∀ (d : ℕ), isDistalSystem (multiProdDynamicalSystem dSystem d) ∧
---     (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) →
---       ∃ (d : ℕ), d ≥ 1 ∧ (isSemisimpleSystem (multiProdDynamicalSystem dSystem d)) :=
---         by sorry
-
 end Proximality_and_distality
 
 section Regional_proximality_basics

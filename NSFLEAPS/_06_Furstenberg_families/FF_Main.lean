@@ -1554,7 +1554,7 @@ ContinuousInv G := by
     isClosed_eq hmul continuous_const
   simpa only [mul_eq_one_iff_eq_inv'] using h
 
-/- The group above has a continuous inverse.  This is a standard fact: any
+/-- The group above has a continuous inverse.  This is a standard fact: any
 compact Hausdorff group with a continuous multiplication has a continuous
 inverse. -/
 theorem groupFromCompactSubmonoidHasContinuousInv
@@ -1575,7 +1575,7 @@ ContinuousInv S := by
       inferInstance
       hMul
 
-/- A compact submonoid of a topological monoid with the property
+/-- A compact submonoid of a topological monoid with the property
 that "idempotent implies unit" is a compact Hausdorff group. -/
 theorem groupFromCompactSubmonoidIsTopologicalGroup
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
@@ -1598,7 +1598,7 @@ IsTopologicalGroup S := by
     { continuous_mul := hMul.continuous_mul
       continuous_inv := hInv.continuous_inv }
 
--- theorem: if A ⊆ C(X,X) consists of surjections, then so does its closure
+/-- If `S ⊆ C(X,X)` consists of surjections, then so does its closure -/
 theorem surjectiveSetImpliesSurjectiveClosure
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
@@ -1613,11 +1613,6 @@ theorem surjectiveSetImpliesSurjectiveClosure
   let ψ : (ContinuousMap.End X) → Z :=
     fun (f : ContinuousMap.End X) ↦ TopologicalSpace.NonemptyCompacts.map
       f.toContinuousMap f.toContinuousMap.continuous XZelt
-  -- {
-  --   carrier := f.toContinuousMap '' (Set.univ (α := X))
-  --   isCompact' := IsCompact.image (isCompact_univ) f.toContinuousMap.continuous
-  --   nonempty' := Set.image_nonempty.mpr (Set.univ_nonempty)
-  -- }
   have ψCont : Continuous ψ := by
     apply Continuous.nonemptyCompacts_map'
     · exact continuous_const
@@ -1644,7 +1639,7 @@ theorem surjectiveSetImpliesSurjectiveClosure
     TopologicalSpace.Compacts.coe_mk, Set.image_univ] at this
   exact this
 
--- theorem: if S ⊆ C(X,X) is a subsemigroup, then so is its closure
+/-- If `S ⊆ C(X,X)` is a subsemigroup, then so is its closure -/
 theorem closureOfSubsemiIsSubsemi
 {T : Type*} [semi : Semigroup T] [TopologicalSpace T] [T2Space T] [CM : ContinuousMul T]
 {S : Set T} (hSsubsemi : ∀ (ϕ ψ : T), ϕ ∈ S → ψ ∈ S → ϕ * ψ ∈ S) :
@@ -1673,7 +1668,7 @@ theorem closureOfSubsemiIsSubsemi
     exact ⟨⟨hx,hy⟩,rfl⟩
   exact closInv prodInImg
 
--- theorem: if the maps in A ⊆ C(X,X) commute, then the maps in its closure commute
+/-- If the maps in `S ⊆ C(X,X)` commute, then the maps in its closure commute -/
 theorem closureOfCommSetIsCommSet
 {T : Type*} [semi : Semigroup T] [TopologicalSpace T] [T2Space T] [CM : ContinuousMul T]
 {S : Set T} (hScomm : ∀ (ϕ ψ : T), ϕ ∈ S → ψ ∈ S → ϕ * ψ = ψ * ϕ) :
@@ -1699,8 +1694,8 @@ theorem closureOfCommSetIsCommSet
   unfold Set.EqOn at eqonSclos
   exact eqonSclos (x := ⟨x,y⟩) ⟨hx, hy⟩
 
--- theorem: if S ⊆ C(X,X) is a subsemigroup and consists of surjections,
--- then any idempotent it contains is equal to Id_X
+/-- If `S ⊆ C(X,X)` is a precompact subsemigroup consisting of surjections,
+then any idempotent it contains is equal to `Id_X` -/
 theorem surjectiveSubsemiUniqueIdempotent
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
@@ -1719,8 +1714,8 @@ theorem surjectiveSubsemiUniqueIdempotent
       rw [φIdemp]
     _ = x := hy
 
--- theorem: if S ⊆ C(X,X) is a subsemigroup and consists of surjections,
--- then it contains Id_X
+/-- If `S ⊆ C(X,X)` is a precompact subsemigroup consisting of surjections,
+then it contains `Id_X` -/
 theorem surjectiveSubsemiContainsId
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
@@ -1750,10 +1745,8 @@ theorem surjectiveSubsemiContainsId
   rw [←this]
   exact hi
 
--- def: given S ⊆ C(X,X) is a subsemigroup consists of surjections with,
--- overline S compact, get group (overline S) with 1 = id_X
--- def: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
--- overline S compact, get commgroup (overline S)
+/-- A `CommGroup` structure on `closure S`, where `S` is a precompact
+subsemigroup of `C(X,X)` -/
 @[instance_reducible]
 noncomputable
 def commGroupFromSurjectiveSubsemiOfCXX
@@ -1797,8 +1790,8 @@ CommGroup (closure S) := by
     (inferInstance : CommGroup cSSubMonoid)
 
 
--- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
--- overline S compact, get ContinuousInv (overline S)
+/-- Given that `S ⊆ C(X,X)` is a precompact commutative subsemigroup consisting
+of surjections, get `ContinuousInv (overline S)` -/
 theorem groupFromPrecompactSubsemiHasContinuousInv
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
@@ -1833,8 +1826,8 @@ ContinuousInv (closure S) := by
       inferInstance
       hMul
 
--- theorem: given S ⊆ C(X,X) is a commutative subsemigroup consists of surjections with,
--- overline S compact, get IsTopologicalGroup (overline S)
+/-- Given that `S ⊆ C(X,X)` is a precompact commutative subsemigroup consisting
+of surjections, get `IsTopologicalGroup (overline S)` -/
 theorem isTopologicalGroupFromSurjectiveSubsemiOfCXX
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
@@ -1865,9 +1858,8 @@ IsTopologicalGroup (closure S) := by
     { continuous_mul := hMul.continuous_mul
       continuous_inv := hInv.continuous_inv }
 
-/-- The open neighborhoods of 1 in a compact Hausdorff group
-  are generated by finite intersections of neighborhoods of 1 by characters.
--/
+/-- The open neighborhoods of `1` in a compact Hausdorff group
+are generated by finite intersections of neighborhoods of `1` by characters. -/
 theorem openPreimageInOpenSubsetTopCommGroup
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [CommGroup X]
 [IsTopologicalGroup X] {W : Set X} (hW : IsOpen W) (hWone : (1 : X) ∈ W) :
@@ -1965,8 +1957,8 @@ theorem openPreimageInOpenSubsetTopCommGroup
     simpa [O] using hyzO
   exact hyzO' hyPre
 
-/- This is the application of ArzelaAscoli that we need.  ArzelaAscoli is stated in
-general terms in Mathlib. -/
+/-- The particular application of `ArzelaAscoli` that we need in this development.
+`ArzelaAscoli` is stated in very general terms in Mathlib. -/
 theorem compactClosureOfUniformEquicontinuous
     {X S : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
     (i : S → ContinuousMap.End X) (hi : UniformEquicontinuous fun s x => (i s).1 x) :
@@ -2085,9 +2077,10 @@ DynamicalSystem (Fin d → Circle) (Fin d → Circle) :=
     exact fun s ↦ (uniformContinuous_mul_left s).continuous
 }
 
+/-- A simple algebra lemma -/
 lemma easyAlgebraLemma
 {G : Type*} [CommGroup G] (x y z : G) :
-(z * x)⁻¹ * (z * y) = x⁻¹ * y := by --aesop also works!
+(z * x)⁻¹ * (z * y) = x⁻¹ * y := by
   have stepone : (z * x)⁻¹ = x⁻¹ * z⁻¹ := by
     exact DivisionMonoid.mul_inv_rev z x
   have steptwo : (z * x)⁻¹ * (z * y) = (x⁻¹ * z⁻¹) * (z * y) := by
@@ -2108,6 +2101,7 @@ lemma easyAlgebraLemma
     simp only [mul_one]
   rw [this]
 
+/-- The torus acting on itself is an equicontinuous system -/
 theorem torusDSIsEquicontinuous
 (d : ℕ) :
 isEquicontinuousSystem (torusDynamicalSystem d) :=
@@ -2138,33 +2132,7 @@ by
   rw [easyAlgebraLemma p.1 p.2 i]
   exact interior_subset hp'
 
--- theorem torusDSIsEquicontinuousOrig
--- (d : ℕ) :
--- isEquicontinuousSystem (torusDynamicalSystem d) :=
--- by -- needs to be updated to equiv2
---   let T := Fin d → Circle
---   intro α αUniformity filterOnProd temp
---   simp only [Set.mem_image, Set.mem_diagonal_iff, Prod.exists, exists_eq_left'] at temp
---   obtain ⟨a, ha⟩ := temp
---   rw [←ha]
---   simp only [Set.mem_ofPred_eq]
---   rw [uniformity_eq_comap_inv_mul_nhds_one] at αUniformity
---   obtain ⟨V, hV, hVsub⟩ := αUniformity
---   let β : Set (T × T) := {p | p.1⁻¹ * p.2 ∈ V}
---   have hβu : β ∈ uniformity T := by
---     rw [uniformity_eq_comap_inv_mul_nhds_one]
---     exact Filter.mem_comap.mpr ⟨V, hV, subset_rfl⟩
---   have βSubset : β ⊆ {x | ∀ (i : T),
---     ((torusDynamicalSystem d).map i x.1, (torusDynamicalSystem d).map i x.2) ∈ α} := by
---     intro p hp i
---     apply hVsub
---     change (i * p.1)⁻¹ * (i * p.2) ∈ V
---     rw [easyAlgebraLemma p.1 p.2 i]
---     exact hp
---   have βInNhds : β ∈ nhds (a, a) := by
---     exact (nhds_le_uniformity a) hβu
---   exact Filter.mem_of_superset βInNhds βSubset
-
+/-- The torus acting on itself is a distal system -/
 theorem torusDSIsDistal
 (d : ℕ) :
 isDistalSystem (torusDynamicalSystem d) := by
@@ -2397,72 +2365,6 @@ isBohrZero A := by
     _ ⊆ A := visitsxUinA
   use d, φ, φHom, V, VisOpen, oneInV, φpreimInA
 
--- /-- A set `A ⊆ S` is a set of Bohr recurrence if for all minimal, equicontinuous
--- actions of `S` on a compact, Hausdorff space `X`, all points `x ∈ X` and
--- all neighborhoods `U` of `x`, `A ∩ R(x,U) ≠ ∅` -/
--- def isSetOfBohrRecurrence
--- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
--- Prop :=
--- by sorry
-
--- /-- If `A ⊆ S` is a set of Bohr recurrence and `A ⊆ B`, then `B`
--- is a set of Bohr recurrence. -/
--- theorem setOfBohrRecurrenceIsMonotone
--- {S : Type*} [Semigroup S] [Nonempty S]
--- {A B : Set S} (hA : isSetOfBohrRecurrence A) (hAB : A ⊆ B) :
--- isSetOfBohrRecurrence B :=
--- by sorry
-
--- /-- The family of Bohr_0 subsets of a semigroup -/
--- def setOfBohrRecurrenceFamily
--- (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
--- {
---   sets := {A : Set S | isSetOfBohrRecurrence A}
---   upward_closed := by
---     intro A B hA hAB
---     exact setOfBohrRecurrenceIsMonotone hA hAB
--- }
-
-/- The family of Bohr_0 sets is a filter -/
--- Here I've spelled out the requirement for a filter.
--- Later update with isFilterFamily (bohrZeroFamily S)
--- theorem bohrZeroFamilyIsFilter
--- {S : Type*} [CommSemigroup S] [Nonempty S] :
--- (bohrZeroFamily S).sets.Nonempty ∧ (∀ (A B : Set S), A ∈ (bohrZeroFamily S) →
---   B ∈ (bohrZeroFamily S) → A ∩ B ∈ (bohrZeroFamily S)) :=
--- by
---   constructor
---   · -- `S` is Bohr_0 in itself, via the trivial homomorphism into the `0`-dimensional torus
---     exact ⟨Set.univ, 0, fun _ ↦ 1, fun _ _ ↦ (one_mul 1).symm, Set.univ, isOpen_univ,
---       Set.mem_univ 1, Set.subset_univ _⟩
---   · rintro A B ⟨k, φ, hφ, U, hUopen, h1U, hUA⟩ ⟨l, ψ, hψ, V, hVopen, h1V, hVB⟩
---     -- `s ↦ (φ s, ψ s) : S → 𝕋^(k+l)` is a homomorphism and `U × V` is an open
---     -- neighbourhood of the identity of `𝕋^(k+l)`
---     refine ⟨k + l, fun s ↦ Fin.append (φ s) (ψ s), fun s t ↦ ?_,
---       (fun x : (Fin (k + l) → Circle) ↦ (fun i ↦ x (Fin.castAdd l i))) ⁻¹' U ∩
---         (fun x : (Fin (k + l) → Circle) ↦ (fun i ↦ x (Fin.natAdd k i))) ⁻¹' V, ?_, ?_, ?_⟩
---     · -- appending pointwise products is the pointwise product of the appended families
---       funext i
---       induction i using Fin.addCases with
---       | left i => simp only [Pi.mul_apply, Fin.append_left, hφ]
---       | right i => simp only [Pi.mul_apply, Fin.append_right, hψ]
---     · exact (hUopen.preimage (continuous_pi fun i ↦ continuous_apply (Fin.castAdd l i))).inter
---         (hVopen.preimage (continuous_pi fun i ↦ continuous_apply (Fin.natAdd k i)))
---     · exact ⟨h1U, h1V⟩
---     · -- `(φ ⊗ ψ)⁻¹ (U × V) = φ⁻¹ U ∩ ψ⁻¹ V ⊆ A ∩ B`
---       rintro s ⟨hsU, hsV⟩
---       have hφs : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.castAdd l i)) = φ s := by
---         funext i
---         exact Fin.append_left _ _ i
---       have hψs : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.natAdd k i)) = ψ s := by
---         funext i
---         exact Fin.append_right _ _ i
---       have hsU' : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.castAdd l i)) ∈ U := hsU
---       have hsV' : (fun i ↦ Fin.append (φ s) (ψ s) (Fin.natAdd k i)) ∈ V := hsV
---       rw [hφs] at hsU'
---       rw [hψs] at hsV'
---       exact ⟨hUA hsU', hVB hsV'⟩
-
 /-- The family of Bohr_0 sets is a filter -/
 theorem bohrZeroFamilyIsFilter
 {S : Type*} [Semigroup S] [Nonempty S] :
@@ -2554,29 +2456,6 @@ theorem setOfBohrRecurrenceIsMonotone
 {A B : Set S} (hA : isSetOfBohrRecurrence A) (hAB : A ⊆ B) :
 isSetOfBohrRecurrence B :=
 (setOfBohrRecurrenceFamily S).2 A B hA hAB
-
--- theorem bohrZeroiffCompNotSetOfRec
--- {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
--- isSetOfBohrRecurrence A ↔ ¬(isBohrZero Aᶜ) :=
---   by sorry
-  -- This should be easy logical consequence of the definitions
-
-/- The families of Bohr_0 sets and sets of Bohr recurrence are dual -/
--- Something happens upstream regarding "dualEquivForm" that the proof no longer work
--- Need to fix
--- theorem dualBohrZeroSetsOfBohrRecurrence
--- {S : Type*} [Semigroup S] [Nonempty S] :
--- (bohrZeroFamily S)* = (setOfBohrRecurrenceFamily S) :=
--- by sorry
-  -- ext A
-  -- have dualEquivForm : ((bohrZeroFamily S)*).sets = {A : Set S | Aᶜ ∉ bohrZeroFamily S} :=
-  --   famDualAlt (bohrZeroFamily S)
-  -- rw [dualEquivForm]
-  -- change A ∈ {A | Aᶜ ∉ (bohrZeroFamily S).sets} ↔ A ∈ (setOfBohrRecurrenceFamily S).sets
-  -- unfold bohrZeroFamily
-  -- unfold setOfBohrRecurrenceFamily
-  -- simp only [Set.mem_ofPred_eq]
-  -- exact Iff.symm (bohrZeroiffCompNotSetOfRec A)
 
 /-- The family of sets of Bohr recurrence is partition regular -/
 theorem setOfBohrRecurrenceFamilyIsPR

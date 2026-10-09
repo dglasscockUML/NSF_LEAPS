@@ -30,7 +30,7 @@ Beyond the results in the papers, the formalization in this repository includes 
 
 ## Organization
 
-The code in this repository is organized as follows. The main results from the introductions are stated and proved in the files: Delta_main_theorems.lean and RP_main_theorems.lean. The accompanying machinery is split into 9 folders with the following logical dependency:
+The approximately 20000 lines of code are organized into 17 files as follows. The main results from the introductions are stated and proved in the files: Delta_main_theorems.lean and RP_main_theorems.lean. The accompanying machinery is split into 9 folders with the following logical dependency:
 
 ![Diagram of dependencies between the folders](images/folder_diagram.png)
 

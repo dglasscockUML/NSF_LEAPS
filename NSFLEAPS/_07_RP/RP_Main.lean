@@ -944,10 +944,6 @@ by
                       rcases hxpt with ⟨bpt,hbpt1,hbpt2⟩
                       use ⟨s.1,bpt,hbpt1⟩
               exact diags1βInβOrbit applyDiags1
-            -- ys2yInβ : ⟨y,dSystem.map s.2 y⟩ in β
-            -- hit with (diagDynamicalSystem dSystem dSystem).map s.1 to see that
-            -- (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩ in
-            --- set orbit of β
       use (diagDynamicalSystem dSystem dSystem).map s.1 ⟨y,dSystem.map s.2 y⟩
       exact ⟨s1ToPairInU,s1ToPairInOrbit⟩
   refine ⟨?_, ?_⟩
