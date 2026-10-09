@@ -1,3 +1,5 @@
+module
+
 import NSFLEAPS._08_Application.AP_Main
 
 /-!
@@ -84,6 +86,10 @@ def isSetOfBohrRec
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
+
+/- This attribute affirms that multiplication between ultrafilters
+is the same as Ultrafilter.mul appearing in import Mathlib.Combinatorics.Hindman -/
+attribute [local instance] Ultrafilter.mul
 
 /-- A subset `A` of a semigroup `S` is an IP set if it is contained
 in an idempotent ultrafilter. (See Hindman-Strauss Thm. 16.4.) -/
