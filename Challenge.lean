@@ -49,7 +49,7 @@ introduced as a local instance below.
 
 /- # Definitions -/
 
-namespace Intro
+namespace DeltaIntro
 
 /-- A set `A` of a semigroup `S` is syndetic if there exists a finite set `F ⊆ S`
 such that for all `s ∈ S`, there exists `f ∈ F` such that `f * s ∈ A`. -/
@@ -230,4 +230,4 @@ theorem DeltaTheoremD
   familyDual (familyMeet F G) = familyJoin (familyDual F) (familyDual G) ∧
   familyDual (familyJoin F G) = familyMeet (familyDual F) (familyDual G) := by sorry
 
-end Intro
+end DeltaIntro
