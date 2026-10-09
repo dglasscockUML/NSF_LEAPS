@@ -90,6 +90,10 @@ Family α :=
     exact F.2 (A ∩ C) (A ∩ D) hC (Set.inter_subset_inter_right A CinD)
 }
 
+lemma Family.rfl {α : Type*} (F : Family α) : F ⊆ F := by
+  intro A hA
+  exact hA
+
 end Family_structure
 
 section Empty_and_full_families
