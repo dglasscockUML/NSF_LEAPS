@@ -12,14 +12,20 @@ by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le.
 This file imports the entire project development, which rests on Mathlib only via
 the imports in the IM_Main.lean file.
 
-There are two sections below, each in a new namespace called DeltaIntro:
+There are three sections below, each in a new namespace called DeltaIntro:
   · Essential definitions
+  · Translation lemmas
   · Theorems
 
 The _essential definitions_ section contains the definitions required to audit the
 statements of the main theorems.  Some definitions (like isSyndetic) is exist both in
 the development upstream and here in the namespace DeltaIntro.  Note that Lean searches
-the namespace first, then the root, so that below ``isSyndetic'' refers to DeltaIntro.isSyndetic.
+the namespace first, then the root, so that below ``isSyndetic'' refers to
+DeltaIntro.isSyndetic, whereas _root_.isSyndetic refers to the version of
+``isSyndetic'' appearing in the development.
+
+The _translation lemmas_ section contains lemmas that show, where necessary that the
+definitions appearing here match those upstream in the development.
 
 The _theorems_ section contains statements and proofs of the theorems that appear
 in the introduction of the paper.
@@ -99,9 +105,9 @@ in a minimal idempotent ultrafilter. (See Hindman-Strauss Def.
 def isCentral
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
-∃ (p : Ultrafilter S),
-(p * p = p) ∧ (A ∈ p) ∧
-(∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p})
+∃ (p : Ultrafilter S) (_ : p * p = p)
+  (_ : ∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p}),
+    A ∈ p
 
 /-- A set `A` of a semigroup `S` is central* if it has nonempty
 intersection with all central subsets of `S` -/
@@ -154,24 +160,53 @@ isThick A ↔ _root_.isThick A := by
 if and only if it is `isCentral` as defined according to the development -/
 lemma centralIsSame
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-isCentral A ↔ _root_.isCentral A := by sorry
-
-
-/- def isCentral
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∃ (p : Ultrafilter S) (_ : isMinimalUltrafilter p) (_ : p * p = p), A ∈ p -/
-
-/- theorem ultrafilterMinimalIffUnifRec
-{S : Type*} [Semigroup S] [Nonempty S] (p : Ultrafilter S) :
-isMinimalUltrafilter p ↔ isUniformlyRecurrent (ultrafilterSystem S) p -/
-
-/- def isUniformlyRecurrent
-(dSystem : DynamicalSystem S X) (x : X) :
-Prop :=
-∀ U ∈ nhds x, isSyndetic (visitTimeSet dSystem x U) -/
-
--- Need to know that neighborhoods are formed by sets
+isCentral A ↔ _root_.isCentral A := by
+  have ultraURCondition (p : Ultrafilter S) :
+    isUniformlyRecurrent (ultrafilterSystem S) p ↔
+      ∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p} := by
+        unfold isUniformlyRecurrent
+        constructor
+        · intro hUR C hC
+          let Cnhd := {q : Ultrafilter S | C ∈ q}
+          have : Cnhd ∈ nhds p := by
+            apply (TopologicalSpace.IsTopologicalBasis.mem_nhds_iff ultrafilterBasis_is_basis).mpr
+            use Cnhd
+            refine ⟨?_,?_,?_⟩
+            · unfold ultrafilterBasis
+              use C
+            · exact hC
+            · trivial
+          specialize hUR Cnhd this
+          have : visitTimeSet (ultrafilterSystem S) p Cnhd =
+            {x | (fun x_1 ↦ x * x_1) ⁻¹' C ∈ p} := by rfl
+          rwa [this] at hUR
+        · intro hUR U Unhds
+          apply (TopologicalSpace.IsTopologicalBasis.mem_nhds_iff
+            ultrafilterBasis_is_basis).mp at Unhds
+          obtain ⟨V, ⟨C,VisClosC⟩, pInV, VinU⟩ := Unhds
+          simp only at VisClosC
+          rw [←VisClosC] at pInV
+          specialize hUR C pInV
+          have : visitTimeSet (ultrafilterSystem S) p V =
+            {x | (fun x_1 ↦ x * x_1) ⁻¹' C ∈ p} := by
+              rw [←VisClosC]
+              rfl
+          rw [←this] at hUR
+          have visitContained : visitTimeSet (ultrafilterSystem S) p V ⊆
+            visitTimeSet (ultrafilterSystem S) p U := visitTimesMono
+              (ultrafilterSystem S) p VinU
+          apply syndeticIsMonotone (hAB := visitContained)
+          exact hUR
+  constructor
+  · intro hA
+    obtain ⟨p, pIdemp, pPreUR, Ainp⟩ := hA
+    rw [←ultraURCondition p] at pPreUR
+    use p, (ultrafilterMinimalIffUnifRec p).mpr pPreUR
+  · intro hA
+    obtain ⟨p, pPreUR, pIdemp, Ainp⟩ := hA
+    apply (ultrafilterMinimalIffUnifRec p).mp at pPreUR
+    rw [ultraURCondition p] at pPreUR
+    use p
 
 /- # Theorems -/
 
