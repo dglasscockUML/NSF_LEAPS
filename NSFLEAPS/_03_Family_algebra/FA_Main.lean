@@ -1074,6 +1074,8 @@ isPRFamily (F ⋎ F*) := by
 
 end Filters_and_PR
 
+section Some_useful_identities
+
 --familyUsefulIdentity
 theorem familyUsefulIdentity
 {α : Type*} (F G H : Family α) :
@@ -1106,68 +1108,44 @@ F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by
 
 theorem familyLocalImplicationEquivalence
 {α : Type*} (F G H : Family α) :
-H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H :=
-by
-  nth_rw 1 [← dualIsInvolutionOnFamilies (F ⋏ (F* ⋎ G*))]
-  rw [familyDeMorgan2]
-  rw [familyDeMorgan1]
-  repeat rw [dualIsInvolutionOnFamilies]
-  rw [← familyDeMorgan2]
-  have step : H* ⊆ F⋏(F⋏G)* ↔ ((H* ⊆ F) ∧ (H* ⊆ (F ⋏ G)*)) := by sorry
-  rw [step]
+H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
+  have hDual1 : (F ⋏ G) = (F* ⋎ G*)* := by
+    rw [familyDeMorgan1, dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies]
+  have hDual2 : (F ⋏ H) = (F* ⋎ H*)* := by
+    rw [familyDeMorgan1, dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies]
+  rw [hDual1, hDual2]
+  have hAntiTone : (F*⋎G*)* ⊆ (F*⋎H*)* ↔ (F*⋎H*) ⊆ (F*⋎G*) := by
+    constructor
+    · intro h
+      rw [<- dualIsInvolutionOnFamilies (F* ⋎ H*)]
+      rw [<- dualIsInvolutionOnFamilies (F* ⋎ G*)]
+      apply dualIsAntitone
+      exact h
+    · intro h
+      apply dualIsAntitone
+      exact h
+  simp only [hAntiTone]
   constructor
-  · intro h
-    have h2 : H* ⊆ (F ⋏ G)* := h.2
-    have h_anti := dualIsAntitone h2
-    rw [dualIsInvolutionOnFamilies, dualIsInvolutionOnFamilies] at h_anti
-    intro A hA
-    have hmono : (F ⋏ G) ⋏ F ⊆ H ⋏ F :=
-      familyMeetIsMonotonicSlot1 F h_anti
-    have h2 : (F ⋏ G) ⋏ F = F ⋏ G := by
-      rw [←familyMeetIsAssociative]
-      rw [familyMeetIsCommutative G F]
-      rw [familyMeetIsAssociative]
-      sorry
-    have h3 : H ⋏ F = F ⋏ H := by
-      rw [familyMeetIsCommutative]
-    have h4 : F ⋏ G ⊆ F ⋏ H := by
-      rw [← h2]
-      rw [←h3]
-      exact hmono
-    exact h4 hA
-  · intro h
-    rw [←step] at ⊢
-    rw [familyDeMorgan2]
-    sorry
-  /- classical
-  constructor
-  · intro h A hAinFG
-    rw [famDualAlt] at h
-    have h1 : A ∈ F ⋏ G := by
-      exact hAinFG
-    have h2 : A ∈ F := by
-      exact h1.left
-    have h3 : A ∈ G := by
-      exact h1.right
-    have h4 : A ∈ F* ⋎ G* := by
+  · intro h1 A hA
+    rcases hA with ⟨B, hB, C, hC, hBC⟩
+    specialize h1 hC B hB
+    rw [hBC]
+    rw [Set.inter_comm]
+    exact h1
+  · intro h2 A hA B hB
+    have hAB : B ∩ A ∈ F*⋎H* := by
+      use B
       constructor
-      · intro hFstar
-        exact Or.inl hFstar
-      · intro hGstar
-        exact Or.inr hGstar
-    have h5 : A ∈ F ⋏ (F* ⋎ G*) := by
+      · exact hB
+      use A
       constructor
-      · exact h2
-      · exact h4
-    have h6 : Aᶜ ∉ H := by
-      intro hHstar
-      have : A ∈ H* := by
-        rw [famDualAlt]
-        exact hHstar
-      exact h this
-    exact sorry -/
+      · exact hA
+      simp
+    specialize h2 hAB
+    rw [Set.inter_comm]
+    exact h2
 
---end PartialModAndConsequences
+end Some_useful_identities
 
 section Unused_Or_still_to_sort
 

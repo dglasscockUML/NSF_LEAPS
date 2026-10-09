@@ -200,35 +200,6 @@ theorem prFamilyIsMultiPR
 
 end Filters_and_PR_Families
 
--- section Old_filter_and_pr
-
--- def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
---   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
-
--- def isFilterFamily {α : Type*} (F : Family α) : Prop :=
---   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
-
--- def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
---   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
-
--- def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
---   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
-
--- -- want to define pr for beyond two sets
--- def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
---   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
-
--- def isPRFamily {α : Type*} (F : Family α) : Prop :=
---   ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
-
--- structure PRFamily (α : Type) extends Family α where
---   partition_regular : partitionRegularTwoSets sets
-
--- structure FilterFamily (α : Type) extends Family α where
---   filter : isIntersectionClosed sets
-
--- end Old_filter_and_pr
-
 section Dual_Join_Meet_Classes_and_Operators
 
 /- Classes associated with the family dual, join, and meet operators -/
@@ -275,9 +246,6 @@ instance {α : Type*} : HasFamDual (Family α) where
 
 instance {α : Type*} : HasFamDual (Set (Set α)) where
   famDual := _root_.famDual
---instance : HasFamDual (PRFamily α) where
- -- famDual := @PRFamily.famDual α
--- ⋎ definitions
 
 lemma mem_dual_star {α : Type*} (F : Family α) (A : Set α) :
     A ∈ F* ↔ ∀ B ∈ F, (A ∩ B).Nonempty := Iff.rfl
