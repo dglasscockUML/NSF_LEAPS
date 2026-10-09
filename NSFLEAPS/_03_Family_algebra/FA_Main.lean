@@ -251,6 +251,7 @@ F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋎ F2) ⊆ (G1 ⋎ G2) := by
     · apply h2 hD
     · exact hB2
 
+/-- Family join is monotonic slot 1 -/
 theorem familyJoinIsMonotonicSlot1
 {α : Type*} {F G : Family α} (H : Family α) :
 F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
@@ -262,12 +263,14 @@ F ⊆ G → (F ⋎ H) ⊆ (G ⋎ H) :=
   have hC_in_G : C ∈ G.sets := h_sub hC
   exact ⟨C, hC_in_G, D, hD, rfl⟩
 
+/-- Family join is monotonic slot 2 -/
 theorem familyJoinIsMonotonicSlot2
 {α : Type*} (F : Family α) {G H : Family α} :
 G ⊆ H → (F ⋎ G) ⊆ (F ⋎ H) := by
   intro GinH
   exact familyJoinIsMonotonic (Family.rfl F) GinH
 
+/-- If G is not the empty family, then F ⊆ (F ⋎ G) -/
 theorem familyContainedInFamilyJoin
 {α : Type*} (F G : Family α) :
 G ≠ emptyFam α → F ⊆ (F ⋎ G) := by
@@ -288,6 +291,7 @@ G ≠ emptyFam α → F ⊆ (F ⋎ G) := by
       · simp
     · simp
 
+/-- F ⋎ G = emptyFam α if and only if F = emptyFam α ∨ G = emptyFam α -/
 theorem emptyFamilyJoinCondition
 {α : Type*} (F G : Family α) :
 F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α := by
@@ -325,6 +329,7 @@ F ⋎ G = emptyFam α ↔ F = emptyFam α ∨ G = emptyFam α := by
       rcases hG
       exact hC
 
+/-- F ⋎ G = fullFam α if and only if ¬(F ⊆ G*) -/
 theorem fullFamilyJoinCondition
 {α : Type*} (F G : Family α) :
 F ⋎ G = fullFam α ↔ ¬(F ⊆ G*) := by
@@ -394,6 +399,7 @@ end Join
 
 section Meet
 
+/-- Family meet is associative -/
 theorem familyMeetIsAssociative
 {α : Type*} (F G H : Family α) :
 (F ⋏ (G ⋏ H)) = ((F ⋏ G) ⋏ H) :=
@@ -405,6 +411,7 @@ theorem familyMeetIsAssociative
   repeat rw [familyDeMorgan1]
   repeat rw [dualIsInvolutionOnFamilies]
 
+/-- Family meet is commutative -/
 theorem familyMeetIsCommutative
 {α : Type*} (F G : Family α) :
 F ⋏ G = G ⋏ F :=
@@ -417,6 +424,7 @@ F ⋏ G = G ⋏ F :=
   simp_rw [dualIsInvolutionOnFamilies] at h_dual_meet
   exact h_dual_meet
 
+/-- Family meet is monotonic -/
 theorem familyMeetIsMonotonic
 {α : Type*} {F1 G1 F2 G2 : Family α} :
 F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) := by
@@ -431,7 +439,7 @@ F1 ⊆ G1 → F2 ⊆ G2 → (F1 ⋏ F2) ⊆ (G1 ⋏ G2) := by
   specialize hA B hBinF1star
   apply h2 hA
 
--- can derive from familyMeetIsMonotonic
+/-- Family meet is monotonic slot 1 -/
 theorem familyMeetIsMonotonicSlot1
 {α : Type*} {F G : Family α} (H : Family α) :
 F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) := by
@@ -441,12 +449,14 @@ F ⊆ G → (F ⋏ H) ⊆ (G ⋏ H) := by
   · intro t ht
     exact ht
 
+/-- Family meet is monotonic slot 2 -/
 theorem familyMeetIsMonotonicSlot2
 {α : Type*} (F : Family α) {G H : Family α} :
 G ⊆ H → (F ⋏ G) ⊆ (F ⋏ H) := by
   intro GinH
   exact familyMeetIsMonotonic (Family.rfl F) GinH
 
+/-- If G is not fullFam, then F ⋏ G ⊆ F -/
 theorem familyMeetContainedInIntersection
 {α : Type*} (F G : Family α) :
 G ≠ fullFam α → F ⋏ G ⊆ F := by
@@ -480,6 +490,7 @@ G ≠ fullFam α → F ⋏ G ⊆ F := by
   simp only [Set.inter_univ] at hA
   exact hA
 
+/-- Dual of fullFam is emptyFam -/
 lemma fullFamDual
 {α : Type*} : (fullFam α)* = emptyFam α := by
   simp only [HasFamDual.famDual, Family.famDual, famDual]
@@ -498,6 +509,7 @@ lemma fullFamDual
       exact hA
     simp at hAEmp
 
+/-- Dual of emptyFam is fullFam -/
 lemma emptyFamDual
 {α : Type*} : (emptyFam α)* = fullFam α := by
   simp only [HasFamDual.famDual, Family.famDual, famDual]
@@ -511,6 +523,7 @@ lemma emptyFamDual
   · intro hA B hB
     simp [emptyFam] at hB
 
+/-- F ⋏ G = fullFam α iff F = fullFam α ∨ G = fullFam α -/
 theorem fullFamilyMeetCondition
 {α : Type*} (F G : Family α) :
 F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
@@ -617,6 +630,7 @@ F ⋏ G = fullFam α ↔ F = fullFam α ∨ G = fullFam α := by
         rw [h2]
         simp [fullFam, fullCollection]
 
+/-- F ⋏ G = emptyFam α iff ¬(F* ⊆ G) -/
 theorem emptyFamilyMeetCondition
 {α : Type*} (F G : Family α) :
 F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) := by
@@ -676,6 +690,7 @@ F ⋏ G = emptyFam α ↔ ¬(F* ⊆ G) := by
         simp at hA
     exact hFGNonEmp hFGEmp
 
+/-- Characterization of membership of (capFamily G f) ⋎ H -/
 theorem memberOfCapFamJoinH
 {α : Type*} (G H : Family α) (a f : Set α) :
 a ∈ (capFamily G f) ⋎ H ↔
@@ -712,6 +727,7 @@ a ∈ (capFamily G f) ⋎ H ↔
             exact hxa.1
           all_goals exact hxa
 
+/-- Characterization of membership of (capFamily G f)* ⋏ H -/
 theorem memberOfCapFamDualMeetH
 {α : Type*} (G H : Family α) (a f : Set α) :
 a ∈ (capFamily G f)* ⋏ H ↔
@@ -731,6 +747,7 @@ a ∈ (capFamily G f)* ⋏ H ↔
       exact H.upward_closed _ _ (h (f ∩ c) hc Set.inter_subset_left)
         (Set.inter_subset_inter_right a Set.inter_subset_right)
 
+/-- Characterization of Family.iInter (fun (f : F.sets) ↦ (capFamily G f) ⋎ H) -/
 theorem iInterCapFamilyDescription
 {α : Type*} (F G H : Family α) :
 Family.iInter (fun (f : F.sets) ↦ (capFamily G f) ⋎ H) =
@@ -743,6 +760,7 @@ Family.iInter (fun (f : F.sets) ↦ (capFamily G f) ⋎ H) =
   · rintro h ⟨f, hf⟩
     exact (memberOfCapFamJoinH G H a f).mpr (h f hf)
 
+/-- Characterization of Family.iUnion (fun (f : F.sets) ↦ (capFamily G f)* ⋏ H) -/
 theorem iUnionCapFamilyDualDescription
 {α : Type*} (F G H : Family α) :
 Family.iUnion (fun (f : F.sets) ↦ (capFamily G f)* ⋏ H) =
@@ -759,6 +777,7 @@ end Meet
 
 section Filters_and_PR
 
+/-- F = fullFam α if andn only if ∅ ∈ F -/
 lemma fullFamEquiv
 {α : Type*} (F : Family α) :
 F = fullFam α ↔ ∅ ∈ F := by
@@ -778,6 +797,7 @@ F = fullFam α ↔ ∅ ∈ F := by
       · exact hF
       · simp
 
+/-- F ⋏ F = F iff F is partition regular or F = fullFam -/
 theorem familyIsIdempotentForMeetIffPR
 {α : Type*} (F : Family α) :
   F ⋏ F = F ↔ (isPRFamily F ∨ F = fullFam α) := by
@@ -847,6 +867,7 @@ theorem familyIsIdempotentForMeetIffPR
         rw [hF2]
         simp
 
+/-- F ⋎ F = F iff F is a filter or F is the empty family -/
 theorem familyIsIdempotentForJoinIffFilter
 {α : Type*} (F : Family α) :
   F ⋎ F = F ↔ (isFilterFamily F ∨ F = emptyFam α) := by
@@ -895,6 +916,7 @@ theorem familyIsIdempotentForJoinIffFilter
           exact hA
         simp at hAEmp
 
+/-- F is a filter iff F* is partition regular -/
 theorem familyIsPRIffDualIsFilter
 {α : Type*} (F : Family α) :
 isFilterFamily F ↔ isPRFamily (F*) := by
@@ -949,6 +971,7 @@ isFilterFamily F ↔ isPRFamily (F*) := by
         simp only [compl_compl] at hF2b
         exact hF2b hB
 
+/-- F* is filter iff  F ⋏ F* = F* -/
 theorem dualFFilterIffFMeetDualFIsDualF
 {α : Type*} (F : Family α) :
 isFilterFamily (F*) ↔ F ⋏ F* = F* := by
@@ -985,6 +1008,7 @@ isFilterFamily (F*) ↔ F ⋏ F* = F* := by
       specialize hA B hB
       exact hA
 
+/-- F ⋎ F* = F iff F ⋏ F* = F* -/
 theorem FJoinDualFIsFIffFMeetDualFIsDualF
 {α : Type*} (F : Family α) :
 F ⋎ F* = F ↔ F ⋏ F* = F* := by
@@ -1000,6 +1024,7 @@ F ⋎ F* = F ↔ F ⋏ F* = F* := by
     rw [familyDeMorgan2, dualIsInvolutionOnFamilies, familyJoinIsCommutative] at hFdual
     exact hFdual
 
+/-- If F ≠ emptyFam α and F ⋏ F* = F*, then F* ⊆ F -/
 theorem ifFMeetDualFIsDualFAndNonemptyThenDualFInF
 {α : Type*} (F : Family α) :
 F ≠ emptyFam α → F ⋏ F* = F* → F* ⊆ F := by
@@ -1014,9 +1039,10 @@ F ≠ emptyFam α → F ⋏ F* = F* → F* ⊆ F := by
   apply familyMeetContainedInIntersection
   · exact hFstarNotFull
 
+/-- F ⋏ F* is always a filter -/
 theorem meetOfFamilyAndDualIsFilter
 {α : Type*} (F : Family α) :
-isFilterFamily (F ⋏ F*) := /- DGG: can we prove "isFilterFamily (F ⋏ F*) instead"-/
+isFilterFamily (F ⋏ F*) :=
   by
   unfold isFilterFamily
   constructor
@@ -1041,6 +1067,7 @@ isFilterFamily (F ⋏ F*) := /- DGG: can we prove "isFilterFamily (F ⋏ F*) ins
     have hABC : A ∩ (B ∩ C) ∈ F* := hAinFFstar (B ∩ C) hBC
     simpa [Set.inter_assoc]
 
+/-- F ⋎ F* is always partition regular -/
 theorem joinOfFamilyAndDualIsPR
 {α : Type*} (F : Family α) :
 isPRFamily (F ⋎ F*) := by
@@ -1076,7 +1103,7 @@ end Filters_and_PR
 
 section Some_useful_identities
 
---familyUsefulIdentity
+/-- F ⋎ G ⊆ H iff F ⊆ H ⋏ G* -/
 theorem familyUsefulIdentity
 {α : Type*} (F G H : Family α) :
 F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by
@@ -1106,6 +1133,7 @@ F ⋎ G ⊆ H ↔ F ⊆ H ⋏ G* := by
     · exact hF
     · exact hC
 
+/-- H* ⊆ F ⋏ (F* ⋎ G*) iff F ⋏ G ⊆ F ⋏ H -/
 theorem familyLocalImplicationEquivalence
 {α : Type*} (F G H : Family α) :
 H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
@@ -1146,47 +1174,3 @@ H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
     exact h2
 
 end Some_useful_identities
-
-section Unused_Or_still_to_sort
-
-theorem thm_familySetDeMorganLaw1
-{α : Type*} (F G : Family α) :
-(F ∪ G)* = (F* ∩ G*) :=
- by
-  ext A
-  constructor
-  · intro h
-    have AinFdual : A ∈ F* := by
-      rw [mem_dual_alt]
-      rw [mem_dual_alt] at h
-      -- if Aᶜ ∉  F ∪ G, then Aᶜ ∉ F
-      intro a
-      apply h
-      exact Or.inl a
-    have AinGdual : A ∈ G* := by
-      rw [mem_dual_alt]
-      rw [mem_dual_alt] at h
-      -- if Aᶜ ∉  F ∪ G, then Aᶜ ∉ G
-      intro a
-      apply h
-      exact Or.inr a
-    exact ⟨AinFdual, AinGdual⟩
-  · intro h B BinFuG
-    rcases h with ⟨a, b⟩
-    specialize a B
-    specialize b B
-    rcases BinFuG with i | j
-    · exact a i
-    · exact b j
-
-theorem thm_familySetDeMorganLaw2
-{α : Type*} (F G : Family α) :
-(F ∩ G)* = (F* ∪ G*) :=
- by
-  have ugdualdual : (F* ∪ G*)* = F ∩ G := by
-    rw [thm_familySetDeMorganLaw1]
-    repeat rw [dualIsInvolutionOnFamilies]
-  rw [← ugdualdual]
-  rw [dualIsInvolutionOnFamilies]
-
-end Unused_Or_still_to_sort
