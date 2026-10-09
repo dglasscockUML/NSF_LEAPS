@@ -9,7 +9,7 @@ dual, meet, and join operators.
 -/
 
 section Family_structure
-
+/-- A collection of set F is upward closed if for all sets A, B, if A ∈ F and A ⊆ B, then B ∈ F -/
 def upwardClosed {α : Type*} (F : Set (Set α)) : Prop :=
   ∀ (A B : Set α), A ∈ F → A ⊆ B → B ∈ F
 
@@ -19,8 +19,6 @@ structure Family (α : Type*) where
   sets : Set (Set α)
   upward_closed : upwardClosed sets
 
--- instance : Coe (Family α) (Set (Set α)) :=
---   ⟨Family.sets⟩
 instance {α} : SetLike (Family α) (Set α) where
   coe := Family.sets
   coe_injective := by
@@ -48,6 +46,7 @@ instance {α : Type*} : Union (Family α) where
     · exact Or.inl (F.upward_closed A B hAF hAB)
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
+/-- Intersection of a collection of families -/
 def Family.iInter
 {α ι : Type*} (F : ι → Family α) : Family α :=
   ⟨⋂ i, (F i).sets, by
@@ -56,6 +55,7 @@ def Family.iInter
     intro i
     exact (F i).upward_closed A B (hA i) hAB⟩
 
+/-- Union of a collection of families -/
 def Family.iUnion
 {α ι : Type*} (F : ι → Family α) : Family α :=
   ⟨⋃ i, (F i).sets, by
@@ -64,12 +64,14 @@ def Family.iUnion
     obtain ⟨i, hi⟩ := hA
     exact ⟨i, (F i).upward_closed A B hi hAB⟩⟩
 
+/-- Characterization of membership of iInter -/
 @[simp]
 theorem Family.mem_iInter
 {α ι : Type*} (F : ι → Family α) (A : Set α) :
     A ∈ (Family.iInter F).sets ↔ ∀ i, A ∈ (F i).sets :=
   Set.mem_iInter
 
+/-- Characterization of membership of iUnion -/
 @[simp]
 theorem Family.mem_iUnion
 {α ι : Type*} (F : ι → Family α) (A : Set α) :
@@ -200,35 +202,6 @@ theorem prFamilyIsMultiPR
 
 end Filters_and_PR_Families
 
--- section Old_filter_and_pr
-
--- def isIntersectionClosed {α : Type*} (F : Set (Set α)) : Prop :=
---   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F) -- closed under ∩
-
--- def isFilterFamily {α : Type*} (F : Family α) : Prop :=
---   (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
-
--- def isPRTwoSets {α : Type*} (F : Family α) : Prop :=
---   ∀ A ∈ F.sets, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F.sets
-
--- def partitionRegularTwoSets {α : Type*} (F : Set (Set α)) : Prop :=
---   ∀ A ∈ F, ∀ (c : α → Fin 2), ∃ i : Fin 2, {x ∈ A| c x = i} ∈ F
-
--- -- want to define pr for beyond two sets
--- def PartitionRegular {α : Type*} (F : Family α) : Prop := --rewrite this to not use ℕ **
---   sorry--∀ A ∈ F, ∀ n : ℕ, ∀ (c : A → Fin n), ∃ (i : Fin n), {x | c x = i} ∈ F
-
--- def isPRFamily {α : Type*} (F : Family α) : Prop :=
---   ∀ A ∈ F, ∀ (n : ℕ+), ∀ (c : α → Fin n), ∃ (i : Fin n), {x ∈ A | c x = i} ∈ F
-
--- structure PRFamily (α : Type) extends Family α where
---   partition_regular : partitionRegularTwoSets sets
-
--- structure FilterFamily (α : Type) extends Family α where
---   filter : isIntersectionClosed sets
-
--- end Old_filter_and_pr
-
 section Dual_Join_Meet_Classes_and_Operators
 
 /- Classes associated with the family dual, join, and meet operators -/
@@ -241,10 +214,8 @@ class HasFamMeet (T : Type _) where
 
 /- The family dual, join, and meet operator symbols -/
 postfix:max "*" => HasFamDual.famDual
-infixr:80 "⋎" => HasFamJoin.famJoin -- dont like 2 with max precedence
+infixr:80 "⋎" => HasFamJoin.famJoin
 infixr:80 "⋏" => HasFamMeet.famMeet
---infixr:80 "~" => HasFamJoinnew.newFamJoin -- dont like 2 with max precedence
---infixr:80 "!" => HasFamMeetnew.newFamMeet
 
 end Dual_Join_Meet_Classes_and_Operators
 
@@ -267,6 +238,7 @@ def Family.famDual {α : Type*} (fam : Family α) : Family α :=
     exact ⟨x, hAB hxA, hxC⟩
 }
 
+/-- Characterization of membership of F* -/
 lemma mem_famDual {α : Type*} (F : Set (Set α)) (A : Set α) :
   A ∈ famDual F ↔ ∀ B ∈ F, (A ∩ B).Nonempty := by rfl
 
@@ -275,10 +247,8 @@ instance {α : Type*} : HasFamDual (Family α) where
 
 instance {α : Type*} : HasFamDual (Set (Set α)) where
   famDual := _root_.famDual
---instance : HasFamDual (PRFamily α) where
- -- famDual := @PRFamily.famDual α
--- ⋎ definitions
 
+/-- Characterization of membership of F* -/
 lemma mem_dual_star {α : Type*} (F : Family α) (A : Set α) :
     A ∈ F* ↔ ∀ B ∈ F, (A ∩ B).Nonempty := Iff.rfl
 
@@ -308,9 +278,11 @@ def Family.famJoin {α : Type*} (famA famB : Family α) : Family α :=
     exact ⟨B ∪ C, hC', B ∪ D, hD', hB⟩
 }
 
+/-- Characterization of membership of family join -/
 lemma mem_famJoin {α : Type*} (F G : Set (Set α)) (A : Set α) :
   A ∈ famJoin F G ↔ (∃ B ∈ F, ∃ C ∈ G, A = B ∩ C) := by
   rfl
+
 instance {α : Type*} : HasFamJoin (Set (Set α))  where
   famJoin := _root_.famJoin
 
@@ -339,6 +311,7 @@ def Family.famMeet {α : Type*} (famA famB : Family α) : Family α := {
     exact hBCmem
 }
 
+/-- Characterizatoin of membership of family meet -/
 lemma mem_famMeet {α : Type*} (F G : Family α) (A : Set α) :
   A ∈ famMeet F G ↔ (∀ B ∈ F*, A ∩ B ∈ G) := by
   rfl

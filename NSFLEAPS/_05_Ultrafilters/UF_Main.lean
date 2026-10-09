@@ -1596,7 +1596,7 @@ RP dSys = RPM dSys := by
     have h := forwardBackwardSetOrbClosCoincideInBronsSys dSys hDense Set.univ Set.univ
       hUnivThick hUnivThick W hW
     rwa [hfwd W, hbwd W] at h
-  -- neighbourhoods of the diagonal may be shrunk to open ones
+  -- neighborhoods of the diagonal may be shrunk to open ones
   have hinterior : ∀ α ∈ nhdsSet (Set.diagonal X), interior α ∈ nhdsSet (Set.diagonal X) := by
     intro α hα
     obtain ⟨V, hVα, hVopen, hVdiag⟩ := mem_nhdsSet.mp hα

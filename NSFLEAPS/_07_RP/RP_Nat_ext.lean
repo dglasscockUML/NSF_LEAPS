@@ -109,20 +109,10 @@ are interchangeable during type class synthesis.  This only adds an attribute; t
 above is unchanged. -/
 attribute [reducible] groGroup
 
-/- WithOne S is a CommMonoid (Lean already knows this) -/
--- instance
--- (S : Type*) [CommSemigroup S] [Nonempty S] :
--- CommMonoid (WithOne S) := by infer_instance
-
 /-- `groGroup S` is a commutative group -/
 instance
 (S : Type*) [CommSemigroup S] [Nonempty S] :
 CommGroup (groGroup S) := Algebra.GrothendieckGroup.instCommGroup
-
-/- `groGroup S` is nonempty (Lean already knows this) -/
--- instance
--- (S : Type*) [CommSemigroup S] [Nonempty S] :
--- Nonempty (groGroup S) := by infer_instance
 
 /-- The map from a non-empty, commutative semigroup `S` into its
 Grothendieck group `groGroup S` -/

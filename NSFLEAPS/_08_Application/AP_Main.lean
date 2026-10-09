@@ -351,66 +351,6 @@ A ∩ H' = B ∩ H' := by
     · exact hs2
     · exact hs3
 
--- /-- If the containment `S ⋏ F ⊆ S ⋏ G` holds for UR sets, then it holds
--- for all sets. -/ -- this is the old version. The new version is below
--- theorem urContainmentSufficesForFamilyContainment
--- {S : Type*} [Semigroup S] [Nonempty S]
--- (F G : Family S)
--- {hFG : ∀ (B H : Set S), isURSet B → isThick H → B ∩ H ∈ F → B ∩ H ∈ G} :
--- (syndeticFamily S) ⋏ F ⊆ (syndeticFamily S) ⋏ G := by
---     intro A hA
---     have h0 : isSyndetic A := by
---       have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S ∩ F := by
---         apply familyMeetContainedInIntersectionv2
---       have h02 : A ∈ syndeticFamily S ∩ F := by
---         exact h01 hA
---       have h03 : A ∈ syndeticFamily S := by
---         exact h02.1
---       simpa
---     have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
---       intro H hH
---       have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
---       A ∩ H' = B ∩ H' := by
---         apply syndSetIsUROnThickSet
---         · exact h0
---         exact hH
---       obtain ⟨B, hB, H', hH', hHH', h2⟩ := h11
---       have h12 : ∀ B ∈ (syndeticFamily S)*, A ∩ B ∈ F := by
---         exact (mem_famMeet (syndeticFamily S) F A).mp hA
---       have h13 : A ∩ H' ∈ F := by
---         specialize h12 H'
---         rw [dualSyndeticThick] at h12
---         apply h12
---         exact hH'
---       have h14 : B ∩ H' ∈ F := by
---         rw [<- h2]
---         exact h13
---       have h15 : B ∩ H' ∈ G := by
---         apply hFG
---         · exact hB
---         · exact hH'
---         exact h14
---       have h16 : A ∩ H' ∈ G := by
---         rw [h2]
---         exact h15
---       have h17 : A ∩ H' ⊆ A ∩ H := by
---         apply Set.inter_subset_inter_right
---         exact hHH'
---       apply Family.upward_closed
---       · exact h16
---       exact h17
---     simp only [SetLike.mem_coe] at hA
---     simp only [SetLike.mem_coe]
---     have h2 : (syndeticFamily S)* = (thickFamily S) := by
---       exact dualSyndeticThick
---     have h3 : (∀ H ∈ thickFamily S, A ∩ H ∈ G) → A ∈ syndeticFamily S⋏G := by
---       rw [<- dualSyndeticThick]
---       exact (mem_famMeet (syndeticFamily S) G A).mpr
---     apply h3
---     intro H hH2
---     specialize h1 H hH2
---     exact h1
-
 /-- A sufficient condition for strongly-`F` sets to be strongly-`G`:
 it suffices to check a finer statement for UR sets. -/
 theorem urContainmentSufficesForFamilyContainment
@@ -474,12 +414,6 @@ theorem urContainmentSufficesForFamilyContainment
     simp only [Set.subset_inter_iff, Set.empty_subset, and_self]
   · -- Case that F ≠ fullFam S
     intro A hA
-    -- have h0 : isSyndetic A := by
-    --   have h01 : syndeticFamily S ⋏ F ⊆ syndeticFamily S := by
-    --     exact familyMeetContainedInIntersection (syndeticFamily S) F FisFull
-    --   have h03 : A ∈ syndeticFamily S := by
-    --     exact h01 hA
-    --   simpa
     have h1 : ∀ H : Set S, isThick H → A ∩ H ∈ G := by
       intro H hHThick
       have h11 : ∃ (B : Set S) (hB : isURSet B) (H' : Set S) (hH' : isThick H') (hHH' : H' ⊆ H),
@@ -900,8 +834,8 @@ lemma prodExcept_castSucc_eq
   ]
   exact mul_comm _ _
 
-/-- If (x, y) is in regional proximal relation in a minimal system X and V ∋ y,
-then for all thick set H, R(x, V) ∩ H is a Delta set -/
+/-- If `(x, y)` is in regional proximal relation in a minimal system `X` and `V ∋ y`,
+then for all thick set `H`, `R(x, V) ∩ H` is a Delta set -/
 theorem commVisitTimeSetForRPPairIsDelta
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -1246,8 +1180,8 @@ end Delta_builder
 
 section Dynamical_sets_of_bohr_recurrence
 
-/-- If B is a set of Bohr recurrence and a uniformly recurrent set,
-then for all thick set H, B ∩ H is a Δ set -/
+/-- If `B` is a set of Bohr recurrence and a uniformly recurrent set,
+then for all thick set `H`, `B ∩ H` is a `Δ` set -/
 theorem commURSetsOfBohrRecurrenceAreDelta
 {S : Type*} [CommSemigroup S] [Nonempty S]
 (B : Set S) {hBur : isURSet B} {hBrec : isSetOfBohrRecurrence B} :
@@ -1379,7 +1313,7 @@ section Application
 
 
 
-/-- In a commutative semigroup, S ⋏ Δ = S ⋏ dcT_Bohr -/
+/-- In a commutative semigroup, `S ⋏ Δ = S ⋏ dcT_Bohr` -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetSetOfBohrRecurrence
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFamily S:= by
@@ -1412,7 +1346,7 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ setOfBohrRecurrenceFam
       exact h3
     simpa using Set.Subset.antisymm h1 h2
 
-/-- In a commutative semigroup, S ⋏ Δ = S ⋏ Δ_0 -/
+/-- In a commutative semigroup, `S ⋏ Δ = S ⋏ Δ_0` -/
 theorem commSyndFamMeetDeltaIsSnydFamMeetDeltaZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := by
@@ -1430,7 +1364,7 @@ syndeticFamily S ⋏ deltaFamily S = syndeticFamily S ⋏ deltaZeroFamily S := b
     exact h2
   simpa using Set.Subset.antisymm h1 h4
 
-/-- In a commutative semigroup, Δ* ⊆ S ⋏ (T ⋎ dcS_Bohr) -/
+/-- In a commutative semigroup, `Δ* ⊆ S ⋏ (T ⋎ dcS_Bohr)` -/
 theorem commDeltaStarImpliesLocallyBohrZero
 {S : Type*} [CommSemigroup S] [Nonempty S] :
 (deltaFamily S)* ⊆ syndeticFamily S ⋏ (thickFamily S ⋎ bohrZeroFamily S) := by
@@ -1445,7 +1379,7 @@ theorem commDeltaStarImpliesLocallyBohrZero
   exact (familyLocalImplicationEquivalence (syndeticFamily S)
   (bohrZeroFamily S)* (deltaFamily S)).mpr h1
 
-/-- In a countable, commutative semigroup S ⋏ IP = S ⋏ C -/
+/-- In a countable, commutative semigroup `S ⋏ IP = S ⋏ C` -/
 theorem strongIPIffStrongCentralInCountCommSemi
 (S : Type*) [CommSemigroup S] [Nonempty S] [Countable S] :
 (syndeticFamily S) ⋏ (IPFamily S) = (syndeticFamily S) ⋏ (centralFamily S) := by
