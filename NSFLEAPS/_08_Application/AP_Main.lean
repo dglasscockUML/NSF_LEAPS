@@ -1,8 +1,8 @@
 module
 
-import NSFLEAPS._06_Furstenberg_families.FF_Main
-import NSFLEAPS._07_RP.RP_Nat_ext
-import NSFLEAPS._08_Application.AP_Symbolic_system
+public import NSFLEAPS._06_Furstenberg_families.FF_Main
+public import NSFLEAPS._07_RP.RP_Nat_ext
+public import NSFLEAPS._08_Application.AP_Symbolic_system
 
 /-!
 # Applications
@@ -11,11 +11,13 @@ This file contains the main results from the paper "The local dynamical
 structure of delta* sets via a new Furstenberg family algebra".
 -/
 
+public section
+
 section Reduction_to_UR_sets
 
 /-- A set `A ⊆ S` is uniformly recurrent if `1_A` is `S`-uniformly recurrent
 in the symbolic system `{0,1}^S` -/
-def isURSet
+@[expose] def isURSet
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 isUniformlyRecurrent (selfSymbolicSystem S) (indicator A)
@@ -510,7 +512,7 @@ These supporting lemmas are needed for commVisitTimeSetForRPPairIsDelta below
 -/
 
 -- Product of f over a nonempty finset.
-noncomputable def prodNonempty
+@[expose] noncomputable def prodNonempty
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {ι : Type*} (t : Finset ι) (ht : t.Nonempty) (f : ι → S) : S := by
   classical
@@ -518,7 +520,7 @@ noncomputable def prodNonempty
   exact (t.erase a).fold (· * ·) (f a) f
 
 -- Product over all indices in Fin N.
-noncomputable def prodAll
+@[expose] noncomputable def prodAll
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {N : ℕ} (hN : N ≥ 2) (s : Fin N → S) : S :=
   prodNonempty (Finset.univ : Finset (Fin N)) (by
@@ -527,7 +529,7 @@ noncomputable def prodAll
     omega) s
 
 -- Product over all indices in Fin N except i.
-noncomputable def prodExcept
+@[expose] noncomputable def prodExcept
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {N : ℕ} (hN : N ≥ 2) (s : Fin N → S) (i : Fin N) : S :=
 prodNonempty ((Finset.univ : Finset (Fin N)).erase i) (by
@@ -1451,3 +1453,5 @@ by
       exact contain3 hA
 
 end Application
+
+end

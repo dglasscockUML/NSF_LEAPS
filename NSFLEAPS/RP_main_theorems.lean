@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._08_Application.AP_Main
+public import NSFLEAPS._08_Application.AP_Main
 
 /-!
 # Main results in the RP paper
@@ -34,6 +34,8 @@ in the introduction of the paper.
 
 -/
 
+public section
+
 /- # Essential Definitions -/
 
 /- A (topological) dynamical system is a compact Hausdorff space `X` together
@@ -48,7 +50,7 @@ where
 
 /-- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
 we get an action of `T` on `X` by setting `tx = (φ t)x` -/
-def homDynamicalSystemIntro
+@[expose] def homDynamicalSystemIntro
 {S} [Semigroup S] [Nonempty S]
 {T} [Semigroup T] [Nonempty T]
 (φ : MulHom T S)
@@ -75,7 +77,7 @@ structure ICER
     {p : X × X | p.1 ≈ p.2} {p : X × X | p.1 ≈ p.2}
 
 /-- The set form of the relation underlying an ICER -/
-def ICERToSet
+@[expose] def ICERToSet
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :
@@ -83,14 +85,14 @@ Set (X × X) :=
 {x : X × X | I.r x.1 x.2}
 
 /-- The quotient of `X` by an ICER on `X` -/
-def ICERQuotient
+@[expose] def ICERQuotient
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :=
 Quotient I.toSetoid
 
 /-- The quotient map `X → X/I` for an ICER `I` on `X` -/
-def ICERQuotientMap
+@[expose] def ICERQuotientMap
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :=
@@ -136,7 +138,7 @@ T2Space (ICERQuotient I) := by
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient dynamical system has phase space `X/I` with an `S` action
 described by `s[x] = [sx]` -/
-def quotientDynamicalSystemIntro
+@[expose] def quotientDynamicalSystemIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :
@@ -174,7 +176,7 @@ elements of the acting semigroup act by homeomorphisms -/
 ∀ s : S, IsHomeomorph (dSystem.map s) -/
 
 /-- An action of `S` on `X` is minimal if every point has a dense `S`-orbit -/
-def isMinimalSystemIntro
+@[expose] def isMinimalSystemIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -183,7 +185,7 @@ Prop :=
 
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
-def isEquicontinuousSystemIntro
+@[expose] def isEquicontinuousSystemIntro
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -194,7 +196,7 @@ Prop :=
       ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' β ⊆ α
 
 /-- The regionally proximal relation, as a subset of `X × X` -/
-def RPIntro
+@[expose] def RPIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -204,7 +206,7 @@ Set (X × X) :=
     ⟨dSystem.map s x.1, dSystem.map s x.2⟩) ⁻¹' α)
 
 /-- The backward regionally proximal relation, as a subset of `X × X` -/
-def RPMIntro
+@[expose] def RPMIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -215,7 +217,7 @@ Set (X × X) :=
 
 /-- The equicontinuous structure relation of a dynamical system is the
 intersection of all equicontinuous ICERS of the system -/
-def equiStructureRelationIntro
+@[expose] def equiStructureRelationIntro
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -228,7 +230,7 @@ Set (X × X) :=
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is a factor map
 if it is a continuous, `S`-equivariant surjection -/
-def isFactorMapIntro
+@[expose] def isFactorMapIntro
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
@@ -244,7 +246,7 @@ Function.Surjective π
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
 if it is an `S`-equivariant homeomorphism -/
-def isIsomorphismIntro
+@[expose] def isIsomorphismIntro
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
@@ -258,7 +260,7 @@ IsHomeomorph π
 
 /-- Dynamical systems `X` and `Y` are isomorphic if there exists a map `π : X → Y`
 that is an isomorphism -/
-def isIsomorphic
+@[expose] def isIsomorphic
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
@@ -270,7 +272,7 @@ Prop :=
 /-- A map `π : X → Y` is the largest equicontinuous factor of `X` if for all
 equicontinuous factors `ρ : X → Z`, there exists a factor map `ξ : Y → Z`
 such that `ρ = ξ ∘ π`. -/
-def isLargestEquiFactor
+@[expose] def isLargestEquiFactor
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
@@ -290,7 +292,7 @@ the Grothendieck group of the Monoid extension of `S` -/
 --   Algebra.GrothendieckGroup (WithOne S)
 
 /-- The homomorphism from `S` into groGroup `S`, as a `MulHom` structure -/
-def groGroupHomIntro
+@[expose] def groGroupHomIntro
 {S : Type*} [CommSemigroup S] [nonEmpty : Nonempty S] :
 MulHom S (groGroup S) :=
 {
@@ -486,7 +488,7 @@ by
 
 /-- Using Theorem B, provided `S` is commutative and `dSystem` is minimal,
 `RPICER` is the regionally proximal relation as an `ICER` structure -/
-def RPICER
+@[expose] def RPICER
 {S : Type*} [CommSemigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} (hMin : isMinimalSystemIntro dSystem) :
@@ -648,3 +650,5 @@ isIsomorphic SWmodRPSystem GWmodRPSystem
     · intro s
       rw [hGW s, hSW s]
       exact ζEquiv s
+
+end

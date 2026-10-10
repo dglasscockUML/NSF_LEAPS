@@ -1,7 +1,7 @@
 module
 
-import NSFLEAPS._00_Imports.IM_Main
-import NSFLEAPS._01_Topology.TP_Cylinders
+public import NSFLEAPS._00_Imports.IM_Main
+public import NSFLEAPS._01_Topology.TP_Cylinders
 
 /-!
 # Facts from topology
@@ -9,6 +9,8 @@ import NSFLEAPS._01_Topology.TP_Cylinders
 This file records basic facts from topology that are not available
 (or not convenient) from Mathlib.
 -/
+
+public section
 
 /-- The image of the closure of a set `A` under a
 continuous map `f` is the closure of the image of `A` -/
@@ -727,3 +729,5 @@ CompactSpace (Quotient ⟨R, hEquiv⟩) ∧ T2Space (Quotient ⟨R, hEquiv⟩) :
       by_contra hx
       exact hwV ⟨x, hx, rfl⟩
     exact Set.disjoint_left.mp hUV hxU hxV
+
+end

@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._03_Family_algebra.FA_Defs
+public import NSFLEAPS._03_Family_algebra.FA_Defs
 
 /-!
 # Furstenberg family theorems
@@ -8,6 +8,8 @@ import NSFLEAPS._03_Family_algebra.FA_Defs
 This file develops the main abstract theorems governing the algebra
 of Furstenberg families.
 -/
+
+public section
 
 section Dual
 
@@ -1176,3 +1178,5 @@ H* ⊆ F ⋏ (F* ⋎ G*) ↔ F ⋏ G ⊆ F ⋏ H := by
     exact h2
 
 end Some_useful_identities
+
+end

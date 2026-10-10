@@ -1,12 +1,14 @@
 module
 
-import NSFLEAPS._04_Dynamical_systems.DS_Main
+public import NSFLEAPS._04_Dynamical_systems.DS_Main
 
 /-!
 # Ultrafilters as tools in topological dynamics
 
 This file develops the machinery of ultrafilters as tools in topological dynamics.
 -/
+
+public section
 
 section Right_topological_semigroups
 
@@ -277,7 +279,7 @@ structure OurSemigroupAction
   mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
 
 /-- The predicate that the map `φ : S → T` is a semigroup homomorphism -/
-def isSemigroupHom
+@[expose] def isSemigroupHom
 {S T : Type*} [Semigroup S] [Semigroup T] (φ : S → T) :
 Prop :=
 ∀ (s1 s2 : S), φ (s1 * s2) = (φ s1) * (φ s2)
@@ -348,13 +350,13 @@ end Generic_ultrafilter_lemmas
 section Ultrafilters_as_a_semigroup
 
 /-- `leftMult s : S → S` is left multiplication by `s` -/
-def leftMult
+@[expose] def leftMult
 {S : Type*} [Semigroup S] (s : S) :
 S → S :=
   (s * ·)
 
 /-- `rightMult s : S → S` is right multiplication by `s` -/
-def rightMult
+@[expose] def rightMult
 {S : Type*} [Semigroup S] (s : S) :
 S → S :=
   (· * s)
@@ -372,13 +374,13 @@ A ∈ p * q ↔ {s : S | {t : S | s * t ∈ A} ∈ q} ∈ p :=
   Iff.rfl
 
 /-- `leftMultUltra q : βS → βS` is left multiplication by `q` -/
-def leftMultUltra
+@[expose] def leftMultUltra
 {S : Type*} [Semigroup S] (q : Ultrafilter S) :
 Ultrafilter S → Ultrafilter S :=
   (q * ·)
 
 /-- `rightMultUltra q : βS → βS` is right multiplication by `q` -/
-def rightMultUltra
+@[expose] def rightMultUltra
 {S : Type*} [Semigroup S] (q : Ultrafilter S) :
 Ultrafilter S → Ultrafilter S :=
 (· * q)
@@ -559,7 +561,7 @@ p ∈ L → p * u = p := by
 
 /-- The predicate that the ultrafilter p on S is minimal, that is, belongs to
 some minimal left ideal -/
-def isMinimalUltrafilter
+@[expose] def isMinimalUltrafilter
 {S : Type*} [Semigroup S] (p : Ultrafilter S) :
 Prop :=
 ∃ (L : Set (Ultrafilter S)), isMinLeftIdeal L ∧ (p ∈ L)
@@ -627,7 +629,7 @@ section Ultrafilters_as_phase_space
 
 /-- Given a semigroup `S`, `ultrafilterSystem S` is the dynamical system of `S`
 acting on `βS` by left multiplication -/
-def ultrafilterSystem
+@[expose] def ultrafilterSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S (Ultrafilter S) :=
 {
@@ -788,7 +790,7 @@ section Ultrafilters_as_acting_semigroup
 /-- Given an ultrafilter `p` on a set `S` and a map `f : S → X` into a topological
 space `X`, `ultraLim p f`, also written `lim_{s → p} f(s)` or `p-lim_s f(s)`, is the ultrafilter
 limit of `f` along `p` -/
-noncomputable
+@[expose] noncomputable
 def ultraLim
 {S : Type*} {X : Type*} [TopologicalSpace X]
 (p : Ultrafilter S) (f : S → X) :
@@ -910,7 +912,7 @@ by
 
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, `ultraAction dSystem`
 is the semigroup action of `βS` on `X` defined by `px = p-lim_s sx`. -/
-noncomputable
+@[expose] noncomputable
 def ultraAction
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -1406,7 +1408,7 @@ variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty
 variable (dSystem : DynamicalSystem S X)
 
 /-- A system is semisimple if all points are uniformly recurrent -/
-def isSemisimpleSystem
+@[expose] def isSemisimpleSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 ∀ (x : X), isUniformlyRecurrent dSystem x
@@ -1689,3 +1691,5 @@ RP dSystem ⊆ Set.diagonal X ↔
         (equiSurjectiveIffBackEqui dSystem).symm
 
 end Semisimplicity_and_equicontinuity
+
+end

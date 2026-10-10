@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._08_Application.AP_Main
+public import NSFLEAPS._08_Application.AP_Main
 
 /-!
 # Main results in the Delta paper
@@ -34,13 +34,15 @@ in the introduction of the paper.
 
 -/
 
+public section
+
 namespace DeltaIntro
 
 /- # Essential Definitions -/
 
 /-- A set `A` of a semigroup `S` is syndetic if there exists a finite set `F ⊆ S`
 such that for all `s ∈ S`, there exists `f ∈ F` such that `f * s ∈ A`. -/
-def isSyndetic
+@[expose] def isSyndetic
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (F : Set S), F.Finite ∧ (∀ (s : S), ∃ f ∈ F, f * s ∈ A)
@@ -48,7 +50,7 @@ Prop :=
 /-- A set `A` of a semigroup `S` is thick if for all finite
 subsets `F ⊆ S`, there exists `s ∈ S` such that `Fs ⊆ A` -/
 -- *
-def isThick
+@[expose] def isThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isSyndetic B → (A ∩ B).Nonempty
@@ -56,14 +58,14 @@ Prop :=
 /-- A set `A` of a semigroup `S` is a Delta set if there exist
 `s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
 -- *
-def isDelta
+@[expose] def isDelta
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
 
 /-- A set `A` of a semigroup `S` is Delta* if it has nonempty
 intersection with all Delta subsets of `S` -/
-def isDeltaStar
+@[expose] def isDeltaStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isDelta B → (A ∩ B).Nonempty
@@ -73,7 +75,7 @@ A subset `A` of a semigroup `S` is Bohr_0 if there exists a
 semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
 containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
 -- *
-def isBohrZero
+@[expose] def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
   (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
@@ -82,7 +84,7 @@ Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
 
 /-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if
 it has non-empty intersection with all Bohr_0 subsets of `S` -/
-def isSetOfBohrRec
+@[expose] def isSetOfBohrRec
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
@@ -93,14 +95,14 @@ attribute [local instance] Ultrafilter.mul
 
 /-- A subset `A` of a semigroup `S` is an IP set if it is contained
 in an idempotent ultrafilter. (See Hindman-Strauss Thm. 16.4.) -/
-def isIP
+@[expose] def isIP
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (p : Ultrafilter S), (p * p = p) ∧ (A ∈ p)
 
 /-- A set `A` of a semigroup `S` is IP* if it has nonempty
 intersection with all IP subsets of `S` -/
-def isIPStar
+@[expose] def isIPStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isIP B → (A ∩ B).Nonempty
@@ -108,7 +110,7 @@ Prop :=
 /-- A set `A` of a semigroup `S` is central if it is contained
 in a minimal idempotent ultrafilter. (See Hindman-Strauss Def.
 4.42 and Thm. 4.39.) -/
-def isCentral
+@[expose] def isCentral
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (p : Ultrafilter S),
@@ -116,35 +118,35 @@ Prop :=
 
 /-- A set `A` of a semigroup `S` is central* if it has nonempty
 intersection with all central subsets of `S` -/
-def isCentralStar
+@[expose] def isCentralStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
 
 /-- A collection `F` of subsets of `S` is a Furstenberg family if it is
 upward closed: for all `A, B ⊆ S`, if `A ⊆ B` and `A ∈ F`, then `B ∈ F` -/
-def isFamily
+@[expose] def isFamily
 {S : Type*} [Nonempty S] (F : Set (Set S)) :
 Prop :=
 ∀ (A B : Set S), A ⊆ B → A ∈ F → B ∈ F
 
 /-- The family dual of a collection of subsets `F` of `S`
 is the set `{ A ⊆ S : ∀ B ∈ F, A ∩ B ≠ ∅ }` -/
-def familyDual
+@[expose] def familyDual
 {S : Type*} [Nonempty S] (F : Set (Set S)) :
 Set (Set S) :=
 {A : Set S | ∀ B ∈ F, (A ∩ B).Nonempty}
 
 /-- The family meet of two collections of subsets `F` and `G`
 of `S` is the set `{ A ⊆ S : ∀ B ∈ familyDual F, A ∩ B ∈ G }` -/
-def familyMeet
+@[expose] def familyMeet
 {S : Type*} [Nonempty S] (F G : Set (Set S)) :
 Set (Set S) :=
 {A : Set S | ∀ B ∈ familyDual F, A ∩ B ∈ G}
 
 /-- The family join of two collections of subsets `F` and `G`
 of `S` is the set `{ A ⊆ S : ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C }` -/
-def familyJoin
+@[expose] def familyJoin
 {S : Type*} [Nonempty S] (F G : Set (Set S)) :
 Set (Set S) :=
 {A : Set S | ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C}
@@ -418,3 +420,6 @@ theorem DeltaTheoremD
     exact congrArg Family.sets (familyDeMorgan1 𝓕 𝓖)
 
 end DeltaIntro
+
+
+end

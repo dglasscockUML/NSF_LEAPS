@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._00_Imports.IM_Main
+public import NSFLEAPS._00_Imports.IM_Main
 
 /-!
 # Characters separate points on a compact abelian group
@@ -45,6 +45,8 @@ Write `μ` for the normalised Haar measure on `X` and `H = L²(X, μ)`.
 (This file was written by Claude Opus 5.)
 -/
 
+public section
+
 /- A list of imports just for this file:
 import Mathlib.MeasureTheory.Measure.Haar.Basic
 import Mathlib.MeasureTheory.Function.L2Space
@@ -74,6 +76,7 @@ variable (μ : Measure X) [IsProbabilityMeasure μ] [μ.IsMulLeftInvariant]
   [μ.IsOpenPosMeasure] [μ.Regular]
 
 /-- Translation by `a` acting on `L²(X, μ)`, as a linear isometry. -/
+@[expose]
 noncomputable def transl (a : X) : Lp ℂ 2 μ →ₗᵢ[ℂ] Lp ℂ 2 μ :=
   Lp.compMeasurePreservingₗᵢ ℂ (fun z => a * z) (measurePreserving_mul_left μ a)
 
@@ -120,6 +123,7 @@ lemma inner_transl (a : X) (f g : Lp ℂ 2 μ) :
 /-! ### The smoothing operator -/
 
 /-- `trMap φ y` is the translate `z ↦ φ (y⁻¹ * z)` of `φ`. -/
+@[expose]
 noncomputable def trMap (φ : C(X, ℂ)) : C(X, C(X, ℂ)) :=
   ContinuousMap.curry ⟨fun p : X × X => φ (p.1⁻¹ * p.2),
     φ.continuous.comp ((continuous_inv.comp continuous_fst).mul continuous_snd)⟩
@@ -127,6 +131,7 @@ noncomputable def trMap (φ : C(X, ℂ)) : C(X, C(X, ℂ)) :=
 @[simp] lemma trMap_apply (φ : C(X, ℂ)) (y z : X) : trMap φ y z = φ (y⁻¹ * z) := rfl
 
 /-- The `L²`-valued family of translates of `φ`. -/
+@[expose]
 noncomputable def Fmap (φ : C(X, ℂ)) : C(X, Lp ℂ 2 μ) :=
   ⟨fun y => ContinuousMap.toLp 2 μ ℂ (trMap φ y),
     (ContinuousMap.toLp (E := ℂ) 2 μ ℂ).continuous.comp (trMap φ).continuous⟩
@@ -148,6 +153,7 @@ lemma transl_Fmap (φ : C(X, ℂ)) (a y : X) :
   simp [mul_assoc, mul_comm, mul_left_comm]
 
 /-- The linear map `f ↦ (y ↦ ⟪Fmap φ y, f⟫)` from `L²` to `C(X, ℂ)`. -/
+@[expose]
 noncomputable def Lopₗ (φ : C(X, ℂ)) : Lp ℂ 2 μ →ₗ[ℂ] C(X, ℂ) where
   toFun f := ⟨fun y => inner ℂ (Fmap μ φ y) f,
     Continuous.inner (Fmap μ φ).continuous continuous_const⟩
@@ -155,6 +161,7 @@ noncomputable def Lopₗ (φ : C(X, ℂ)) : Lp ℂ 2 μ →ₗ[ℂ] C(X, ℂ) wh
   map_smul' c f := by ext y; simp [inner_smul_right]
 
 /-- `Lop φ` as a continuous linear map. -/
+@[expose]
 noncomputable def Lop (φ : C(X, ℂ)) : Lp ℂ 2 μ →L[ℂ] C(X, ℂ) :=
   (Lopₗ μ φ).mkContinuous ‖Fmap μ φ‖ (fun f => by
     refine (ContinuousMap.norm_le _ (by positivity)).2 fun y => ?_
@@ -166,6 +173,7 @@ noncomputable def Lop (φ : C(X, ℂ)) : Lp ℂ 2 μ →L[ℂ] C(X, ℂ) :=
     Lop μ φ f y = inner ℂ (Fmap μ φ y) f := rfl
 
 /-- The smoothing operator `T_φ` on `L²(X, μ)`. -/
+@[expose]
 noncomputable def Top (φ : C(X, ℂ)) : Lp ℂ 2 μ →L[ℂ] Lp ℂ 2 μ :=
   (ContinuousMap.toLp (E := ℂ) 2 μ ℂ).comp (Lop μ φ)
 
@@ -289,6 +297,7 @@ lemma Top_isCompactOperator (φ : C(X, ℂ)) : IsCompactOperator ⇑(Top μ φ) 
 /-! ### The associated positive compact operator -/
 
 /-- `A_φ = T_φ^* T_φ`: a compact, self-adjoint operator commuting with all translations. -/
+@[expose]
 noncomputable def Aop (φ : C(X, ℂ)) : Lp ℂ 2 μ →L[ℂ] Lp ℂ 2 μ :=
   (ContinuousLinearMap.adjoint (Top μ φ)).comp (Top μ φ)
 
@@ -640,3 +649,5 @@ theorem PontryaginDual.exists_apply_ne_one
              continuous_toFun := Continuous.subtype_mk hcont _ } :
       ContinuousMonoidHom X Circle), fun h => hne ?_⟩
   exact congrArg (fun z : Circle => (z : ℂ)) h
+
+end

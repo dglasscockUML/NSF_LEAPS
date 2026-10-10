@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._04_Dynamical_systems.DS_Main
+public import NSFLEAPS._04_Dynamical_systems.DS_Main
 
 /-!
 # Symbolic dynamics
@@ -8,6 +8,8 @@ import NSFLEAPS._04_Dynamical_systems.DS_Main
 This file contains the code describing the dynamical system {0,1}^S
 together with the shift.
 -/
+
+public section
 
 /-- `RightSemigroupAction S X` is the structure capturing a right action by a semigroup -/
 structure RightSemigroupAction
@@ -18,7 +20,7 @@ structure RightSemigroupAction
 
 /-- Given a right action of `S` on `X`, `symbolicSystem S X rightAction`
 is the `S`-dynamical system (a left action) on `{0,1}^X` -/
-def symbolicSystem
+@[expose] def symbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S]
 (X : Type*) [Nonempty X]
 (rightAction : RightSemigroupAction S X) :
@@ -35,7 +37,7 @@ DynamicalSystem S (X → Bool) := {
 }
 
 /-- The canonical right action of a semigroup on itself -/
-def basicRightAction
+@[expose] def basicRightAction
 (S : Type*) [Semigroup S] [Nonempty S] :
 RightSemigroupAction S S := {
     map := fun (x : S) ↦ (fun (s : S) ↦ x * s)
@@ -45,13 +47,13 @@ RightSemigroupAction S S := {
 }
 
 /-- `symbolicSystem S` is the `S`-dynamical system (left action) of `S` on `{0,1}^S` -/
-def selfSymbolicSystem
+@[expose] def selfSymbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S (S → Bool) :=
 symbolicSystem S S (basicRightAction S)
 
 /-- The right action of `S` on its monoid extension -/
-def rightActionOfSOnMonoidExt
+@[expose] def rightActionOfSOnMonoidExt
 (S : Type*) [Semigroup S] [Nonempty S] :
 RightSemigroupAction S (WithOne S) := {
     map := fun (x : WithOne S) ↦ (fun (s : S) ↦ x * s)
@@ -61,13 +63,13 @@ RightSemigroupAction S (WithOne S) := {
 }
 
 /-- The symbolic `S`-system on `{0, 1}^(WithOne S)` -/
-def monoidExtSymbolicSystem
+@[expose] def monoidExtSymbolicSystem
 (S : Type*) [Semigroup S] [Nonempty S] :
 DynamicalSystem S ((WithOne S) → Bool) :=
 symbolicSystem S (WithOne S) (rightActionOfSOnMonoidExt S)
 
 /-- indicator `A` gives the indicator function of `A` -/
-noncomputable
+@[expose] noncomputable
 def indicator
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 S → Bool := by
@@ -76,7 +78,9 @@ S → Bool := by
 
 /-- For a set `S`, a boolean value val, and `s ∈ S`, the cylinder set
 `[value]_s` is the set of functions `S → Bool` whose value at `s` is `val` -/
-def cylinderSet
+@[expose] def cylinderSet
 (S : Type*) (val : Bool) (s : S) :
 Set (S → Bool) :=
 {f : S → Bool | f s = val}
+
+end

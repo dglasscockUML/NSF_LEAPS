@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._00_Imports.IM_Main
+public import NSFLEAPS._00_Imports.IM_Main
 
 /-!
 # Cylinder neighbourhoods of the diagonal
@@ -16,6 +16,8 @@ This is the concrete form of the statement that the product uniformity has a bas
 cylinders, proved here without introducing a `UniformSpace` structure.
 (This file was written by Claude Opus 5.)
 -/
+
+public section
 
 /-- In a compact Hausdorff space, a pair of distinct points is avoided by some closed
 neighbourhood of the diagonal. -/
@@ -118,3 +120,5 @@ theorem existsProdCylinderSubsetNhds
   refine hS (Set.mk_mem_prod (hA'sub ?_) (hB'sub ?_))
   · exact hAsub fun f hf ↦ hq1 f (Set.mem_union_left _ hf)
   · exact hBsub fun f hf ↦ hq2 f (Set.mem_union_right _ hf)
+
+end

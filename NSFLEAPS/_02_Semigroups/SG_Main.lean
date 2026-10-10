@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._00_Imports.IM_Main
+public import NSFLEAPS._00_Imports.IM_Main
 
 /-!
 # Semigroup properties
@@ -9,8 +9,10 @@ This file develops the basic properties of semigroups that are not
 available (or not convenient) from Mathlib.
 -/
 
+public section
+
 /-- isLeftIdeal is the predicate that `L` is a left ideal of a semigroup `S` -/
-def isLeftIdeal
+@[expose] def isLeftIdeal
 {S : Type*} [Semigroup S] (L : Set S) :
 Prop :=
 L.Nonempty ∧ (∀ (s : S), ((fun x ↦ s * x) '' L ⊆ L))
@@ -45,14 +47,14 @@ by
     exact inAllL L LinI
 
 /-- isMinLeftIdeal is the predicate that `L` is a minimal left ideal of a semigroup `S` -/
-def isMinLeftIdeal
+@[expose] def isMinLeftIdeal
 {S : Type*} [Semigroup S] (L : Set S) :
 Prop :=
 isLeftIdeal L ∧ (∀ (M : Set S), isLeftIdeal M → M ⊆ L → M = L)
 
 
 /-- isSubsemigroup is the predicate that `T` is a subsemigroup of a semigroup `S` -/
-def isSubsemigroup
+@[expose] def isSubsemigroup
 {S : Type*} [Semigroup S] (T : Set S) :
 Prop :=
 ∀ s ∈ T, ∀ t ∈ T, s * t ∈ T
@@ -64,7 +66,7 @@ We don't care about possible duplicates, so finite sets are enough -/
 
 /-- A subset A of a semigroup S is syndetic if there is a finite subset F of S such that
 every element of S can be multiplied on the left by F to land in A -/
-def isSyndetic
+@[expose] def isSyndetic
 {S : Type*} [Semigroup S] (A : Set S) :
 Prop :=
 ∃ F : Set S, F.Finite ∧ (∀ s : S, ∃ f ∈ F, f * s ∈ A)
@@ -153,7 +155,7 @@ lemma syndeticSetIsNonEmpty {S} [Semigroup S] [hSNonempty : Nonempty S]
 
 /-- A set `A ⊆ S` is thick if for all finite subsets `F ⊆ S`,
 there exists `s ∈ S` such that `Fs ⊆ A` -/
-def isThick
+@[expose] def isThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ F : Set S, F.Finite → ∃ s : S, (· * s) '' F ⊆ A
@@ -373,12 +375,14 @@ theorem thickSetContainsRightDeltaSequence
       exact ⟨h, hhH, by rw [hs'eq j hjn1, hs'eq i (by omega), hh]⟩
 
 /-- The right quotient set `A B⁻¹ = {s | ∃ b ∈ B, s * b ∈ A}` -/
+@[expose]
 def rightQuotientSet
 {S : Type*} [Semigroup S] (A B : Set S) :
 Set S :=
 {s | ∃ b ∈ B, s * b ∈ A}
 
 /-- The left quotient set `A⁻¹ B = {s | ∃ a ∈ A, a * s ∈ B}` -/
+@[expose]
 def leftQuotientSet
 {S : Type*} [Semigroup S] (A B : Set S) :
 Set S :=
@@ -449,7 +453,10 @@ isSyndetic (⋃ i, leftQuotientSet (C i) (C i)) := by
       Set.subset_iUnion (fun i ↦ leftQuotientSet (C i) (C i)) ((Fintype.equivFin ι).symm j)
 
 /-- The `(n+1)`-fold product `s * s * ⋯ * s` in a semigroup -/
+@[expose]
 def semigroupIteratePow
 {T : Type*} [Semigroup T] (s : T) : ℕ → T
   | 0 => s
   | (n + 1) => s * semigroupIteratePow s n
+
+end

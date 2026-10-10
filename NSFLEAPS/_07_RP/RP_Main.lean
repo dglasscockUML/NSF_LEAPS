@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._05_Ultrafilters.UF_Main
+public import NSFLEAPS._05_Ultrafilters.UF_Main
 
 /-!
 # The regionally proximal relation is an equivalence relation
@@ -10,6 +10,8 @@ proximal relation from the paper "The regionally proximal relation for
 commutative semigroup actions"
 -/
 
+public section
+
 variable {S} [CommSemigroup S] [Nonempty S]
 variable {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 variable {dSystem : DynamicalSystem S X}
@@ -17,11 +19,11 @@ variable {dSystem : DynamicalSystem S X}
 section Projection_and_injection_maps
 
 /- Projection and injection maps -/
-def π1 : X × X × X → X := fun w ↦ w.1
-def π2 : X × X × X → X := fun w ↦ w.2.1
-def π3 : X × X × X → X := fun w ↦ w.2.2
-def π12 : X × X × X → X × X := fun w ↦ ⟨w.1,w.2.1⟩
-def i21 : (X × X) × X → X × X × X := fun (w : (X × X) × X) ↦ ⟨w.1.1,w.1.2,w.2⟩
+@[expose] def π1 : X × X × X → X := fun w ↦ w.1
+@[expose] def π2 : X × X × X → X := fun w ↦ w.2.1
+@[expose] def π3 : X × X × X → X := fun w ↦ w.2.2
+@[expose] def π12 : X × X × X → X × X := fun w ↦ ⟨w.1,w.2.1⟩
+@[expose] def i21 : (X × X) × X → X × X × X := fun (w : (X × X) × X) ↦ ⟨w.1.1,w.1.2,w.2⟩
 
 end Projection_and_injection_maps
 
@@ -29,7 +31,7 @@ section Corner_System_3
 
 /-- Given an action of `S` on `X`, `leftMap3: X × X × X → X × X × X` is
 defined by `s (x,y,z) = (sx, sy, z)` -/
-def leftMap3 (s : S) :
+@[expose] def leftMap3 (s : S) :
 X × X × X → X × X × X := by
   intro ⟨x, y, z⟩
   exact ⟨dSystem.map s x, dSystem.map s y, z⟩
@@ -47,7 +49,7 @@ Continuous (leftMap3 s (dSystem := dSystem)) :=
 
 /-- Given an action of `S` on `X`, `rightMap3: X × X × X → X × X × X` is
 defined by `s (x,y,z) = (x, sy, sz)` -/
-def rightMap3 (s : S) :
+@[expose] def rightMap3 (s : S) :
 X × X × X → X × X × X :=  by
   intro ⟨x, y, z⟩
   exact ⟨x, dSystem.map s y, dSystem.map s z⟩
@@ -66,7 +68,7 @@ Continuous (rightMap3 s (dSystem := dSystem)) :=
 
 /-- Given an action of `S` on `X`, cornerSystem3 is an action of `S^2`
 on `X^3` given by `(s,t)(x,y,z) = (sx,sty,tz)` -/
-def cornerSystem3 :
+@[expose] def cornerSystem3 :
 DynamicalSystem (S × S) (X × X × X) :=
 {
   map := fun ((s,t) : S × S)
@@ -97,7 +99,7 @@ section Corner_System_2
 
 /-- Given an action of `S` on `X`, `leftMap2: X × X → X × X` is
 defined by `s (x,y) = (sx, sy)` -/
-def leftMap2 (s : S) :
+@[expose] def leftMap2 (s : S) :
 X × X → X × X := by
   intro ⟨x, y⟩
   exact ⟨dSystem.map s x, dSystem.map s y⟩
@@ -114,7 +116,7 @@ Continuous (leftMap2 s (dSystem := dSystem)) :=
 
 /-- Given an action of `S` on `X`, `rightMap2: X × X → X × X` is
 defined by `s (x,y,z) = (x, sy)` -/
-def rightMap2 (s : S) :
+@[expose] def rightMap2 (s : S) :
 X × X → X × X :=  by
   intro ⟨x, y⟩
   exact ⟨x, dSystem.map s y⟩
@@ -131,7 +133,7 @@ Continuous (rightMap2 s (dSystem := dSystem)) :=
 
 /-- Given an action of `S` on `X`, `cornerSystem2` is an action of `S^2`
 on `X^2` given by `(s,t)(x,y,z) = (sx,sty,tz)` -/
-def cornerSystem2 :
+@[expose] def cornerSystem2 :
 DynamicalSystem (S × S) (X × X) :=
 {
   map := fun ((s,t) : S × S)
@@ -375,7 +377,7 @@ section Corner_System_1
 
 omit [CommSemigroup S] [Nonempty S] [CompactSpace X] [T2Space X] [Nonempty X] in
 /-- Given an action of `S` on `X`, `leftMap1: X → X` is defined by `s z = z` -/
-def leftMap1 (_s : S) : X → X := id
+@[expose] def leftMap1 (_s : S) : X → X := id
 
 omit [CommSemigroup S] [Nonempty S] [CompactSpace X] [T2Space X] [Nonempty X] in
 /-- `leftMap1 : X → X` is continuous -/
@@ -387,7 +389,7 @@ Continuous (leftMap1 s (X := X)) :=
     exact continuous_id
 
 /-- Given an action of `S` on `X`, `rightMap1: X → X` is defined by `s z = sz` -/
-def rightMap1 (s : S) :
+@[expose] def rightMap1 (s : S) :
 X → X := dSystem.map s
 
 /-- `rightMap1 : X → X` is continuous -/
@@ -400,7 +402,7 @@ Continuous (rightMap1 s (dSystem := dSystem)) :=
 
 /-- Given an action of `S` on `X`, cornerSystem1 is an action of `S^2`
 on `X` given by `(s,t)z = tz` -/
-def cornerSystem1 :
+@[expose] def cornerSystem1 :
 DynamicalSystem (S × S) X :=
 {
   map := fun ((s,t) : S × S)
@@ -1231,3 +1233,5 @@ theorem RPIsStrongSInvariant
     · exact hMin
 
 end Corollaries
+
+end

@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._00_Imports.IM_Main
+public import NSFLEAPS._00_Imports.IM_Main
 
 /-!
 # C(X,X) as a monoid under compositions
@@ -10,6 +10,8 @@ pointwise multiplication.  In this file, we define ContinuousMap.End to give
 monoid structure on `C(X,X)` under composition.
 (This file was written by ChatGPT 5.6 Sol.)
 -/
+
+public section
 
 namespace ContinuousMap
 
@@ -85,7 +87,7 @@ instance [LocallyCompactSpace X] : ContinuousMul (End X) where
       (continuous_toContinuousMap.comp continuous_fst).compCM
         (continuous_toContinuousMap.comp continuous_snd)
 
-def homeomorphContinuousMap : End X ≃ₜ C(X, X) where
+@[expose] def homeomorphContinuousMap : End X ≃ₜ C(X, X) where
   toEquiv :=
   { toFun := fun f => f.toContinuousMap
     invFun := fun f => ⟨f⟩
@@ -104,3 +106,5 @@ def homeomorphContinuousMap : End X ≃ₜ C(X, X) where
 end End
 
 end ContinuousMap
+
+end

@@ -1,6 +1,6 @@
 module
 
-import NSFLEAPS._00_Imports.IM_Main
+public import NSFLEAPS._00_Imports.IM_Main
 
 /-!
 # Furstenberg family structure objects
@@ -10,9 +10,11 @@ and their basic properties.  It also establishes notation for the family
 dual, meet, and join operators.
 -/
 
+public section
+
 section Family_structure
 /-- A collection of set F is upward closed if for all sets A, B, if A ∈ F and A ⊆ B, then B ∈ F -/
-def upwardClosed {α : Type*} (F : Set (Set α)) : Prop :=
+@[expose] def upwardClosed {α : Type*} (F : Set (Set α)) : Prop :=
   ∀ (A B : Set α), A ∈ F → A ⊆ B → B ∈ F
 
 /-- A term of type `Family α` is an upward closed
@@ -49,7 +51,7 @@ instance {α : Type*} : Union (Family α) where
     · exact Or.inr (G.upward_closed A B hAG hAB)⟩
 
 /-- Intersection of a collection of families -/
-def Family.iInter
+@[expose] def Family.iInter
 {α ι : Type*} (F : ι → Family α) : Family α :=
   ⟨⋂ i, (F i).sets, by
     intro A B hA hAB
@@ -58,7 +60,7 @@ def Family.iInter
     exact (F i).upward_closed A B (hA i) hAB⟩
 
 /-- Union of a collection of families -/
-def Family.iUnion
+@[expose] def Family.iUnion
 {α ι : Type*} (F : ι → Family α) : Family α :=
   ⟨⋃ i, (F i).sets, by
     intro A B hA hAB
@@ -82,7 +84,7 @@ theorem Family.mem_iUnion
 
 /-- Given a family `F` and a set `A`, `capFamily F A` is the family of
 sets `B` for which `B ∩ A ∈ F` -/
-def capFamily
+@[expose] def capFamily
 {α : Type*} (F : Family α) (A : Set α) :
 Family α :=
 {
@@ -101,12 +103,12 @@ end Family_structure
 section Empty_and_full_families
 
 /-- The full collection is the set of all subsets of `α` -/
-def fullCollection (α : Type*) : Set (Set α) :=
+@[expose] def fullCollection (α : Type*) : Set (Set α) :=
   Set.powerset (Set.univ : Set α)
 
 /-- The full family is the family whose underlying set is
 the full collection -/
-def fullFam (α : Type*) : Family α := {
+@[expose] def fullFam (α : Type*) : Family α := {
   sets := fullCollection α,
   upward_closed := by
     intro A B hA hAB
@@ -116,7 +118,7 @@ def fullFam (α : Type*) : Family α := {
 
 /-- The empty family is the family whose underlying set is
 the empty set -/
-def emptyFam (α : Type*) : Family α := {
+@[expose] def emptyFam (α : Type*) : Family α := {
   sets := ∅,
   upward_closed := by
     intro A B hA hAB
@@ -158,7 +160,7 @@ section Filters_and_PR_Families
 
 /-- A family is a filter if it is not the empty family and if it
 is closed under intersections -/
-def isFilterFamily
+@[expose] def isFilterFamily
 {α : Type*} (F : Family α) :
 Prop :=
   (F ≠ emptyFam α) ∧ (∀ {A B : Set α}, A ∈ F → B ∈ F → A ∩ B ∈ F)
@@ -166,7 +168,7 @@ Prop :=
 /-- A family is partition regular (PR) if it is not the full
 family and if the union of two sets belonging to the family
 implies that at least one of the sets belongs to the family -/
-def isPRFamily
+@[expose] def isPRFamily
 {α : Type*} (F : Family α) :
 Prop :=
   (F ≠ fullFam α) ∧ (∀ A B : Set α, A ∪ B ∈ F → ((A ∈ F) ∨ (B ∈ F)))
@@ -225,11 +227,11 @@ section Dual
 
 /-- The family dual defined at the level of collections:
 famDual F = { A | ∀ B ∈ F, A ∩ B ≠ ∅ } -/
-def famDual {α : Type*} (F : Set (Set α)) : Set (Set α) :=
+@[expose] def famDual {α : Type*} (F : Set (Set α)) : Set (Set α) :=
   { A : Set α | ∀ (B : Set α), B ∈ F → (A ∩ B).Nonempty}
 
 /-- The family dual of a family as a term of type Family α -/
-def Family.famDual {α : Type*} (fam : Family α) : Family α :=
+@[expose] def Family.famDual {α : Type*} (fam : Family α) : Family α :=
 { sets := _root_.famDual fam.sets,
   upward_closed := by
     intro A B hA hAB C hCF
@@ -260,11 +262,11 @@ section Join
 
 /-- The family join defined at the level of collections:
 famJoin F G = {C | ∃ A ∈ F, ∃ B ∈ G, C = A ∩ B} -/
-def famJoin {α : Type*} (F G : Set (Set α)) : Set (Set α) :=
+@[expose] def famJoin {α : Type*} (F G : Set (Set α)) : Set (Set α) :=
   { C | ∃ A ∈ F, ∃ B ∈ G, C = A ∩ B }
 
 /-- The family join of families as a term of type Family α -/
-def Family.famJoin {α : Type*} (famA famB : Family α) : Family α :=
+@[expose] def Family.famJoin {α : Type*} (famA famB : Family α) : Family α :=
 {
   sets := _root_.famJoin famA.sets famB.sets,
   upward_closed := by
@@ -297,11 +299,11 @@ section Meet
 
 /-- The family meet defined at the level of collections:
 famMeet F G = { A | ∀ B ∈ F*, A ∩ B ∈ G } -/
-def famMeet {α : Type*} (F G : Set (Set α)) : Set (Set α) :=
+@[expose] def famMeet {α : Type*} (F G : Set (Set α)) : Set (Set α) :=
   { A : Set α | ∀ B ∈ F*, A ∩ B ∈ G }
 
 /-- The family meet of families as a term of type Family α -/
-def Family.famMeet {α : Type*} (famA famB : Family α) : Family α := {
+@[expose] def Family.famMeet {α : Type*} (famA famB : Family α) : Family α := {
   sets := _root_.famMeet famA.sets famB.sets,
   upward_closed := by
     intro A B hA hAB
@@ -325,3 +327,5 @@ instance {α : Type*} : HasFamMeet (Family α) where
   famMeet := @Family.famMeet α
 
 end Meet
+
+end

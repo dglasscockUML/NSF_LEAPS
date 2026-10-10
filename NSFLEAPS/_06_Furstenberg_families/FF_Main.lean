@@ -1,9 +1,9 @@
 module
 
-import NSFLEAPS._03_Family_algebra.FA_Main
-import NSFLEAPS._05_Ultrafilters.UF_Main
-import NSFLEAPS._06_Furstenberg_families.FF_CXX
-import NSFLEAPS._06_Furstenberg_families.FF_Pontryagin
+public import NSFLEAPS._03_Family_algebra.FA_Main
+public import NSFLEAPS._05_Ultrafilters.UF_Main
+public import NSFLEAPS._06_Furstenberg_families.FF_CXX
+public import NSFLEAPS._06_Furstenberg_families.FF_Pontryagin
 
 /-!
 # Furstenberg families
@@ -11,6 +11,8 @@ import NSFLEAPS._06_Furstenberg_families.FF_Pontryagin
 This file develops the machinery around concrete Furstenberg families:
 syndetic sets, thick sets, Delta sets, Bohr sets, etc...
 -/
+
+public section
 
 section Abstract_results
 
@@ -119,7 +121,7 @@ end Abstract_results
 section Syndetic_and_thick_sets
 
 /-- The family of syndetic subsets of a semigroup -/
-def syndeticFamily
+@[expose] def syndeticFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isSyndetic A}
@@ -129,7 +131,7 @@ def syndeticFamily
 }
 
 /-- The family of thick subsets of a semigroup -/
-def thickFamily
+@[expose] def thickFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isThick A}
@@ -324,6 +326,7 @@ isMinimalUltrafilter p ∧ p * p = p ∧ ∀ (F : Set S), F.Finite → (⋂ f �
 /-- Given a family `F`, a set `A` is strongly piecewise-`F` if
 for all thick sets `H ⊆ S`, there exists a thick set `H' ⊆ S` and a
 set `B ∈ F` such that `A ∩ H = B ∩ H'` -/
+@[expose]
 noncomputable
 def stronglyPW
 {S : Type*} [Semigroup S] [Nonempty S] (F : Family S) :
@@ -333,6 +336,7 @@ syndeticFamily S ⋏ (thickFamily S ⋎ F)
 /-- Given a family `F`, a set `A` is very strongly piecewise-`F` if
 for all thick sets `H ⊆ S`, there exists a thick set `H' ⊆ H` and a
 set `B ∈ F` such that `A ∩ H' = B ∩ H'` -/
+@[expose]
 noncomputable
 def veryStronglyPW
 {S : Type*} [Semigroup S] [Nonempty S] (F : Family S) :
@@ -361,7 +365,7 @@ section Delta_sets
 
 /-- A set `A ⊆ S` is Delta_0 if for all `n`, there exist `s_1, ..., s_n ∈ S`
 such that for all `1 ≤ i < j ≤ k`, `s_j ∈ s_i A` -/
-def isDeltaZero
+@[expose] def isDeltaZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∀ (k : ℕ), ∃ (s : Fin k → S), ∀ (i j : Fin k), i < j → (s j) ∈ ((s i) * ·) '' A
@@ -386,7 +390,7 @@ isDeltaZero B := by
   · exact hx2
 
 /-- The family of Delta_0 subsets of a semigroup -/
-def deltaZeroFamily
+@[expose] def deltaZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isDeltaZero A}
@@ -397,7 +401,7 @@ def deltaZeroFamily
 
 /-- A set `A ⊆ S` is Delta if there exist `s_1, s_2, ... ∈ S`
 such that for all `1 ≤ i < j`, `s_j ∈ s_i A` -/
-def isDelta
+@[expose] def isDelta
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
@@ -420,7 +424,7 @@ isDelta B := by
   · exact hx2
 
 /-- The family of Delta subsets of a semigroup -/
-def deltaFamily
+@[expose] def deltaFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isDelta A}
@@ -455,7 +459,7 @@ section dcS_sets
 /-- A subset `A` of a semigroup `S` is a dcS set (dynamically central syndetic)
 if there exists a minimal ultrafilter `p` and an open set `U ⊆ βS` containing `p`
 such that the times of visits of `p` to `U` is contained in `A` -/
-def isdcSSet
+@[expose] def isdcSSet
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (p : Ultrafilter S) (_ : isMinimalUltrafilter p),
@@ -476,7 +480,7 @@ isdcSSet B := by
   exact Set.Subset.trans hU3 hAB
 
 /-- The family of `dcS` sets -/
-def dcSFamily
+@[expose] def dcSFamily
 (S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 {
@@ -582,13 +586,13 @@ visitTimeSet dSystem x U ⊆ A) → isdcSSet A := by
 
 /-- A subset `A` of a semigroup `S` is a set of pointwise recurrence if it
 has non-empty intersection with every `dcS` subset of `S` -/
-def isdcTSet
+@[expose] def isdcTSet
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 A ∈ (dcSFamily S)*
 
 /-- The family of dcT subsets of a semigroup -/
-def dcTFamily
+@[expose] def dcTFamily
 (S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 (dcSFamily S)*
@@ -650,7 +654,7 @@ section IP_sets
 
 /-- A subset `A` of a semigroup `S` is an IP set if it belongs to an
 idempotent ultrafilter on `S` -/
-def isIP
+@[expose] def isIP
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (p : Ultrafilter S) (_ : p * p = p), A ∈ p
@@ -666,7 +670,7 @@ isIP B := by
   exact Filter.mem_of_superset rest hAB
 
 /-- The family of `IP` sets -/
-def IPFamily
+@[expose] def IPFamily
 (S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 {
@@ -682,7 +686,7 @@ section central_sets
 
 /-- A subset `A` of a semigroup `S` is a central set if it belongs to a
 minimal idempotent ultrafilter on `S` -/
-def isCentral
+@[expose] def isCentral
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (p : Ultrafilter S) (_ : isMinimalUltrafilter p) (_ : p * p = p), A ∈ p
@@ -699,7 +703,7 @@ isCentral B := by
   exact Filter.mem_of_superset rest hAB
 
 /-- The family of `central` sets -/
-def centralFamily
+@[expose] def centralFamily
 (S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 {
@@ -1478,8 +1482,7 @@ theorem existsTwoSidedInvInCompactSubmonoid
 
 /-- An inverse for compact submonoid of a topological monoid
 with the property that "idempotent implies unit" -/
-@[instance_reducible]
-noncomputable
+@[instance_reducible, expose] noncomputable
 def invFromCompactSubmonoid
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
@@ -1493,8 +1496,7 @@ Inv S :=
 
 /-- A group structure for compact submonoid of a topological monoid
 with the property that "idempotent implies unit" -/
-@[instance_reducible]
-noncomputable
+@[instance_reducible, expose] noncomputable
 def groupFromCompactSubmonoid
 {T : Type*} [Monoid T] [TopologicalSpace T] [T2Space T] [ContinuousMul T]
 (S : Submonoid T) (hSComp : IsCompact (S : Set T))
@@ -1749,8 +1751,7 @@ theorem surjectiveSubsemiContainsId
 
 /-- A `CommGroup` structure on `closure S`, where `S` is a precompact
 subsemigroup of `C(X,X)` -/
-@[instance_reducible]
-noncomputable
+@[instance_reducible, expose] noncomputable
 def commGroupFromSurjectiveSubsemiOfCXX
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {S : Set (ContinuousMap.End X)}
@@ -2032,7 +2033,7 @@ section Bohr_sets
 A subset `A` of a semigroup `S` is Bohr_0 if there exists a
 semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
 containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
-def isBohrZero
+@[expose] def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
   (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
@@ -2056,7 +2057,7 @@ isBohrZero B := by
   apply Set.Subset.trans h5 hAB
 
 /-- The family of Bohr_0 subsets of a semigroup -/
-def bohrZeroFamily
+@[expose] def bohrZeroFamily
 (S : Type*) [Semigroup S] [Nonempty S] : Family S :=
 {
   sets := {A : Set S | isBohrZero A}
@@ -2066,6 +2067,7 @@ def bohrZeroFamily
 }
 
 /-- The `d`-torus acting on itself. -/
+@[expose]
 noncomputable
 def torusDynamicalSystem
 (d : ℕ) :
@@ -2410,13 +2412,13 @@ by
 
 /-- A subset `A` of a semigroup `S` is a set of Bohr recurrence if it has
 non-empty intersection with every `Bohr_0` subset of `S` -/
-def isSetOfBohrRecurrence
+@[expose] def isSetOfBohrRecurrence
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 A ∈ (bohrZeroFamily S)*
 
 /-- The family of Bohr_0 subsets of a semigroup -/
-def setOfBohrRecurrenceFamily
+@[expose] def setOfBohrRecurrenceFamily
 (S : Type*) [Semigroup S] [Nonempty S] :
 Family S :=
 (bohrZeroFamily S)*
@@ -2553,3 +2555,5 @@ by
 
 
 end Bohr_sets
+
+end

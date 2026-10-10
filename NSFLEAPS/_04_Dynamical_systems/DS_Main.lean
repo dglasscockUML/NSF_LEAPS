@@ -1,7 +1,7 @@
 module
 
-import NSFLEAPS._01_Topology.TP_Main
-import NSFLEAPS._02_Semigroups.SG_Main
+public import NSFLEAPS._01_Topology.TP_Main
+public import NSFLEAPS._02_Semigroups.SG_Main
 
 /-!
 # Topological Dynamical Systems
@@ -9,6 +9,8 @@ import NSFLEAPS._02_Semigroups.SG_Main
 This file develops definitions, structures, and properies of actions of discrete
 semigroups on compact Hausdorff spaces by continuous maps.
 -/
+
+public section
 
 section Structures
 
@@ -24,7 +26,7 @@ where
 
 /-- Given dynamical systems of `S` on `X` and `T` on `Y`, the product system
 of `S × T` on `X × Y` is given by `(s,t) (x,y) = (sx,ty)` -/
-def prodDynamicalSystem
+@[expose] def prodDynamicalSystem
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemOne : DynamicalSystem S X)
@@ -46,7 +48,7 @@ DynamicalSystem (S × T) (X × Y):=
 
 /-- Given dynamical systems of `S` on `X` and `Y`, the diagonal system
 of `S` on `X × Y` is given by `s (x,y) = (sx,sy)` -/
-def diagDynamicalSystem
+@[expose] def diagDynamicalSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
@@ -70,6 +72,7 @@ product system of `S` on `∀ i, X i` is given by the diagonal action `s φ = fu
 
 The phase space carries the product topology; it is compact by Tychonoff, and Hausdorff and
 non-empty because each factor is, so Lean finds those instances on its own. -/
+@[expose]
 def arbProdDynamicalSystem
 {S : Type*} [Semigroup S] [Nonempty S]
 {I : Type*}
@@ -99,7 +102,7 @@ DynamicalSystem S (∀ i, X i) :=
 
 /-- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
 we get an action of `T` on `X` by setting `tx = (φ t)x` -/
-def homDynamicalSystem
+@[expose] def homDynamicalSystem
 {S} [Semigroup S] [Nonempty S]
 {T} [Semigroup T] [Nonempty T]
 (φ : T → S) [hSemiHom : SemigroupHom φ]
@@ -118,7 +121,7 @@ DynamicalSystem T X :=
 
 /-- A dynamical system satisfies `isSurjectiveSystem` if all
 elements of the acting semigroup act by surjections -/
-def isSurjectiveSystem
+@[expose] def isSurjectiveSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :=
@@ -137,7 +140,7 @@ isSurjectiveSystem (diagDynamicalSystem dSystem dSystem) := by
 
 /-- A dynamical system satisfies `homeoSystem` if all
 elements of the acting semigroup act by homeomorphisms -/
-def isHomeoSystem
+@[expose] def isHomeoSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :=
@@ -207,7 +210,7 @@ variable {S : Type*} [Semigroup S] [Nonempty S]
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
 /-- A subset `A ⊆ X` is `S`-invariant if `SA ⊆ A` -/
-def isInvariantSet
+@[expose] def isInvariantSet
 (dSystem : DynamicalSystem S X) (A : Set X) :
 Prop :=
 ∀ s : S, Set.MapsTo (dSystem.map s) A A
@@ -247,6 +250,7 @@ by
 
 /-- The predicate that the set `Z ⊆ X` is a nonempty, compact,
 T2 subset that is invariant under the action `dSystem.map` -/
+@[expose]
 def isNonemptyCompactT2InvariantSubset
 (dSystem : DynamicalSystem S X) (Z : Set X) :
 Prop :=
@@ -287,46 +291,46 @@ dSystem.map (semigroupIteratePow s n) x = (dSystem.map s)^[n + 1] x := by
 
 /-- The orbit of a point `x` under the action of a semigroup `S` is the
 image of `S` under the map `s ↦ sx` -/
-def orbit
+@[expose] def orbit
 (dSystem : DynamicalSystem S X) (x : X) :
 Set X :=
 Set.range (fun s ↦ dSystem.map s x)
 
 /-- The orbit of a set `Z ⊆ X` under the action of a semigroup `S` is the
 image of `S` under the map `s ↦ sx` -/
-def setOrbit
+@[expose] def setOrbit
 (dSystem : DynamicalSystem S X) (Z : Set X) :
 Set X :=
 Set.range (fun ((s,z) : S × Z) ↦ dSystem.map s z)
 
 /-- The orbit closure of a point `x` under the action of a semigroup `S` is the
 closure of the image of `S` under the map `s ↦ sx` -/
-def orbitClosure
+@[expose] def orbitClosure
 (dSystem : DynamicalSystem S X) (x : X) :
 Set X :=
 closure (orbit dSystem x)
 
 /-- The orbit closure of a set `Z ⊆ X` under the action of a semigroup `S` is the
 closure of the image of `S` under the map `s ↦ sZ` -/
-def setOrbitClosure
+@[expose] def setOrbitClosure
 (dSystem : DynamicalSystem S X) (Z : Set X) :
 Set X :=
 closure (setOrbit dSystem Z)
 
 /-- The inverse orbit of a set -/
-def inverseSetOrbit
+@[expose] def inverseSetOrbit
 (dSystem : DynamicalSystem S X) (Z : Set X) :
 Set X :=
 ⋃ (s : S), (dSystem.map s) ⁻¹' Z
 
 /-- The orbit along a set `A ⊆ S` -/
-def setOrbitAlongASet
+@[expose] def setOrbitAlongASet
 (dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
 Set X :=
 ⋃ (s : A), (dSystem.map s) '' Z
 
 /-- The inverse orbit along a set `A ⊆ S` -/
-def inverseSetOrbitAlongASet
+@[expose] def inverseSetOrbitAlongASet
 (dSystem : DynamicalSystem S X) (A : Set S) (Z : Set X) :
 Set X :=
 ⋃ (s : A), (dSystem.map s) ⁻¹' Z
@@ -476,7 +480,7 @@ section Subsystems
 create a term of type `DynamicalSystem S ↑Z`, where note that `↑Z` is the type
 corresponding to membership in `Z` (tuples of term of type `X` and proof of
 membership in `Z`) -/
-def fromNonemptyCompactT2InvariantSubsetToSystem
+@[expose] def fromNonemptyCompactT2InvariantSubsetToSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X)
@@ -504,18 +508,21 @@ end Subsystems
 section Relations_as_sets
 
 /-- setToRelation sends a set `s : Set (X × X)` to a relation `X → X → Prop` -/
+@[expose]
 def setToRelation
 {X : Type*} (s : Set (X × X)) :
 X → X → Prop :=
 fun x y => (x, y) ∈ s
 
 /-- A set `s : Set (X × X)` is reflexive if for all `x : X`, `(x,x) ∈ s` -/
+@[expose]
 def isReflexive
 {X : Type*} (s : Set (X × X)) :
 Prop :=
 Std.Refl (setToRelation s)
 
 /-- A set `s : Set (X × X)` is symmetric if for all `x y : X`, `(x,y) ∈ s → (y,x) ∈ s` -/
+@[expose]
 def isSymmetric
 {X : Type*} (s : Set (X × X)) :
 Prop :=
@@ -523,6 +530,7 @@ Std.Symm (setToRelation s)
 
 /-- A set `s : Set (X × X)` is transitive if for all `x y z : X`,
 `(x,y) ∈ s ∧ (y,z) ∈ s → (x,z) ∈ s` -/
+@[expose]
 def isTransitive
 {X : Type*} (s : Set (X × X)) :
 Prop :=
@@ -530,6 +538,7 @@ IsTrans X (setToRelation s)
 
 /-- A set `s : Set (X × X)` is an equivalence relation if it is reflexive, symmetric,
 and transitive -/
+@[expose]
 def isEquivalenceRelation
 {X : Type*} (s : Set (X × X)) :
 Prop :=
@@ -591,6 +600,7 @@ section Factor_maps_and_ICERS
 
 /-- Given actions `S → X → X` and `S → Y → Y`, a map `π : X → Y` is
 `S`-equivariant if it intertwines the actions -/
+@[expose]
 def isEquivariant
 {S : Type*} [Semigroup S] {X Y : Type*}
 (actionMapX : S → X → X) (actionMapY : S → Y → Y) (π : X → Y) :
@@ -599,6 +609,7 @@ Prop :=
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is a factor map
 if it is a continuous, equivariant surjection -/
+@[expose]
 def isFactorMap
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -642,6 +653,7 @@ isFactorMap (diagDynamicalSystem dSys dSys)
 
 /-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
 if it is a equivariant homeomorphism -/
+@[expose]
 def isIsomorphism
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -654,12 +666,14 @@ IsHomeomorph π ∧ isEquivariant dSystemX.map dSystemY.map π
 
 /-- Given a map f : X → Y, the map relation is the subset of X × X
 consisting of those points (x1,x2) such that f(x1) = f(x2) -/
+@[expose]
 def mapRelation
 {X Y : Type*} (f : X → Y) :
 Set (X × X) :=
 (Prod.map f f) ⁻¹' (Set.diagonal Y)
 
 /-- The definition of a dynamical system Y being a factor of a dynamical system X -/
+@[expose]
 def isFactor
 {S} [Semigroup S] [Nonempty S]
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
@@ -671,13 +685,14 @@ Prop :=
 
 /- The image of a nonempty, compact, T2, `S`-invariant set `Z ⊆ X` under
 a continuous, intertwining map `π: X → Y` as a dynamical system -/
+@[expose]
 def imageDynamicalSystem
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
 {Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
-(π : X → Y) {hπCont : Continuous π} {hπInt : isEquivariant dSystemX.map dSystemY.map π}
+(π : X → Y) {_hπCont : Continuous π} {hπInt : isEquivariant dSystemX.map dSystemY.map π}
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
 (hZisInv : isInvariantSet dSystemX Z) [CompactSpace ↑(π '' Z)] :
 DynamicalSystem S ↑(π '' Z) :=
@@ -732,7 +747,7 @@ theorem contIntertwineRestrictionIsFactorMap
 {Z : Set X} [CompactSpace ↑Z] [Nonempty ↑Z]
 (hZisInv : isNonemptyCompactT2InvariantSubset dSystemX Z) [CompactSpace ↑(π '' Z)] :
 isFactorMap (fromNonemptyCompactT2InvariantSubsetToSystem dSystemX hZisInv)
-  (imageDynamicalSystem dSystemX dSystemY π (hπInt := hπInt) (hπCont := hπCont) hZisInv.2.2.2)
+  (imageDynamicalSystem dSystemX dSystemY π (hπInt := hπInt) (_hπCont := hπCont) hZisInv.2.2.2)
   (Set.MapsTo.restrict π Z (π '' Z) (Set.mapsTo_image π Z)) := by
     constructor
     · apply Continuous.restrict
@@ -771,6 +786,7 @@ isSurjectiveSystem dSystemV := by
 /-- Given a dynamical system `dSystem : DynamicalSystem S X`, an ICER
 (for dSystem) is an invariant (under the diagonal action of `S`),
 closed equivalence relation -/
+@[expose]
 def isICER
 {S} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -864,7 +880,7 @@ T2Space (Quotient ⟨setToRelation I, hIEquiv⟩) :=
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient dynamical system has phase space `X/I` with an `S` action
 described by `s[x] = [sx]` -/
-def quotientDynamicalSystem
+@[expose] def quotientDynamicalSystem
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 (dSystem : DynamicalSystem S X)
@@ -996,13 +1012,13 @@ variable {S : Type*} [Semigroup S] [Nonempty S]
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
 /-- The set of times `s ∈ S` for which the point `x ∈ X` visits the set `U ⊆ X` -/
-def visitTimeSet
+@[expose] def visitTimeSet
 (dSystem : DynamicalSystem S X) (x : X) (U : Set X) :
 Set S :=
 (fun (s : S) ↦ dSystem.map s x) ⁻¹' U
 
 /-- The set of times `s ∈ S` for which the point `x ∈ X` visits the set `U ⊆ X` -/
-def setVisitTimeSet
+@[expose] def setVisitTimeSet
 (dSystem : DynamicalSystem S X) (U V : Set X) :
 Set S :=
 {s : S | (((dSystem.map s) '' U) ∩ V).Nonempty}
@@ -1165,7 +1181,7 @@ variable {S : Type*} [Semigroup S] [Nonempty S]
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 
 /-- An action of `S` on `X` is minimal if `X` is a minimal subset -/
-def isMinimalSystem
+@[expose] def isMinimalSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 ∀ Z : Set X,
@@ -1173,7 +1189,7 @@ isNonemptyCompactT2InvariantSubset dSystem Z → Z = Set.univ
 
 /-- A subset `Y ⊆ X` is a minimal subset of `X` if it is minimal by containment
 amongst all non-empty, compact, `S` invariant sets -/
-def isMinimalSubset
+@[expose] def isMinimalSubset
 (dSystem : DynamicalSystem S X) (Y : Set X) :
 Prop :=
 (isNonemptyCompactT2InvariantSubset dSystem Y) ∧
@@ -1714,7 +1730,7 @@ variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty
 
 /-- A point `x ∈ X` is uniformly recurrent if for all neighborhoods `U` of `x`
 the set of visit times `R(x,U)` is a syndetic subset of `S` -/
-def isUniformlyRecurrent
+@[expose] def isUniformlyRecurrent
 (dSystem : DynamicalSystem S X) (x : X) :
 Prop :=
 ∀ U ∈ nhds x, isSyndetic (visitTimeSet dSystem x U)
@@ -3191,7 +3207,7 @@ variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty
 /-- Points `x` and `y` are proximal under the semigroup action of `S` on `X`
 if for all neighborhoods `α` of the diagonal in `X × X`, there exists `s ∈ S`
 such that `(sx, sy) ∈ α` -/
-def proximal
+@[expose] def proximal
 (dSystem : DynamicalSystem S X) (x y : X) :
 Prop :=
 ∀ α ∈ nhdsSet (Set.diagonal X), ∃ (s : S), (dSystem.map s x, dSystem.map s y) ∈ α
@@ -3404,7 +3420,7 @@ isThick (visitTimeSet (diagDynamicalSystem dSystem dSystem) ⟨x,y⟩ α) := by
   exact hs
 
 /-- A system is distal if there are no non-diagonal proximal pairs -/
-def isDistalSystem
+@[expose] def isDistalSystem
 (dSystem : DynamicalSystem S X) : Prop :=
 ∀ (x y : X), proximal dSystem x y → x = y
 
@@ -3454,7 +3470,7 @@ end Proximality_and_distality
 section Regional_proximality_basics
 
 /-- The regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
-def RP
+@[expose] def RP
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -3898,7 +3914,7 @@ z ∈ RP dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.diag
       exact hab1
 
 /-- The backward regionally proximal relation for a dynamical system, as type `Set (X × X)` -/
-def RPM
+@[expose] def RPM
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -4404,7 +4420,7 @@ z ∈ RPM dSystemX ↔ ∀ (U : Set (X × X)), IsOpen U → z ∈ U → (Set.dia
 
 /-- A characterization of points belonging to the backward regionally proximal
 equivalence relation as those whose inverse set orbits of neighborhoods have
-non-empty intersection with neighborhoods of the diagonal  -/
+non-empty intersection with neighborhoods of the diagonal -/
 lemma inRPMiffBackwardUOrbitClosInterNeighDiag
 {S : Type*} [Semigroup S] [Nonempty S]
 {X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -5888,7 +5904,7 @@ instance : UniformSpace X := uniformSpaceOfCompactR1
 
 /-- A dynamical system `dSystem` is equicontinuous if the family of maps
 given by `dSystem.map` is uniformly equicontinuous -/
-def isEquicontinuousSystem
+@[expose] def isEquicontinuousSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 ∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
@@ -5979,7 +5995,7 @@ isEquicontinuousSystem dSystem ↔ RPM dSystem ⊆ Set.diagonal X := by
       exact ⟨(t, ⟨p, interior_subset (hp γ hγ)⟩), rfl⟩
 
 -- Here is a ``by hand'' attempt at backward equicontinuity
-def isBackwardEquicontinuousSystem
+@[expose] def isBackwardEquicontinuousSystem
 (dSystem : DynamicalSystem S X) :
 Prop :=
 ∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
@@ -6168,7 +6184,7 @@ isEquicontinuousSystem (homDynamicalSystem φ dSystem) := by
 
 /-- An ICER `I` on `X` is equicontinuous if the quotient
 system `X/I` is equicontinuous -/
-def isEquicontinuousICER
+@[expose] def isEquicontinuousICER
 (dSystem : DynamicalSystem S X)
 {I : Set (X × X)} (hI : isICER dSystem I) :
 Prop :=
@@ -6277,7 +6293,7 @@ end Equicontinuity_and_regional_proximality_with_S_commutative
 section Equicontinuous_structure_relation
 
 /-- The set of ICERS of a dynamical system -/
-def setOfICERS
+@[expose] def setOfICERS
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -6285,7 +6301,7 @@ Set (Set (X × X)) :=
 {I : Set (X × X) | isICER dSystem I}
 
 /-- The set of equicontinuous ICERS of a dynamical system -/
-def setOfEquicontinuousICERS
+@[expose] def setOfEquicontinuousICERS
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -6294,7 +6310,7 @@ fun (I : Set (X × X)) ↦ ∃ (h : I ∈ setOfICERS dSystem), isEquicontinuousI
 
 /-- The equicontinuous structure relation of a dynamical system is the
 intersection of all equicontinuous ICERS of the system -/
-def equiStructureRelation
+@[expose] def equiStructureRelation
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -6315,7 +6331,7 @@ isICER dSystem (equiStructureRelation dSystem) := by
   exact hI1
 
 /-- Given a dynamical system dSystem, the factor X / S_eq -/
-def equiStructureFactorSystem
+@[expose] def equiStructureFactorSystem
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystem : DynamicalSystem S X) :
@@ -6558,3 +6574,5 @@ isEquicontinuousICER dSystem (equiStructureRelationIsICER dSystem) := by
   exact equiStructureFactorSystemIsEquicontinuous dSystem
 
 end Equicontinuous_structure_relation
+
+end

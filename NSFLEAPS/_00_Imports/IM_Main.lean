@@ -1,78 +1,78 @@
 module
 
-import Init.PropLemmas
+public import Init.PropLemmas
 
-import Mathlib.Data.Set.Defs
-import Mathlib.Data.Set.Basic
-import Mathlib.Data.Set.Lattice.Bounded
-import Mathlib.Data.Set.Lattice.Disjoint
-import Mathlib.Data.Set.Lattice.Image
-import Mathlib.Data.Set.Lattice.Indexed
-import Mathlib.Data.Set.Lattice.Order
-import Mathlib.Data.Fin.Basic
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Set.Operations
-import Mathlib.Data.Finset.Empty
+public import Mathlib.Data.Set.Defs
+public import Mathlib.Data.Set.Basic
+public import Mathlib.Data.Set.Lattice.Bounded
+public import Mathlib.Data.Set.Lattice.Disjoint
+public import Mathlib.Data.Set.Lattice.Image
+public import Mathlib.Data.Set.Lattice.Indexed
+public import Mathlib.Data.Set.Lattice.Order
+public import Mathlib.Data.Fin.Basic
+public import Mathlib.Data.Fintype.Basic
+public import Mathlib.Data.Set.Operations
+public import Mathlib.Data.Finset.Empty
 
-import Mathlib.Topology.Defs.Basic
-import Mathlib.Topology.Defs.Filter
-import Mathlib.Topology.Defs.Ultrafilter
-import Mathlib.Topology.Separation.Hausdorff
-import Mathlib.Topology.UniformSpace.Defs
-import Mathlib.Topology.UniformSpace.Separation
-import Mathlib.Topology.Maps.Proper.Basic
-import Mathlib.Topology.Maps.Basic
-import Mathlib.Topology.Constructions.SumProd
-import Mathlib.Topology.UniformSpace.Separation
-import Mathlib.Topology.UniformSpace.HeineCantor
-import Mathlib.Topology.UniformSpace.Compact
-import Mathlib.Topology.UniformSpace.UniformConvergenceTopology
-import Mathlib.Topology.Constructions
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Continuous
-import Mathlib.Topology.Compactification.StoneCech
-import Mathlib.Topology.Algebra.Semigroup
-import Mathlib.Topology.Algebra.Group.Defs
-import Mathlib.Topology.Algebra.ContinuousMonoidHom
-import Mathlib.Topology.Algebra.PontryaginDual
-import Mathlib.Topology.Defs.Induced
-import Mathlib.Topology.Baire.LocallyCompactRegular
-import Mathlib.Topology.Instances.AddCircle.Real
-import Mathlib.Topology.Sets.VietorisTopology
-import Mathlib.Topology.Separation.Regular
-import Mathlib.Topology.UniformSpace.Equicontinuity
-import Mathlib.Topology.UniformSpace.OfCompactT2
-import Mathlib.Topology.Category.TopCat.OpenNhds
-import Mathlib.Topology.UrysohnsLemma
-import Mathlib.Topology.Algebra.PontryaginDual
-import Mathlib.Topology.ContinuousMap.Compact
+public import Mathlib.Topology.Defs.Basic
+public import Mathlib.Topology.Defs.Filter
+public import Mathlib.Topology.Defs.Ultrafilter
+public import Mathlib.Topology.Separation.Hausdorff
+public import Mathlib.Topology.UniformSpace.Defs
+public import Mathlib.Topology.UniformSpace.Separation
+public import Mathlib.Topology.Maps.Proper.Basic
+public import Mathlib.Topology.Maps.Basic
+public import Mathlib.Topology.Constructions.SumProd
+public import Mathlib.Topology.UniformSpace.Separation
+public import Mathlib.Topology.UniformSpace.HeineCantor
+public import Mathlib.Topology.UniformSpace.Compact
+public import Mathlib.Topology.UniformSpace.UniformConvergenceTopology
+public import Mathlib.Topology.Constructions
+public import Mathlib.Topology.Compactness.Compact
+public import Mathlib.Topology.Continuous
+public import Mathlib.Topology.Compactification.StoneCech
+public import Mathlib.Topology.Algebra.Semigroup
+public import Mathlib.Topology.Algebra.Group.Defs
+public import Mathlib.Topology.Algebra.ContinuousMonoidHom
+public import Mathlib.Topology.Algebra.PontryaginDual
+public import Mathlib.Topology.Defs.Induced
+public import Mathlib.Topology.Baire.LocallyCompactRegular
+public import Mathlib.Topology.Instances.AddCircle.Real
+public import Mathlib.Topology.Sets.VietorisTopology
+public import Mathlib.Topology.Separation.Regular
+public import Mathlib.Topology.UniformSpace.Equicontinuity
+public import Mathlib.Topology.UniformSpace.OfCompactT2
+public import Mathlib.Topology.Category.TopCat.OpenNhds
+public import Mathlib.Topology.UrysohnsLemma
+public import Mathlib.Topology.Algebra.PontryaginDual
+public import Mathlib.Topology.ContinuousMap.Compact
 
-import Mathlib.Combinatorics.Hindman
+public import Mathlib.Combinatorics.Hindman
 
-import Mathlib.Algebra.Group.Defs
-import Mathlib.Algebra.Group.WithOne.Defs
-import Mathlib.Algebra.Group.MinimalAxioms
-import Mathlib.Algebra.BigOperators.Group.Finset.Defs
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Algebra.Group.WithOne.Basic
+public import Mathlib.Algebra.Group.Defs
+public import Mathlib.Algebra.Group.WithOne.Defs
+public import Mathlib.Algebra.Group.MinimalAxioms
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Algebra.Group.WithOne.Basic
 
-import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.MonoidLocalization.GrothendieckGroup
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.GroupTheory.MonoidLocalization.GrothendieckGroup
 
-import Mathlib.Analysis.Complex.Circle
-import Mathlib.Analysis.InnerProductSpace.Spectrum
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
-import Mathlib.Analysis.Complex.Polynomial.Basic
+public import Mathlib.Analysis.Complex.Circle
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
+public import Mathlib.Analysis.Complex.Polynomial.Basic
 
-import Mathlib.MeasureTheory.Measure.Haar.Basic
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Function.ContinuousMapDense
+public import Mathlib.MeasureTheory.Measure.Haar.Basic
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Function.ContinuousMapDense
 
 /-!
 # Imports
 
-This file contains imports from Mathlib that the project requires.
+This file contains public imports from Mathlib that the project requires.
 -/
