@@ -47,9 +47,8 @@ such that for all `s ∈ S`, there exists `f ∈ F` such that `f * s ∈ A`. -/
 Prop :=
 ∃ (F : Set S), F.Finite ∧ (∀ (s : S), ∃ f ∈ F, f * s ∈ A)
 
-/-- A set `A` of a semigroup `S` is thick if for all finite
-subsets `F ⊆ S`, there exists `s ∈ S` such that `Fs ⊆ A` -/
--- *
+/-- A set `A` of a semigroup `S` is thick if it has nonempty intersection
+with all syndetic subsets of `S`. -/
 @[expose] def isThick
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
@@ -57,7 +56,6 @@ Prop :=
 
 /-- A set `A` of a semigroup `S` is a Delta set if there exist
 `s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
--- *
 @[expose] def isDelta
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
@@ -74,7 +72,6 @@ Prop :=
 A subset `A` of a semigroup `S` is Bohr_0 if there exists a
 semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
 containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
--- *
 @[expose] def isBohrZero
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))

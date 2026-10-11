@@ -1,0 +1,338 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# formalization.yaml v0.4
+version: "v0.4"
+
+project:
+  name: "The local dynamical structure of Δ* sets via a new Furstenberg family algebra"
+  description: >-
+    This development formalizes in Lean 4 the results of the paper "The local dynamical
+    structure of Δ* sets via a new Furstenberg family algebra", which strengthens the
+    connection between the combinatorics of difference sets and the dynamics of group
+    rotations.
+
+    Let S be a discrete semigroup. A set A ⊆ S is syndetic if there is a finite F ⊆ S with
+    S = ∪_{f ∈ F} f⁻¹A; a Δ set if there is a sequence s₁, s₂, … in S with s_j ∈ s_i A for
+    all i < j; and a Bohr_0 set if it contains the preimage of an open neighborhood of the
+    identity under a semigroup homomorphism from S to a finite-dimensional torus. Dually, a
+    set is thick, a Δ* set, or a set of Bohr recurrence according as it meets every
+    syndetic, every Δ, or every Bohr_0 subset of S. In the integers, Δ sets are infinite
+    difference sets and Bohr_0 sets are the almost periodic sets of classical interest; Δ*
+    sets are combinatorially large, being syndetic and rich in additive patterns.
+
+    The main result (Theorem A) is that Δ* sets in an arbitrary commutative semigroup carry
+    local Bohr structure: if A ⊆ S is a Δ* set, then for every thick H ⊆ S there is a thick
+    H′ ⊆ H and a Bohr_0 set B with A ∩ H′ = B ∩ H′. This generalizes results of Bergelson,
+    Furstenberg and Weiss and of Host and Kra from the integers to arbitrary commutative
+    semigroups by a purely topological-dynamical route in place of the ergodic-theoretic
+    arguments used in the integer case. Theorem B is the dual formulation, in terms of Δ
+    sets and sets of Bohr recurrence, that the proof actually establishes: if A ⊆ S admits
+    a thick H such that A ∩ H′ is a set of Bohr recurrence for every thick H′ ⊆ H, then A
+    is a Δ set. Theorem C exhibits a second instance of local structure by the same method:
+    in a countable commutative semigroup, every C* set agrees with an IP* set on a thick
+    subset of any prescribed thick set.
+
+    Theorem D supplies the algebraic framework the arguments rest on. A Furstenberg family
+    on a set S is an upward-closed collection of subsets of S. On the Furstenberg families
+    of a non-empty set, two binary operations, family meet and family join, are described
+    and shown to be associative, commutative and monotone. Together with the family dual,
+    they satisfy De Morgan-type laws. Family join has appeared before in the literature;
+    family meet, as presented here, is believed to be new. The algebra reduces the
+    equivalence of Theorems A and B to a short computation and makes similar reformulations
+    in Ramsey theory routine.
+
+    The proofs of Theorems A and B depend on a companion result, formalized here but the
+    subject of another Palomar entry, that the regionally proximal relation is an equivalence
+    relation for minimal actions of commutative semigroups. The development runs to roughly
+    20,000 lines of Lean across 17 files and formalizes every lemma, proposition, corollary
+    and theorem of the paper; the registered statements are Theorems A, B, C and D. Proved
+    along the way, and not available in Mathlib, is the classical fact that the characters
+    of a compact abelian group separate its points.
+  authors:
+    - "Angelina Blahodatna"
+    - "Lauren Detmold"
+    - "Daniel Glasscock"
+    - "Anh N. Le"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Daniel Glasscock"
+    - "Anh N. Le"
+
+classification:
+  arxiv: ["math.CO", "math.DS"]
+  msc2020: ["05D10", "37B05", "37B20", "22A20"]
+
+sources:
+  - title: "The local dynamical structure of Δ* sets via a new Furstenberg family algebra"
+    authors:
+      - "Angelina Blahodatna"
+      - "Lauren Detmold"
+      - "Daniel Glasscock"
+      - "Anh N. Le"
+    id: "arXiv:2610.10416"
+    type: "paper"
+    location: "https://doi.org/10.48550/arXiv.2610.10416"
+    relationship: "formalizes"
+    note: >-
+      The source paper, by the same people who wrote this formalization. Theorems A, B, C
+      and D are stated in its introduction; the registered Lean statements correspond to
+      those four results.
+    author_endorsement: "participated"
+
+  - title: "The regionally proximal relation for commutative semigroup actions"
+    authors:
+      - "Angelina Blahodatna"
+      - "Lauren Detmold"
+      - "Daniel Glasscock"
+      - "Anh N. Le"
+    id: "arXiv:2610.10397"
+    type: "paper"
+    location: "https://doi.org/10.48550/arXiv.2610.10397"
+    relationship: "other"
+    note: >-
+      A companion paper by the same authors. The main results of the present entry rely
+      crucially on its main result, that the regionally proximal relation is an equivalence
+      relation for minimal actions of commutative semigroups. This development formalizes
+      all of the results of that paper, but its main results are registered in a separate
+      Palomar submission; the relationship is recorded as other rather than formalizes
+      because the present entry's registered statements are those of the first source.
+    author_endorsement: "participated"
+
+  - title: "Piecewise-Bohr sets of integers and combinatorial number theory"
+    authors:
+      - "Vitaly Bergelson"
+      - "Hillel Furstenberg"
+      - "Benjamin Weiss"
+    id: "doi:10.1007/3-540-33700-8_2"
+    type: "paper"
+    location: >-
+      Topics in Discrete Mathematics, Algorithms and Combinatorics 26, pages 13–37,
+      Springer, Berlin, 2006. https://doi.org/10.1007/3-540-33700-8_2
+    relationship: "background"
+    note: >-
+      One of the integer-case results that Theorem A generalizes to arbitrary commutative
+      semigroups. Not itself formalized.
+    author_endorsement: "not-contacted"
+
+  - title: "Nil-Bohr sets of integers"
+    authors:
+      - "Bernard Host"
+      - "Bryna Kra"
+    id: "doi:10.1017/S014338570900087X"
+    type: "paper"
+    location: >-
+      Ergodic Theory and Dynamical Systems 31(1), pages 113–142, 2011.
+      https://doi.org/10.1017/S014338570900087X
+    relationship: "background"
+    note: >-
+      The integer-case result, strengthening Bergelson–Furstenberg–Weiss to Δ* sets, that
+      Theorem A generalizes to arbitrary commutative semigroups. Not itself formalized.
+    author_endorsement: "not-contacted"
+
+status:
+  scope: >-
+    Every result in the source paper labelled lemma, proposition, corollary or theorem is
+    fully formalized in the development, including the two substantial supporting
+    components the main argument rests on: that the regionally proximal relation is an
+    equivalence relation for minimal actions of commutative semigroups, and the Furstenberg
+    family algebra. The development additionally proves a classical fact absent from
+    Mathlib, that characters separate points in a compact abelian group, which does not
+    itself appear as a stated theorem in the paper.
+
+    The Challenge file contains only Theorems A, B, C and D as stated in the paper's
+    introduction; the remaining formalized results are present in the development but are
+    not part of the registered statement set.
+
+    Semigroups are assumed nonempty throughout, in the paper and in the formalization
+    alike. Theorem C assumes the semigroup is countable; this hypothesis is present in the
+    paper's statement of Theorem C and the formal statement matches it. Theorems A, B and D
+    carry no countability hypothesis. Both degenerate Furstenberg families, the empty
+    family and the full power set, are admitted as Furstenberg families and are handled
+    explicitly in the development rather than excluded by hypothesis.
+
+    No result is assumed from the literature rather than derived. Every result the proofs
+    depend on is either proved within the development or available in the pinned Mathlib;
+    in particular the Pontryagin separation fact named above is proved in full in
+    FF_Pontryagin.lean rather than assumed.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+
+automation:
+  methods:
+    - method: "manual"
+      models: []
+      framework: "n/a"
+      tool_setup: >-
+        Hand-coding of a substantial portion of the definitions, theorem statements and
+        theorem proofs, and hand-scaffolding of helper theorem statements and proof steps.
+      cost:
+        wall_time: "approximately 6 months of effort"
+        spend_usd: "n/a"
+        hardware: "n/a"
+      prompting_notes: "n/a"
+
+    - method: "agent"
+      models: ["Claude Opus 5 High"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Autonomous coding of the file FF_Pontryagin.lean, completed in a single pass with a
+        sorry-free build. The target theorem, PontryaginDual.exists_apply_ne_one, that
+        characters separate points in a compact abelian group, is classical but not
+        available in Mathlib.
+      cost:
+        wall_time: "approximately 1 hour"
+        spend_usd: "subscription-based"
+        hardware: "local machine and API"
+      prompting_notes: >-
+        Instructions were to match the hand-stated target theorem
+        PontryaginDual.exists_apply_ne_one; to make edits only to the file
+        FF_Pontryagin.lean; and to find and use whichever proof of the target theorem is
+        best suited to formalization in Lean 4.
+
+    - method: "copilot"
+      models: ["Claude Opus 5 High"]
+      framework: "Claude Code"
+      tool_setup: >-
+        The authors hand-scaffolded the main theorems in RP_Nat_ext.lean, and the model
+        supplied proofs of those theorems, introducing definitions and helper lemmas as
+        necessary.
+      cost:
+        wall_time: "approximately 1 hour over a single run"
+        spend_usd: "subscription-based"
+        hardware: "local machine and API"
+      prompting_notes: >-
+        Instructions were to edit the RP_Nat_ext.lean file only; to provide proofs for the
+        already-scaffolded main theorems following proofs supplied by the authors in a
+        write-up; and not to edit the main theorem statements in any way.
+
+    - method: "copilot"
+      models: ["Claude Opus 5 High"]
+      framework: "Claude Code"
+      tool_setup: >-
+        The model supplied proofs of approximately two dozen theorems across the project,
+        following proofs the authors wrote in English in LaTeX and provided to it. Work
+        proceeded on a theorem-by-theorem basis, with output reviewed and managed after
+        each call. Helper lemmas introduced by the model were organized by hand into the
+        project structure; several were placed in TP_Defs.lean.
+      cost:
+        wall_time: "approximately 2 hours, broken into runs of roughly 10 minutes"
+        spend_usd: "subscription-based"
+        hardware: "local machine and API"
+      prompting_notes: >-
+        Instructions were given on a line-by-line basis. A representative prompt: "Write a
+        proof of preStrongIPIffStrongCentralInCountCommSemi in the FF_Defs.lean file. Add
+        lines only; do not modify or delete any lines. Follow the proof in the attached pdf
+        file. Do not change any other part of the FF_Defs.lean file. If you need a helper
+        lemma, you can write it just above preStrongIPIffStrongCentralInCountCommSemi.
+        Before writing a helper lemma, search for what you need in the files upstream in
+        the project."
+  spend_usd: "subscription-based"
+  notes: >-
+    All mathematical content in this project is the work of the authors. Every definition,
+    every main theorem statement, and every proof appearing in the source paper was
+    developed and written by hand, as mathematical prose, before formalization was
+    attempted. Automation was applied only to the task of rendering that mathematics in
+    Lean: agents were given human-written proofs and asked to encode them, not to find
+    them, with the noted exception of the results in FF_Pontryagin.lean.
+
+    Coding agents were used in three roles: to supply Lean proofs of individual theorems,
+    one at a time, from English proofs the authors wrote and provided; to produce the
+    FF_Pontryagin.lean file; and to supply proofs for theorem statements the authors had
+    already scaffolded by hand in RP_Nat_ext.lean. Main theorem statements and definitions
+    were hand-written throughout, and agents were instructed not to modify them.
+
+    FF_Pontryagin.lean is the one exception to the description above. Its target statement
+    was fixed by hand, but the agent was asked to locate and formalize whichever proof of
+    that statement was best suited to Lean, so the choice of argument there was the agent's
+    rather than the authors'. The result concerned, that the characters of a compact
+    abelian group separate its points, is classical, is not original to this paper, and is
+    referenced in the paper only as a tool, without proof.
+
+    Agent output was reviewed and organized by the authors as it was produced, with helper
+    lemmas placed by hand into the project structure. We do not claim independent peer
+    review or a complete line-by-line human audit of every machine-generated proof.
+
+fidelity:
+  divergences: >-
+    There are no known divergences between the formally verified statements in Lean and the
+    statements of the main theorems in the introduction of the source paper.
+
+    One representational choice is worth recording, although it does not change what is
+    asserted. Bohr_0 sets are formalized through semigroup homomorphisms into Fin d →
+    Circle, the d-dimensional torus presented as a power of the unit circle in ℂ, rather
+    than as ℝ^d/ℤ^d as written in the paper. As in the paper, no continuity is required of
+    these homomorphisms.
+
+review:
+  status: "author-verified"
+  reviewers:
+    - "Angelina Blahodatna"
+    - "Lauren Detmold"
+    - "Daniel Glasscock"
+    - "Anh N. Le"
+  notes: >-
+    The authors hand-formalized all main definitions and all main theorem statements, and
+    audited the registered statements against the paper. This status does not claim
+    independent peer review, nor a complete human audit of every machine-generated proof.
+
+alignment:
+  namespace: "DeltaIntro"
+  notes: >-
+    Each of the four theorems is stated without proof in Palomar/Delta/Challenge.lean,
+    together with the sixteen definitions needed to read the statements, and is stated and
+    proved under the same fully qualified name in NSFLEAPS/Delta_main_theorems.lean.
+    Palomar/Delta/Solution.lean supplies the proved forms by importing that module. Three
+    translation lemmas in Delta_main_theorems.lean, namely thickIsSame, IPIsSame and
+    centralIsSame, connect the definitions as stated for the reader to the equivalent
+    notions the development works with internally; the remaining definitions agree with the
+    development's own by definitional equality.
+  statements:
+    - source: "Theorem A (Section 1.2; proof in Section 5.3)"
+      lean: "DeltaIntro.DeltaTheoremA"
+      module: "NSFLEAPS/Delta_main_theorems.lean"
+      status: "proved"
+      note: >-
+        The main result: in a commutative semigroup, a Δ* set agrees with a Bohr_0 set on a
+        thick subset of any prescribed thick set. The formal statement carries the
+        containment H′ ⊆ H explicitly, as the paper's does. Bohr_0 sets are formalized
+        through semigroup homomorphisms into Fin d → Circle rather than into ℝ^d/ℤ^d; no
+        continuity is required of these homomorphisms, matching the paper.
+
+    - source: "Theorem B (Section 1.2; proof in Section 5.3)"
+      lean: "DeltaIntro.DeltaTheoremB"
+      module: "NSFLEAPS/Delta_main_theorems.lean"
+      status: "proved"
+      note: >-
+        The dual formulation, in terms of Δ sets and sets of Bohr recurrence, that the proof
+        establishes directly. The paper derives A and B from one another using the family
+        algebra of Section 1.4; the formalization proves B first and obtains A from it, so
+        both are proved rather than one being derived informally from the other.
+
+    - source: "Theorem C (Section 1.2; proof in Section 5.4)"
+      lean: "DeltaIntro.DeltaTheoremC"
+      module: "NSFLEAPS/Delta_main_theorems.lean"
+      status: "proved"
+      note: >-
+        In a countable commutative semigroup, a central* set agrees with an IP* set on a
+        thick subset of any prescribed thick set. The countability hypothesis appears in
+        the paper's statement and in the formal statement alike. IP and central sets are
+        formalized as membership in an idempotent, respectively minimal idempotent,
+        ultrafilter, with multiplication given by Ultrafilter.mul from
+        Mathlib.Combinatorics.Hindman; IPIsSame and centralIsSame link these to the
+        development's closely-related formulations.
+
+    - source: "Theorem D (Section 1.4; proof in Section 3)"
+      lean: "DeltaIntro.DeltaTheoremD"
+      module: "NSFLEAPS/Delta_main_theorems.lean"
+      status: "proved"
+      note: >-
+        The algebraic properties of family meet, family join and the family dual, stated
+        for an arbitrary non-empty set with no semigroup structure, as in Section 1.4. The
+        single declaration bundles ten conclusions: closure of meet and join on families,
+        associativity and commutativity of each, monotonicity of each in both arguments,
+        and the two De Morgan-type laws of equation (1.2).
+
+acknowledgements: >-
+  The authors gratefully acknowledge support from the National Science Foundation under a
+  LEAPS Grant, Award Number 2418589. This development is built on Mathlib, and was produced
+  partially with the assistance of coding agents as described in the automation section.

@@ -1,0 +1,11 @@
+{
+  "challenge_module": "Palomar.Delta.Challenge",
+  "solution_module": "Palomar.Delta.Solution",
+  "theorem_names": [
+    "DeltaIntro.DeltaTheoremA",
+    "DeltaIntro.DeltaTheoremB",
+    "DeltaIntro.DeltaTheoremC",
+    "DeltaIntro.DeltaTheoremD"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
