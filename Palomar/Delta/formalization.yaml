@@ -52,7 +52,7 @@ project:
     - "Lauren Detmold"
     - "Daniel Glasscock"
     - "Anh N. Le"
-  license: "Apache-2.0"
+  license: "MIT"
   responsible_maintainers:
     - "Daniel Glasscock"
     - "Anh N. Le"
