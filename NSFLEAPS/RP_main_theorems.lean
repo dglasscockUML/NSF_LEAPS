@@ -134,8 +134,27 @@ instance
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} {I : ICER dSystem} :
 T2Space (ICERQuotient I) := by
-  unfold ICERQuotient
-  exact (quotientByCERIsCompactHausdorff (R := I.r) I.iseqv I.isClosed).2
+  change T2Space (Quotient I.toSetoid)
+  -- the image of a closed set under the quotient map is closed
+  have hπ : ∀ K : Set X, IsClosed K → IsOpen (Quotient.mk I.toSetoid '' K)ᶜ := fun K hK ↦ by
+    rw [← isQuotientMap_quotient_mk'.isOpen_preimage, Set.preimage_compl, isOpen_compl_iff]
+    convert (((hK.isCompact.prod isCompact_univ).inter_right I.isClosed).image
+      continuous_snd).isClosed using 1
+    ext x
+    simp [Quotient.mk', Quotient.eq]
+  refine ⟨fun a b hab ↦ ?_⟩
+  obtain ⟨a, rfl⟩ := Quotient.mk_surjective a
+  obtain ⟨b, rfl⟩ := Quotient.mk_surjective b
+  -- separate the (compact, disjoint) fibres in `X`, then push forward
+  have hF : ∀ c : X, IsCompact {y | I.r y c} := fun c ↦
+    (I.isClosed.preimage (continuous_id.prodMk continuous_const)).isCompact
+  obtain ⟨U, V, hU, hV, haU, hbV, hUV⟩ := SeparatedNhds.of_isCompact_isCompact (hF a) (hF b)
+    (Set.disjoint_left.2 fun y hya hyb ↦ hab (Quotient.sound (I.trans (I.symm hya) hyb)))
+  refine ⟨_, _, hπ _ hU.isClosed_compl, hπ _ hV.isClosed_compl,
+    fun ⟨y, hy, hya⟩ ↦ hy (haU (Quotient.exact hya)),
+    fun ⟨y, hy, hyb⟩ ↦ hy (hbV (Quotient.exact hyb)), Set.disjoint_left.2 fun q hqU hqV ↦ ?_⟩
+  obtain ⟨y, rfl⟩ := Quotient.mk_surjective q
+  exact hqV ⟨y, Set.disjoint_left.1 hUV (not_not.1 fun h ↦ hqU ⟨y, h, rfl⟩), rfl⟩
 
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient dynamical system has phase space `X/I` with an `S` action
@@ -342,17 +361,6 @@ DynamicalSystem S X := {
   mapMult := dSystem.mapMult
   mapCont := dSystem.mapCont
 }
-
-/- isMinimalSystem is the same as _root_.isMinimalSystem -/
--- lemma isFactorMapIsSame
--- {S : Type*} [Semigroup S] [Nonempty S]
--- {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
--- (dSystemX : DynamicalSystem S X)
--- {Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
--- (dSystemY : DynamicalSystem S Y) (π : X → Y) :
--- isFactorMap dSystemX dSystemY π ↔
---   _root_.isFactorMap (dSystemToRootdSystem dSystemX) (dSystemToRootdSystem dSystemY) π :=
--- by rfl
 
 /-- isMinimalSystem is the same as _root_.isMinimalSystem -/
 lemma minimalIsSame

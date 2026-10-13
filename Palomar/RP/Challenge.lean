@@ -1,19 +1,20 @@
 module
 
+public import Mathlib.Topology.Defs.Basic
+public import Mathlib.Topology.Defs.Filter
+public import Mathlib.Topology.Separation.Hausdorff
 public import Mathlib.Algebra.Group.Semigroup
-public import Mathlib.Data.Set.Defs
-public import Mathlib.Analysis.Complex.Circle
-public import Mathlib.Combinatorics.Hindman
-public import Mathlib.Order.Filter.Ultrafilter.Defs
+public import Mathlib.Algebra.Group.WithOne.Defs
+public import Mathlib.GroupTheory.MonoidLocalization.GrothendieckGroup
 
 /-!
 # Advertised statement
 
-This module states the four main theorems of
+This module states the six main theorems of
 
   A. Blahodatna, L. Detmold, D. Glasscock and A. N. Le,
-  "The local dynamical structure of Δ* sets via a new Furstenberg
-  family algebra", arXiv:2610.10416,
+  "The regionally proximal relation for commutative semigroup
+  actions", arXiv:2610.10397,
 
 together with the definitions they depend on. Each theorem carries the letter
 it has in the introduction of that paper and is stated here without proof;
@@ -21,218 +22,487 @@ proofs are supplied in `Solution.lean` from the development in this repository.
 
 ## What is claimed
 
-`DeltaTheoremA` and `DeltaTheoremB` are the main result and the dual
-formulation the proof establishes: in an arbitrary commutative semigroup, a
-Δ* set agrees with a Bohr_0 set on a thick subset of any prescribed thick set;
-equivalently, a set that is a set of Bohr recurrence along every thick refinement
-of some thick set is itself a Δ set. These generalize results of Bergelson,
-Furstenberg, and Weiss and of Host and Kra from the integers to arbitrary commutative
-semigroups. `DeltaTheoremC` gives a second instance of the same phenomenon: in
-a countable commutative semigroup, a central* set agrees with an IP* set on a
-thick subset of any prescribed thick set. `DeltaTheoremD` records the algebraic
-properties of family meet, family join and the family dual on which the
-reformulations rest.
+Theorem A states that for a commutative semigroup S and a minimal S-system X,
+a factor is equicontinuous exactly when RP is contained in the relation it
+induces.
+
+Theorem B states that RP and Seq coincide; in particular RP is a
+closed, S-invariant equivalence relation and X -> X/RP is the largest
+equicontinuous factor of X.
+
+Theorem C states that RP coincides with the backward regionally proximal
+relation RP^-, the second natural generalization of regional proximality
+from groups to semigroups; the two differ in general for semigroup actions,
+already for S = (N,+).
+
+Theorem D states that commuting minimal actions of two commutative semigroups
+on the same space induce the same regionally proximal relation.
+
+Theorems E and F concern natural extensions. Theorem E constructs, for any
+minimal action of a commutative semigroup, a smallest extension on which the
+semigroup acts by homeomorphisms: a minimal S-system W and a factor map
+W -> X through which every extension of X by homeomorphisms factors. The
+construction goes through the Grothendieck group of S and requires no
+cancellativity assumption. Theorem F identifies the largest equicontinuous
+factor of X with that of its natural extension W, both as an S-system and as
+a Gr(S)-system.
 
 ## Conventions
 
-Semigroups are discrete and are assumed to be non-empty.
-Definitions are stated for a general `Semigroup`; commutativity and
-countability are assumed only in the theorems that need them.
+Semigroups are discrete and assumed nonempty. Phase spaces are assumed
+nonempty, compact and Hausdorff. These hypotheses appear as typeclass
+arguments on every definition and theorem below rather than being assumed
+globally. Commutativity is assumed only in the theorems, not in the
+definitions.
 
-Bohr_0 sets are described via homomorphisms into `Fin d → Circle`, the
-`d`-dimensional torus presented as a power of the unit circle in `ℂ`, rather
-than as `ℝ^d / ℤ^d` as in the paper. No continuity is required of these
-homomorphisms.
+A dynamical system is bundled as a structure carrying the action map together
+with its multiplicativity and continuity. The regionally proximal relation
+and its backward counterpart are defined as subsets of X x X rather than as
+Setoid instances, since neither is an equivalence relation without the
+hypotheses of Theorem B. An ICER is a closed, invariant equivalence relation,
+presented as a Setoid together with those two properties; the compact
+Hausdorff structure on the quotient of a system by an ICER is established
+below, because the statements of Theorems B, E and F depend on it.
 
-The multiplication on `Ultrafilter S` used by `isIP` and `isCentral` is
-`Ultrafilter.mul`, defined in Mathlib.Combinatorics.Hindman and
-introduced as a local instance below.
+The Grothendieck group of a commutative semigroup S is taken to be the
+Grothendieck group of the monoid WithOne S, which requires no cancellativity
+assumption on S.
 -/
 
 public section
 
+namespace RPIntro
+
 /- # Definitions -/
 
-namespace DeltaIntro
+/-- A (topological) dynamical system is a compact Hausdorff space `X` together
+with an action by a (discrete) semigroup `S`. -/
+structure DynamicalSystem
+(S : Type*) [Semigroup S] [Nonempty S]
+(X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+where
+  map : S → X → X
+  mapMult : ∀ s₁ s₂ x, map (s₁ * s₂) x = map s₁ (map s₂ x)
+  mapCont : ∀ s, Continuous (map s)
 
-/-- A set `A` of a semigroup `S` is syndetic if there exists a finite set `F ⊆ S`
-such that for all `s ∈ S`, there exists `f ∈ F` such that `f * s ∈ A`. -/
-@[expose] def isSyndetic
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+/-- Given an action of `S` on `X` and a semigroup homomorphism `φ: T → S`,
+we get an action of `T` on `X` by setting `tx = (φ t)x` -/
+@[expose] def homDynamicalSystem
+{S} [Semigroup S] [Nonempty S]
+{T} [Semigroup T] [Nonempty T]
+(φ : MulHom T S)
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+DynamicalSystem T X :=
+{
+  map := fun (t : T) ↦ dSystem.map (φ.toFun t)
+  mapMult := by
+    intro t1 t2 x
+    rw [φ.map_mul']
+    rw [dSystem.mapMult]
+  mapCont := fun (t : T) ↦ dSystem.mapCont (φ t)
+}
+
+/-- Given a dynamical system, an ICER is a closed equivalence relation on X that
+is invariant under the diagonal action of `S` -/
+structure ICER
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) extends Setoid X where
+  isClosed : IsClosed {p : X × X | p.1 ≈ p.2}
+  isInvariant : ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s))
+    {p : X × X | p.1 ≈ p.2} {p : X × X | p.1 ≈ p.2}
+
+/-- The set form of the relation underlying an ICER -/
+@[expose] def ICERToSet
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :
+Set (X × X) :=
+{x : X × X | I.r x.1 x.2}
+
+/-- The quotient of `X` by an ICER on `X` -/
+@[expose] def ICERQuotient
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :=
+Quotient I.toSetoid
+
+/-- The quotient map `X → X/I` for an ICER `I` on `X` -/
+@[expose] def ICERQuotientMap
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :=
+Quotient.mk I.toSetoid
+
+/-- Instance giving that `ICERQuotient` is nonempty -/
+instance
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {I : ICER dSystem} :
+Nonempty (ICERQuotient I) := by
+  change Nonempty (Quotient I.toSetoid)
+  obtain ⟨x⟩ := ‹Nonempty X›
+  exact ⟨Quotient.mk' (s := I.toSetoid) x⟩
+
+/-- Instance giving the topology on `ICERQuotient` -/
+instance
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {I : ICER dSystem} :
+TopologicalSpace (ICERQuotient I) := by
+  change TopologicalSpace (Quotient I.toSetoid)
+  exact @instTopologicalSpaceQuotient X I.toSetoid inferInstance
+
+/-- Instance giving that `ICERQuotient` is compact -/
+instance
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {I : ICER dSystem} :
+CompactSpace (ICERQuotient I) := by
+  change CompactSpace (Quotient I.toSetoid)
+  exact Quotient.compactSpace
+
+/-- Instance giving that `ICERQuotient` is T2 -/
+instance
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {I : ICER dSystem} :
+T2Space (ICERQuotient I) := by
+  change T2Space (Quotient I.toSetoid)
+  -- the image of a closed set under the quotient map is closed
+  have hπ : ∀ K : Set X, IsClosed K → IsOpen (Quotient.mk I.toSetoid '' K)ᶜ := fun K hK ↦ by
+    rw [← isQuotientMap_quotient_mk'.isOpen_preimage, Set.preimage_compl, isOpen_compl_iff]
+    convert (((hK.isCompact.prod isCompact_univ).inter_right I.isClosed).image
+      continuous_snd).isClosed using 1
+    ext x
+    simp [Quotient.mk', Quotient.eq]
+  refine ⟨fun a b hab ↦ ?_⟩
+  obtain ⟨a, rfl⟩ := Quotient.mk_surjective a
+  obtain ⟨b, rfl⟩ := Quotient.mk_surjective b
+  -- separate the (compact, disjoint) fibres in `X`, then push forward
+  have hF : ∀ c : X, IsCompact {y | I.r y c} := fun c ↦
+    (I.isClosed.preimage (continuous_id.prodMk continuous_const)).isCompact
+  obtain ⟨U, V, hU, hV, haU, hbV, hUV⟩ := SeparatedNhds.of_isCompact_isCompact (hF a) (hF b)
+    (Set.disjoint_left.2 fun y hya hyb ↦ hab (Quotient.sound (I.trans (I.symm hya) hyb)))
+  refine ⟨_, _, hπ _ hU.isClosed_compl, hπ _ hV.isClosed_compl,
+    fun ⟨y, hy, hya⟩ ↦ hy (haU (Quotient.exact hya)),
+    fun ⟨y, hy, hyb⟩ ↦ hy (hbV (Quotient.exact hyb)), Set.disjoint_left.2 fun q hqU hqV ↦ ?_⟩
+  obtain ⟨y, rfl⟩ := Quotient.mk_surjective q
+  exact hqV ⟨y, Set.disjoint_left.1 hUV (not_not.1 fun h ↦ hqU ⟨y, h, rfl⟩), rfl⟩
+
+/-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
+the quotient dynamical system has phase space `X/I` with an `S` action
+described by `s[x] = [sx]` -/
+@[expose] def quotientDynamicalSystem
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :
+DynamicalSystem S (ICERQuotient I) :=
+  {
+    map := by
+      have hRespect : ∀ (s : S), ∀ (x y : X),
+         ⟨x,y⟩ ∈ ICERToSet I →
+          (ICERQuotientMap I) (dSystem.map s x) = (ICERQuotientMap I) (dSystem.map s y) := by
+            intro s x y hxy
+            exact (Equivalence.quot_mk_eq_iff I.iseqv (dSystem.map s x) (dSystem.map s y)).mpr
+              (I.isInvariant s hxy)
+      exact fun s ↦ Quotient.lift ((ICERQuotientMap I) ∘ (dSystem.map s)) (hRespect s)
+    mapMult := by
+      intro s1 s2 y
+      refine Quotient.inductionOn y ?_
+      intro x
+      have hs12 : dSystem.map (s1 * s2) = (dSystem.map s1) ∘ (dSystem.map s2) := by
+        ext t
+        exact (dSystem.mapMult s1 s2 t)
+      simp only [hs12]
+      rfl
+    mapCont := by
+      intro s
+      apply Continuous.quotient_lift
+      exact Continuous.comp continuous_quot_mk (dSystem.mapCont s)
+  }
+
+/-- A dynamical system satisfies `homeoSystem` if all
+elements of the acting semigroup act by homeomorphisms -/
+@[expose] def isHomeoSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :=
+∀ s : S, IsHomeomorph (dSystem.map s)
+
+/-- An action of `S` on `X` is minimal if every point has a dense `S`-orbit -/
+@[expose] def isMinimalSystem
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
 Prop :=
-∃ (F : Set S), F.Finite ∧ (∀ (s : S), ∃ f ∈ F, f * s ∈ A)
+∀ (x : X), Dense (Set.range (fun (s : S) ↦ dSystem.map s x))
 
-/-- A set `A` of a semigroup `S` is thick if it has nonempty intersection
-with all syndetic subsets of `S`. -/
-@[expose] def isThick
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+/-- A dynamical system `dSystem` is equicontinuous if the family of maps
+given by `dSystem.map` is uniformly equicontinuous -/
+@[expose] def isEquicontinuousSystem
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
 Prop :=
-∀ (B : Set S), isSyndetic B → (A ∩ B).Nonempty
+∀ (α : Set (X × X)), IsOpen α → Set.diagonal X ⊆ α →
+  ∃ (β : Set (X × X)) (_ : IsOpen β) (_ : Set.diagonal X ⊆ β),
+    ∀ (s : S), (fun (x : X × X) ↦
+      ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' β ⊆ α
 
-/-- A set `A` of a semigroup `S` is a Delta set if there exist
-`s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
-@[expose] def isDelta
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+/-- The regionally proximal relation, as a subset of `X × X` -/
+@[expose] def RP
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (X × X) :=
+⋂ α ∈ nhdsSet (Set.diagonal X),
+  closure (⋃ (s : S), (fun (x : X × X) ↦
+    ⟨dSystem.map s x.1, dSystem.map s x.2⟩) ⁻¹' α)
+
+/-- The backward regionally proximal relation, as a subset of `X × X` -/
+@[expose] def RPM
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (X × X) :=
+⋂ α ∈ nhdsSet (Set.diagonal X),
+  closure (⋃ (s : S), (fun (x : X × X) ↦
+    ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' α)
+
+/-- The equicontinuous structure relation of a dynamical system is the
+intersection of all equicontinuous ICERS of the system -/
+@[expose] def equiStructureRelation
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) :
+Set (X × X) :=
+⋂₀ {I : Set (X × X) |
+  ∃ (IC : ICER dSystem),
+    I = ICERToSet IC ∧
+    isEquicontinuousSystem (quotientDynamicalSystem IC)
+  }
+
+/-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is a factor map
+if it is a continuous, `S`-equivariant surjection -/
+@[expose] def isFactorMap
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
 Prop :=
-∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
+Continuous π
+∧
+Function.Surjective π
+∧
+∀ (s : S), (dSystemY.map s) ∘ π = π ∘ (dSystemX.map s)
 
-/-- A set `A` of a semigroup `S` is Delta* if it has nonempty
-intersection with all Delta subsets of `S` -/
-@[expose] def isDeltaStar
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+/-- Given dynamical systems `X` and `Y`, a map `π : X → Y` is an isomorphism
+if it is an `S`-equivariant homeomorphism -/
+@[expose] def isIsomorphism
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
 Prop :=
-∀ (B : Set S), isDelta B → (A ∩ B).Nonempty
+IsHomeomorph π
+∧
+∀ (s : S), (dSystemY.map s) ∘ π = π ∘ (dSystemX.map s)
 
-/- The following line allows us to write `p * q` for `Ultrafilter.mul.mul p q` -/
-attribute [local instance] Ultrafilter.mul
-
-/-- A subset `A` of a semigroup `S` is an IP set if it is contained
-in an idempotent ultrafilter. (See Hindman-Strauss Thm. 16.4.) -/
-@[expose] def isIP
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+/-- Dynamical systems `X` and `Y` are isomorphic if there exists a map `π : X → Y`
+that is an isomorphism -/
+@[expose] def isIsomorphic
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y) :
 Prop :=
-∃ (p : Ultrafilter S), (p * p = p) ∧ (A ∈ p)
+∃ (ξ : X → Y), isIsomorphism dSystemX dSystemY ξ
 
-/-- A set `A` of a semigroup `S` is IP* if for all IP
-subsets `B` of `S`, `A ∩ B ≠ ∅`. -/
-@[expose] def isIPStar
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
+/-- A map `π : X → Y` is the largest equicontinuous factor of `X` if for all
+equicontinuous factors `ρ : X → Z`, there exists a factor map `ξ : Y → Z`
+such that `ρ = ξ ∘ π`. -/
+@[expose] def isLargestEquiFactor
+{S} [Semigroup S] [Nonempty S]
+{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystemX : DynamicalSystem S X)
+{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+(π : X → Y) :
 Prop :=
-∀ (B : Set S), isIP B → (A ∩ B).Nonempty
+(∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
+  ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
+  ∀ (ρ : X → Z) (_ : isFactorMap dSystemX dSystemZ ρ) ,
+  ∃ (ξ : Y → Z) (_ : isFactorMap dSystemY dSystemZ ξ), ρ = ξ ∘ π)
 
-/-- A set `A` of a semigroup `S` is central if it is contained
-in a minimal idempotent ultrafilter. (See Hindman-Strauss Def.
-4.42 and Thm. 4.39.) -/
-@[expose] def isCentral
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∃ (p : Ultrafilter S),
-  (p * p = p) ∧ (∀ (B : Set S), B ∈ p → isSyndetic {x : S | (x * ·) ⁻¹' B ∈ p}) ∧ (A ∈ p)
+/- The Grothendieck group of a non-empty, commutative semigroup `S` is
+the Grothendieck group of the Monoid extension of `S` -/
+@[expose] def groGroup
+(S : Type*) [CommSemigroup S] [Nonempty S] :=
+  Algebra.GrothendieckGroup (WithOne S)
 
-/-- A set `A` of a semigroup `S` is `central*` if for all central
-subsets `B` of `S`, `A ∩ B ≠ ∅`. -/
-@[expose] def isCentralStar
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ (B : Set S), isCentral B → (A ∩ B).Nonempty
+/- `groGroup` is made reducible so that `groGroup S` and `Algebra.GrothendieckGroup (WithOne S)`
+are interchangeable during type class synthesis.  This only adds an attribute; the definition
+above is unchanged. -/
+attribute [reducible] groGroup
 
-/-- Denote by `U(1)` the unit circle in the complex plain as an abelian group.
-A subset `A` of a semigroup `S`is Bohr_0 if there exists a
-semigroup homomorphism `ϕ : S → U(1)^d` and an open set `U ⊆ U(1)^d`
-containing `1` such that `A ⊇ ϕ ⁻¹ U`. -/
-@[expose] def isBohrZero
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop := ∃ (d : ℕ) (φ : S → (Fin d → Circle))
-  (_ : ∀ (s t : S), φ (s * t) = (φ s) * (φ t)) (U : Set (Fin d → Circle))
-  (_ : IsOpen U) (_ : 1 ∈ U),
-  Set.preimage φ U ⊆ A
+/-- Instance giving that `groGroup S` is a commutative group -/
+instance
+(S : Type*) [CommSemigroup S] [Nonempty S] :
+CommGroup (groGroup S) := Algebra.GrothendieckGroup.instCommGroup
 
-/-- A set `A` of a semigroup `S` is a `set of Bohr recurrence` if it has
-nonempty intersection with all `Bohr_0` subsets of `S`. -/
-@[expose] def isSetOfBohrRec
-{S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
-Prop :=
-∀ (B : Set S), isBohrZero B → (A ∩ B).Nonempty
-
-/-- A collection `F` of subsets of `S` is a Furstenberg family if it is
-upward closed: for all `A, B ⊆ S`, if `A ⊆ B` and `A ∈ F`, then `B ∈ F` -/
-@[expose] def isFamily
-{S : Type*} [Nonempty S] (F : Set (Set S)) :
-Prop :=
-∀ (A B : Set S), A ⊆ B → A ∈ F → B ∈ F
-
-/-- The family dual of a collection of subsets `F` of `S`
-is the set `{ A ⊆ S : ∀ B ∈ F, A ∩ B ≠ ∅ }` -/
-@[expose] def familyDual
-{S : Type*} [Nonempty S] (F : Set (Set S)) :
-Set (Set S) :=
-{A : Set S | ∀ B ∈ F, (A ∩ B).Nonempty}
-
-/-- The family meet of two collections of subsets `F` and `G`
-of `S` is the set `{ A ⊆ S : ∀ B ∈ familyDual F, A ∩ B ∈ G }` -/
-@[expose] def familyMeet
-{S : Type*} [Nonempty S] (F G : Set (Set S)) :
-Set (Set S) :=
-{A : Set S | ∀ B ∈ familyDual F, A ∩ B ∈ G}
-
-/-- The family join of two collections of subsets `F` and `G`
-of `S` is the set `{ A ⊆ S : ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C }` -/
-@[expose] def familyJoin
-{S : Type*} [Nonempty S] (F G : Set (Set S)) :
-Set (Set S) :=
-{A : Set S | ∃ B ∈ F, ∃ C ∈ G, A = B ∩ C}
+/-- The homomorphism from `S` into groGroup `S`, as a `MulHom` structure -/
+@[expose] def groGroupHom
+{S : Type*} [CommSemigroup S] [nonEmpty : Nonempty S] :
+MulHom S (groGroup S) :=
+{
+  toFun := Algebra.GrothendieckGroup.of ∘ WithOne.coe
+  map_mul' := by
+    intro s t
+    change Algebra.GrothendieckGroup.of (s * t : WithOne S) = (Algebra.GrothendieckGroup.of
+      (s : WithOne S)) * (Algebra.GrothendieckGroup.of (t : WithOne S))
+    rfl
+}
 
 /- # Theorems -/
 
 /-- # Theorem A
-    Let `S` be a commutative semigroup and `A ⊆ S`.
-    If `A` is a Delta* set, then for all thick sets `H ⊆ S`,
-    there exists a Bohr_0 set `B ⊆ S` and a thick set `H' ⊆ S`,
-    such that `A ∩ H' = B ∩ H'`. -/
-theorem DeltaTheoremA
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-∀ (A : Set S), isDeltaStar A →
-  ∀ (H : Set S), isThick H →
-    ∃ (B H' : Set S),
-      (isBohrZero B) -- B is a Bohr_0 set
-      ∧ (isThick H') -- H' is thick
-      ∧ (H' ⊆ H) -- H' is contained in H
-      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
-by sorry
-
+  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
+  A factor `π : X → Y` is equicontinuous if and
+  only if `RP ⊆ {(x,y) ∈ X^2 | π x = π y}`. -/
+theorem RPTheoremA
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem)
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+(dSystemY : DynamicalSystem S Y)
+{π : X → Y} (hFactorMap : isFactorMap dSystem dSystemY π) :
+RP dSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔
+  isEquicontinuousSystem dSystemY := sorry
 
 /-- # Theorem B
-    Let `S` be a commutative semigroup and `A ⊆ S`.
-    If there exists a thick set `H ⊆ S` such that for all thick sets
-    `H' ⊆ H`, the set `A ∩ H'` is a set of Bohr recurrence,
-    then the set `A` is a Delta set. -/
-theorem DeltaTheoremB
-{S : Type*} [CommSemigroup S] [Nonempty S] :
-∀ (A : Set S),
-  (∃ (H : Set S), isThick H
-  ∧ (∀ (H' : Set S), H' ⊆ H → isThick H' → isSetOfBohrRec (A ∩ H'))) →
-  isDelta A := by sorry
-
+  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
+  The regionally proximal relation coincides with the equicontinuous
+  structure relation: `RP = S_eq`. In particular, `RP` is a closed,
+  `S`-invariant equivalence relation. Moreover, the quotient `X → X/RP`
+  is the largest equicontinuous factor of `X`, in the sense that if
+  `ξ : X → Y` is an equicontinuous factor of `X`, then there exists
+  a factor map `ρ : X/RP → Y` of `S`-systems. -/
+theorem RPTheoremB
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+-- RP = S_eq
+RP dSystem = equiStructureRelation dSystem
+∧
+-- RPX is an ICER and X / RP is the largest equicontinuous factor
+(∃ (I : ICER dSystem), RP dSystem = ICERToSet I ∧
+  isLargestEquiFactor dSystem (quotientDynamicalSystem I)
+    (ICERQuotientMap I)) := sorry
 
 /-- # Theorem C
-    Let `S` be a countable, commutative semigroup. If `A ⊆ S` is a `central*` set,
-    then for all thick sets `H ⊆ S`, there exists an `IP*` set `B ⊆ S` and a thick
-    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. -/
-theorem DeltaTheoremC
-{S : Type*} [CommSemigroup S] [Nonempty S] [Countable S] :
-∀ (A : Set S), isCentralStar A →
-  ∀ (H : Set S), isThick H →
-    ∃ (B H' : Set S),
-      (isIPStar B) -- B is a IP*
-      ∧ (isThick H') -- H' is thick
-      ∧ (H' ⊆ H) -- H' is contained in H
-      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
-        by sorry
+  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
+  The regionally proximal relation and the backward regionally
+  proximal relation coincide: `RP = RP^-`. -/
+theorem RPTheoremC
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+(dSystem : DynamicalSystem S X) (hMin : isMinimalSystem dSystem) :
+RP dSystem = RPM dSystem := sorry
 
 /-- # Theorem D
-    Let `S` be a set. Family meet and family join, when restricted to
-    the collection of families, are associative, commutative, and monotone
-    operators that, together with the family dual, satisfy the DeMorgan-type
-    laws `(F meet G)* = F* join G*` and `(F join G)* = F* meet G*`. -/
-theorem DeltaTheoremD
-{S : Type*} [Nonempty S] :
-∀ (F G H I : Set (Set S)), isFamily F → isFamily G → isFamily H → isFamily I →
-  -- closedness
-  (isFamily (familyMeet F G)) ∧
-  (isFamily (familyJoin F G)) ∧
-  -- associativity
-  familyMeet (familyMeet F G) H = familyMeet F (familyMeet G H) ∧
-  familyJoin (familyJoin F G) H = familyJoin F (familyJoin G H) ∧
-  -- commutativity
-  familyMeet F G = familyMeet G F ∧
-  familyJoin F G = familyJoin G F ∧
-  -- monotonicity
-  (F ⊆ H → G ⊆ I → familyMeet F G ⊆ familyMeet H I) ∧
-  (F ⊆ H → G ⊆ I → familyJoin F G ⊆ familyJoin H I) ∧
-  -- DeMorgan-type laws
-  familyDual (familyMeet F G) = familyJoin (familyDual F) (familyDual G) ∧
-  familyDual (familyJoin F G) = familyMeet (familyDual F) (familyDual G) := by sorry
+  Let `S` and `T` be commutative semigroups.  Let `X` be both a minimal
+  `S`-system and a minimal `T`-system.  If the actions of `S` and `T` commute,
+  then `RP_S = RP_T`. -/
+theorem RPTheoremD
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{T : Type*} [CommSemigroup T] [Nonempty T]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystemS : DynamicalSystem S X} (hMinS : isMinimalSystem dSystemS)
+{dSystemT : DynamicalSystem T X} (hMinT : isMinimalSystem dSystemT)
+(hCommActions : ∀ (s : S) (t : T),
+  (dSystemS.map s) ∘ (dSystemT.map t) = (dSystemT.map t) ∘ (dSystemS.map s)) :
+RP dSystemS = RP dSystemT := sorry
 
-end DeltaIntro
+/-- Using Theorem B, provided `S` is commutative and `dSystem` is minimal,
+`RPICER` is the regionally proximal relation as an `ICER` structure -/
+@[expose] def RPICER
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+ICER dSystem :=
+{
+  r := fun (x : X) ↦ (⟨x, ·⟩ ∈ RP dSystem)
+  iseqv := by
+    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
+    rw [RPisICERSet]
+    unfold ICERToSet
+    simp only [Set.mem_ofPred_eq]
+    exact I.iseqv
+  isClosed := by
+    change IsClosed (RP dSystem)
+    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
+    rw [RPisICERSet]
+    exact I.isClosed
+  isInvariant := by
+    change ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s))
+      (RP dSystem) (RP dSystem)
+    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
+    rw [RPisICERSet]
+    exact I.isInvariant
+}
+
+/-- # Theorems E & F
+  Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
+  There exists a minimal `S`-system `W` on which `S` acts by homeomorphism
+  and a factor map `π : W → X` with the property that for all extensions
+  `ξ : V → X` of `S`-systems in which `S` acts on `V` by homeomorphisms, there
+  exists a factor map `ρ : V → W` such that `ξ = π ∘ ρ`.
+  Moreover, the following `S`-systems are the same up to isomorphism:
+  · `X / RP_{X,S}`, the largest equicontinuous factor of the `S`-system `X`;
+  · `W / RP_{W,S}`, the largest equicontinuous factor of the natural
+      extension `W` of `X` as an `S`-system; and
+  · `W / RP_{W,Gr(S)}`, the largest equicontinuous factor of the
+      natural extension `W` of `X` as a `Gr(S)`-system, made
+      into an `S`-system via the homomorphism `i_Gr(S) : S \to Gr(S)`. -/
+theorem RPTheoremsEandF
+{S : Type u} [CommSemigroup S] [Nonempty S]
+{X : Type v} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystemX : DynamicalSystem S X} (hMinX : isMinimalSystem dSystemX) :
+∃ (W : Type (max u v)) (_ : TopologicalSpace W)
+  (_ : CompactSpace W) (_ : T2Space W) (_ : Nonempty W),
+∃ (dSystemGW : DynamicalSystem (groGroup S) W) (minGroSys : isMinimalSystem dSystemGW),
+/- The system `dSystemSW` is the `S`-system whose existence is stipulated in the statement
+of the theorem.  It is the homomorphism system of `dSystemWG` via `groGroupHom`. -/
+let dSystemSW := homDynamicalSystem groGroupHom dSystemGW
+∃ (π : W → X) (_ : isFactorMap dSystemSW dSystemX π),
+-- 1. The system `dSystemSW` is minimal
+∃ (minHomSys : isMinimalSystem dSystemSW),
+-- 2. The semigroup `S` acts by homeomorphisms on the system `dSystemSW`
+isHomeoSystem dSystemSW
+∧
+-- 3. `W → X` is smallest extension on which `S` acts by homeomorphisms
+(∀ (V : Type*) [TopologicalSpace V] [CompactSpace V] [T2Space V] [Nonempty V],
+  ∀ (dSystemV : DynamicalSystem S V) (_ : isHomeoSystem dSystemV),
+  ∀ (ρ : V → X) (_ : isFactorMap dSystemV dSystemX ρ),
+  ∃ (ξ : V → W) (_ : isFactorMap dSystemV dSystemSW ξ), ρ = π ∘ ξ)
+∧
+let XmodRPSystem := quotientDynamicalSystem (RPICER hMinX)
+let GWmodRPSystem := homDynamicalSystem groGroupHom
+  (quotientDynamicalSystem (RPICER minGroSys))
+let SWmodRPSystem := quotientDynamicalSystem (RPICER minHomSys)
+-- 4. The systems `W / RP_{W,S}` and `X / RP_{X,S}` are isomorphic
+isIsomorphic SWmodRPSystem XmodRPSystem
+∧
+-- 5. The systems `W / RP_{W,S}` and `W / RP_{W,G}` are isomorphic
+isIsomorphic SWmodRPSystem GWmodRPSystem := sorry
+
+end RPIntro
 
 end
