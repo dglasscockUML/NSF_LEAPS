@@ -206,7 +206,7 @@ theorem DeltaTheoremC
       (isIPStar B) -- B is a IP*
       ∧ (isThick H') -- H' is thick
       ∧ (H' ⊆ H) -- H' is contained in H
-      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
+      ∧ (A ∩ H' = B ∩ H') := -- A along H' is B along H'
         by sorry
 
 /-- # Theorem D

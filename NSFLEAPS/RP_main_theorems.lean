@@ -294,12 +294,12 @@ Prop :=
 equicontinuous factors `ρ : X → Z`, there exists a factor map `ξ : Y → Z`
 such that `ρ = ξ ∘ π`. -/
 @[expose] def isLargestEquiFactor
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 (dSystemX : DynamicalSystem S X)
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
+{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
 (dSystemY : DynamicalSystem S Y)
-(π : X → Y) :
+(π : X → Y) (_hπ : isFactorMap dSystemX dSystemY π) :
 Prop :=
 (∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
   ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
@@ -744,6 +744,9 @@ isIsomorphic SWmodRPSystem GWmodRPSystem
     · intro s
       rw [hGW s, hSW s]
       exact ζEquiv s
+
+#print RPIntro.isLargestEquiFactor
+#print RPTheoremsEandF
 
 end RPIntro
 
