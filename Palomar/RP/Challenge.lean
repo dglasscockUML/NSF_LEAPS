@@ -325,22 +325,6 @@ that is an isomorphism -/
 Prop :=
 ∃ (ξ : X → Y), isIsomorphism dSystemX dSystemY ξ
 
-/-- A map `π : X → Y` is the largest equicontinuous factor of `X` if for all
-equicontinuous factors `ρ : X → Z`, there exists a factor map `ξ : Y → Z`
-such that `ρ = ξ ∘ π`. -/
-@[expose] def isLargestEquiFactor
-{S} [Semigroup S] [Nonempty S]
-{X} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-{Y} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-(dSystemY : DynamicalSystem S Y)
-(π : X → Y) :
-Prop :=
-(∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
-  ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
-  ∀ (ρ : X → Z) (_ : isFactorMap dSystemX dSystemZ ρ) ,
-  ∃ (ξ : Y → Z) (_ : isFactorMap dSystemY dSystemZ ξ), ρ = ξ ∘ π)
-
 /- The Grothendieck group of a non-empty, commutative semigroup `S` is
 the Grothendieck group of the Monoid extension of `S` -/
 @[expose] def groGroup
@@ -402,9 +386,17 @@ theorem RPTheoremB
 RP dSystem = equiStructureRelation dSystem
 ∧
 -- RPX is an ICER and X / RP is the largest equicontinuous factor
-(∃ (I : ICER dSystem), RP dSystem = ICERToSet I ∧
-  isLargestEquiFactor dSystem (quotientDynamicalSystem I)
-    (ICERQuotientMap I)) := sorry
+(∃ (I : ICER dSystem),
+  RP dSystem = ICERToSet I
+  ∧
+  isFactorMap dSystem (quotientDynamicalSystem I) (ICERQuotientMap I)
+  ∧
+  (∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
+    ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
+    ∀ (ρ : X → Z) (_ : isFactorMap dSystem dSystemZ ρ),
+    ∃ (ξ : (ICERQuotient I) → Z)
+      (_ : isFactorMap (quotientDynamicalSystem I) dSystemZ ξ),
+        ρ = ξ ∘ (ICERQuotientMap I))) := sorry
 
 /-- # Theorem C
   Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
@@ -440,20 +432,21 @@ ICER dSystem :=
 {
   r := fun (x : X) ↦ (⟨x, ·⟩ ∈ RP dSystem)
   iseqv := by
-    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
+    have := (RPTheoremB.{u_1,u_2,0} hMin).2
+    obtain ⟨I,RPisICERSet,-,-⟩ := (RPTheoremB.{u_1,u_2,0} hMin).2
     rw [RPisICERSet]
     unfold ICERToSet
     simp only [Set.mem_ofPred_eq]
     exact I.iseqv
   isClosed := by
     change IsClosed (RP dSystem)
-    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
+    obtain ⟨I,RPisICERSet,-,-⟩ := (RPTheoremB.{u_1,u_2,0} hMin).2
     rw [RPisICERSet]
     exact I.isClosed
   isInvariant := by
     change ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s))
       (RP dSystem) (RP dSystem)
-    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
+    obtain ⟨I,RPisICERSet,-,-⟩ := (RPTheoremB.{u_1,u_2,0} hMin).2
     rw [RPisICERSet]
     exact I.isInvariant
 }

@@ -290,22 +290,6 @@ that is an isomorphism -/
 Prop :=
 ∃ (ξ : X → Y), isIsomorphism dSystemX dSystemY ξ
 
-/-- A map `π : X → Y` is the largest equicontinuous factor of `X` if for all
-equicontinuous factors `ρ : X → Z`, there exists a factor map `ξ : Y → Z`
-such that `ρ = ξ ∘ π`. -/
-@[expose] def isLargestEquiFactor
-{S : Type*} [Semigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-(dSystemX : DynamicalSystem S X)
-{Y : Type*} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] [Nonempty Y]
-(dSystemY : DynamicalSystem S Y)
-(π : X → Y) (_hπ : isFactorMap dSystemX dSystemY π) :
-Prop :=
-(∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
-  ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
-  ∀ (ρ : X → Z) (_ : isFactorMap dSystemX dSystemZ ρ) ,
-  ∃ (ξ : Y → Z) (_ : isFactorMap dSystemY dSystemZ ξ), ρ = ξ ∘ π)
-
 /- The Grothendieck group of a non-empty, commutative semigroup `S` is
 the Grothendieck group of the Monoid extension of `S` -/
 @[expose] def groGroup
@@ -489,8 +473,6 @@ RP dSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔ isEquicontinuousSystem d
   let rdSystem := dSystemToRootdSystem dSystem
   have rhMin : _root_.isMinimalSystem rdSystem := (minimalIsSame dSystem).mp hMin
   let rdSystemY := dSystemToRootdSystem dSystemY
-  -- have rhFactorMap : _root_.isFactorMap rdSystem rdSystemY π :=
-  --   (isFactorMapIsSame dSystem dSystemY π).mp hFactorMap
   have : _root_.RP rdSystem ⊆ { ⟨x,y⟩ : X × X | π x = π y } ↔
     _root_.isEquicontinuousSystem rdSystemY :=
       (minimalFactorEquicontinuousIffRPInFactorRelation
@@ -515,8 +497,17 @@ theorem RPTheoremB
 RP dSystem = equiStructureRelation dSystem
 ∧
 -- RPX is an ICER and X / RP is the largest equicontinuous factor
-(∃ (I : ICER dSystem), RP dSystem = ICERToSet I ∧
-  isLargestEquiFactor dSystem (quotientDynamicalSystem I) (ICERQuotientMap I)) :=
+(∃ (I : ICER dSystem),
+  RP dSystem = ICERToSet I
+  ∧
+  isFactorMap dSystem (quotientDynamicalSystem I) (ICERQuotientMap I)
+  ∧
+  (∀ (Z : Type*) [TopologicalSpace Z] [CompactSpace Z] [T2Space Z] [Nonempty Z],
+    ∀ (dSystemZ : DynamicalSystem S Z) (_ : isEquicontinuousSystem dSystemZ),
+    ∀ (ρ : X → Z) (_ : isFactorMap dSystem dSystemZ ρ),
+    ∃ (ξ : (ICERQuotient I) → Z)
+      (_ : isFactorMap (quotientDynamicalSystem I) dSystemZ ξ),
+        ρ = ξ ∘ (ICERQuotientMap I))) :=
 by
   let rdSystem := dSystemToRootdSystem dSystem
   have rhMin : _root_.isMinimalSystem rdSystem := (minimalIsSame dSystem).mp hMin
@@ -549,57 +540,34 @@ by
       rw [←equiIsRPIntro] at this
       exact this
     use I, by rfl
-    intro V _ _ _ _ dSystemV VEqui ρ ρFactor
-    let rdSystemV := dSystemToRootdSystem dSystemV
-    obtain ⟨ξpre, ξpreFactor, ρIsξpreCircQuotmk⟩ :=
-      equiStructFactorIsLargestEquiFactor rdSystem V rdSystemV ρ ρFactor VEqui
-    obtain ⟨ψ, hψ1, hψ2⟩ := QuotSameViaIsom hE I hFishE
-    use ξpre ∘ ψ
-    let Y := Quotient ⟨setToRelation E, hE.2.2⟩
-    have : Nonempty Y := nonemptyQuotient X hE.2.2
-    have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hE.2.1 hE.2.2
-    have hψ1Factor : _root_.isFactorMap (dSystemToRootdSystem (quotientDynamicalSystem I))
-      (_root_.quotientDynamicalSystem rdSystem hE) ψ := by
-        unfold _root_.isFactorMap
-        refine ⟨?_,?_,?_⟩
-        · exact hψ1.1.continuous
-        · exact hψ1.1.bijective.2
-        · exact hψ1.right
-    have factorComp : _root_.isFactorMap (dSystemToRootdSystem (quotientDynamicalSystem I))
-      rdSystemV (ξpre ∘ ψ) := compositionOfFactorMapsIsFactorMap hψ1Factor ξpreFactor
-    use factorComp
-    rw [Function.comp_assoc ξpre ψ (ICERQuotientMap I)]
-    rw [←hψ2]
-    exact ρIsξpreCircQuotmk
-
-
-/-- Using Theorem B, provided `S` is commutative and `dSystem` is minimal,
-`RPICER` is the regionally proximal relation as an `ICER` structure -/
-@[expose] def RPICER
-{S : Type*} [CommSemigroup S] [Nonempty S]
-{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
-{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
-ICER dSystem :=
-{
-  r := fun (x : X) ↦ (⟨x, ·⟩ ∈ RP dSystem)
-  iseqv := by
-    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
-    rw [RPisICERSet]
-    unfold ICERToSet
-    simp only [Set.mem_ofPred_eq]
-    exact I.iseqv
-  isClosed := by
-    change IsClosed (RP dSystem)
-    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
-    rw [RPisICERSet]
-    exact I.isClosed
-  isInvariant := by
-    change ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s))
-      (RP dSystem) (RP dSystem)
-    obtain ⟨I,RPisICERSet,-⟩ := (RPTheoremB hMin).2
-    rw [RPisICERSet]
-    exact I.isInvariant
-}
+    constructor
+    · refine ⟨?_,?_,?_⟩
+      · exact { isOpen_preimage := fun s a ↦ a }
+      · exact Quotient.mk_surjective
+      · intro s
+        rfl
+    · intro V _ _ _ _ dSystemV VEqui ρ ρFactor
+      let rdSystemV := dSystemToRootdSystem dSystemV
+      obtain ⟨ξpre, ξpreFactor, ρIsξpreCircQuotmk⟩ :=
+        equiStructFactorIsLargestEquiFactor rdSystem V rdSystemV ρ ρFactor VEqui
+      obtain ⟨ψ, hψ1, hψ2⟩ := QuotSameViaIsom hE I hFishE
+      use ξpre ∘ ψ
+      let Y := Quotient ⟨setToRelation E, hE.2.2⟩
+      have : Nonempty Y := nonemptyQuotient X hE.2.2
+      have : T2Space Y := quotientOfCompactT2ByClosedIsT2 hE.2.1 hE.2.2
+      have hψ1Factor : _root_.isFactorMap (dSystemToRootdSystem (quotientDynamicalSystem I))
+        (_root_.quotientDynamicalSystem rdSystem hE) ψ := by
+          unfold _root_.isFactorMap
+          refine ⟨?_,?_,?_⟩
+          · exact hψ1.1.continuous
+          · exact hψ1.1.bijective.2
+          · exact hψ1.right
+      have factorComp : _root_.isFactorMap (dSystemToRootdSystem (quotientDynamicalSystem I))
+        rdSystemV (ξpre ∘ ψ) := compositionOfFactorMapsIsFactorMap hψ1Factor ξpreFactor
+      use factorComp
+      rw [Function.comp_assoc ξpre ψ (ICERQuotientMap I)]
+      rw [←hψ2]
+      exact ρIsξpreCircQuotmk
 
 /-- # Theorem C
   Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
@@ -638,6 +606,35 @@ RP dSystemS = RP dSystemT := by
   rw [←(RPSameFromIntroToRoot dSystemS)] at RPisSame
   rw [←(RPSameFromIntroToRoot dSystemT)] at RPisSame
   exact RPisSame
+
+/-- Using Theorem B, provided `S` is commutative and `dSystem` is minimal,
+`RPICER` is the regionally proximal relation as an `ICER` structure -/
+@[expose] def RPICER
+{S : Type*} [CommSemigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} (hMin : isMinimalSystem dSystem) :
+ICER dSystem :=
+{
+  r := fun (x : X) ↦ (⟨x, ·⟩ ∈ RP dSystem)
+  iseqv := by
+    have := (RPTheoremB.{u_1,u_2,0} hMin).2
+    obtain ⟨I,RPisICERSet,-,-⟩ := (RPTheoremB.{u_1,u_2,0} hMin).2
+    rw [RPisICERSet]
+    unfold ICERToSet
+    simp only [Set.mem_ofPred_eq]
+    exact I.iseqv
+  isClosed := by
+    change IsClosed (RP dSystem)
+    obtain ⟨I,RPisICERSet,-,-⟩ := (RPTheoremB.{u_1,u_2,0} hMin).2
+    rw [RPisICERSet]
+    exact I.isClosed
+  isInvariant := by
+    change ∀ (s : S), Set.MapsTo (Prod.map (dSystem.map s) (dSystem.map s))
+      (RP dSystem) (RP dSystem)
+    obtain ⟨I,RPisICERSet,-,-⟩ := (RPTheoremB.{u_1,u_2,0} hMin).2
+    rw [RPisICERSet]
+    exact I.isInvariant
+}
 
 /-- # Theorems E & F
   Let `S` be a commutative semigroup and `X` be a minimal `S`-system.
@@ -744,9 +741,6 @@ isIsomorphic SWmodRPSystem GWmodRPSystem
     · intro s
       rw [hGW s, hSW s]
       exact ζEquiv s
-
-#print RPIntro.isLargestEquiFactor
-#print RPTheoremsEandF
 
 end RPIntro
 
