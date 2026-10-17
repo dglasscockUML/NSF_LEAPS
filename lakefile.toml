@@ -14,18 +14,11 @@ name = "mathlib"
 scope = "leanprover-community"
 rev = "c55e6e786f49471c72fbddbec5415808896aec1e"
 
-[[require]]
-name = "checkdecls"
-git = "https://github.com/PatrickMassot/checkdecls.git"
-
-[[require]]
-name = "«doc-gen4»"
-git = "https://github.com/leanprover/doc-gen4"
-rev = "main"
-
 [[lean_lib]]
 name = "NSFLEAPS"
+globs = ["NSFLEAPS.+"]
 
 [[lean_lib]]
 name = "Palomar"
-roots = ["Palomar.Delta.Challenge", "Palomar.Delta.Solution"]
+roots = ["Palomar.Delta.Challenge", "Palomar.Delta.Solution",
+         "Palomar.RP.Challenge", "Palomar.RP.Solution"]
