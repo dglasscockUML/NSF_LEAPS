@@ -303,58 +303,72 @@ by
     (memberOfCapFamJoinH (thickFamily S) (bohrZeroFamily S) A H).mp hAJ
   exact ⟨B, H', hB, ((thickIsSame H').mpr hH'), hH'H, hAB⟩
 
-
 /-- # Theorem C
     Let `S` be a countable, commutative semigroup. If `A ⊆ S` is a `central*` set,
     then for all thick sets `H ⊆ S`, there exists an `IP*` set `B ⊆ S` and a thick
-    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. -/
+    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. Equivalently, if `A ⊆ S` is such that
+    there exists a thick set `H ⊆ S` such that for all thick sets `H' ⊆ H`, the set
+    `A ∩ H'` is an IP set, then the set `A` is a central set. -/
 theorem DeltaTheoremC
 {S : Type*} [CommSemigroup S] [Nonempty S] [Countable S] :
-∀ (A : Set S), isCentralStar A →
+(∀ (A : Set S), isCentralStar A →
   ∀ (H : Set S), isThick H →
     ∃ (B H' : Set S),
       (isIPStar B) -- B is a IP*
       ∧ (isThick H') -- H' is thick
       ∧ (H' ⊆ H) -- H' is contained in H
-      ∧ (A ∩ H' = B ∩ H') :=-- A along H' is B along H'
-        by
-  intro A hA H hH
-  have hAC : A ∈ (centralFamily S)* := (mem_dual_star _ A).mpr
-    fun C hC ↦ hA C ((centralIsSame C).mpr hC)
-  -- (5.3): `⋃_{H ∈ T} ((T∩H)* ⋏ IP) ⊆ C`
-  have h53 : Family.iUnion (fun (t : (thickFamily S).sets) ↦
-      (capFamily (thickFamily S) t)* ⋏ IPFamily S) ⊆ centralFamily S := by
-    -- the condition of Theorem 5.4 for `F := IP` and `G := C`
-    have hFG : ∀ h ∈ thickFamily S,
-        ((capFamily (thickFamily S) h)* ⋏ IPFamily S).sets ∩ {C : Set S | isURSet C} ⊆
-          ((capFamily (thickFamily S) h)* ⋏ centralFamily S).sets := by
-      rintro h hh B ⟨hB, hBUR⟩
-      -- by Lemma 5.2, `B = R(x, U)` for a point `x` in a minimal system and a clopen `U`
-      obtain ⟨X, _, _, _, _, dSystem, hMin, x, U, hU, rfl⟩ := urSetIsRxU hBUR
-      -- `R(x, U) ∩ H' ∈ IP` for all thick `H' ⊆ h`, so `R(x, U) ∩ H' ∈ C` for all thick `H' ⊆ h`
-      refine (memberOfCapFamDualMeetH (thickFamily S) (centralFamily S) _ h).mpr
-        fun H' hH' hH'h ↦ ?_
-      exact preStrongIPIffStrongCentralInCountCommSemi hMin x hU h hh
-        (fun G hGh hG ↦ (memberOfCapFamDualMeetH (thickFamily S) (IPFamily S) _ h).mp hB G hG hGh)
-        H' hH'h hH'
-    -- by Theorem 5.4, `D ∈ ⋃_{H ∈ T} ((T∩H)* ⋏ C)`, and `(T∩t)* ⋏ C ⊆ C`
-    intro D hD
-    obtain ⟨⟨t, ht⟩, hDt⟩ := (Family.mem_iUnion _ D).mp
-      (urContainmentSufficesForFamilyContainmentUpgrade _ _ hFG hD)
-    exact capThickDualMeetContained ht (centralFamily S) hDt
-  -- in particular, `(T∩H)* ⋏ IP ⊆ C`
-  have hsub : (capFamily (thickFamily S) H)* ⋏ IPFamily S ⊆ centralFamily S := fun B hB ↦
-    h53 ((Family.mem_iUnion _ B).mpr ⟨⟨H, ((thickIsSame H).mp hH)⟩, hB⟩)
-  -- taking duals, `C* ⊆ ((T∩H)* ⋏ IP)* = (T∩H) ⋎ IP*`
-  have hAJ : A ∈ capFamily (thickFamily S) H ⋎ (IPFamily S)* := by
-    have hA' := dualIsAntitone hsub hAC
-    rwa [familyDeMorgan2, dualIsInvolutionOnFamilies] at hA'
-  -- by Lemma 3.8, there is a thick `H' ⊆ H` and an IP* set `B` with `A ∩ H' = B ∩ H'`
-  obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
-    (memberOfCapFamJoinH (thickFamily S) (IPFamily S)* A H).mp hAJ
-  exact ⟨B, H', fun C hC ↦ (mem_dual_star _ B).mp hB C
-    ((IPIsSame C).mp hC), ((thickIsSame H').mpr hH'), hH'H, hAB⟩
-
+      ∧ (A ∩ H' = B ∩ H')) -- A along H' is B along H'
+∧
+(∀ (A : Set S),
+  (∃ (H : Set S), isThick H
+  ∧ (∀ (H' : Set S), H' ⊆ H → isThick H' → isIP (A ∩ H'))) →
+  isCentral A) := by
+    -- (5.3): `⋃_{H ∈ T} ((T∩H)* ⋏ IP) ⊆ C`
+    have h53 (A : Set S) : Family.iUnion (fun (t : (thickFamily S).sets) ↦
+        (capFamily (thickFamily S) t)* ⋏ IPFamily S) ⊆ centralFamily S := by
+      -- the condition of Theorem 5.4 for `F := IP` and `G := C`
+      have hFG : ∀ h ∈ thickFamily S,
+          ((capFamily (thickFamily S) h)* ⋏ IPFamily S).sets ∩ {C : Set S | isURSet C} ⊆
+            ((capFamily (thickFamily S) h)* ⋏ centralFamily S).sets := by
+        rintro h hh B ⟨hB, hBUR⟩
+        -- by Lemma 5.2, `B = R(x, U)` for a point `x` in a minimal system and a clopen `U`
+        obtain ⟨X, _, _, _, _, dSystem, hMin, x, U, hU, rfl⟩ := urSetIsRxU hBUR
+        -- `R(x, U) ∩ H' ∈ IP` for all thick `H' ⊆ h`, so `R(x, U) ∩ H' ∈ C` for all thick `H' ⊆ h`
+        refine (memberOfCapFamDualMeetH (thickFamily S) (centralFamily S) _ h).mpr
+          fun H' hH' hH'h ↦ ?_
+        exact preStrongIPIffStrongCentralInCountCommSemi hMin x hU h hh
+          (fun G hGh hG ↦ (memberOfCapFamDualMeetH (thickFamily S) (IPFamily S) _ h).mp hB G hG hGh)
+          H' hH'h hH'
+      -- by Theorem 5.4, `D ∈ ⋃_{H ∈ T} ((T∩H)* ⋏ C)`, and `(T∩t)* ⋏ C ⊆ C`
+      intro D hD
+      obtain ⟨⟨t, ht⟩, hDt⟩ := (Family.mem_iUnion _ D).mp
+        (urContainmentSufficesForFamilyContainmentUpgrade _ _ hFG hD)
+      exact capThickDualMeetContained ht (centralFamily S) hDt
+    constructor
+    · intro A hA H hH
+      have hAC : A ∈ (centralFamily S)* := (mem_dual_star _ A).mpr
+        fun C hC ↦ hA C ((centralIsSame C).mpr hC)
+      -- in particular, `(T∩H)* ⋏ IP ⊆ C`
+      have hsub : (capFamily (thickFamily S) H)* ⋏ IPFamily S ⊆ centralFamily S := fun B hB ↦
+        (h53 A) ((Family.mem_iUnion _ B).mpr ⟨⟨H, ((thickIsSame H).mp hH)⟩, hB⟩)
+      -- taking duals, `C* ⊆ ((T∩H)* ⋏ IP)* = (T∩H) ⋎ IP*`
+      have hAJ : A ∈ capFamily (thickFamily S) H ⋎ (IPFamily S)* := by
+        have hA' := dualIsAntitone hsub hAC
+        rwa [familyDeMorgan2, dualIsInvolutionOnFamilies] at hA'
+      -- by Lemma 3.8, there is a thick `H' ⊆ H` and an IP* set `B` with `A ∩ H' = B ∩ H'`
+      obtain ⟨H', hH', hH'H, B, hB, hAB⟩ :=
+        (memberOfCapFamJoinH (thickFamily S) (IPFamily S)* A H).mp hAJ
+      exact ⟨B, H', fun C hC ↦ (mem_dual_star _ B).mp hB C
+        ((IPIsSame C).mp hC), ((thickIsSame H').mpr hH'), hH'H, hAB⟩
+    · intro A hA
+      obtain ⟨H, hH1, hH2⟩ := hA
+      have hsub : (capFamily (thickFamily S) H)* ⋏ IPFamily S ⊆ centralFamily S := fun B hB ↦
+        (h53 A) ((Family.mem_iUnion _ B).mpr ⟨⟨H, ((thickIsSame H).mp hH1)⟩, hB⟩)
+      have AinMeet : A ∈ (capFamily (thickFamily S) H)* ⋏ IPFamily S := by
+        apply (memberOfCapFamDualMeetH (thickFamily S) (IPFamily S) A H).mpr
+        intro F hF1 hF2
+        exact (IPIsSame (A ∩ F)).mp (hH2 F hF2 ((thickIsSame F).mpr hF1))
+      exact (centralIsSame A).mpr (hsub AinMeet)
 
 /-- # Theorem D
     Let `S` be a set. Family meet and family join, when restricted to

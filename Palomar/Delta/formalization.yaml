@@ -29,7 +29,8 @@ project:
     a thick H such that A ∩ H′ is a set of Bohr recurrence for every thick H′ ⊆ H, then A
     is a Δ set. Theorem C exhibits a second instance of local structure by the same method:
     in a countable commutative semigroup, every C* set agrees with an IP* set on a thick
-    subset of any prescribed thick set.
+    subset of any prescribed thick set.  Theorem C also formulates the equivalent dual
+    statement, just as Theorem B is in relation to Theorem A.
 
     Theorem D supplies the algebraic framework the arguments rest on. A Furstenberg family
     on a set S is an upward-closed collection of subsets of S. On the Furstenberg families

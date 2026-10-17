@@ -197,16 +197,23 @@ theorem DeltaTheoremB
 /-- # Theorem C
     Let `S` be a countable, commutative semigroup. If `A ⊆ S` is a `central*` set,
     then for all thick sets `H ⊆ S`, there exists an `IP*` set `B ⊆ S` and a thick
-    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. -/
+    set `H' ⊆ H` such that `A ∩ H' = B ∩ H'`. Equivalently, if `A ⊆ S` is such that
+    there exists a thick set `H ⊆ S` such that for all thick sets `H' ⊆ H`, the set
+    `A ∩ H'` is an IP set, then the set `A` is a central set. -/
 theorem DeltaTheoremC
 {S : Type*} [CommSemigroup S] [Nonempty S] [Countable S] :
-∀ (A : Set S), isCentralStar A →
+(∀ (A : Set S), isCentralStar A →
   ∀ (H : Set S), isThick H →
     ∃ (B H' : Set S),
       (isIPStar B) -- B is a IP*
       ∧ (isThick H') -- H' is thick
       ∧ (H' ⊆ H) -- H' is contained in H
-      ∧ (A ∩ H' = B ∩ H') := -- A along H' is B along H'
+      ∧ (A ∩ H' = B ∩ H')) -- A along H' is B along H'
+∧
+(∀ (A : Set S),
+  (∃ (H : Set S), isThick H
+  ∧ (∀ (H' : Set S), H' ⊆ H → isThick H' → isIP (A ∩ H'))) →
+  isCentral A) :=
         by sorry
 
 /-- # Theorem D
