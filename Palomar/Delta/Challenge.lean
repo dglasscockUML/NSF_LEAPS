@@ -26,18 +26,32 @@ formulation the proof establishes: in an arbitrary commutative semigroup, a
 Δ* set agrees with a Bohr_0 set on a thick subset of any prescribed thick set;
 equivalently, a set that is a set of Bohr recurrence along every thick refinement
 of some thick set is itself a Δ set. These generalize results of Bergelson,
-Furstenberg, and Weiss and of Host and Kra from the integers to arbitrary commutative
-semigroups. `DeltaTheoremC` gives a second instance of the same phenomenon: in
-a countable commutative semigroup, a central* set agrees with an IP* set on a
-thick subset of any prescribed thick set. `DeltaTheoremD` records the algebraic
-properties of family meet, family join and the family dual on which the
-reformulations rest.
+Furstenberg, and Weiss and of Host and Kra from the positive integers to arbitrary
+commutative semigroups. `DeltaTheoremC` gives a second instance of the same
+phenomenon: in a countable commutative semigroup, a central* set agrees with an
+IP* set on a thick subset of any prescribed thick set. Theorem C also formulates the
+equivalent dual statement, just as Theorem B is in relation to Theorem A.
+`DeltaTheoremD` records the algebraic properties of family meet, family join and the
+family dual on which the reformulations rest.
 
 ## Conventions
 
 Semigroups are discrete and are assumed to be non-empty.
 Definitions are stated for a general `Semigroup`; commutativity and
 countability are assumed only in the theorems that need them.
+
+Δ sets are defined here by the existence of a sequence `s₁, s₂, …` with
+`s_j ∈ s_i • A` for all `i < j`, with no injectivity requirement on the
+sequence. This is Hindman's notion of an `rQ` set for general semigroups
+(Q for quotient); in a commutative semigroup his left- and right-handed
+variants coincide. It is slightly more inclusive than the classical
+difference-set definition, and the two agree exactly in the positive
+integers: a set of positive integers admitting such a sequence forces that
+sequence to be strictly increasing, so it contains the difference set of an
+infinite set, and conversely. They differ only when `S` contains an element
+`a` with `s * a = s` for some `s`, since the constant sequence then makes
+every set containing `a` a Δ set; in `(ℤ, +)` the element `0` is of this
+kind, so Δ* sets in `ℤ` are precisely the classical Δ* sets containing `0`.
 
 Bohr_0 sets are described via homomorphisms into `Fin d → Circle`, the
 `d`-dimensional torus presented as a power of the unit circle in `ℂ`, rather
@@ -69,15 +83,32 @@ with all syndetic subsets of `S`. -/
 Prop :=
 ∀ (B : Set S), isSyndetic B → (A ∩ B).Nonempty
 
-/-- A set `A` of a semigroup `S` is a Delta set if there exist
-`s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
+/-- A set `A` of a semigroup `S` is a Δ set if there exist
+`s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`.
+
+This is Hindman's `rQ` set, the general-semigroup form of the classical
+notion of a difference set. The sequence is not required to be injective.
+In `(ℕ, +)` with `ℕ` the positive integers this is equivalent to containing
+`(S − S) ∩ ℕ` for some infinite `S`, because positivity forces any
+witnessing sequence to be strictly increasing. In a semigroup with an
+element `a` satisfying `s * a = s` for some `s`, the constant sequence
+witnesses the condition, so every set containing such an `a` is a Δ set;
+`0` is such an element of `(ℤ, +)`.
+
+Reference: N. Hindman, *Notions of size in a semigroup: an update from a
+historical perspective*, Semigroup Forum 100(1):52–76, 2020, Definition 2.5. -/
 @[expose] def isDelta
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
 
 /-- A set `A` of a semigroup `S` is Delta* if it has nonempty
-intersection with all Delta subsets of `S` -/
+intersection with all Delta subsets of `S`.
+
+Because every set containing an element `a` with `s * a = s` is a Δ set, a
+Δ* set contains every such element. In `(ℤ, +)` this means a Δ* set in the
+present sense is exactly a classical Δ* set that contains `0`; in `(ℕ, +)`
+no such element exists and the notion agrees with the classical one. -/
 @[expose] def isDeltaStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=

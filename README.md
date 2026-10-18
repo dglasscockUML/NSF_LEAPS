@@ -16,9 +16,9 @@ Abstract: The regionally proximal and equicontinuous structure relations are fun
 
 - [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416)
 
-Abstract: In this paper, we strengthen the connection between the combinatorics of difference sets and the dynamics of group rotations. Our main result shows that sets which have non-empty intersection with all difference subsets of a commutative semigroup possess local Bohr structure. This generalizes results of Bergelson, Furstenberg, and Weiss and Host and Kra from the integers to arbitrary commutative semigroups. We accomplish this by utilizing a recent result showing that the regionally proximal relation is an equivalence relation for minimal actions of commutative semigroups and by describing a new, DeMorgan-type algebra on Furstenberg families that allows for efficient manipulation and computation.
+Abstract: In this paper, we strengthen the connection between the combinatorics of difference sets and the dynamics of group rotations. Our main result shows that sets which have non-empty intersection with all difference subsets of a commutative semigroup possess local Bohr structure. This generalizes results of Bergelson, Furstenberg, and Weiss and Host and Kra from the positive integers to arbitrary commutative semigroups. We accomplish this by utilizing a recent result showing that the regionally proximal relation is an equivalence relation for minimal actions of commutative semigroups and by describing a new, DeMorgan-type algebra on Furstenberg families that allows for efficient manipulation and computation.
 
-See the Organization section below for more detailed information.
+See the papers for precise definitions and the organization section below for more detailed information on the formalization.
 
 ## Math in this formalization
 
@@ -60,7 +60,7 @@ Parts of this formalization were written with the help of AI-based coding agents
 - definitions, theorems, and proofs in the files `TP_Cylinders.lean` and `FF_Pontryagin.lean` were written by Claude Opus 5;
 - definitions, theorems, and proofs in the file `FF_CXX.lean` were written by ChatGPT 5.6 Sol;
 - some definitions and most proofs in the file `RP_Nat_ext.lean` were written by Claude Opus 5;
-- approximately 20 proofs of theorems scattered throughout the project were written by Claude Opus 5.
+- approximately two dozen proofs of theorems scattered throughout the project were written by Claude Opus 5.
 
 ChatGPT 5.6 Sol and Luna were used to help with tactics at particular places in proofs, diagnose compilation errors, and search Mathlib. Beyond these specific callouts, all code was written by hand.  In particular, all definition and theorem statements outside of the specific files mentioned above were written by hand.
 
@@ -68,8 +68,8 @@ All submitted code was reviewed by the authors and checked by the Lean elaborato
 
 ## Requirements
 
-- Lean 4.34.0-rc2
-- Mathlib 082e2d37e8b0463410cdb532e111cd43d5a66174
+- Lean4 v4.35.0-rc3
+- Mathlib c55e6e786f49471c72fbddbec5415808896aec1e
 
 The `lean-toolchain` and `lakefile.toml` files contain the authoritative version information.
 
@@ -77,8 +77,7 @@ The `lean-toolchain` and `lakefile.toml` files contain the authoritative version
 
 - [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397)
 - [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416)
-- [Palomar 1](link)
-- [Palomar 2](link)
+- Palomar: links will be added upon registration
 
 ## License
 

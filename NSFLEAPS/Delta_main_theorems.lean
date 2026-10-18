@@ -54,15 +54,32 @@ with all syndetic subsets of `S`. -/
 Prop :=
 ∀ (B : Set S), isSyndetic B → (A ∩ B).Nonempty
 
-/-- A set `A` of a semigroup `S` is a Delta set if there exist
-`s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`. -/
+/-- A set `A` of a semigroup `S` is a Δ set if there exist
+`s_1, s_2, ... ∈ S` such that for all `1 ≤ i < j`, `s_j ∈ s_i A`.
+
+This is Hindman's `rQ` set, the general-semigroup form of the classical
+notion of a difference set. The sequence is not required to be injective.
+In `(ℕ, +)` with `ℕ` the positive integers this is equivalent to containing
+`(S − S) ∩ ℕ` for some infinite `S`, because positivity forces any
+witnessing sequence to be strictly increasing. In a semigroup with an
+element `a` satisfying `s * a = s` for some `s`, the constant sequence
+witnesses the condition, so every set containing such an `a` is a Δ set;
+`0` is such an element of `(ℤ, +)`.
+
+Reference: N. Hindman, *Notions of size in a semigroup: an update from a
+historical perspective*, Semigroup Forum 100(1):52–76, 2020, Definition 2.5. -/
 @[expose] def isDelta
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=
 ∃ (s : ℕ → S), ∀ (i j : ℕ), i < j → (s j) ∈ ((s i) * ·) '' A
 
 /-- A set `A` of a semigroup `S` is Delta* if it has nonempty
-intersection with all Delta subsets of `S` -/
+intersection with all Delta subsets of `S`.
+
+Because every set containing an element `a` with `s * a = s` is a Δ set, a
+Δ* set contains every such element. In `(ℤ, +)` this means a Δ* set in the
+present sense is exactly a classical Δ* set that contains `0`; in `(ℕ, +)`
+no such element exists and the notion agrees with the classical one. -/
 @[expose] def isDeltaStar
 {S : Type*} [Semigroup S] [Nonempty S] (A : Set S) :
 Prop :=

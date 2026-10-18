@@ -15,22 +15,35 @@ project:
     all i < j; and a Bohr_0 set if it contains the preimage of an open neighborhood of the
     identity under a semigroup homomorphism from S to a finite-dimensional torus. Dually, a
     set is thick, a Δ* set, or a set of Bohr recurrence according as it meets every
-    syndetic, every Δ, or every Bohr_0 subset of S. In the integers, Δ sets are infinite
-    difference sets and Bohr_0 sets are the almost periodic sets of classical interest; Δ*
-    sets are combinatorially large, being syndetic and rich in additive patterns.
+    syndetic, every Δ, or every Bohr_0 subset of S. Bohr_0 sets in the integers are the
+    almost periodic sets of classical interest, and Δ* sets are combinatorially large,
+    being syndetic and rich in additive patterns.
+
+    The definition of a Δ set used here is the one given for general semigroups by Hindman,
+    who calls these rQ sets, Q for quotient; in a commutative semigroup his left- and
+    right-handed variants agree. It does not require the witnessing sequence to be
+    injective, and so is slightly more inclusive than the classical difference-set
+    definition. In the positive integers the two agree exactly: if A consists of positive
+    integers and s_j − s_i ∈ A for all i < j then the sequence is strictly increasing, so A
+    contains the difference set (S − S) ∩ ℕ of the infinite set S = {s₁, s₂, …}, and
+    conversely. The two notions separate only in a semigroup containing an element a with
+    sa = s for some s, where the constant sequence makes every set containing such an a a Δ
+    set. In the integers the element 0 is of this kind, so a Δ set in the present sense is
+    either a classical difference set or a set containing 0, and a Δ* set is exactly a
+    classical Δ* set that contains 0.
 
     The main result (Theorem A) is that Δ* sets in an arbitrary commutative semigroup carry
     local Bohr structure: if A ⊆ S is a Δ* set, then for every thick H ⊆ S there is a thick
     H′ ⊆ H and a Bohr_0 set B with A ∩ H′ = B ∩ H′. This generalizes results of Bergelson,
-    Furstenberg and Weiss and of Host and Kra from the integers to arbitrary commutative
-    semigroups by a purely topological-dynamical route in place of the ergodic-theoretic
-    arguments used in the integer case. Theorem B is the dual formulation, in terms of Δ
-    sets and sets of Bohr recurrence, that the proof actually establishes: if A ⊆ S admits
-    a thick H such that A ∩ H′ is a set of Bohr recurrence for every thick H′ ⊆ H, then A
-    is a Δ set. Theorem C exhibits a second instance of local structure by the same method:
-    in a countable commutative semigroup, every C* set agrees with an IP* set on a thick
-    subset of any prescribed thick set.  Theorem C also formulates the equivalent dual
-    statement, just as Theorem B is in relation to Theorem A.
+    Furstenberg and Weiss and of Host and Kra from the positive integers to arbitrary
+    commutative semigroups by a purely topological-dynamical route in place of the ergodic-
+    theoretic arguments used in the integer case. Theorem B is the dual formulation, in
+    terms of Δ sets and sets of Bohr recurrence, that the proof actually establishes: if
+    A ⊆ S admits a thick H such that A ∩ H′ is a set of Bohr recurrence for every thick
+    H′ ⊆ H, then A is a Δ set. Theorem C exhibits a second instance of local structure by
+    the same method: in a countable commutative semigroup, every C* set agrees with an IP*
+    set on a thick subset of any prescribed thick set.  Theorem C also formulates the
+    equivalent dual statement, just as Theorem B is in relation to Theorem A.
 
     Theorem D supplies the algebraic framework the arguments rest on. A Furstenberg family
     on a set S is an upward-closed collection of subsets of S. On the Furstenberg families
@@ -125,8 +138,24 @@ sources:
       https://doi.org/10.1017/S014338570900087X
     relationship: "background"
     note: >-
-      The integer-case result, strengthening Bergelson–Furstenberg–Weiss to Δ* sets, that
-      Theorem A generalizes to arbitrary commutative semigroups. Not itself formalized.
+      The positive integer-case result, strengthening Bergelson–Furstenberg–Weiss to Δ*
+      sets, that Theorem A generalizes to arbitrary commutative semigroups. Not itself
+      formalized.
+    author_endorsement: "not-contacted"
+
+  - title: "Notions of size in a semigroup: an update from a historical perspective"
+    authors:
+      - "Neil Hindman"
+    id: "doi:10.1007/s00233-019-10041-0"
+    type: "paper"
+    location: >-
+      Semigroup Forum 100(1), pages 52–76, 2020.
+      https://doi.org/10.1007/s00233-019-10041-0
+    relationship: "background"
+    note: >-
+      The source of the definition of a Δ set used here: Hindman's rQ sets, Definition 2.5.
+      In a commutative semigroup his left- and right-handed variants coincide. Not itself
+      formalized.
     author_endorsement: "not-contacted"
 
 status:
@@ -164,8 +193,9 @@ automation:
       models: []
       framework: "n/a"
       tool_setup: >-
-        Hand-coding of a substantial portion of the definitions, theorem statements and
-        theorem proofs, and hand-scaffolding of helper theorem statements and proof steps.
+        Hand-coding of most of the development, including every definition and theorem
+        statement outside the four files named in the entries below, and hand-scaffolding
+        of helper theorem statements and proof steps.
       cost:
         wall_time: "approximately 6 months of effort"
         spend_usd: "n/a"
@@ -195,16 +225,21 @@ automation:
       framework: "Claude Code"
       tool_setup: >-
         The authors hand-scaffolded the main theorems in RP_Nat_ext.lean, and the model
-        supplied proofs of those theorems, introducing definitions and helper lemmas as
-        necessary.
+        supplied some definitions and most of the proofs in that file. In the course of
+        this work the model also produced the file TP_Cylinders.lean in its entirety: a
+        collection of lemmas on the uniform topology of product spaces needed for the
+        natural extension results. The definitions, theorem statements and proofs in
+        TP_Cylinders.lean are the model's rather than the authors'.
       cost:
         wall_time: "approximately 1 hour over a single run"
         spend_usd: "subscription-based"
         hardware: "local machine and API"
       prompting_notes: >-
-        Instructions were to edit the RP_Nat_ext.lean file only; to provide proofs for the
-        already-scaffolded main theorems following proofs supplied by the authors in a
-        write-up; and not to edit the main theorem statements in any way.
+        Instructions were to provide proofs for the already-scaffolded main theorems in
+        RP_Nat_ext.lean, following proofs supplied by the authors in a write-up, and not to
+        edit the main theorem statements in any way. Supporting lemmas on the uniform
+        topology of product spaces were collected by the model into the new file
+        TP_Cylinders.lean in the course of that work.
 
     - method: "copilot"
       models: ["Claude Opus 5 High"]
@@ -214,7 +249,7 @@ automation:
         following proofs the authors wrote in English in LaTeX and provided to it. Work
         proceeded on a theorem-by-theorem basis, with output reviewed and managed after
         each call. Helper lemmas introduced by the model were organized by hand into the
-        project structure; several were placed in TP_Defs.lean.
+        project structure; several were manually organized into TP_Defs.lean.
       cost:
         wall_time: "approximately 2 hours, broken into runs of roughly 10 minutes"
         spend_usd: "subscription-based"
@@ -227,31 +262,82 @@ automation:
         lemma, you can write it just above preStrongIPIffStrongCentralInCountCommSemi.
         Before writing a helper lemma, search for what you need in the files upstream in
         the project."
+
+    - method: "copilot"
+      models: ["ChatGPT 5.6 Sol", "ChatGPT 5.6 Luna"]
+      framework: "ChatGPT web interface"
+      tool_setup: >-
+        Used throughout the project to suggest tactics at particular points in proofs, to
+        diagnose compilation errors, and to search Mathlib. No file was authored in this
+        role; suggestions were incorporated by hand.
+      cost:
+        wall_time: "approximately 1 hour over dozens of calls"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: >-
+        Individual lines or blocks of code were copy-pasted when calling the model for help
+        with a specific problem during proof writing or code debugging. Responses were
+        copied back into the code line by line and verified by the authors.
+
+    - method: "copilot"
+      models: ["ChatGPT 5.6 Sol"]
+      framework: "ChatGPT web interface"
+      tool_setup: >-
+        Creation of the file FF_CXX.lean, which allows the space of continuous self-maps of
+        a compact Hausdorff space X to be treated as a monoid under composition. The
+        definitions, theorem statements and proofs in this file are the model's rather than
+        the authors'.
+      cost:
+        wall_time: "approximately 10 minutes across four calls"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: >-
+        The file was created by prompting the model four times, copying the suggested code
+        into the file, and verifying that it functioned as intended.
   spend_usd: "subscription-based"
   notes: >-
-    All mathematical content in this project is the work of the authors. Every definition,
-    every main theorem statement, and every proof appearing in the source paper was
-    developed and written by hand, as mathematical prose, before formalization was
-    attempted. Automation was applied only to the task of rendering that mathematics in
-    Lean: agents were given human-written proofs and asked to encode them, not to find
-    them, with the noted exception of the results in FF_Pontryagin.lean.
+    The mathematics of the source paper is the authors' own. Every definition, theorem
+    statement and proof appearing in the paper was developed and written by the authors as
+    mathematical prose, independently of and prior to formalization; no generative AI was
+    used to obtain the mathematical results. The account below concerns the separate
+    question of how that mathematics, and the supporting machinery around it, was rendered
+    in Lean.
 
-    Coding agents were used in three roles: to supply Lean proofs of individual theorems,
-    one at a time, from English proofs the authors wrote and provided; to produce the
-    FF_Pontryagin.lean file; and to supply proofs for theorem statements the authors had
-    already scaffolded by hand in RP_Nat_ext.lean. Main theorem statements and definitions
-    were hand-written throughout, and agents were instructed not to modify them.
+    Coding agents contributed in five distinguishable ways. Claude Opus 5 wrote the
+    definitions, theorems and proofs in FF_Pontryagin.lean. Claude Opus 5 wrote some
+    definitions and most of the proofs in RP_Nat_ext.lean, working from theorem statements
+    the authors had scaffolded by hand, and in the course of that work produced
+    TP_Cylinders.lean in its entirety. Claude Opus 5 supplied Lean proofs for approximately
+    two dozen theorems scattered through the project, one at a time, from English proofs the
+    authors wrote and provided. ChatGPT 5.6 Sol wrote the definitions, theorems and proofs
+    in FF_CXX.lean. ChatGPT 5.6 Sol and Luna were used throughout for tactic suggestions,
+    compilation diagnostics and Mathlib search.
 
-    FF_Pontryagin.lean is the one exception to the description above. Its target statement
-    was fixed by hand, but the agent was asked to locate and formalize whichever proof of
-    that statement was best suited to Lean, so the choice of argument there was the agent's
-    rather than the authors'. The result concerned, that the characters of a compact
-    abelian group separate its points, is classical, is not original to this paper, and is
-    referenced in the paper only as a tool, without proof.
+    Outside those four files and those roles, all code was written by hand. In particular,
+    all of the definitions and theorem statements registered in this submission were
+    coded by hand.
 
-    Agent output was reviewed and organized by the authors as it was produced, with helper
-    lemmas placed by hand into the project structure. We do not claim independent peer
-    review or a complete line-by-line human audit of every machine-generated proof.
+    Three of these contributions went beyond encoding mathematics the authors had already
+    written. In FF_Pontryagin.lean the target statement was fixed by hand but the model
+    chose the proof; the result concerned, that the characters of a compact abelian group
+    separate its points, is classical, is not original to this paper, and is referenced in
+    the paper only as a tool, without proof. In FF_CXX.lean and TP_Cylinders.lean the
+    models produced the statements as well as the proofs, in the first case from a
+    description of what was wanted and in the second as supporting lemmas the model
+    identified as necessary while proving results the authors had scaffolded.
+
+    The definitions and statements registered in this submission are hand-written, but the
+    proofs that discharge them are not independent of machine-written code: FF_CXX.lean,
+    TP_Cylinders.lean and FF_Pontryagin.lean all supply machinery that the registered
+    proofs depend on. A reader auditing the Challenge statements reads only hand-written
+    code; a reader auditing the proof development will encounter machine-written code.
+
+    All submitted code was reviewed by the authors and checked by the Lean elaborator and
+    compiler. The authors are responsible for the mathematical content of the
+    formalization, the correctness of the statements, and the interpretation of the
+    resulting code. We do not claim independent peer review or a complete line-by-line
+    human audit of every machine-generated proof.
+
 
 fidelity:
   divergences: >-
@@ -264,6 +350,21 @@ fidelity:
     than as ℝ^d/ℤ^d as written in the paper. As in the paper, no continuity is required of
     these homomorphisms.
 
+    A second definitional point, which likewise does not change what the theorems assert
+    but does bear on how they are read. The formal definition of a Δ set follows the source
+    paper, which in turn follows Hindman's definition of an rQ set for general semigroups:
+    the witnessing sequence is not required to be injective. In the positive integers this
+    agrees exactly with the classical difference-set definition, and specializing Theorem A
+    to (ℕ, +) recovers the setting of Host and Kra's Theorem 2.8. The notions separate only
+    in a semigroup containing an element a with sa = s for some s, where every set
+    containing such an a is a Δ set by the constant sequence, and Δ* sets must therefore
+    contain every such element. In the integers that element is 0, so a Δ* set in the
+    present sense is a classical Δ* set containing 0: read in ℤ, Theorem A's hypothesis is
+    formally stronger than the classical one and Theorem B's conclusion formally weaker.
+    The classical statement in ℤ is nevertheless recovered, since if A ⊆ ℤ is a classical
+    Δ* set then A ∪ {0} is a Δ* set in the present sense, and deleting 0 from the thick set
+    Theorem A produces returns the classical conclusion.
+
 review:
   status: "author-verified"
   reviewers:
@@ -272,15 +373,19 @@ review:
     - "Daniel Glasscock"
     - "Anh N. Le"
   notes: >-
-    The authors hand-formalized all main definitions and all main theorem statements, and
-    audited the registered statements against the paper. This status does not claim
-    independent peer review, nor a complete human audit of every machine-generated proof.
+    The authors wrote by hand every definition and theorem statement registered in this
+    submission, and audited those statements against the paper. Parts of the supporting
+    development were machine-written, as recorded in the automation section, and some of
+    that machine-written code lies in the import closure of the registered proofs. All
+    submitted code was reviewed by the authors and checked by the Lean elaborator and
+    compiler. This status does not claim independent peer review, nor a complete
+    line-by-line human audit of every machine-generated proof.
 
 alignment:
   namespace: "DeltaIntro"
   notes: >-
     Each of the four theorems is stated without proof in Palomar/Delta/Challenge.lean,
-    together with the sixteen definitions needed to read the statements, and is stated and
+    together with the definitions needed to read the statements, and is stated and
     proved under the same fully qualified name in NSFLEAPS/Delta_main_theorems.lean.
     Palomar/Delta/Solution.lean supplies the proved forms by importing that module. Three
     translation lemmas in Delta_main_theorems.lean, namely thickIsSame, IPIsSame and
@@ -315,12 +420,13 @@ alignment:
       status: "proved"
       note: >-
         In a countable commutative semigroup, a central* set agrees with an IP* set on a
-        thick subset of any prescribed thick set. The countability hypothesis appears in
-        the paper's statement and in the formal statement alike. IP and central sets are
-        formalized as membership in an idempotent, respectively minimal idempotent,
-        ultrafilter, with multiplication given by Ultrafilter.mul from
-        Mathlib.Combinatorics.Hindman; IPIsSame and centralIsSame link these to the
-        development's closely-related formulations.
+        thick subset of any prescribed thick set. Additionally, the dual version of this
+        statement is given. The countability hypothesis appears in the paper's statement
+        and in the formal statement alike. IP and central sets are formalized as
+        membership in an idempotent, respectively minimal idempotent, ultrafilter, with
+        multiplication given by Ultrafilter.mul from Mathlib.Combinatorics.Hindman;
+        IPIsSame and centralIsSame link these to the development's closely-related
+        formulations.
 
     - source: "Theorem D (Section 1.4; proof in Section 3)"
       lean: "DeltaIntro.DeltaTheoremD"
