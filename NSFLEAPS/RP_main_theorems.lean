@@ -129,7 +129,7 @@ CompactSpace (ICERQuotient I) := by
   exact Quotient.compactSpace
 
 /-- Instance giving that `ICERQuotient` is T2 -/
-instance tempname5
+instance
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} {I : ICER dSystem} :
@@ -155,9 +155,6 @@ T2Space (ICERQuotient I) := by
     fun ⟨y, hy, hyb⟩ ↦ hy (hbV (Quotient.exact hyb)), Set.disjoint_left.2 fun q hqU hqV ↦ ?_⟩
   obtain ⟨y, rfl⟩ := Quotient.mk_surjective q
   exact hqV ⟨y, Set.disjoint_left.1 hUV (not_not.1 fun h ↦ hqU ⟨y, h, rfl⟩), rfl⟩
-
-set_option pp.all true in
-#print RPIntro.tempname5
 
 /-- Toward describing quotient systems, quotientLiftRespects shows that if
 `[x]_I = [y]_I`, then `[sx]_I = [sy]_I` -/
