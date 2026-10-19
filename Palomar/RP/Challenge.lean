@@ -64,6 +64,19 @@ presented as a Setoid together with those two properties; the compact
 Hausdorff structure on the quotient of a system by an ICER is established
 below, because the statements of Theorems B, E and F depend on it.
 
+The regionally proximal relation has classically been defined only for group
+actions. The definition used here, for actions of a general semigroup, is the
+one adopted by Auslander and Dai and by Dai and Xiao; it agrees with the
+classical relation whenever the acting semigroup is a group, so nothing is
+lost relative to the classical setting. It is not the only natural
+generalization: following instead de Vries's group-action definition gives
+the backward regionally proximal relation `RPM`, written `RP⁻` in the paper.
+For semigroup actions the two differ in general, already for `S = (ℕ, +)`,
+which is what gives `RPTheoremC` its content.
+
+The Lean proof of the T2Space (ICERQuotient I) instance below was rendered
+by a model from an English proof written by the authors.
+
 The Grothendieck group of a commutative semigroup S is taken to be the
 Grothendieck group of the monoid WithOne S, which requires no cancellativity
 assumption on S.
@@ -251,7 +264,27 @@ Prop :=
     ∀ (s : S), (fun (x : X × X) ↦
       ⟨dSystem.map s x.1, dSystem.map s x.2⟩) '' β ⊆ α
 
-/-- The regionally proximal relation, as a subset of `X × X` -/
+/-- The regionally proximal relation of a dynamical system, as a subset of
+`X × X`: the intersection, over all neighbourhoods `α` of the diagonal, of
+the closure of the union over `s ∈ S` of the preimages of `α` under
+`s × s`.
+
+Equivalently, `(x, y) ∈ RP` when for every neighbourhood `U` of `x`, every
+neighbourhood `V` of `y` and every neighbourhood `α` of the diagonal, there
+are `x' ∈ U`, `y' ∈ V` and `s ∈ S` with `(s x', s y') ∈ α`.
+
+The relation is classically defined only for group actions. This is the
+semigroup-action definition adopted by Auslander and Dai and by Dai and
+Xiao, and it agrees with the classical relation when `S` is a group. See
+`RPM` for the other natural generalization.
+
+References:
+J. Auslander and X. Dai, *Minimality, distality and equicontinuity for
+semigroup actions on compact Hausdorff spaces*, Discrete Contin. Dyn. Syst.
+39(8):4647–4711, 2019.
+X. Dai and Z. Xiao, *Equicontinuity, uniform almost periodicity, and
+regionally proximal relation for topological semiflows*, Topology Appl.
+231:35–49, 2017. -/
 @[expose] def RP
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
@@ -261,7 +294,15 @@ Set (X × X) :=
   closure (⋃ (s : S), (fun (x : X × X) ↦
     ⟨dSystem.map s x.1, dSystem.map s x.2⟩) ⁻¹' α)
 
-/-- The backward regionally proximal relation, as a subset of `X × X` -/
+/-- The backward regionally proximal relation, as a subset of `X × X`:
+as `RP`, but with the images of `α` under `s × s` in place of the
+preimages.
+
+This is the second natural generalization of the classical relation to
+semigroup actions, obtained by following the group-action definition in
+de Vries. For group actions `RP` and `RPM` coincide; for semigroup actions
+they differ in general, already for `S = (ℕ, +)`. `RPTheoremC` records that
+they nevertheless agree when `S` is commutative and the action is minimal. -/
 @[expose] def RPM
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]

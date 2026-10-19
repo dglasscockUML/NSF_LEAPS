@@ -22,6 +22,14 @@ project:
     in a. The equicontinuous structure relation Seq consists of the pairs identified by
     every equicontinuous factor.
 
+    The regionally proximal relation has classically been defined only for group actions.
+    The definition used here, for actions of a general semigroup, is the one adopted by
+    Auslander and Dai and by Dai and Xiao; it agrees with the classical notion when the
+    acting semigroup is a group. A second, inequivalent generalization is also natural: the
+    backward regionally proximal relation RP^-, obtained by following the group-action
+    definition of de Vries. For semigroup actions the two differ in general, already for
+    S = (N,+), which is what makes Theorem C below a statement with content.
+
     Theorem A states that for a commutative semigroup S and a minimal S-system X, a factor
     is equicontinuous exactly when RP is contained in the relation it induces. Theorem B
     states that RP and Seq coincide; in particular RP is a closed, S-invariant equivalence
@@ -37,9 +45,9 @@ project:
     action of a commutative semigroup, a smallest extension on which the semigroup acts by
     homeomorphisms: a minimal S-system W and a factor map W -> X through which every
     extension of X by homeomorphisms factors. The construction goes through the
-    Grothendieck group of S and requires no cancellativity assumption. Theorem F identifies
-    the largest equicontinuous factor of X with that of its natural extension W, both as an
-    S-system and as a Gr(S)-system.
+    Grothendieck group Gr(S) of S and requires no cancellativity assumption. Theorem F
+    identifies the largest equicontinuous factor of X with that of its natural extension
+    W, both as an S-system and as a Gr(S)-system.
 
     The proof of Theorem B follows the cube-space methods of Glasner, Gutman and Ye,
     generalized in places and specialized in others, using ultrafilters in place of
@@ -47,7 +55,7 @@ project:
     roughly 20,000 lines of Lean across 17 files and formalizes every lemma, proposition,
     corollary and theorem of the paper; the registered statements are Theorems A through F.
     The same repository also formalizes a companion paper on the local structure of Delta*
-    sets, registered separately.
+    sets, registered separately as Palomar entry PALOMAR-2026-10-18-000015.
   authors:
     - "Angelina Blahodatna"
     - "Lauren Detmold"
@@ -91,7 +99,8 @@ sources:
     relationship: "other"
     note: >-
       A companion paper by the same authors. It features an application of the main
-      results of the first source listed here and is itself a separate Palomar entry.
+      results of the first source listed here and is itself a separate Palomar entry,
+      PALOMAR-2026-10-18-000015.
       Because of the substantial overlap in material, the development in the repository
       associated with the current submission formalizes all of the results of this paper
       as well.
@@ -113,13 +122,47 @@ sources:
       some places and specialized in others. Not itself formalized.
     author_endorsement: "not-contacted"
 
+  - title: >-
+      Minimality, distality and equicontinuity for semigroup actions on compact Hausdorff
+      spaces
+    authors:
+      - "Joseph Auslander"
+      - "Xiongping Dai"
+    id: "doi:10.3934/dcds.2019190"
+    type: "paper"
+    location: >-
+      Discrete and Continuous Dynamical Systems 39(8), pages 4647–4711, 2019.
+      https://doi.org/10.3934/dcds.2019190
+    relationship: "background"
+    note: >-
+      One of the two papers from which the definition of the regionally proximal relation
+      for semigroup actions used here is adopted. Not itself formalized.
+    author_endorsement: "not-contacted"
+
+  - title: >-
+      Equicontinuity, uniform almost periodicity, and regionally proximal relation for
+      topological semiflows
+    authors:
+      - "Xiongping Dai"
+      - "Zhen Xiao"
+    id: "doi:10.1016/j.topol.2017.09.007"
+    type: "paper"
+    location: >-
+      Topology and its Applications 231, pages 35–49, 2017.
+      https://doi.org/10.1016/j.topol.2017.09.007
+    relationship: "background"
+    note: >-
+      One of the two papers from which the definition of the regionally proximal relation
+      for semigroup actions used here is adopted. Not itself formalized.
+    author_endorsement: "not-contacted"
+
 related_formalizations:
-  - id: "arXiv:2610.10416"
+  - id: "https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-18-000015&version=1"
     relationship: "independent"
     note: >-
       The main results of the companion paper, "The local dynamical structure of Delta*
-      sets via a new Furstenberg family algebra" (arXiv:2610.10416), are registered as a
-      separate Palomar entry drawn from the same repository and the same development. That
+      sets via a new Furstenberg family algebra" (arXiv:2610.10416), are registered as
+      Palomar entry PALOMAR-2026-10-18-000015, drawn from the same repository and the same development. That
       entry and this one share definitions, infrastructure and a common body of formalized
       results; the two are independent in the sense that neither Challenge imports anything
       from the other. No prior formalization of the results of the present paper, in Lean
@@ -130,7 +173,7 @@ status:
     Every result in the source paper labelled lemma, proposition, corollary or theorem is
     fully formalized in the development. The development additionally formalizes a
     companion paper, "The local dynamical structure of Delta* sets via a new Furstenberg
-    family algebra", whose main results are registered as a separate Palomar entry; the two
+    family algebra", whose main results are registered as Palomar entry PALOMAR-2026-10-18-000015; the two
     formalizations share a single repository and a substantial body of common material.
 
     The Challenge file registers the six theorems of the introduction, stated as five
@@ -152,11 +195,11 @@ status:
     those hypotheses and admit no degenerate instances that the paper excludes. There is no
     partial operation in the statements whose Mathlib totality could make a conclusion
     vacuous: RP and RP^- are intersections of closures of preimages or images over
-    neighbourhoods of the diagonal, and are well behaved when empty; the equicontinuous
-    structure relation is an intersection over a family of closed invariant equivalence
-    relations that always contains the full relation, so it is never an empty intersection;
-    and quotients by an ICER are formed from a genuine Setoid, with the compact Hausdorff
-    structure on the quotient established in the Challenge rather than assumed.
+    neighbourhoods of the diagonal; the equicontinuous structure relation is an
+    intersection over a family of closed invariant equivalence relations that always
+    contains the full relation, so it is never an empty intersection; and quotients by an
+    ICER are formed from a genuine Setoid, with the compact Hausdorff structure on the
+    quotient established in the Challenge rather than assumed.
 
     No result is assumed from the literature rather than derived. Every result the proofs
     depend on is either proved within the development or available in the pinned Mathlib.
@@ -170,8 +213,9 @@ automation:
       models: []
       framework: "n/a"
       tool_setup: >-
-        Hand-coding of a substantial portion of the definitions, theorem statements and
-        theorem proofs, and hand-scaffolding of helper theorem statements and proof steps.
+        Hand-coding of most of the development, including every definition and theorem
+        statement outside the four files named in the entries below, and hand-scaffolding
+        of helper theorem statements and proof steps.
       cost:
         wall_time: "approximately 6 months of effort"
         spend_usd: "n/a"
@@ -201,16 +245,21 @@ automation:
       framework: "Claude Code"
       tool_setup: >-
         The authors hand-scaffolded the main theorems in RP_Nat_ext.lean, and the model
-        supplied proofs of those theorems, introducing definitions and helper lemmas as
-        necessary.
+        supplied some definitions and most of the proofs in that file. In the course of
+        this work the model also produced the file TP_Cylinders.lean in its entirety: a
+        collection of lemmas on the uniform topology of product spaces needed for the
+        natural extension results. The definitions, theorem statements and proofs in
+        TP_Cylinders.lean are the model's rather than the authors'.
       cost:
         wall_time: "approximately 1 hour over a single run"
         spend_usd: "subscription-based"
         hardware: "local machine and API"
       prompting_notes: >-
-        Instructions were to edit the RP_Nat_ext.lean file only; to provide proofs for the
-        already-scaffolded main theorems following proofs supplied by the authors in a
-        write-up; and not to edit the main theorem statements in any way.
+        Instructions were to provide proofs for the already-scaffolded main theorems in
+        RP_Nat_ext.lean, following proofs supplied by the authors in a write-up, and not to
+        edit the main theorem statements in any way. Supporting lemmas on the uniform
+        topology of product spaces were collected by the model into the new file
+        TP_Cylinders.lean in the course of that work.
 
     - method: "copilot"
       models: ["Claude Opus 5 High"]
@@ -220,7 +269,10 @@ automation:
         following proofs the authors wrote in English in LaTeX and provided to it. Work
         proceeded on a theorem-by-theorem basis, with output reviewed and managed after
         each call. Helper lemmas introduced by the model were organized by hand into the
-        project structure; several were placed in TP_Defs.lean.
+        project structure; several were manually organized into TP_Defs.lean. The proof of
+        the instance `T2Space (ICERQuotient I)` in the Challenge file was supplied in this
+        way: the statement and the mathematical argument are the authors', given to the
+        model in English, and the model rendered that argument in Lean.
       cost:
         wall_time: "approximately 2 hours, broken into runs of roughly 10 minutes"
         spend_usd: "subscription-based"
@@ -233,33 +285,91 @@ automation:
         lemma, you can write it just above preStrongIPIffStrongCentralInCountCommSemi.
         Before writing a helper lemma, search for what you need in the files upstream in
         the project."
+
+    - method: "copilot"
+      models: ["ChatGPT 5.6 Sol", "ChatGPT 5.6 Luna"]
+      framework: "ChatGPT web interface"
+      tool_setup: >-
+        Used throughout the project to suggest tactics at particular points in proofs, to
+        diagnose compilation errors, and to search Mathlib. No file was authored in this
+        role; suggestions were incorporated by hand.
+      cost:
+        wall_time: "approximately 1 hour over dozens of calls"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: >-
+        Individual lines or blocks of code were copy-pasted when calling the model for help
+        with a specific problem during proof writing or code debugging. Responses were
+        copied back into the code line by line and verified by the authors.
+
+    - method: "copilot"
+      models: ["ChatGPT 5.6 Sol"]
+      framework: "ChatGPT web interface"
+      tool_setup: >-
+        Creation of the file FF_CXX.lean, which allows the space of continuous self-maps of
+        a compact Hausdorff space X to be treated as a monoid under composition. The
+        definitions, theorem statements and proofs in this file are the model's rather than
+        the authors'.
+      cost:
+        wall_time: "approximately 10 minutes across four calls"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: >-
+        The file was created by prompting the model four times, copying the suggested code
+        into the file, and verifying that it functioned as intended.
   spend_usd: "subscription-based"
   notes: >-
-    All mathematical content in this project is the work of the authors. Every definition,
-    every main theorem statement, and every proof appearing in the source paper was
-    developed and written by hand, as mathematical prose, before formalization was
-    attempted. Automation was applied only to the task of rendering that mathematics in
-    Lean: agents were given human-written proofs and asked to encode them, not to find
-    them, with the noted exception of the results in FF_Pontryagin.lean.
+    The mathematics of the source paper is the authors' own. Every definition, theorem
+    statement and proof appearing in the paper was developed and written by the authors as
+    mathematical prose, independently of and prior to formalization; no generative AI was
+    used to obtain the mathematical results. The account below concerns the separate
+    question of how that mathematics, and the supporting machinery around it, was rendered
+    in Lean.
 
-    Coding agents were used in three roles: to supply Lean proofs of individual theorems,
-    one at a time, from English proofs the authors wrote and provided; to produce the
-    FF_Pontryagin.lean file; and to supply proofs for theorem statements the authors had
-    already scaffolded by hand in RP_Nat_ext.lean. Main theorem statements and definitions
-    were hand-written throughout, and agents were instructed not to modify them.
+    Coding agents contributed in five distinguishable ways. Claude Opus 5 wrote the
+    definitions, theorems and proofs in FF_Pontryagin.lean. Claude Opus 5 wrote some
+    definitions and most of the proofs in RP_Nat_ext.lean, working from theorem statements
+    the authors had scaffolded by hand, and in the course of that work produced
+    TP_Cylinders.lean in its entirety. Claude Opus 5 supplied Lean proofs for approximately
+    two dozen theorems scattered through the project, one at a time, from English proofs the
+    authors wrote and provided. ChatGPT 5.6 Sol wrote the definitions, theorems and proofs
+    in FF_CXX.lean. ChatGPT 5.6 Sol and Luna were used throughout for tactic suggestions,
+    compilation diagnostics and Mathlib search.
 
-    FF_Pontryagin.lean is the one exception to the description above. Its target statement
-    was fixed by hand, but the agent was asked to locate and formalize whichever proof of
-    that statement was best suited to Lean, so the choice of argument there was the agent's
-    rather than the authors'. The result concerned, that the characters of a compact
-    abelian group separate its points, is classical, is not original to this paper, and
-    only appears in the development as part of results that are adjacent to and do not
-    appear in the present paper.
+    Outside those four files and those roles, all code was written by hand, with one
+    exception in the Challenge file noted below. Every definition and theorem statement
+    registered in this submission was written by hand.
 
-    Agent output was reviewed and organized by the authors as it was produced, with helper
-    lemmas placed by hand into the project structure. We do not claim independent peer
-    review or a complete line-by-line human audit of every machine-generated proof.
+    The Challenge file contains one piece of machine-written code: the Lean proof of the
+    instance T2Space (ICERQuotient I), rendered by Claude Opus 5 High from an English proof
+    the authors wrote and supplied, as part of the theorem-by-theorem work described above.
+    The statement of that instance and the argument it encodes are the authors'. Because
+    the Challenge file is the surface a reader audits, this is recorded explicitly:
+    everything else in that file, including every definition and every registered theorem
+    statement, was written by hand.
 
+    Three of these contributions went beyond encoding mathematics the authors had already
+    written. In FF_Pontryagin.lean the target statement was fixed by hand but the model
+    chose the proof; the result concerned, that the characters of a compact abelian group
+    separate its points, is classical, is not original to this paper, and does not appear in
+    the present paper; FF_Pontryagin.lean supports results in the companion paper rather
+    than this one. In FF_CXX.lean and TP_Cylinders.lean the models produced the statements
+    as well as the proofs, in the first case from a description of what was wanted and in
+    the second as supporting lemmas the model identified as necessary while proving results
+    the authors had scaffolded.
+
+    The definitions and statements registered in this submission are hand-written, but the
+    proofs that discharge them are not independent of machine-written code: RP_Nat_ext.lean,
+    TP_Cylinders.lean and FF_CXX.lean all supply machinery that the registered proofs depend
+    on, and the natural extension results of Theorems E and F rest directly on the first two.
+    A reader auditing the Challenge statements reads only hand-written code; a reader
+    auditing the proof development will encounter machine-written code.
+
+    All submitted code was reviewed by the authors and checked by the Lean elaborator and
+    compiler. The authors are responsible for the mathematical content of the
+    formalization, the correctness of the statements, and the interpretation of the
+    resulting code. We do not claim independent peer review or a complete line-by-line
+    human audit of every machine-generated proof.
 fidelity:
   divergences: >-
     For Theorems A, B, C and D there are no known divergences between the formally verified
@@ -288,10 +398,24 @@ fidelity:
     the reading intended throughout the paper, where an equicontinuous factor of X is a
     factor whose target is an equicontinuous system.
 
+    A definitional point, which does not change what the theorems assert but bears on how
+    they are read. The regionally proximal relation is classically defined only for group
+    actions. The formal definition used here is the semigroup-action definition adopted by
+    Auslander and Dai and by Dai and Xiao, and it agrees with the classical relation
+    whenever the acting semigroup is a group, so no generality is lost relative to the
+    classical setting. It is not the only natural generalization: the backward regionally
+    proximal relation RP^- follows de Vries's group-action definition instead, and for
+    semigroup actions the two relations differ in general, already for S = (N,+). Theorem C
+    records that they nevertheless coincide when S is commutative and the action is
+    minimal.
+
     The Challenge file contains some proofs as well as statements: the compact Hausdorff
     structure on the quotient of a system by an ICER is established there, since it is
     needed for the statements of Theorems B, E and F to typecheck. These proofs are part of
-    the audited surface.
+    the audited surface. The Lean proof of the T2Space (ICERQuotient I) instance was
+    written by Claude Opus 5 High from an English proof the authors supplied, as recorded
+    in the automation section; the argument is the authors'. Every other proof in the
+    Challenge file, and every statement in it, was written by hand.
 
 review:
   status: "author-verified"
@@ -301,9 +425,15 @@ review:
     - "Daniel Glasscock"
     - "Anh N. Le"
   notes: >-
-    The authors hand-formalized all main definitions and all main theorem statements, and
-    audited the registered statements against the paper. This status does not claim
-    independent peer review, nor a complete human audit of every machine-generated proof.
+    The authors wrote by hand every definition and theorem statement registered in this
+    submission, and audited those statements against the paper. The Lean proof of one instance in the
+    Challenge file, T2Space (ICERQuotient I), was rendered by a model from an English proof
+    the authors supplied, and is identified as such in the automation section. Parts of the supporting
+    development were machine-written, as recorded in the automation section, and some of
+    that machine-written code lies in the import closure of the registered proofs. All
+    submitted code was reviewed by the authors and checked by the Lean elaborator and
+    compiler. This status does not claim independent peer review, nor a complete
+    line-by-line human audit of every machine-generated proof.
 
 alignment:
   namespace: "RPIntro"

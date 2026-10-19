@@ -2,7 +2,7 @@
 
 A Lean 4 formalization of all of the results and underlying machinery of the two papers below. Both papers jointly authored by Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le with support from the US National Science Foundation under a LEAPS Grant, Award Number 2418589. See below for affiliation and contact information.
 
-There are two associated Palomar submissions, one for each of the papers: (to be updated).
+There are two associated [Palomar](https://palomar-registry.org/) submissions, one for each of the papers.
 
 ## Papers and abstracts
 
@@ -14,7 +14,7 @@ Abstract: The regionally proximal and equicontinuous structure relations are fun
 
 ### The local dynamical structure of delta* sets via a new Furstenberg family algebra
 
-- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416)
+- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416) [(Palomar)](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-18-000015&version=1)
 
 Abstract: In this paper, we strengthen the connection between the combinatorics of difference sets and the dynamics of group rotations. Our main result shows that sets which have non-empty intersection with all difference subsets of a commutative semigroup possess local Bohr structure. This generalizes results of Bergelson, Furstenberg, and Weiss and Host and Kra from the positive integers to arbitrary commutative semigroups. We accomplish this by utilizing a recent result showing that the regionally proximal relation is an equivalence relation for minimal actions of commutative semigroups and by describing a new, DeMorgan-type algebra on Furstenberg families that allows for efficient manipulation and computation.
 
@@ -76,8 +76,7 @@ The `lean-toolchain` and `lakefile.toml` files contain the authoritative version
 ## References
 
 - [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397)
-- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416)
-- Palomar: links will be added upon registration
+- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416) [Palomar](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-18-000015&version=1)
 
 ## License
 
