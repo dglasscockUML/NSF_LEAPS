@@ -129,7 +129,7 @@ CompactSpace (ICERQuotient I) := by
   exact Quotient.compactSpace
 
 /-- Instance giving that `ICERQuotient` is T2 -/
-instance
+instance tempname5
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} {I : ICER dSystem} :
@@ -156,6 +156,61 @@ T2Space (ICERQuotient I) := by
   obtain ⟨y, rfl⟩ := Quotient.mk_surjective q
   exact hqV ⟨y, Set.disjoint_left.1 hUV (not_not.1 fun h ↦ hqU ⟨y, h, rfl⟩), rfl⟩
 
+set_option pp.all true in
+#print RPIntro.tempname5
+
+/-- Toward describing quotient systems, quotientLiftRespects shows that if
+`[x]_I = [y]_I`, then `[sx]_I = [sy]_I` -/
+theorem quotientLiftRespects
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) (s : S) :
+    ∀ x y : X, ⟨x, y⟩ ∈ ICERToSet I →
+      ICERQuotientMap I (dSystem.map s x) = ICERQuotientMap I (dSystem.map s y) := by
+        intro x y hxy
+        exact (Equivalence.quot_mk_eq_iff I.iseqv (dSystem.map s x) (dSystem.map s y)).mpr
+          (I.isInvariant s hxy)
+
+/-- Toward describing quotient systems, quotientSystemMap defines the action by `S` on the
+quotient -/
+@[expose] def quotientSystemMap
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :
+    S → ICERQuotient I → ICERQuotient I :=
+  fun s ↦ Quotient.lift (ICERQuotientMap I ∘ dSystem.map s) (quotientLiftRespects I s)
+
+/-- Toward describing quotient systems, quotientSystemMapMult shows that quotientSystemMap
+is an action of S on `ICERQuotient I` -/
+theorem quotientSystemMapMult
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :
+∀ (s₁ s₂ : S) (y : ICERQuotient I),
+  (quotientSystemMap I) (s₁ * s₂) y = (quotientSystemMap I) s₁ ((quotientSystemMap I) s₂ y) :=
+    by
+      intro s1 s2 y
+      refine Quotient.inductionOn y ?_
+      intro x
+      have hs12 : dSystem.map (s1 * s2) = (dSystem.map s1) ∘ (dSystem.map s2) := by
+        ext t
+        exact (dSystem.mapMult s1 s2 t)
+      unfold quotientSystemMap
+      simp only [hs12]
+      rfl
+
+/-- Toward describing quotient systems, quotientSystemMapCont shows that quotientSystemMap
+is continuous -/
+theorem quotientSystemMapCont
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
+{dSystem : DynamicalSystem S X} (I : ICER dSystem) :
+∀ (s : S), Continuous (quotientSystemMap I s) :=
+  by
+    intro s
+    apply Continuous.quotient_lift
+    exact Continuous.comp continuous_quot_mk (dSystem.mapCont s)
+
 /-- Given a dynamical system of `S` acting on `X` and an ICER `I`,
 the quotient dynamical system has phase space `X/I` with an `S` action
 described by `s[x] = [sx]` -/
@@ -164,29 +219,9 @@ described by `s[x] = [sx]` -/
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [hT2 : T2Space X] [hNonempty : Nonempty X]
 {dSystem : DynamicalSystem S X} (I : ICER dSystem) :
 DynamicalSystem S (ICERQuotient I) :=
-  {
-    map := by
-      have hRespect : ∀ (s : S), ∀ (x y : X),
-         ⟨x,y⟩ ∈ ICERToSet I →
-          (ICERQuotientMap I) (dSystem.map s x) = (ICERQuotientMap I) (dSystem.map s y) := by
-            intro s x y hxy
-            exact (Equivalence.quot_mk_eq_iff I.iseqv (dSystem.map s x) (dSystem.map s y)).mpr
-              (I.isInvariant s hxy)
-      exact fun s ↦ Quotient.lift ((ICERQuotientMap I) ∘ (dSystem.map s)) (hRespect s)
-    mapMult := by
-      intro s1 s2 y
-      refine Quotient.inductionOn y ?_
-      intro x
-      have hs12 : dSystem.map (s1 * s2) = (dSystem.map s1) ∘ (dSystem.map s2) := by
-        ext t
-        exact (dSystem.mapMult s1 s2 t)
-      simp only [hs12]
-      rfl
-    mapCont := by
-      intro s
-      apply Continuous.quotient_lift
-      exact Continuous.comp continuous_quot_mk (dSystem.mapCont s)
-  }
+  { map := quotientSystemMap I
+    mapMult := quotientSystemMapMult I
+    mapCont := quotientSystemMapCont I }
 
 /-- A dynamical system satisfies `homeoSystem` if all
 elements of the acting semigroup act by homeomorphisms -/
@@ -346,7 +381,6 @@ MulHom S (groGroup S) :=
       (s : WithOne S)) * (Algebra.GrothendieckGroup.of (t : WithOne S))
     rfl
 }
-
 
 /- # Translation lemmas -/
 
