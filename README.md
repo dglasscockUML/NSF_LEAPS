@@ -75,7 +75,7 @@ The `lean-toolchain` and `lakefile.toml` files contain the authoritative version
 
 ## References
 
-- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397) [(Palomar)] (https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-20-000017&version=1)
+- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397) [(Palomar)](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-20-000017&version=1)
 - [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416) [(Palomar)](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-18-000015&version=1)
 
 ## License
