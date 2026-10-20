@@ -176,20 +176,32 @@ CompactSpace (ICERQuotient I) := by
   change CompactSpace (Quotient I.toSetoid)
   exact Quotient.compactSpace
 
-/-- Instance giving that `ICERQuotient` is T2 -/
-instance
+/-- Toward `instT2SpaceICERQuotient`, `ICERQuotientMapClosed` shows that
+the image of a closed set under the quotient map is closed -/
+theorem ICERQuotientMapClosed
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {I : ICER dSystem} :
+∀ K : Set X, IsClosed K → IsOpen (Quotient.mk I.toSetoid '' K)ᶜ :=
+  fun K hK ↦ by
+    rw [← isQuotientMap_quotient_mk'.isOpen_preimage, Set.preimage_compl, isOpen_compl_iff]
+    convert (((hK.isCompact.prod isCompact_univ).inter_right I.isClosed).image
+      continuous_snd).isClosed using 1
+    ext x
+    constructor
+    · rintro ⟨a, haK, hEq⟩
+      exact ⟨(a, x), ⟨⟨haK, Set.mem_univ x⟩, Quotient.eq.mp hEq⟩, rfl⟩
+    · rintro ⟨⟨a, b⟩, ⟨⟨haK, -⟩, hab⟩, rfl⟩
+      exact ⟨a, haK, Quotient.eq.mpr hab⟩
+
+/-- Toward `instT2SpaceICERQuotient`, `ICERQuotientT2Space` gives that `ICERQuotient I`
+is a Hausdorff space -/
+theorem ICERQuotientT2Space
 {S : Type*} [Semigroup S] [Nonempty S]
 {X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
 {dSystem : DynamicalSystem S X} {I : ICER dSystem} :
 T2Space (ICERQuotient I) := by
   change T2Space (Quotient I.toSetoid)
-  -- the image of a closed set under the quotient map is closed
-  have hπ : ∀ K : Set X, IsClosed K → IsOpen (Quotient.mk I.toSetoid '' K)ᶜ := fun K hK ↦ by
-    rw [← isQuotientMap_quotient_mk'.isOpen_preimage, Set.preimage_compl, isOpen_compl_iff]
-    convert (((hK.isCompact.prod isCompact_univ).inter_right I.isClosed).image
-      continuous_snd).isClosed using 1
-    ext x
-    simp [Quotient.mk', Quotient.eq]
   refine ⟨fun a b hab ↦ ?_⟩
   obtain ⟨a, rfl⟩ := Quotient.mk_surjective a
   obtain ⟨b, rfl⟩ := Quotient.mk_surjective b
@@ -198,11 +210,19 @@ T2Space (ICERQuotient I) := by
     (I.isClosed.preimage (continuous_id.prodMk continuous_const)).isCompact
   obtain ⟨U, V, hU, hV, haU, hbV, hUV⟩ := SeparatedNhds.of_isCompact_isCompact (hF a) (hF b)
     (Set.disjoint_left.2 fun y hya hyb ↦ hab (Quotient.sound (I.trans (I.symm hya) hyb)))
-  refine ⟨_, _, hπ _ hU.isClosed_compl, hπ _ hV.isClosed_compl,
+  refine ⟨_, _, ICERQuotientMapClosed _ hU.isClosed_compl,
+    ICERQuotientMapClosed _ hV.isClosed_compl,
     fun ⟨y, hy, hya⟩ ↦ hy (haU (Quotient.exact hya)),
     fun ⟨y, hy, hyb⟩ ↦ hy (hbV (Quotient.exact hyb)), Set.disjoint_left.2 fun q hqU hqV ↦ ?_⟩
   obtain ⟨y, rfl⟩ := Quotient.mk_surjective q
   exact hqV ⟨y, Set.disjoint_left.1 hUV (not_not.1 fun h ↦ hqU ⟨y, h, rfl⟩), rfl⟩
+
+/-- Instance giving that `ICERQuotient` is Hausdorff -/
+instance ICERQuotientT2SpaceInst
+{S : Type*} [Semigroup S] [Nonempty S]
+{X : Type*} [TopologicalSpace X] [CompactSpace X] [T2Space X] [Nonempty X]
+{dSystem : DynamicalSystem S X} {I : ICER dSystem} :
+T2Space (ICERQuotient I) := ICERQuotientT2Space
 
 /-- Toward describing quotient systems, quotientLiftRespects shows that if
 `[x]_I = [y]_I`, then `[sx]_I = [sy]_I` -/
