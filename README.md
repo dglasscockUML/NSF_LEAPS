@@ -8,7 +8,7 @@ There are two associated [Palomar](https://palomar-registry.org/) submissions, o
 
 ### The regionally proximal relation for commutative semigroup actions
 
-- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397)
+- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397) [(Palomar)](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-20-000017&version=1)
 
 Abstract: The regionally proximal and equicontinuous structure relations are fundamental relations in topological dynamics that capture the equicontinuous behavior in a topological dynamical system and its factors. For minimal actions of abelian groups, these relations are known to be equivalence relations and are known to coincide. In this paper, we generalize these facts to semigroup actions: for minimal actions of commutative semigroups, the regionally proximal and equicontinuous structure relations are equivalence relations and the two coincide. We also develop the machinery of natural extensions for commutative semigroup actions that act by surjections, concluding that the maximal equicontinuous factor of a minimal action of a commutative semigroup is the same as the maximal equicontinuous factor of the group action into which it embeds.
 
@@ -75,8 +75,8 @@ The `lean-toolchain` and `lakefile.toml` files contain the authoritative version
 
 ## References
 
-- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397)
-- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416) [Palomar](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-18-000015&version=1)
+- [The regionally proximal relation for commutative semigroup actions](https://arxiv.org/abs/2610.10397) [(Palomar)] (https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-20-000017&version=1)
+- [The local dynamical structure of delta* sets via a new Furstenberg family algebra](https://arxiv.org/abs/2610.10416) [(Palomar)](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-18-000015&version=1)
 
 ## License
 
