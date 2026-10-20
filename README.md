@@ -87,7 +87,7 @@ file for the complete license text.
 
 If you use this formalization, please cite:
 
-> Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le. Regional Proximality for Semigroup Actions and the Local Dynamical Structure of Delta* Sets: A Lean Formalization. GitHub repository LINK, 2026.
+> Angelina Blahodatna, Lauren Detmold, Daniel Glasscock, and Anh N. Le. Regional Proximality for Semigroup Actions and the Local Dynamical Structure of Delta* Sets: A Lean Formalization. GitHub repository <https://github.com/dglasscockUML/NSF_LEAPS/>, 2026.
 
 ## Contributing
 
