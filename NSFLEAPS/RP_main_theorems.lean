@@ -164,8 +164,9 @@ T2Space (ICERQuotient I) := by
     (Set.disjoint_left.2 fun y hya hyb ↦ hab (Quotient.sound (I.trans (I.symm hya) hyb)))
   refine ⟨_, _, ICERQuotientMapClosed _ hU.isClosed_compl,
     ICERQuotientMapClosed _ hV.isClosed_compl,
-    fun ⟨y, hy, hya⟩ ↦ hy (haU (Quotient.exact hya)),
-    fun ⟨y, hy, hyb⟩ ↦ hy (hbV (Quotient.exact hyb)), Set.disjoint_left.2 fun q hqU hqV ↦ ?_⟩
+    fun h ↦ Exists.elim h (fun y hy ↦ hy.1 (haU (Quotient.exact hy.2))),
+    fun h ↦ Exists.elim h (fun y hy ↦ hy.1 (hbV (Quotient.exact hy.2))),
+      Set.disjoint_left.2 fun q hqU hqV ↦ ?_⟩
   obtain ⟨y, rfl⟩ := Quotient.mk_surjective q
   exact hqV ⟨y, Set.disjoint_left.1 hUV (not_not.1 fun h ↦ hqU ⟨y, h, rfl⟩), rfl⟩
 
